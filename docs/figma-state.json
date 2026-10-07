@@ -1,0 +1,77 @@
+{
+  "createdNodeIds": [
+    "3209:2",
+    "3209:3",
+    "3209:4"
+  ],
+  "mutatedNodeIds": [
+    "0:1",
+    "29:2",
+    "29:3",
+    "11:8318",
+    "11:8324",
+    "11:8303"
+  ],
+  "pages": {
+    "admin": "0:1",
+    "tv": "3209:3",
+    "phone": "3209:4"
+  },
+  "tokens": {
+    "light": {
+      "bg": "VariableID:3209:26",
+      "surface": "VariableID:3209:28",
+      "text": "VariableID:3209:30",
+      "muted": "VariableID:3209:32",
+      "accent": "VariableID:3209:34",
+      "onAccent": "VariableID:3209:36",
+      "soft": "VariableID:3209:38",
+      "border": "VariableID:3209:40",
+      "success": "VariableID:3209:42",
+      "successBg": "VariableID:3209:44",
+      "danger": "VariableID:3209:46",
+      "dangerBg": "VariableID:3209:48"
+    },
+    "dark": {
+      "bg": "VariableID:3209:27",
+      "surface": "VariableID:3209:29",
+      "text": "VariableID:3209:31",
+      "muted": "VariableID:3209:33",
+      "accent": "VariableID:3209:35",
+      "onAccent": "VariableID:3209:37",
+      "soft": "VariableID:3209:39",
+      "border": "VariableID:3209:41",
+      "success": "VariableID:3209:43",
+      "successBg": "VariableID:3209:45",
+      "danger": "VariableID:3209:47",
+      "dangerBg": "VariableID:3209:49"
+    },
+    "gap8": "VariableID:3209:50",
+    "gap12": "VariableID:3209:51",
+    "gap16": "VariableID:3209:52",
+    "gap24": "VariableID:3209:53",
+    "pad24": "VariableID:3209:54",
+    "radius12": "VariableID:3209:55",
+    "radius16": "VariableID:3209:56"
+  },
+  "styles": {
+    "tvTitle": "S:3dbb0103afbc154cbc583a4dc376ca7376d31d62,",
+    "tvBody": "S:b32652c48a700c1064839920a37af1a8934b32d4,",
+    "tvLabel": "S:d0b134e6161896205b93beb74dc113d0cdc66dde,",
+    "phoneTitle": "S:28f7cac85b8bbc2d2948df86349251c7e4a090ca,",
+    "body": "S:9aa9fbf7201efc079581262fdcdb0ceb131fa782,",
+    "label": "S:8019d709cec30a421d9ef4928503c5b4b1de607f,",
+    "small": "S:364c267ab0bc4d8fab83bba2535809062542f462,",
+    "adminTitle": "S:a8fd1ab7c5c99a2d644e7f6f1d4a681b31a9736f,"
+  },
+  "archiveId": "3209:2",
+  "variables": 49,
+  "fonts": "Poppins",
+  "discovery": {
+    "codeConnect": "aucun",
+    "localComponentsBefore": 0,
+    "localStylesBefore": 0,
+    "libraryDecision": "Composants Plummo locaux pour préserver Poppins et identité visuelle"
+  },
+  "imageHash": "4b76a491be7d68a1958a88907a8f4f6a44814c99"
+}
