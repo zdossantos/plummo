@@ -3,7 +3,7 @@
 Première interprétation vectorielle de la mascotte fournie : corps crème, plumes/mains/pieds personnalisables, grands yeux et contours violets. Les formes ont été redessinées ; le SVG ne contient aucune image matricielle.
 
 - `base.svg` : mascotte neutre, avec groupes nommés pour les plumes, les pieds, les mains, le corps et le visage.
-- `accessories/` : 29 accessoires, tous dans le même cadre `0 0 512 512`.
+- `accessories/` : 28 accessoires, tous dans le même cadre `0 0 512 512`.
 - `catalog.json` : couleurs, zones, fichiers avant/arrière et cadrages de présentation.
 - `index.html` : atelier autonome en français/anglais, essais de couleurs et assemblages, vue des pièces seules, export du personnage choisi.
 
@@ -15,7 +15,7 @@ Première interprétation vectorielle de la mascotte fournie : corps crème, plu
 
 Conserver le même cadre et la même taille pour tous les calques. Aucun calcul de placement selon la combinaison n'est nécessaire. L'écharpe et les huit objets de main utilisent un calque arrière distinct. Le manche d'un objet passe derrière la main ; le prolongement inférieur est devant. Les SVG d'un accessoire à deux calques doivent être utilisés ensemble.
 
-Deux accessoires au maximum, un par zone : tête, visage, cou, mains. La collection comprend dix pièces de tête, six de visage, cinq de cou et huit objets de main.
+Deux accessoires au maximum, un par zone : tête, visage, cou, mains. La collection comprend neuf pièces de tête, six de visage, cinq de cou et huit objets de main.
 
 ## Couleurs
 
@@ -33,4 +33,4 @@ php scripts/build-plummo-preview.php
 
 La planche constitue un outil de revue des visuels, pas encore le parcours d'arrivée dans un salon. Les choix restent locaux à la planche ; aucune identité joueur n'est créée ou enregistrée.
 
-Les couvre-chefs fermés déclarent `coversPlumes: true` dans le catalogue. À la composition, retirer le groupe `plummo-plumes` de la base avant de superposer le chapeau : les plumes sont contenues sous le tissu. La couronne, la fleur et le casque audio conservent les plumes. Cette règle est aussi appliquée aux exports, sans créer de variantes de la mascotte.
+Les couvre-chefs fermés déclarent `coversPlumes: true` dans le catalogue. À la composition, retirer le groupe `plummo-plumes` de la base avant de superposer le chapeau : les plumes sont contenues sous le tissu. La couronne et la fleur conservent les plumes. Cette règle est aussi appliquée aux exports, sans créer de variantes de la mascotte.

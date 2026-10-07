@@ -61,7 +61,6 @@ return [
         'paintbrush' => 'Paintbrush',
         'maraca' => 'Maraca',
         'balloon' => 'Balloon',
-        'headphones' => 'Headphones',
     ],
     'palette' => [
         'violet' => 'Purple',

@@ -1,10 +1,20 @@
 {
     "version": 2,
-    "viewBox": [0, 0, 512, 512],
+    "viewBox": [
+        0,
+        0,
+        512,
+        512
+    ],
     "base": "base.svg",
     "maxAccessories": 2,
     "onePerSlot": true,
-    "slots": ["head", "face", "neck", "hand"],
+    "slots": [
+        "head",
+        "face",
+        "neck",
+        "hand"
+    ],
     "colors": [
         {
             "id": "violet",
@@ -76,7 +86,12 @@
                 "en": "Cap"
             },
             "front": "accessories/cap.svg",
-            "bounds": [120, 65, 391, 195],
+            "bounds": [
+                120,
+                65,
+                391,
+                195
+            ],
             "coversPlumes": true
         },
         {
@@ -87,7 +102,12 @@
                 "en": "Crown"
             },
             "front": "accessories/crown.svg",
-            "bounds": [130, 82, 369, 190]
+            "bounds": [
+                130,
+                82,
+                369,
+                190
+            ]
         },
         {
             "id": "beanie",
@@ -97,7 +117,12 @@
                 "en": "Beanie"
             },
             "front": "accessories/beanie.svg",
-            "bounds": [123, 32, 367, 193],
+            "bounds": [
+                123,
+                32,
+                367,
+                193
+            ],
             "coversPlumes": true
         },
         {
@@ -108,7 +133,12 @@
                 "en": "Wizard hat"
             },
             "front": "accessories/wizard-hat.svg",
-            "bounds": [104, 11, 391, 187],
+            "bounds": [
+                104,
+                11,
+                391,
+                187
+            ],
             "coversPlumes": true
         },
         {
@@ -119,7 +149,12 @@
                 "en": "Bucket hat"
             },
             "front": "accessories/bucket-hat.svg",
-            "bounds": [111, 68, 380, 191],
+            "bounds": [
+                111,
+                68,
+                380,
+                191
+            ],
             "coversPlumes": true
         },
         {
@@ -130,7 +165,12 @@
                 "en": "Flower"
             },
             "front": "accessories/flower.svg",
-            "bounds": [270, 117, 368, 211]
+            "bounds": [
+                270,
+                117,
+                368,
+                211
+            ]
         },
         {
             "id": "round-glasses",
@@ -140,7 +180,12 @@
                 "en": "Round glasses"
             },
             "front": "accessories/round-glasses.svg",
-            "bounds": [132, 212, 371, 312]
+            "bounds": [
+                132,
+                212,
+                371,
+                312
+            ]
         },
         {
             "id": "sunglasses",
@@ -150,7 +195,12 @@
                 "en": "Sunglasses"
             },
             "front": "accessories/sunglasses.svg",
-            "bounds": [130, 224, 375, 304]
+            "bounds": [
+                130,
+                224,
+                375,
+                304
+            ]
         },
         {
             "id": "heart-glasses",
@@ -160,7 +210,12 @@
                 "en": "Heart glasses"
             },
             "front": "accessories/heart-glasses.svg",
-            "bounds": [129, 219, 373, 308]
+            "bounds": [
+                129,
+                219,
+                373,
+                308
+            ]
         },
         {
             "id": "monocle",
@@ -170,7 +225,12 @@
                 "en": "Monocle"
             },
             "front": "accessories/monocle.svg",
-            "bounds": [269, 222, 377, 395]
+            "bounds": [
+                269,
+                222,
+                377,
+                395
+            ]
         },
         {
             "id": "pirate-patch",
@@ -180,7 +240,12 @@
                 "en": "Pirate patch"
             },
             "front": "accessories/pirate-patch.svg",
-            "bounds": [126, 204, 369, 300]
+            "bounds": [
+                126,
+                204,
+                369,
+                300
+            ]
         },
         {
             "id": "bow-tie",
@@ -190,7 +255,12 @@
                 "en": "Bow tie"
             },
             "front": "accessories/bow-tie.svg",
-            "bounds": [190, 339, 305, 406]
+            "bounds": [
+                190,
+                339,
+                305,
+                406
+            ]
         },
         {
             "id": "tie",
@@ -200,7 +270,12 @@
                 "en": "Tie"
             },
             "front": "accessories/tie.svg",
-            "bounds": [205, 345, 288, 449]
+            "bounds": [
+                205,
+                345,
+                288,
+                449
+            ]
         },
         {
             "id": "kerchief",
@@ -210,7 +285,12 @@
                 "en": "Kerchief"
             },
             "front": "accessories/kerchief.svg",
-            "bounds": [195, 345, 316, 417]
+            "bounds": [
+                195,
+                345,
+                316,
+                417
+            ]
         },
         {
             "id": "scarf",
@@ -220,7 +300,12 @@
                 "en": "Scarf"
             },
             "front": "accessories/scarf.svg",
-            "bounds": [162, 344, 320, 456],
+            "bounds": [
+                162,
+                344,
+                320,
+                456
+            ],
             "back": "accessories/scarf-back.svg"
         },
         {
@@ -231,7 +316,12 @@
                 "en": "Medal necklace"
             },
             "front": "accessories/medal.svg",
-            "bounds": [201, 342, 298, 445]
+            "bounds": [
+                201,
+                342,
+                298,
+                445
+            ]
         },
         {
             "id": "wand",
@@ -241,7 +331,12 @@
                 "en": "Magic wand"
             },
             "front": "accessories/wand.svg",
-            "bounds": [399, 164, 503, 397],
+            "bounds": [
+                399,
+                164,
+                503,
+                397
+            ],
             "back": "accessories/wand-back.svg"
         },
         {
@@ -252,7 +347,12 @@
                 "en": "Fan"
             },
             "front": "accessories/fan.svg",
-            "bounds": [385, 208, 497, 369],
+            "bounds": [
+                385,
+                208,
+                497,
+                369
+            ],
             "back": "accessories/fan-back.svg"
         },
         {
@@ -263,7 +363,12 @@
                 "en": "Microphone"
             },
             "front": "accessories/microphone.svg",
-            "bounds": [408, 214, 474, 450],
+            "bounds": [
+                408,
+                214,
+                474,
+                450
+            ],
             "back": "accessories/microphone-back.svg"
         },
         {
@@ -274,18 +379,13 @@
                 "en": "Scepter"
             },
             "front": "accessories/scepter.svg",
-            "bounds": [403, 173, 487, 405],
+            "bounds": [
+                403,
+                173,
+                487,
+                405
+            ],
             "back": "accessories/scepter-back.svg"
-        },
-        {
-            "id": "headphones",
-            "slot": "head",
-            "label": {
-                "fr": "Casque audio",
-                "en": "Headphones"
-            },
-            "front": "accessories/headphones.svg",
-            "bounds": [106, 139, 395, 317]
         },
         {
             "id": "top-hat",
@@ -295,7 +395,12 @@
                 "en": "Top hat"
             },
             "front": "accessories/top-hat.svg",
-            "bounds": [119, 36, 376, 191],
+            "bounds": [
+                119,
+                36,
+                376,
+                191
+            ],
             "coversPlumes": true
         },
         {
@@ -306,7 +411,12 @@
                 "en": "Cowboy hat"
             },
             "front": "accessories/cowboy-hat.svg",
-            "bounds": [99, 58, 401, 190],
+            "bounds": [
+                99,
+                58,
+                401,
+                190
+            ],
             "coversPlumes": true
         },
         {
@@ -317,7 +427,12 @@
                 "en": "Pirate hat"
             },
             "front": "accessories/pirate-hat.svg",
-            "bounds": [101, 42, 394, 190],
+            "bounds": [
+                101,
+                42,
+                394,
+                190
+            ],
             "coversPlumes": true
         },
         {
@@ -328,7 +443,12 @@
                 "en": "Moustache"
             },
             "front": "accessories/moustache.svg",
-            "bounds": [203, 273, 298, 306]
+            "bounds": [
+                203,
+                273,
+                298,
+                306
+            ]
         },
         {
             "id": "lollipop",
@@ -338,7 +458,12 @@
                 "en": "Lollipop"
             },
             "front": "accessories/lollipop.svg",
-            "bounds": [406, 180, 489, 393],
+            "bounds": [
+                406,
+                180,
+                489,
+                393
+            ],
             "back": "accessories/lollipop-back.svg"
         },
         {
@@ -349,7 +474,12 @@
                 "en": "Paintbrush"
             },
             "front": "accessories/paintbrush.svg",
-            "bounds": [414, 177, 477, 398],
+            "bounds": [
+                414,
+                177,
+                477,
+                398
+            ],
             "back": "accessories/paintbrush-back.svg"
         },
         {
@@ -360,7 +490,12 @@
                 "en": "Maraca"
             },
             "front": "accessories/maraca.svg",
-            "bounds": [411, 184, 485, 396],
+            "bounds": [
+                411,
+                184,
+                485,
+                396
+            ],
             "back": "accessories/maraca-back.svg"
         },
         {
@@ -371,7 +506,12 @@
                 "en": "Balloon"
             },
             "front": "accessories/balloon.svg",
-            "bounds": [421, 110, 503, 396],
+            "bounds": [
+                421,
+                110,
+                503,
+                396
+            ],
             "back": "accessories/balloon-back.svg"
         }
     ]

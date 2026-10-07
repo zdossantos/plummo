@@ -56,4 +56,4 @@ Aucun hébergement de production n’est configuré. Les sources publiques ne co
 
 ## Kit vectoriel Plummo
 
-La [planche de personnalisation](public/plummo/index.html) présente la mascotte et 29 accessoires indépendants. Sur un serveur du dossier public, ouvrir `/plummo/index.html`. Les [conventions du kit](public/plummo/README.md) expliquent les calques, les couleurs et l’ajout de pièces. Reconstruire la planche après modification des SVG ou des libellés : `php scripts/build-plummo-preview.php`.
+La [planche de personnalisation](public/plummo/index.html) présente la mascotte et 28 accessoires indépendants. Sur un serveur du dossier public, ouvrir `/plummo/index.html`. Les [conventions du kit](public/plummo/README.md) expliquent les calques, les couleurs et l’ajout de pièces. Reconstruire la planche après modification des SVG ou des libellés : `php scripts/build-plummo-preview.php`.

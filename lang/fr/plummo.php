@@ -61,7 +61,6 @@ return [
         'paintbrush' => 'Pinceau',
         'maraca' => 'Maracas',
         'balloon' => 'Ballon',
-        'headphones' => 'Casque audio',
     ],
     'palette' => [
         'violet' => 'Violet',
