@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\ContentController;
+use App\Http\Controllers\Admin\PackController;
+use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Rooms\PlayerController;
 use App\Http\Controllers\Rooms\RoomController;
 use App\Http\Controllers\Rooms\SessionController;
@@ -35,4 +38,11 @@ Route::prefix('admin')->group(function (): void {
         ->middleware(['guest:web', 'throttle:admin-login'])->name('login.store');
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->middleware('auth:web')->name('logout');
+});
+
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:administer'])->group(function (): void {
+    Route::resource('contents', ContentController::class)->except('show');
+    Route::get('contents/{content}/audio', [ContentController::class, 'audio'])->name('contents.audio');
+    Route::resource('tags', TagController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::resource('packs', PackController::class)->only(['index', 'store', 'update', 'destroy']);
 });

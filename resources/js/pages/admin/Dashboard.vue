@@ -1,25 +1,23 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
-import RoomHeader from '@/components/RoomHeader.vue';
-import { Button } from '@/components/ui/button';
+import { Link } from '@inertiajs/vue3';
+import AdminLayout from '@/components/AdminLayout.vue';
 import { useTranslations } from '@/composables/useTranslations';
 const { t } = useTranslations('admin');
 </script>
-
 <template>
-    <Head :title="t('title')" />
-    <RoomHeader />
-    <main class="mx-auto max-w-5xl px-6 py-16">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-            <h1 class="text-3xl font-bold">{{ t('title') }}</h1>
-            <Button variant="outline" @click="router.post('/admin/logout')">{{
-                t('logout')
-            }}</Button>
+    <AdminLayout :title="t('title')">
+        <p class="text-lg">{{ t('dashboard_intro') }}</p>
+        <div class="mt-8 grid gap-5 sm:grid-cols-3">
+            <Link
+                v-for="section in ['contents', 'tags', 'packs']"
+                :key="section"
+                :href="`/admin/${section}`"
+                class="rounded-2xl border p-6 text-xl font-bold hover:bg-muted"
+                >{{ t(section) }}</Link
+            >
         </div>
-        <p class="mt-8 text-lg">{{ t('dashboard_intro') }}</p>
-        <p class="mt-3 text-muted-foreground">{{ t('dashboard_pending') }}</p>
         <Link href="/" class="mt-8 inline-block underline">{{
             t('play')
         }}</Link>
-    </main>
+    </AdminLayout>
 </template>
