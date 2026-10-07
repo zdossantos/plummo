@@ -14,7 +14,9 @@ MySQL 8.4 et Redis 7.4 sont configurés en Compose. Sessions/cache/files utilise
 
 Pest, Pest Browser/Playwright Chromium, Bun test, Pint, Larastan niveau 7, ESLint, Prettier, vue-tsc. CI : backend/frontend/navigateur, image runtime, démarrage et healthcheck. Dependabot couvre Composer, Bun et Actions.
 
-Release Please est disponible par déclenchement manuel ; aucune release ou publication d’image n’est automatique. GHCR, Coolify, domaines, sauvegardes et production restent à configurer lors du choix d’hébergement. Aucun déploiement n’est inclus dans cette initialisation.
+Release Please maintient une PR de release après les merges sur `main`, avec un déclenchement manuel de secours. La fusion volontaire de cette PR publie la version GitHub et son changelog. Les contrôles de sa branche sont déclenchés explicitement avec le jeton intégré à GitHub Actions. Le [processus de livraison](quality-ci-cd.md) détaille les protections et les vérifications.
+
+GHCR, Coolify, architecture du serveur, domaines, sauvegardes et production restent à configurer lors du choix d’hébergement. Aucun déploiement n’est inclus dans ce socle.
 
 ## Suite métier
 
