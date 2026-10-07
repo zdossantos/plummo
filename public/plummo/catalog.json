@@ -1,5 +1,5 @@
 {
-    "version": 1,
+    "version": 2,
     "viewBox": [0, 0, 512, 512],
     "base": "base.svg",
     "maxAccessories": 2,
@@ -76,7 +76,8 @@
                 "en": "Cap"
             },
             "front": "accessories/cap.svg",
-            "bounds": [153, 110, 348, 211]
+            "bounds": [120, 65, 391, 195],
+            "coversPlumes": true
         },
         {
             "id": "crown",
@@ -86,7 +87,7 @@
                 "en": "Crown"
             },
             "front": "accessories/crown.svg",
-            "bounds": [159, 117, 329, 204]
+            "bounds": [130, 82, 369, 190]
         },
         {
             "id": "beanie",
@@ -96,7 +97,8 @@
                 "en": "Beanie"
             },
             "front": "accessories/beanie.svg",
-            "bounds": [153, 65, 325, 195]
+            "bounds": [123, 32, 367, 193],
+            "coversPlumes": true
         },
         {
             "id": "wizard-hat",
@@ -106,7 +108,8 @@
                 "en": "Wizard hat"
             },
             "front": "accessories/wizard-hat.svg",
-            "bounds": [137, 28, 343, 201]
+            "bounds": [104, 11, 391, 187],
+            "coversPlumes": true
         },
         {
             "id": "bucket-hat",
@@ -116,7 +119,8 @@
                 "en": "Bucket hat"
             },
             "front": "accessories/bucket-hat.svg",
-            "bounds": [146, 103, 332, 214]
+            "bounds": [111, 68, 380, 191],
+            "coversPlumes": true
         },
         {
             "id": "flower",
@@ -241,17 +245,6 @@
             "back": "accessories/wand-back.svg"
         },
         {
-            "id": "flag",
-            "slot": "hand",
-            "label": {
-                "fr": "Petit drapeau",
-                "en": "Little flag"
-            },
-            "front": "accessories/flag.svg",
-            "bounds": [425, 200, 506, 400],
-            "back": "accessories/flag-back.svg"
-        },
-        {
             "id": "fan",
             "slot": "hand",
             "label": {
@@ -293,6 +286,93 @@
             },
             "front": "accessories/headphones.svg",
             "bounds": [106, 139, 395, 317]
+        },
+        {
+            "id": "top-hat",
+            "slot": "head",
+            "label": {
+                "fr": "Haut-de-forme",
+                "en": "Top hat"
+            },
+            "front": "accessories/top-hat.svg",
+            "bounds": [119, 36, 376, 191],
+            "coversPlumes": true
+        },
+        {
+            "id": "cowboy-hat",
+            "slot": "head",
+            "label": {
+                "fr": "Chapeau de cowboy",
+                "en": "Cowboy hat"
+            },
+            "front": "accessories/cowboy-hat.svg",
+            "bounds": [99, 58, 401, 190],
+            "coversPlumes": true
+        },
+        {
+            "id": "pirate-hat",
+            "slot": "head",
+            "label": {
+                "fr": "Tricorne pirate",
+                "en": "Pirate hat"
+            },
+            "front": "accessories/pirate-hat.svg",
+            "bounds": [101, 42, 394, 190],
+            "coversPlumes": true
+        },
+        {
+            "id": "moustache",
+            "slot": "face",
+            "label": {
+                "fr": "Moustache",
+                "en": "Moustache"
+            },
+            "front": "accessories/moustache.svg",
+            "bounds": [203, 273, 298, 306]
+        },
+        {
+            "id": "lollipop",
+            "slot": "hand",
+            "label": {
+                "fr": "Sucette",
+                "en": "Lollipop"
+            },
+            "front": "accessories/lollipop.svg",
+            "bounds": [406, 180, 489, 393],
+            "back": "accessories/lollipop-back.svg"
+        },
+        {
+            "id": "paintbrush",
+            "slot": "hand",
+            "label": {
+                "fr": "Pinceau",
+                "en": "Paintbrush"
+            },
+            "front": "accessories/paintbrush.svg",
+            "bounds": [414, 177, 477, 398],
+            "back": "accessories/paintbrush-back.svg"
+        },
+        {
+            "id": "maraca",
+            "slot": "hand",
+            "label": {
+                "fr": "Maracas",
+                "en": "Maraca"
+            },
+            "front": "accessories/maraca.svg",
+            "bounds": [411, 184, 485, 396],
+            "back": "accessories/maraca-back.svg"
+        },
+        {
+            "id": "balloon",
+            "slot": "hand",
+            "label": {
+                "fr": "Ballon",
+                "en": "Balloon"
+            },
+            "front": "accessories/balloon.svg",
+            "bounds": [421, 110, 503, 396],
+            "back": "accessories/balloon-back.svg"
         }
     ]
 }

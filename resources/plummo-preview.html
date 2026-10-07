@@ -534,6 +534,17 @@
                     const n = ++serial;
                     const chosen = ids.map(byId).filter(Boolean);
                     let body = options.noBase ? '' : baseBody();
+                    if (
+                        !options.noBase &&
+                        chosen.some((item) => item.coversPlumes)
+                    ) {
+                        const doc = new DOMParser().parseFromString(
+                            `<svg xmlns="http://www.w3.org/2000/svg">${body}</svg>`,
+                            'image/svg+xml',
+                        );
+                        doc.querySelector('[id="plummo-plumes"]')?.remove();
+                        body = doc.documentElement.innerHTML;
+                    }
                     const behind = chosen
                         .map((i) => bodies[i.id + '-back'] || '')
                         .join('');
