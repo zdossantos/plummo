@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /** @property CarbonImmutable|null $empty_since */
 class Room extends Model
 {
-    protected $fillable = ['code', 'owner_id', 'empty_since'];
+    protected $fillable = ['code', 'owner_id', 'empty_since', 'point_target'];
 
     protected function casts(): array
     {
-        return ['empty_since' => 'immutable_datetime'];
+        return ['empty_since' => 'immutable_datetime', 'point_target' => 'integer'];
     }
 
     /** @return HasMany<RoomPlayer, $this> */

@@ -13,6 +13,9 @@ it('connects a customized phone to the screen and restores it on refresh', funct
             ->assertSee('You are the room leader.')->assertNoJavaScriptErrors();
         $screen->assertSee('Camille')->assertNoJavaScriptErrors()->screenshot(filename: 'rooms-screen');
         $phone->refresh()->assertSee('Camille')->assertSee('You are the room leader.')->assertNoJavaScriptErrors();
+        $phone->fill('session-target', '500')->click('Save target')->assertSee('Target: 500 points');
+        $screen->assertSee('Target: 500 points')->click('Overall leaderboard')->assertSee('Back to lobby')->assertSee('Camille');
+        $phone->fill('session-extra', '250')->click('Extend session')->assertSee('Target: 250 points')->assertValue('session-target', '250')->assertNoJavaScriptErrors();
         $phone->screenshot(filename: 'rooms-phone');
         expect($room->players()->count())->toBe(1);
         expect($room->players()->first()->accessories)->toBe(['cap']);

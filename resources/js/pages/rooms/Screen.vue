@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
+import RoomRanking from '@/components/RoomRanking.vue';
 import RoomHeader from '@/components/RoomHeader.vue';
 import { useRoom } from '@/composables/useRoom';
 import { useTranslations } from '@/composables/useTranslations';
@@ -16,6 +17,7 @@ const { room, closed, error } = useRoom(props.room.code, {
     me: null,
 });
 const { t } = useTranslations('rooms');
+const showRanking = ref(false);
 const slots = computed(() =>
     Array.from({ length: 8 }, (_, index) => room.value?.players[index] ?? null),
 );
@@ -38,7 +40,27 @@ const slots = computed(() =>
             <p v-if="error" role="status" class="mt-4 rounded-xl bg-accent p-3">
                 {{ error }}
             </p>
+            <div
+                v-if="room?.ranking.length"
+                class="mt-5 flex items-center justify-between gap-4"
+            >
+                <p class="font-semibold text-primary">
+                    {{
+                        room.pointTarget === null
+                            ? t('nonstop')
+                            : t('point_target', { count: room.pointTarget })
+                    }}
+                </p>
+                <button
+                    class="rounded-xl bg-accent px-4 py-3 font-bold"
+                    :aria-expanded="showRanking"
+                    @click="showRanking = !showRanking"
+                >
+                    {{ showRanking ? t('back_lobby') : t('ranking') }}
+                </button>
+            </div>
             <section
+                v-if="!showRanking"
                 class="grid flex-1 items-center gap-10 py-10 lg:grid-cols-[1fr_420px]"
             >
                 <div>
@@ -144,6 +166,7 @@ const slots = computed(() =>
                     </article>
                 </div>
             </section>
+            <RoomRanking v-if="room && showRanking" :room="room" />
         </template>
     </main>
 </template>

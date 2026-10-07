@@ -170,12 +170,30 @@ class RoomService
         return $player;
     }
 
+    /** @return list<array<string, mixed>> */
+    public function ranking(Room $room): array
+    {
+        $rank = 0;
+        $previous = null;
+        $result = [];
+        foreach ($room->players()->orderByDesc('score')->orderBy('id')->get() as $index => $player) {
+            if ($player->score !== $previous) {
+                $rank = $index + 1;
+                $previous = $player->score;
+            }
+            $result[] = [...$player->publicData(), 'rank' => $rank];
+        }
+
+        return $result;
+    }
+
     /** @return array<string, mixed> */
     public function state(Room $room, ?RoomPlayer $me = null): array
     {
         return [
             'room' => [
                 'code' => $room->code, 'capacity' => 8, 'occupied' => $this->occupied($room), 'chiefId' => $this->chiefId($room),
+                'pointTarget' => $room->point_target, 'ranking' => $this->ranking($room),
                 'players' => $room->players()->orderBy('id')->get()->filter(fn (RoomPlayer $player): bool => $player->occupiesPlace())->map(fn (RoomPlayer $player): array => $player->publicData())->values()->all(),
             ],
             'me' => $me?->publicData(),
