@@ -26,7 +26,7 @@ GHCR, Coolify, architecture du serveur, domaines, sauvegardes et production rest
 
 ## Suite métier
 
-Les règles et maquettes existantes restent les sources de vérité. Fortify sera activé pour l’administration lors de son implémentation ; aucune inscription joueur n’est exposée. Reverb/Echo seront intégrés aux interactions temps réel des mini-jeux, et le stockage audio avec l’administration des contenus. Aucun service mail/analytics/SEO/PWA ajouté par anticipation.
+Les règles et maquettes existantes restent les sources de vérité. Fortify est actif sous `/admin` pour les comptes portant `is_admin`. Inscription, réinitialisation, profils publics, 2FA et passkeys sont désactivés ; aucune inscription joueur n’est exposée. La création locale passe uniquement par `admin:create`, sans seeder. Reverb/Echo seront intégrés aux interactions temps réel des mini-jeux, et le stockage audio avec l’administration des contenus. Aucun service mail/analytics/SEO/PWA ajouté par anticipation.
 
 Playwright est épinglé à 1.63.0. Chaque mise à jour doit passer la suite Pest Browser sur Chromium : l’ancien épinglage à 1.60.0 répondait à des attentes indéfinies constatées lors des vérifications initiales.
 

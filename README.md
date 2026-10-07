@@ -81,3 +81,9 @@ Un salon sans joueur connecté expire après trente minutes, même si le grand �
 Le chef règle un objectif entier (1 000 points par défaut) ou choisit le mode sans limite depuis son téléphone. Prolonger fixe le nouvel objectif au meilleur score actuel, augmenté des points demandés. Recommencer remet tous les scores à zéro après confirmation, en conservant les identités et les Plummos. Le classement global inclut les joueurs partis et partage les rangs en cas d’égalité.
 
 Le service serveur `Scoring` centralise les barèmes validés et leurs arrondis. Aucun téléphone ne peut attribuer des points ; les futurs mini-jeux appliqueront ces calculs. L’arrêt après la manche atteignant l’objectif et le verrouillage des réglages pendant un mini-jeu seront intégrés avec le moteur de manches.
+
+## Administration
+
+L’administration est accessible sur `/admin` avec un compte dédié. Aucune inscription publique ni compte joueur n’est ajouté. Après migration explicite de la base souhaitée, créer un administrateur avec `php artisan admin:create` : nom, adresse e-mail et mot de passe confirmé de 12 caractères minimum sont saisis interactivement ; le mot de passe est masqué. La commande refuse les adresses déjà utilisées et ne transforme aucun compte existant. Aucun administrateur n’est créé automatiquement.
+
+La connexion utilise Fortify, limitée à cinq tentatives par minute et combinaison e-mail/adresse IP. Toutes les pages d’administration exigent la permission serveur `administer`. Cette étape fournit la connexion et la déconnexion ; le catalogue sera ajouté dans une PR séparée.
