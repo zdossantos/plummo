@@ -1,8 +1,9 @@
 FROM php:8.4-apache AS php-base
-RUN apt-get update && apt-get install -y --no-install-recommends git unzip libzip-dev curl \
-    && docker-php-ext-install pdo_mysql zip opcache \
+RUN apt-get update && apt-get install -y --no-install-recommends git unzip libzip-dev libxml2-dev curl \
+    && docker-php-ext-install pdo_mysql zip opcache xmlreader \
     && pecl install redis-6.3.0 && docker-php-ext-enable redis \
     && a2enmod rewrite && rm -rf /var/lib/apt/lists/*
+COPY docker/uploads.ini /usr/local/etc/php/conf.d/plummo-uploads.ini
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf \
     && printf '<Directory /var/www/html/public>\nAllowOverride All\nRequire all granted\n</Directory>\n' > /etc/apache2/conf-available/plummo.conf \

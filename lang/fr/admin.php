@@ -1,6 +1,28 @@
 <?php
 
 return [
+    'import_cell_type' => 'La colonne :column doit contenir du texte, pas une date ni un type de cellule complexe.',
+    'imports' => 'Imports',
+    'import_help' => 'Chargez un tableau, vérifiez les lignes puis confirmez leur ajout. Un aperçu expire après une heure.',
+    'import_unreadable' => 'Tableau illisible. Utilisez un CSV UTF-8 ou un fichier Excel XLSX valide.',
+    'import_columns' => 'Colonnes requises : :columns. Aucun en-tête ne doit être répété.',
+    'import_unknown_tag' => 'Tag inconnu « :tag ». Créez-le dans Tags, puis rechargez le tableau.',
+    'import_audio_match' => 'Le fichier « :name » doit correspondre à un seul extrait fourni.',
+    'import_duplicate' => 'Doublon potentiel : ce contenu existe déjà dans le catalogue ou dans ce tableau. Aucun remplacement automatique.',
+    'import_limit' => 'Le tableau est limité à 500 lignes de contenus.',
+    'import_template' => 'Télécharger le modèle CSV',
+    'import_conventions' => 'CSV UTF-8 : virgule ou point-virgule, guillemets pour les textes contenant séparateurs ou retours à la ligne. Tags séparés par |, bonne réponse A, B, C ou D. Excel : première feuille XLSX. 500 lignes, tableau 5 Mio, 50 extraits maximum.',
+    'import_table' => 'Tableau CSV ou Excel',
+    'import_audios' => 'Extraits audio correspondant aux noms du tableau',
+    'import_preview' => 'Vérifier l’aperçu',
+    'import_unused' => 'Fichiers non utilisés : {names}',
+    'import_result' => '{added} contenus ajoutés, dont {published} publiés ; {refused} lignes refusées.',
+    'import_valid' => '{count} lignes valides prêtes à être ajoutées. Les lignes en erreur seront exclues.',
+    'import_drafts' => 'Ajouter les lignes valides en brouillon',
+    'import_publish' => 'Ajouter et publier les lignes valides',
+    'import_export' => 'Exporter les lignes en erreur',
+    'import_line' => 'Ligne {line}',
+
     'status' => 'Statut',
     'all_statuses' => 'Tous les statuts',
     'title' => 'Administration',
