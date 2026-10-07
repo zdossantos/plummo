@@ -3,6 +3,6 @@ export type ResolvedAppearance = 'light' | 'dark';
 export type SharedProps = {
     name: string;
     locale: 'fr' | 'en';
-    translations: { home: Record<string, string> };
+    translations: Record<string, Record<string, unknown>>;
     [key: string]: unknown;
 };

@@ -2,7 +2,7 @@
 
 Jeux entre amis et en famille : un grand écran commun et un téléphone par joueur.
 
-Le dépôt contient le **socle technique**, les spécifications validées et les références des maquettes. Les salons, mini-jeux et l’administration restent à développer.
+Le dépôt contient le socle technique, les salons sans compte et la personnalisation des Plummos. Les mini-jeux et l’administration restent à développer.
 
 ## Installation
 
@@ -42,7 +42,13 @@ php artisan test
 docker build --target runtime -t plummo:ci .
 ```
 
-Les tests utilisent `plummo_testing` pour tout futur accès MySQL. Aucun test actuel ne nécessite de données. Aucun compte n’est créé par les seeders.
+Les tests métier et navigateur utilisent exclusivement MySQL `plummo_testing`. Démarrer MySQL puis migrer explicitement cette base avant les tests :
+
+```sh
+APP_ENV=testing DB_DATABASE=plummo_testing php artisan migrate --force
+```
+
+Aucun compte n’est créé par les seeders.
 
 ## Références
 
@@ -57,3 +63,16 @@ Aucun hébergement de production n’est configuré. Les sources publiques ne co
 ## Kit vectoriel Plummo
 
 La [planche de personnalisation](public/plummo/index.html) présente la mascotte et 28 accessoires indépendants. Sur un serveur du dossier public, ouvrir `/plummo/index.html`. Les [conventions du kit](public/plummo/README.md) expliquent les calques, les couleurs et l’ajout de pièces. Reconstruire la planche après modification des SVG ou des libellés : `php scripts/build-plummo-preview.php`.
+
+
+## Salons
+
+Ouvrir `/` sur le grand écran crée un salon (une actualisation retrouve le même salon). Les téléphones entrent via le QR ou `/join` avec le code de six caractères. Chaque joueur choisit son prénom, sa couleur et jusqu’à deux accessoires. Huit places maximum ; le premier arrivé devient chef et peut transférer son rôle ou fermer le salon avec confirmation.
+
+Le navigateur du téléphone conserve une identité privée dans un cookie chiffré HttpOnly : revenir avec ce même navigateur retrouve le Plummo et les points. Effacer les cookies ou utiliser un autre navigateur crée une autre identité. Un départ volontaire libère la place immédiatement ; une déconnexion détectée après quinze secondes réserve la place deux minutes. Un retour dans un salon plein attend une place disponible.
+
+Les listes se synchronisent toutes les cinq secondes. Les mini-jeux ne sont pas encore disponibles : les points sont conservés et affichés, sans gain possible pour le moment. Reverb/Echo sera intégré aux interactions de jeu.
+
+Pour tester avec de vrais téléphones sur le même réseau, définir `APP_URL=http://ADRESSE_LOCALE_DU_PC:8000` dans `.env`, exécuter les migrations de développement puis lancer `composer dev`. Ouvrir cette adresse sur le grand écran et les téléphones. Les liens QR et de saisie utilisent `APP_URL` ; `localhost` n’est joignable que depuis le PC. Les ports Compose restent accessibles uniquement depuis le PC.
+
+Un salon sans joueur connecté expire après trente minutes, même si le grand écran reste ouvert. Le nettoyage est planifié chaque minute : Compose lance le service `scheduler`, et `composer dev` lance `schedule:work`. Les migrations doivent être effectuées explicitement avant de démarrer ces processus. Nettoyage manuel : `php artisan rooms:prune`. En production, prévoir l’exécution régulière de `schedule:run` lors de la configuration de l’hébergement.

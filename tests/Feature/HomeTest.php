@@ -3,11 +3,11 @@
 use Inertia\Testing\AssertableInertia as Assert;
 
 it('opens without an account with French translations', function () {
-    $this->withoutVite()->withHeader('Accept-Language', '')->get('/')->assertOk()->assertInertia(fn (Assert $page) => $page
-        ->component('Welcome')->where('locale', 'fr')->where('translations.home.title', 'Tout le monde joue.'));
+    $this->withoutVite()->withHeader('Accept-Language', '')->get('/join')->assertOk()->assertInertia(fn (Assert $page) => $page
+        ->component('rooms/Join')->where('locale', 'fr')->where('translations.home.title', 'Tout le monde joue.'));
 });
 it('uses the supported browser language', function () {
-    $this->withoutVite()->withHeader('Accept-Language', 'en-GB,en;q=0.9')->get('/')
+    $this->withoutVite()->withHeader('Accept-Language', 'en-GB,en;q=0.9')->get('/join')
         ->assertInertia(fn (Assert $page) => $page->where('locale', 'en'));
 });
 it('does not expose player registration', function () {

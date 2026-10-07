@@ -10,6 +10,22 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: plummo_testing
+          MYSQL_USER: plummo
+          MYSQL_PASSWORD: local-only
+          MYSQL_ROOT_PASSWORD: local-root-only
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: plummo_testing
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
@@ -30,6 +46,7 @@ jobs:
       - run: composer lint:check && composer analyse
       - run: bun run lint:check && bun run format:check && bun run types:check && bun run test:unit && bun run build
       - run: bunx playwright install --with-deps chromium
+      - run: APP_ENV=testing php artisan migrate --force
       - run: php artisan test
   runtime:
     runs-on: ubuntu-latest
@@ -44,5 +61,5 @@ jobs:
             sleep 2
           done
           curl --fail http://localhost:8080/up
-          curl --fail http://localhost:8080/ > /tmp/home.html
+          curl --fail http://localhost:8080/join > /tmp/join.html
           docker exec plummo-ci test -f public/build/manifest.json
