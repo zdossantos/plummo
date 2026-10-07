@@ -22,4 +22,4 @@ GHCR, Coolify, architecture du serveur, domaines, sauvegardes et production rest
 
 Les règles et maquettes existantes restent les sources de vérité. Fortify sera activé pour l’administration lors de son implémentation ; aucune inscription joueur n’est exposée. Reverb/Echo seront intégrés avec les salons temps réel, et le stockage audio avec l’administration des contenus. Aucun service mail/analytics/SEO/PWA ajouté par anticipation.
 
-Playwright est épinglé à 1.60.0 : les versions suivantes ont provoqué une attente indéfinie dans Pest Browser lors des vérifications initiales. Réévaluer cet épinglage avec une suite navigateur réussie lors des mises à jour.
+Playwright est épinglé à 1.63.0. Chaque mise à jour doit passer la suite Pest Browser sur Chromium : l’ancien épinglage à 1.60.0 répondait à des attentes indéfinies constatées lors des vérifications initiales.
