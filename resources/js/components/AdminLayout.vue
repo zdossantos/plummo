@@ -20,6 +20,9 @@ const { t } = useTranslations('admin');
             }}</Link>
             <Link href="/admin/tags" class="underline">{{ t('tags') }}</Link>
             <Link href="/admin/packs" class="underline">{{ t('packs') }}</Link>
+            <Link href="/admin/imports" class="underline">{{
+                t('imports')
+            }}</Link>
             <Button
                 variant="outline"
                 class="ml-auto"

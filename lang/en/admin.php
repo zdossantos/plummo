@@ -1,6 +1,28 @@
 <?php
 
 return [
+    'import_cell_type' => 'Column :column must contain text, not a date or complex cell type.',
+    'imports' => 'Imports',
+    'import_help' => 'Upload a table, review its rows and confirm their addition. A preview expires after one hour.',
+    'import_unreadable' => 'Unreadable table. Use a UTF-8 CSV or a valid Excel XLSX file.',
+    'import_columns' => 'Required columns: :columns. Headers must not be repeated.',
+    'import_unknown_tag' => 'Unknown tag “:tag”. Create it in Tags, then upload the table again.',
+    'import_audio_match' => 'File “:name” must match exactly one uploaded clip.',
+    'import_duplicate' => 'Potential duplicate: this content already exists in the catalogue or this table. Nothing will be replaced automatically.',
+    'import_limit' => 'The table is limited to 500 content rows.',
+    'import_template' => 'Download CSV template',
+    'import_conventions' => 'UTF-8 CSV: comma or semicolon, quote text containing separators or newlines. Separate tags with |; correct answer A, B, C or D. Excel: first XLSX sheet. 500 rows, 5 MiB table, up to 50 clips.',
+    'import_table' => 'CSV or Excel table',
+    'import_audios' => 'Audio clips matching the table filenames',
+    'import_preview' => 'Review preview',
+    'import_unused' => 'Unused files: {names}',
+    'import_result' => '{added} contents added, including {published} published; {refused} rows rejected.',
+    'import_valid' => '{count} valid rows ready to add. Rows with errors will be excluded.',
+    'import_drafts' => 'Add valid rows as drafts',
+    'import_publish' => 'Add and publish valid rows',
+    'import_export' => 'Export rejected rows',
+    'import_line' => 'Row {line}',
+
     'status' => 'Status',
     'all_statuses' => 'All statuses',
     'title' => 'Administration',

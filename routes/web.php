@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ContentController;
+use App\Http\Controllers\Admin\ImportController;
 use App\Http\Controllers\Admin\PackController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Rooms\PlayerController;
@@ -41,6 +42,13 @@ Route::prefix('admin')->group(function (): void {
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:administer'])->group(function (): void {
+    Route::get('imports', [ImportController::class, 'index'])->name('imports.index');
+    Route::post('imports', [ImportController::class, 'store'])->name('imports.store');
+    Route::get('imports/template/{type}', [ImportController::class, 'template'])->name('imports.template');
+    Route::get('imports/{import}', [ImportController::class, 'show'])->name('imports.show');
+    Route::post('imports/{import}/confirm', [ImportController::class, 'confirm'])->name('imports.confirm');
+    Route::get('imports/{import}/audio/{line}', [ImportController::class, 'audio'])->name('imports.audio');
+    Route::get('imports/{import}/errors', [ImportController::class, 'errors'])->name('imports.errors');
     Route::resource('contents', ContentController::class)->except('show');
     Route::get('contents/{content}/audio', [ContentController::class, 'audio'])->name('contents.audio');
     Route::resource('tags', TagController::class)->only(['index', 'store', 'update', 'destroy']);
