@@ -4,6 +4,8 @@ import { computed, onMounted, ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import PlummoPicker from '@/components/PlummoPicker.vue';
+import SessionSettings from '@/components/SessionSettings.vue';
+import RoomRanking from '@/components/RoomRanking.vue';
 import RoomHeader from '@/components/RoomHeader.vue';
 import { useRoom } from '@/composables/useRoom';
 import { useTranslations } from '@/composables/useTranslations';
@@ -237,6 +239,14 @@ onMounted(async () => {
                     >{{ t('return') }}</Button
                 >
                 <template v-else>
+                    <SessionSettings
+                        v-if="chief && room"
+                        :key="room.chiefId ?? 0"
+                        :room="room"
+                        :busy="busy"
+                        @save="request('session', 'PATCH', $event)"
+                    />
+                    <RoomRanking v-if="room" :room="room" />
                     <p class="mt-5 text-center text-sm text-muted-foreground">
                         {{ t('games_soon') }}
                     </p>

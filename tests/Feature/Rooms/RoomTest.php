@@ -14,24 +14,6 @@ uses(DatabaseTransactions::class);
 
 beforeEach(fn () => $this->withCredentials());
 
-function openRoom(): Room
-{
-    test()->withoutVite()->get('/')->assertRedirect();
-
-    return Room::latest('id')->firstOrFail();
-}
-
-function enterRoom(Room $room, string $name = 'Camille', array $accessories = []): array
-{
-    test()->withCookie('plummo_player_'.$room->code, '');
-    $response = test()->postJson('/rooms/'.$room->code.'/players', [
-        'name' => $name, 'color' => 'violet', 'accessories' => $accessories,
-    ])->assertCreated();
-    $token = $response->getCookie('plummo_player_'.$room->code)->getValue();
-
-    return [$response->json('me.id'), $token];
-}
-
 it('creates a room when opening the shared screen and reuses it on refresh', function () {
     $this->withoutVite()->get('/')->assertRedirect();
     $room = Room::sole();

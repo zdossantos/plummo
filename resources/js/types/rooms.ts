@@ -12,6 +12,8 @@ export type RoomState = {
     occupied: number;
     chiefId: number | null;
     players: Player[];
+    pointTarget: number | null;
+    ranking: (Player & { rank: number })[];
 };
 export type Snapshot = { room: RoomState; me: Player | null };
 export type Accessory = {
