@@ -2,6 +2,12 @@ name: PR title
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      pull-request-number:
+        description: Release pull request to check at this ref
+        required: true
+        type: string
 permissions:
   pull-requests: read
 jobs:
@@ -9,5 +15,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: amannn/action-semantic-pull-request@v6
+        if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check the generated release PR title
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ inputs.pull-request-number }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          [[ "$PR_NUMBER" =~ ^[1-9][0-9]*$ ]]
+          gh api "repos/$GH_REPO/pulls/$PR_NUMBER" > /tmp/release-pr.json
+          node --input-type=module <<'JS'
+          import { readFileSync } from 'node:fs';
+          const pr = JSON.parse(readFileSync('/tmp/release-pr.json', 'utf8'));
+          if (pr.head.sha !== process.env.EXPECTED_SHA || pr.base.ref !== 'main' || pr.state !== 'open') {
+            throw new Error('The workflow ref must match an open release PR targeting main.');
+          }
+          if (!/^(?:feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(?:\([^\r\n()]+\))?!?: [^\r\n]+$/.test(pr.title)) {
+            throw new Error(`Invalid Conventional Commit title: ${pr.title}`);
+          }
+          console.log(`Valid release title: ${pr.title}`);
+          JS
