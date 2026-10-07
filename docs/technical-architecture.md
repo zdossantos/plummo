@@ -8,7 +8,11 @@ Source : https://github.com/laravel/vue-starter-kit (commit d282e817c6c2fa1bd475
 
 TypeScript 7 est disponible via l’alias `@typescript/native`. Vue, `vue-tsc` et ESLint utilisent l’API de `typescript` 6.0.x, selon le principe de [compatibilité officielle](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6.0). Le paquet 6 est installé directement : Bun 1.3.14 résout incorrectement la dépendance imbriquée du wrapper `@typescript/typescript6` dans cette configuration. Les contrôles Vue restent exécutés par `vue-tsc` ; le compilateur natif ne le remplace pas. Pour lancer explicitement le compilateur natif : `bun node_modules/@typescript/native/bin/tsc --version`.
 
-La page d’entrée décrit le fonctionnement prévu, avec traductions Laravel FR/EN (langue du navigateur, français par défaut) et thème clair/sombre/système persistant. Elle ne crée pas encore de salon.
+L’entrée `/` crée ou retrouve le salon du grand écran ; `/join` sert à la saisie du code sur téléphone. Laravel valide les apparences du catalogue SVG et toutes les mutations. MySQL conserve salons et joueurs ; un verrou transactionnel du salon protège capacité et rôle du chef. Un cookie opaque chiffré HttpOnly par salon permet la reconnexion depuis le même navigateur, indépendamment du prénom. Seul son hash est stocké en base ; aucun identifiant secret n’est publié. Les téléphones signalent leur présence et le grand écran relit le salon toutes les cinq secondes. Les noms et scores sont publics pour les détenteurs du code de salon.
+
+BaconQrCode produit les QR SVG localement ; liens de connexion et adresse manuelle utilisent APP_URL. `rooms:prune`, planifié chaque minute, supprime les salons sans joueur connecté depuis trente minutes avec leurs participants. Compose et composer dev exécutent le scheduler ; aucun processus ne lance automatiquement les migrations.
+
+Traductions Laravel FR/EN (langue du navigateur, français par défaut), libellés du catalogue partagés via Inertia et thème clair/sombre/système persistant.
 
 MySQL 8.4 et Redis 7.4 sont configurés en Compose. Sessions/cache/files utilisent Redis. L’image Apache/PHP 8.4 contient les assets et extensions ; cible runtime commune pour les futurs processus. Les migrations restent une commande explicite. La base de tests est distincte.
 
@@ -22,6 +26,6 @@ GHCR, Coolify, architecture du serveur, domaines, sauvegardes et production rest
 
 ## Suite métier
 
-Les règles et maquettes existantes restent les sources de vérité. Fortify sera activé pour l’administration lors de son implémentation ; aucune inscription joueur n’est exposée. Reverb/Echo seront intégrés avec les salons temps réel, et le stockage audio avec l’administration des contenus. Aucun service mail/analytics/SEO/PWA ajouté par anticipation.
+Les règles et maquettes existantes restent les sources de vérité. Fortify sera activé pour l’administration lors de son implémentation ; aucune inscription joueur n’est exposée. Reverb/Echo seront intégrés aux interactions temps réel des mini-jeux, et le stockage audio avec l’administration des contenus. Aucun service mail/analytics/SEO/PWA ajouté par anticipation.
 
 Playwright est épinglé à 1.63.0. Chaque mise à jour doit passer la suite Pest Browser sur Chromium : l’ancien épinglage à 1.60.0 répondait à des attentes indéfinies constatées lors des vérifications initiales.

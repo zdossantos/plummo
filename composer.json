@@ -9,6 +9,7 @@
     ],
     "require": {
         "php": "^8.4",
+        "bacon/bacon-qr-code": "^3.1",
         "inertiajs/inertia-laravel": "^3.0",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
@@ -47,7 +48,7 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "bunx concurrently \"php artisan serve --host=0.0.0.0\" \"bun run dev\""
+            "bunx concurrently \"php artisan serve --host=0.0.0.0\" \"bun run dev\" \"php artisan schedule:work\""
         ],
         "lint": [
             "pint"
