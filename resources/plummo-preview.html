@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Plummo — Atelier vectoriel</title>
+        <style>
+            :root {
+                color-scheme: light;
+                --ink: #46305e;
+                --muted: #75667e;
+                --paper: #fffbf4;
+                --line: #e5dbec;
+                --wash: #f3edf8;
+                --accent: #7652ac;
+                --mint: #e5f2e9;
+                font-family:
+                    ui-rounded, 'Arial Rounded MT Bold', system-ui, sans-serif;
+                color: var(--ink);
+                background: var(--paper);
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+            }
+            button,
+            a {
+                font: inherit;
+            }
+            button {
+                cursor: pointer;
+            }
+            a {
+                color: inherit;
+                text-underline-offset: 4px;
+            }
+            button:focus-visible,
+            a:focus-visible {
+                outline: 3px solid #9269c6;
+                outline-offset: 4px;
+            }
+            ::selection {
+                background: #d9c5f0;
+                color: var(--ink);
+            }
+            header {
+                max-width: 1440px;
+                margin: auto;
+                padding: 30px 44px 24px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid var(--line);
+            }
+            .brand {
+                font-size: 32px;
+                font-weight: 850;
+                letter-spacing: -0.03em;
+            }
+            .languages {
+                display: flex;
+                gap: 6px;
+            }
+            .languages button {
+                background: transparent;
+                border: 0;
+                padding: 10px 14px;
+                border-radius: 10px;
+                color: var(--muted);
+            }
+            .languages button[aria-pressed='true'] {
+                background: var(--wash);
+                color: var(--ink);
+            }
+            main {
+                max-width: 1440px;
+                margin: auto;
+                padding: 36px 44px 64px;
+            }
+            .intro {
+                margin-bottom: 34px;
+            }
+            h1 {
+                font-size: clamp(30px, 3.6vw, 48px);
+                line-height: 1.1;
+                letter-spacing: -0.035em;
+                margin: 0 0 12px;
+                font-weight: 800;
+            }
+            p {
+                line-height: 1.5;
+                margin: 0;
+            }
+            .intro p {
+                font-size: 17px;
+                color: var(--muted);
+            }
+            .layout {
+                display: grid;
+                grid-template-columns: minmax(300px, 420px) minmax(0, 1fr);
+                gap: 56px;
+                align-items: start;
+            }
+            .preview {
+                position: sticky;
+                top: 24px;
+            }
+            .stage {
+                background: var(--mint);
+                border-radius: 36px;
+                padding: 20px 24px 22px;
+                text-align: center;
+            }
+            .stage h2 {
+                font-size: 18px;
+                margin: 0;
+                font-weight: 600;
+            }
+            .main-avatar {
+                width: 100%;
+                max-width: 350px;
+                height: auto;
+                display: block;
+                margin: 8px auto 0;
+            }
+            .stage .status {
+                font-size: 14px;
+                margin-top: 4px;
+                min-height: 21px;
+            }
+            .color-section {
+                margin: 25px 0;
+            }
+            .color-section h3 {
+                font-size: 16px;
+                margin: 0 0 12px;
+            }
+            .swatches {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            .swatch {
+                width: 46px;
+                height: 46px;
+                background: var(--swatch);
+                border: 4px solid var(--paper);
+                border-radius: 50%;
+                box-shadow: 0 0 0 1px var(--line);
+                font-size: 0;
+            }
+            .swatch[aria-pressed='true'] {
+                box-shadow: 0 0 0 3px var(--ink);
+            }
+            .color-name {
+                font-size: 14px;
+                color: var(--muted);
+                margin-top: 12px;
+            }
+            .actions {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            .action {
+                min-height: 44px;
+                border: 0;
+                border-radius: 12px;
+                background: var(--wash);
+                color: var(--ink);
+                padding: 12px 18px;
+                font-weight: 600;
+            }
+            .action.primary {
+                background: var(--ink);
+                color: var(--paper);
+            }
+            .message {
+                margin-top: 12px;
+                color: var(--muted);
+                font-size: 14px;
+                min-height: 42px;
+            }
+            .small-preview {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                margin-top: 16px;
+                padding-top: 20px;
+                border-top: 1px solid var(--line);
+            }
+            .small-preview svg {
+                width: 74px;
+                height: 74px;
+                flex: none;
+            }
+            .small-preview h3 {
+                margin: 0;
+                font-size: 14px;
+                font-weight: 600;
+            }
+            .small-preview span {
+                display: block;
+                font-size: 13px;
+                color: var(--muted);
+                margin-top: 4px;
+            }
+            .catalog-head {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+            .catalog-head h2 {
+                font-size: 26px;
+                letter-spacing: -0.025em;
+                margin: 0;
+            }
+            .view-buttons {
+                display: flex;
+                gap: 4px;
+                background: var(--wash);
+                border-radius: 12px;
+                padding: 4px;
+            }
+            .view-buttons button {
+                padding: 9px 11px;
+                border: 0;
+                color: var(--muted);
+                border-radius: 9px;
+                background: transparent;
+                font-size: 13px;
+            }
+            .view-buttons button[aria-pressed='true'] {
+                background: var(--paper);
+                color: var(--ink);
+            }
+            .limit {
+                color: var(--muted);
+                font-size: 14px;
+                margin: 10px 0 0;
+            }
+            .group {
+                margin-top: 30px;
+            }
+            .group h3 {
+                font-size: 17px;
+                font-weight: 650;
+                margin: 0 0 13px;
+            }
+            .tiles {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+                gap: 10px;
+            }
+            .tile {
+                position: relative;
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                background: transparent;
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                padding: 10px 6px 12px;
+                color: var(--ink);
+                text-align: center;
+                transition: background 0.15s;
+            }
+            .tile:hover {
+                background: var(--wash);
+            }
+            .tile[aria-pressed='true'] {
+                background: var(--wash);
+                border-color: var(--accent);
+                box-shadow: inset 0 0 0 1px var(--accent);
+            }
+            .tile svg {
+                display: block;
+                width: 100%;
+                height: 120px;
+            }
+            .tile span {
+                font-size: 13px;
+                line-height: 1.35;
+                min-height: 35px;
+                display: grid;
+                align-content: center;
+            }
+            .tile .selection {
+                position: absolute;
+                top: 7px;
+                right: 9px;
+                font-size: 12px;
+                font-weight: 700;
+                min-height: 0;
+                color: var(--accent);
+            }
+            .assembled {
+                margin-top: 30px;
+                padding-top: 22px;
+                border-top: 1px solid var(--line);
+            }
+            .assembled h3 {
+                margin: 0 0 16px;
+                font-size: 16px;
+            }
+            .layers {
+                display: flex;
+                align-items: flex-start;
+                gap: 14px;
+                flex-wrap: wrap;
+            }
+            .layer {
+                text-align: center;
+                flex: 1;
+                min-width: 88px;
+                max-width: 120px;
+            }
+            .layer svg {
+                width: 88px;
+                height: 88px;
+                display: block;
+                margin: auto;
+            }
+            .layer span {
+                font-size: 12px;
+                line-height: 1.3;
+                display: block;
+            }
+            .layer a {
+                font-size: 12px;
+                display: inline-block;
+                margin-top: 6px;
+            }
+            .remove {
+                margin-top: 8px;
+                border: 0;
+                background: transparent;
+                color: var(--muted);
+                text-decoration: underline;
+                text-underline-offset: 3px;
+                padding: 6px;
+                font-size: 12px;
+            }
+            footer {
+                padding-top: 40px;
+                color: var(--muted);
+                font-size: 14px;
+            }
+            @media (max-width: 950px) {
+                main {
+                    padding: 30px 24px;
+                }
+                .layout {
+                    gap: 28px;
+                    grid-template-columns: 300px minmax(0, 1fr);
+                }
+                header {
+                    padding: 24px;
+                }
+                .tiles {
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                }
+                .tile svg {
+                    height: 95px;
+                }
+            }
+            @media (max-width: 680px) {
+                .layout {
+                    grid-template-columns: 1fr;
+                }
+                .preview {
+                    position: static;
+                }
+                .stage {
+                    padding: 14px;
+                }
+                .main-avatar {
+                    max-width: 260px;
+                }
+                .intro {
+                    margin-bottom: 24px;
+                }
+                h1 {
+                    font-size: 32px;
+                }
+                .stage h2 {
+                    font-size: 16px;
+                }
+                .small-preview {
+                    margin: 8px 0 26px;
+                }
+                .color-section {
+                    margin: 20px 0;
+                }
+                .tile svg {
+                    height: 110px;
+                }
+                .catalog-head {
+                    align-items: flex-start;
+                }
+                .assembled {
+                    display: none;
+                }
+                main {
+                    padding: 25px 20px 40px;
+                }
+                header {
+                    padding: 18px 20px;
+                }
+                .brand {
+                    font-size: 28px;
+                }
+                .message {
+                    min-height: 21px;
+                }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    transition: none !important;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <span class="brand">Plummo</span>
+            <div class="languages" role="group" aria-label="Langue">
+                <button type="button" data-lang="fr" aria-pressed="true">
+                    FR</button
+                ><button type="button" data-lang="en" aria-pressed="false">
+                    EN
+                </button>
+            </div>
+        </header>
+        <main id="plummo-workshop">
+            <div class="intro">
+                <h1 data-text="title"></h1>
+                <p data-text="intro"></p>
+            </div>
+            <div class="layout">
+                <section class="preview" aria-labelledby="preview-title">
+                    <div class="stage">
+                        <h2 id="preview-title" data-text="preview"></h2>
+                        <div id="main-preview"></div>
+                        <p
+                            class="status"
+                            id="selection-status"
+                            aria-live="polite"
+                        ></p>
+                    </div>
+                    <div class="color-section">
+                        <h3 data-text="colors"></h3>
+                        <div id="swatches" class="swatches" role="group"></div>
+                        <p class="color-name" id="color-name"></p>
+                    </div>
+                    <div class="actions">
+                        <button
+                            type="button"
+                            class="action primary"
+                            id="download"
+                            data-text="download"
+                        ></button
+                        ><button
+                            type="button"
+                            class="action"
+                            id="random"
+                            data-text="random"
+                        ></button>
+                    </div>
+                    <p class="message" id="message" aria-live="polite"></p>
+                    <div class="small-preview">
+                        <div id="small-preview"></div>
+                        <div>
+                            <h3 data-text="small"></h3>
+                            <span id="small-caption"></span>
+                        </div>
+                    </div>
+                    <div class="assembled">
+                        <h3 data-text="assembly"></h3>
+                        <div id="layers" class="layers"></div>
+                    </div>
+                </section>
+                <section class="catalog" aria-labelledby="catalog-title">
+                    <div class="catalog-head">
+                        <h2 id="catalog-title" data-text="gallery"></h2>
+                        <div class="view-buttons" role="group">
+                            <button
+                                type="button"
+                                id="worn"
+                                aria-pressed="true"
+                                data-text="worn"
+                            ></button
+                            ><button
+                                type="button"
+                                id="pieces"
+                                aria-pressed="false"
+                                data-text="switch"
+                            ></button>
+                        </div>
+                    </div>
+                    <p class="limit" data-text="limit"></p>
+                    <div id="groups"></div>
+                </section>
+            </div>
+            <footer data-text="gallery_note"></footer>
+        </main>
+        <script>
+            (() => {
+                const bodies = __SYMBOLS__;
+                const catalog = __CATALOG__;
+                const messages = __MESSAGES__;
+                let locale = 'fr',
+                    color = catalog.colors[0],
+                    selection = ['crown', 'bow-tie'],
+                    pieces = false,
+                    serial = 0;
+                const root = document.getElementById('plummo-workshop');
+                const t = (key) => messages[locale][key];
+                const label = (item) => t('items')[item.id];
+                const byId = (id) =>
+                    catalog.accessories.find((item) => item.id === id);
+                function baseBody() {
+                    return bodies.base
+                        .replaceAll('#b99aef', color.light)
+                        .replaceAll('#9672dc', color.color)
+                        .replaceAll('#6950ac', color.dark);
+                }
+                function vector(ids = [], options = {}) {
+                    const n = ++serial;
+                    const chosen = ids.map(byId).filter(Boolean);
+                    let body = options.noBase ? '' : baseBody();
+                    const behind = chosen
+                        .map((i) => bodies[i.id + '-back'] || '')
+                        .join('');
+                    const ahead = chosen.map((i) => bodies[i.id]).join('');
+                    body = behind + body + ahead;
+                    body = body
+                        .replace(
+                            /id="(plummo-[^"]+)"/g,
+                            (_, id) => `id="${id}-${n}"`,
+                        )
+                        .replace(
+                            /url\(#(plummo-[^)]+)\)/g,
+                            (_, id) => `url(#${id}-${n})`,
+                        );
+                    const box = options.box || [0, 0, 512, 512];
+                    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${box.join(' ')}" role="img" aria-label="${options.title || t('preview')}"${options.main ? ' class="main-avatar"' : ''}><title>${options.title || t('preview')}</title>${body}</svg>`;
+                }
+                function crop(item) {
+                    const b = item.bounds;
+                    return [
+                        b[0] - 6,
+                        b[1] - 6,
+                        b[2] - b[0] + 12,
+                        b[3] - b[1] + 12,
+                    ];
+                }
+                function render() {
+                    document.documentElement.lang = locale;
+                    document.title = 'Plummo · ' + t('title');
+                    document
+                        .querySelectorAll('[data-text]')
+                        .forEach((el) => (el.textContent = t(el.dataset.text)));
+                    document
+                        .querySelectorAll('[data-lang]')
+                        .forEach((el) =>
+                            el.setAttribute(
+                                'aria-pressed',
+                                String(el.dataset.lang === locale),
+                            ),
+                        );
+                    document
+                        .querySelector('.languages')
+                        .setAttribute('aria-label', t('language'));
+                    document
+                        .querySelector('.view-buttons')
+                        .setAttribute('aria-label', t('galleryview'));
+                    root.querySelector('#main-preview').innerHTML = vector(
+                        selection,
+                        { main: true },
+                    );
+                    root.querySelector('#small-preview').innerHTML =
+                        vector(selection);
+                    root.querySelector('#small-caption').textContent =
+                        selection.length
+                            ? selection.map((id) => label(byId(id))).join(' + ')
+                            : t('empty');
+                    root.querySelector('#selection-status').textContent =
+                        `${selection.length} / 2 ${t('selected')}`;
+                    root.querySelector('#swatches').setAttribute(
+                        'aria-label',
+                        t('colors'),
+                    );
+                    root.querySelector('#swatches').innerHTML = catalog.colors
+                        .map(
+                            (c) =>
+                                `<button type="button" class="swatch" data-color="${c.id}" style="--swatch:${c.color}" aria-label="${t('palette')[c.id]}" aria-pressed="${color.id === c.id}">${t('palette')[c.id]}</button>`,
+                        )
+                        .join('');
+                    root.querySelector('#color-name').textContent =
+                        t('palette')[color.id];
+                    root.querySelector('#groups').innerHTML = catalog.slots
+                        .map(
+                            (slot) =>
+                                `<section class="group"><h3>${t(slot)}</h3><div class="tiles">${catalog.accessories
+                                    .filter((i) => i.slot === slot)
+                                    .map(
+                                        (i) =>
+                                            `<button type="button" class="tile" data-item="${i.id}" aria-pressed="${selection.includes(i.id)}" aria-label="${label(i)}">${vector([i.id], { noBase: pieces, box: pieces ? crop(i) : undefined, title: label(i) })}<span>${label(i)}</span>${selection.includes(i.id) ? '<span class="selection" aria-hidden="true">✓</span>' : ''}</button>`,
+                                    )
+                                    .join('')}</div></section>`,
+                        )
+                        .join('');
+                    root.querySelector('#layers').innerHTML =
+                        `<div class="layer">${vector([], { title: t('body') })}<span>${t('body')}</span><a href="base.svg" download>${t('download_piece')}</a></div>` +
+                        selection
+                            .map((id) => {
+                                const i = byId(id);
+                                return `<div class="layer">${vector([id], { noBase: true, box: crop(i), title: label(i) })}<span>${label(i)}</span><a href="${i.front}" download>${t('download_piece')}</a>${i.back ? `<br><a href="${i.back}" download>${t('back')}</a>` : ''}<br><button type="button" class="remove" data-remove="${id}">${t('remove')}</button></div>`;
+                            })
+                            .join('');
+                    root.querySelector('#pieces').setAttribute(
+                        'aria-pressed',
+                        String(pieces),
+                    );
+                    root.querySelector('#worn').setAttribute(
+                        'aria-pressed',
+                        String(!pieces),
+                    );
+                }
+                root.addEventListener('click', (event) => {
+                    const target = event.target.closest('button');
+                    if (!target) return;
+                    const message = root.querySelector('#message');
+                    message.textContent = '';
+                    if (target.dataset.color) {
+                        color = catalog.colors.find(
+                            (c) => c.id === target.dataset.color,
+                        );
+                        render();
+                        return;
+                    }
+                    const id = target.dataset.item || target.dataset.remove;
+                    if (id) {
+                        const i = byId(id);
+                        if (selection.includes(id))
+                            selection = selection.filter((x) => x !== id);
+                        else {
+                            const same = selection.find(
+                                (x) => byId(x).slot === i.slot,
+                            );
+                            if (same) {
+                                selection = selection.map((x) =>
+                                    x === same ? id : x,
+                                );
+                                message.textContent = t('replace');
+                            } else if (selection.length < 2) selection.push(id);
+                            else {
+                                message.textContent = t('full');
+                                return;
+                            }
+                        }
+                        render();
+                        return;
+                    }
+                    if (target.id === 'pieces' || target.id === 'worn') {
+                        pieces = target.id === 'pieces';
+                        render();
+                        return;
+                    }
+                    if (target.id === 'random') {
+                        color =
+                            catalog.colors[
+                                Math.floor(
+                                    Math.random() * catalog.colors.length,
+                                )
+                            ];
+                        const first =
+                            catalog.accessories[
+                                Math.floor(
+                                    Math.random() * catalog.accessories.length,
+                                )
+                            ];
+                        const others = catalog.accessories.filter(
+                            (i) => i.slot !== first.slot,
+                        );
+                        selection = [
+                            first.id,
+                            others[Math.floor(Math.random() * others.length)]
+                                .id,
+                        ];
+                        render();
+                        return;
+                    }
+                    if (target.id === 'download') {
+                        const svg = vector(selection);
+                        const blob = new Blob(
+                            ['<?xml version="1.0" encoding="UTF-8"?>\n' + svg],
+                            { type: 'image/svg+xml' },
+                        );
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `plummo-${color.id}${selection.length ? '-' + selection.join('-') : ''}.svg`;
+                        a.click();
+                        setTimeout(() => URL.revokeObjectURL(url), 1000);
+                        message.textContent = t('downloaded');
+                    }
+                });
+                document.querySelectorAll('[data-lang]').forEach((button) =>
+                    button.addEventListener('click', () => {
+                        locale = button.dataset.lang;
+                        root.querySelector('#message').textContent = '';
+                        render();
+                    }),
+                );
+                render();
+            })();
+        </script>
+    </body>
+</html>

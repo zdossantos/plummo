@@ -1,0 +1,298 @@
+{
+    "version": 1,
+    "viewBox": [0, 0, 512, 512],
+    "base": "base.svg",
+    "maxAccessories": 2,
+    "onePerSlot": true,
+    "slots": ["head", "face", "neck", "hand"],
+    "colors": [
+        {
+            "id": "violet",
+            "label": {
+                "fr": "Violet",
+                "en": "Purple"
+            },
+            "color": "#9672dc",
+            "light": "#bca2ef",
+            "dark": "#6950ac"
+        },
+        {
+            "id": "blue",
+            "label": {
+                "fr": "Bleu",
+                "en": "Blue"
+            },
+            "color": "#6d9ed2",
+            "light": "#aaccec",
+            "dark": "#496da6"
+        },
+        {
+            "id": "pink",
+            "label": {
+                "fr": "Rose",
+                "en": "Pink"
+            },
+            "color": "#de8cae",
+            "light": "#f5bdd0",
+            "dark": "#aa598b"
+        },
+        {
+            "id": "green",
+            "label": {
+                "fr": "Vert",
+                "en": "Green"
+            },
+            "color": "#7cab90",
+            "light": "#b1d3ad",
+            "dark": "#4d816b"
+        },
+        {
+            "id": "honey",
+            "label": {
+                "fr": "Miel",
+                "en": "Honey"
+            },
+            "color": "#d5a25c",
+            "light": "#f5d28d",
+            "dark": "#aa753e"
+        },
+        {
+            "id": "slate",
+            "label": {
+                "fr": "Gris",
+                "en": "Slate"
+            },
+            "color": "#8b93ae",
+            "light": "#b9c2d7",
+            "dark": "#616882"
+        }
+    ],
+    "accessories": [
+        {
+            "id": "cap",
+            "slot": "head",
+            "label": {
+                "fr": "Casquette",
+                "en": "Cap"
+            },
+            "front": "accessories/cap.svg",
+            "bounds": [153, 110, 348, 211]
+        },
+        {
+            "id": "crown",
+            "slot": "head",
+            "label": {
+                "fr": "Couronne",
+                "en": "Crown"
+            },
+            "front": "accessories/crown.svg",
+            "bounds": [159, 117, 329, 204]
+        },
+        {
+            "id": "beanie",
+            "slot": "head",
+            "label": {
+                "fr": "Bonnet",
+                "en": "Beanie"
+            },
+            "front": "accessories/beanie.svg",
+            "bounds": [153, 65, 325, 195]
+        },
+        {
+            "id": "wizard-hat",
+            "slot": "head",
+            "label": {
+                "fr": "Chapeau de sorcier",
+                "en": "Wizard hat"
+            },
+            "front": "accessories/wizard-hat.svg",
+            "bounds": [137, 28, 343, 201]
+        },
+        {
+            "id": "bucket-hat",
+            "slot": "head",
+            "label": {
+                "fr": "Bob",
+                "en": "Bucket hat"
+            },
+            "front": "accessories/bucket-hat.svg",
+            "bounds": [146, 103, 332, 214]
+        },
+        {
+            "id": "flower",
+            "slot": "head",
+            "label": {
+                "fr": "Fleur",
+                "en": "Flower"
+            },
+            "front": "accessories/flower.svg",
+            "bounds": [270, 117, 368, 211]
+        },
+        {
+            "id": "round-glasses",
+            "slot": "face",
+            "label": {
+                "fr": "Lunettes rondes",
+                "en": "Round glasses"
+            },
+            "front": "accessories/round-glasses.svg",
+            "bounds": [132, 212, 371, 312]
+        },
+        {
+            "id": "sunglasses",
+            "slot": "face",
+            "label": {
+                "fr": "Lunettes de soleil",
+                "en": "Sunglasses"
+            },
+            "front": "accessories/sunglasses.svg",
+            "bounds": [130, 224, 375, 304]
+        },
+        {
+            "id": "heart-glasses",
+            "slot": "face",
+            "label": {
+                "fr": "Lunettes en cœur",
+                "en": "Heart glasses"
+            },
+            "front": "accessories/heart-glasses.svg",
+            "bounds": [129, 219, 373, 308]
+        },
+        {
+            "id": "monocle",
+            "slot": "face",
+            "label": {
+                "fr": "Monocle",
+                "en": "Monocle"
+            },
+            "front": "accessories/monocle.svg",
+            "bounds": [269, 222, 377, 395]
+        },
+        {
+            "id": "pirate-patch",
+            "slot": "face",
+            "label": {
+                "fr": "Bandeau de pirate",
+                "en": "Pirate patch"
+            },
+            "front": "accessories/pirate-patch.svg",
+            "bounds": [126, 204, 369, 300]
+        },
+        {
+            "id": "bow-tie",
+            "slot": "neck",
+            "label": {
+                "fr": "Nœud papillon",
+                "en": "Bow tie"
+            },
+            "front": "accessories/bow-tie.svg",
+            "bounds": [190, 339, 305, 406]
+        },
+        {
+            "id": "tie",
+            "slot": "neck",
+            "label": {
+                "fr": "Cravate",
+                "en": "Tie"
+            },
+            "front": "accessories/tie.svg",
+            "bounds": [205, 345, 288, 449]
+        },
+        {
+            "id": "kerchief",
+            "slot": "neck",
+            "label": {
+                "fr": "Foulard",
+                "en": "Kerchief"
+            },
+            "front": "accessories/kerchief.svg",
+            "bounds": [195, 345, 316, 417]
+        },
+        {
+            "id": "scarf",
+            "slot": "neck",
+            "label": {
+                "fr": "Écharpe",
+                "en": "Scarf"
+            },
+            "front": "accessories/scarf.svg",
+            "bounds": [162, 344, 320, 456],
+            "back": "accessories/scarf-back.svg"
+        },
+        {
+            "id": "medal",
+            "slot": "neck",
+            "label": {
+                "fr": "Collier avec médaille",
+                "en": "Medal necklace"
+            },
+            "front": "accessories/medal.svg",
+            "bounds": [201, 342, 298, 445]
+        },
+        {
+            "id": "wand",
+            "slot": "hand",
+            "label": {
+                "fr": "Baguette magique",
+                "en": "Magic wand"
+            },
+            "front": "accessories/wand.svg",
+            "bounds": [399, 164, 503, 397],
+            "back": "accessories/wand-back.svg"
+        },
+        {
+            "id": "flag",
+            "slot": "hand",
+            "label": {
+                "fr": "Petit drapeau",
+                "en": "Little flag"
+            },
+            "front": "accessories/flag.svg",
+            "bounds": [425, 200, 506, 400],
+            "back": "accessories/flag-back.svg"
+        },
+        {
+            "id": "fan",
+            "slot": "hand",
+            "label": {
+                "fr": "Éventail",
+                "en": "Fan"
+            },
+            "front": "accessories/fan.svg",
+            "bounds": [385, 208, 497, 369],
+            "back": "accessories/fan-back.svg"
+        },
+        {
+            "id": "microphone",
+            "slot": "hand",
+            "label": {
+                "fr": "Micro",
+                "en": "Microphone"
+            },
+            "front": "accessories/microphone.svg",
+            "bounds": [408, 214, 474, 450],
+            "back": "accessories/microphone-back.svg"
+        },
+        {
+            "id": "scepter",
+            "slot": "hand",
+            "label": {
+                "fr": "Sceptre",
+                "en": "Scepter"
+            },
+            "front": "accessories/scepter.svg",
+            "bounds": [403, 173, 487, 405],
+            "back": "accessories/scepter-back.svg"
+        },
+        {
+            "id": "headphones",
+            "slot": "head",
+            "label": {
+                "fr": "Casque audio",
+                "en": "Headphones"
+            },
+            "front": "accessories/headphones.svg",
+            "bounds": [106, 139, 395, 317]
+        }
+    ]
+}

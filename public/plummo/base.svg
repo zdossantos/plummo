@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Plummo — mascotte de base"><title>Plummo — mascotte de base</title><defs>
+ <linearGradient id="plummo-tone" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#b99aef"/><stop offset=".55" stop-color="#9672dc"/><stop offset="1" stop-color="#6950ac"/></linearGradient>
+ <linearGradient id="plummo-cream" x2=".3" y2="1"><stop stop-color="#fffaf0"/><stop offset="1" stop-color="#f7eadb"/></linearGradient>
+ <linearGradient id="plummo-iris" x2="0" y2="1"><stop stop-color="#231744"/><stop offset=".65" stop-color="#382259"/><stop offset="1" stop-color="#9672dc"/></linearGradient>
+ <linearGradient id="plummo-pink" x2=".5" y2="1"><stop stop-color="#ffd0b3"/><stop offset="1" stop-color="#f096b8"/></linearGradient>
+</defs>
+<g stroke="#49317c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+ <g id="plummo-feet" fill="url(#plummo-tone)"><path d="M178 439 Q174 452 180 464 C143 458 139 485 151 489 C169 496 205 494 216 486 Q229 477 216 451Z"/><path d="M281 450 Q278 464 287 477 C280 491 313 497 337 491 C362 485 348 465 321 465 L319 442Z"/></g>
+ <g id="plummo-plumes"><path fill="url(#plummo-tone)" d="M240 167 C225 124 237 64 272 39 C313 9 354 29 355 61 C358 96 306 87 275 123 Q259 138 240 167Z"/><path fill="url(#plummo-pink)" d="M241 164 C221 144 186 136 187 102 C188 75 212 62 230 78 C245 93 239 124 241 164Z"/><path fill="url(#plummo-tone)" d="M248 169 C259 115 294 98 324 112 C361 132 351 157 319 158 Q285 158 248 169Z"/>
+ <path d="M243 150 C244 106 267 57 305 40" stroke="#d4b9fc" stroke-width="9" opacity=".45" fill="none"/>
+ <path d="M250 156 C272 130 300 119 319 124" stroke="#d4b9fc" stroke-width="7" opacity=".45" fill="none"/>
+ </g>
+ <g id="plummo-hands" fill="url(#plummo-tone)"><path d="M116 305 C100 302 88 292 80 283 C71 269 52 265 53 281 Q54 292 64 296 C44 283 37 305 51 321 C68 341 100 343 119 333Z"/><path d="M391 313 C405 312 415 302 421 289 C428 276 443 277 440 293 C460 282 473 298 463 316 C451 341 422 348 389 337Z"/>
+ <path d="M55 305 Q75 333 107 327 M419 319 Q440 324 456 308" stroke="#d3b6ff" stroke-width="6" opacity=".4" fill="none"/></g>
+ <path id="plummo-body" fill="url(#plummo-cream)" d="M234 158 C210 137 180 139 169 152 Q158 160 179 164 C147 172 119 189 119 205 Q122 215 143 207 C123 223 100 248 101 262 Q102 271 121 260 Q100 279 105 287 L117 284 Q100 307 103 332 C92 362 100 390 114 379 C109 408 130 424 138 408 C141 439 159 445 163 432 C181 452 197 454 213 445 C237 461 267 460 283 448 C305 457 325 447 330 435 C350 450 371 428 369 413 C389 427 402 399 395 379 C414 388 417 366 412 346 C421 319 411 303 404 293 C414 306 405 268 391 248 C409 255 410 245 401 230 C385 207 357 187 331 178 C344 174 324 161 307 163 C319 151 295 151 281 163 C291 145 268 154 258 167 C248 154 241 151 234 158Z"/>
+ <path id="plummo-fluff-shadow" stroke="none" fill="#9672dc" opacity=".2" d="M105 329 C100 356 107 374 116 364 L126 351 C119 378 137 400 144 393 L148 378 Q149 418 170 420 L176 403 Q184 433 213 432 Q210 425 207 422 Q244 449 282 431 L284 419 Q301 430 321 415 L326 398 Q337 412 346 405 L354 385 Q373 390 376 364 L390 382 Q403 375 400 356 L411 336 C419 371 407 397 395 379 C402 410 386 427 369 413 Q365 444 330 435 Q307 459 283 448 Q247 469 213 445 Q185 462 163 432 Q145 452 138 408 Q115 437 114 379 Q91 391 105 329Z"/>
+ <g id="plummo-face">
+ <path d="M182 211 C189 192 207 186 213 198 Q195 200 182 211Z" fill="#392468" stroke="none"/><path d="M308 205 C316 186 334 204 339 221 Q325 205 308 205Z" fill="#392468" stroke="none"/>
+ <path d="M157 263 C151 233 169 216 190 221 C216 225 222 261 208 280 C190 302 160 285 157 263Z" fill="#fffdf8" stroke-width="3"/>
+ <path d="M284 274 C278 244 291 224 313 227 C342 230 351 264 337 286 C320 307 289 299 284 274Z" fill="#fffdf8" stroke-width="3"/>
+ <ellipse cx="195" cy="263" rx="21" ry="28" fill="url(#plummo-iris)" stroke="none"/><ellipse cx="314" cy="273" rx="22" ry="29" fill="url(#plummo-iris)" stroke="none"/>
+ <ellipse cx="198" cy="250" rx="7" ry="8" fill="#fff" stroke="none"/><ellipse cx="306" cy="259" rx="7" ry="8" fill="#fff" stroke="none"/>
+ <ellipse cx="161" cy="300" rx="20" ry="14" transform="rotate(12 161 300)" fill="#ffb9b4" stroke="none"/><ellipse cx="337" cy="309" rx="20" ry="14" transform="rotate(-12 337 309)" fill="#ffb9b4" stroke="none"/>
+ <path d="M225 284 C219 294 222 311 229 324 C242 345 267 339 275 317 C281 300 280 286 273 287 Q247 293 225 284Z" fill="#532044" stroke="#392468" stroke-width="3"/>
+ <path d="M228 313 Q251 290 275 312 C266 342 243 347 228 313Z" fill="#ef6e8e" stroke="none"/><path d="M233 322 Q252 308 267 321" stroke="#ff91a0" stroke-width="5" fill="none"/>
+ </g>
+</g></svg>
