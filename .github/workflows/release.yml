@@ -1,14 +1,37 @@
 name: Release proposal
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 permissions:
+  actions: write
   contents: write
+  issues: write
   pull-requests: write
+concurrency:
+  group: release-please-main
+  cancel-in-progress: false
 jobs:
   release:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: googleapis/release-please-action@v5
+        id: release
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+      # PRs created with GITHUB_TOKEN do not trigger pull_request workflows.
+      - name: Check the release pull requests
+        if: steps.release.outputs.prs_created == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_PRS: ${{ steps.release.outputs.prs }}
+        run: |
+          while read -r number; do
+            branch=$(gh api "repos/$GH_REPO/pulls/$number" --jq '.head.ref')
+            gh workflow run ci.yml --ref "$branch"
+            gh workflow run pr-title.yml --ref "$branch" -f pull-request-number="$number"
+          done < <(jq -r '.[].number' <<< "$RELEASE_PRS")
