@@ -6,6 +6,8 @@ PHP 8.4, Laravel 13, Inertia 3, Vue 3 Composition API/TypeScript, Vite 8, Bun 1.
 
 Source : https://github.com/laravel/vue-starter-kit (commit d282e817c6c2fa1bd475f7c42ea785ccfc67d0ab), documentation https://laravel.com/docs/13.x/starter-kits et https://inertiajs.com/docs/v3.
 
+TypeScript 7 est disponible via l’alias `@typescript/native`. Vue, `vue-tsc` et ESLint utilisent l’API de `typescript` 6.0.x, selon le principe de [compatibilité officielle](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6.0). Le paquet 6 est installé directement : Bun 1.3.14 résout incorrectement la dépendance imbriquée du wrapper `@typescript/typescript6` dans cette configuration. Les contrôles Vue restent exécutés par `vue-tsc` ; le compilateur natif ne le remplace pas. Pour lancer explicitement le compilateur natif : `bun node_modules/@typescript/native/bin/tsc --version`.
+
 La page d’entrée décrit le fonctionnement prévu, avec traductions Laravel FR/EN (langue du navigateur, français par défaut) et thème clair/sombre/système persistant. Elle ne crée pas encore de salon.
 
 MySQL 8.4 et Redis 7.4 sont configurés en Compose. Sessions/cache/files utilisent Redis. L’image Apache/PHP 8.4 contient les assets et extensions ; cible runtime commune pour les futurs processus. Les migrations restent une commande explicite. La base de tests est distincte.
