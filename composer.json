@@ -1,0 +1,91 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "zdossantos/plummo",
+    "type": "project",
+    "description": "Plummo : mini-jeux sur grand \u00e9cran et t\u00e9l\u00e9phones.",
+    "keywords": [
+        "laravel",
+        "framework"
+    ],
+    "require": {
+        "php": "^8.4",
+        "inertiajs/inertia-laravel": "^3.0",
+        "laravel/framework": "^13.17",
+        "laravel/tinker": "^3.0",
+        "laravel/wayfinder": "^0.1.14"
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.24",
+        "larastan/larastan": "^3.9",
+        "laravel/pail": "^1.2.5",
+        "laravel/pint": "^1.27",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.9.3",
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.0",
+        "pestphp/pest-plugin-browser": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "setup": [
+            "composer install",
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php artisan key:generate",
+            "bun install --frozen-lockfile",
+            "bun run build"
+        ],
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "bunx concurrently \"php artisan serve --host=0.0.0.0\" \"bun run dev\""
+        ],
+        "lint": [
+            "pint"
+        ],
+        "lint:check": [
+            "pint --test"
+        ],
+        "analyse": [
+            "phpstan analyse --memory-limit=512M"
+        ],
+        "test": [
+            "@php artisan test"
+        ],
+        "ci:check": [
+            "@lint:check",
+            "@analyse",
+            "bun run lint:check",
+            "bun run format:check",
+            "bun run types:check",
+            "bun run test:unit",
+            "bun run build",
+            "@test"
+        ],
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "license": "proprietary"
+}
