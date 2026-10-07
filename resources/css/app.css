@@ -1,0 +1,44 @@
+@import 'tailwindcss';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../views';
+@custom-variant dark (&:where(.dark, .dark *));
+@theme inline {
+    --font-sans: ui-sans-serif, system-ui, sans-serif;
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-card: var(--card);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--foreground);
+    --color-secondary: var(--accent);
+    --color-secondary-foreground: var(--foreground);
+    --color-ring: var(--primary);
+    --color-border: var(--accent);
+    --color-input: var(--accent);
+    --color-destructive: #c93448;
+}
+:root {
+    --background: #faf6ef;
+    --foreground: #30214b;
+    --primary: #7951c8;
+    --primary-foreground: #fff;
+    --card: #fff;
+    --muted-foreground: #70677b;
+    --accent: #ede3fb;
+}
+.dark {
+    --background: #1c1627;
+    --foreground: #f8f4ff;
+    --primary: #b99ae9;
+    --primary-foreground: #231732;
+    --card: #2a203a;
+    --muted-foreground: #c4b6d3;
+    --accent: #3a2b50;
+}
+@layer base {
+    body {
+        @apply bg-background text-foreground;
+    }
+}
