@@ -15,7 +15,7 @@
 
 - [x] Pages admin/Login.vue et admin/Dashboard.vue, traduction FR/EN dans lang/admin et messages auth, thème partagé, erreurs et traitement en cours, déconnexion. Tableau de bord décrit seulement les fonctionnalités disponibles ; le catalogue viendra dans la PR suivante.
 - [x] Test navigateur de connexion et déconnexion ; contrôles README, Docker, revue indépendante.
-- [ ] PR dédiée, CI sur dernier commit puis Squash & Merge autorisé.
+- [x] PR #16 fusionnée après succès des quatre contrôles GitHub sur 7573fb3.
 
 ## Interfaces
 

@@ -2,7 +2,7 @@
 
 Jeux entre amis et en famille : un grand écran commun et un téléphone par joueur.
 
-Le dépôt contient le socle technique, les salons sans compte, la personnalisation des Plummos et les réglages de session. Les mini-jeux et l’administration restent à développer.
+Le dépôt contient le socle technique, les salons sans compte, la personnalisation des Plummos et les réglages de session. Le catalogue administrateur est disponible ; les mini-jeux restent à développer.
 
 ## Installation
 
@@ -86,4 +86,6 @@ Le service serveur `Scoring` centralise les barèmes validés et leurs arrondis.
 
 L’administration est accessible sur `/admin` avec un compte dédié. Aucune inscription publique ni compte joueur n’est ajouté. Après migration explicite de la base souhaitée, créer un administrateur avec `php artisan admin:create` : nom, adresse e-mail et mot de passe confirmé de 12 caractères minimum sont saisis interactivement ; le mot de passe est masqué. La commande refuse les adresses déjà utilisées et ne transforme aucun compte existant. Aucun administrateur n’est créé automatiquement.
 
-La connexion utilise Fortify, limitée à cinq tentatives par minute et combinaison e-mail/adresse IP. Toutes les pages d’administration exigent la permission serveur `administer`. Cette étape fournit la connexion et la déconnexion ; le catalogue sera ajouté dans une PR séparée.
+La connexion utilise Fortify, limitée à cinq tentatives par minute et combinaison e-mail/adresse IP. Toutes les pages d’administration exigent la permission serveur `administer`. Le catalogue permet de créer et publier les questions, morceaux, mots à dessiner et débuts de phrases. Les brouillons incomplets restent privés. Les tags sont réutilisables et chaque pack exige tous ses tags ; les sélections de plusieurs packs forment une union sans doublons. Un tag requis par un pack ne peut pas être supprimé.
+
+Les extraits préparés (MP3, WAV, OGG ou M4A, 20 Mio maximum) sont stockés sur le disque privé et écoutables uniquement par un administrateur. Les fichiers remplacés ou supprimés sont nettoyés. Aucun contenu ni audio de démonstration n’est fourni. Les imports CSV et Excel seront ajoutés séparément.
