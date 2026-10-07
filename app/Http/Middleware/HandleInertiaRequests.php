@@ -39,7 +39,7 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'locale' => app()->getLocale(),
-            'translations' => ['home' => __('home'), 'rooms' => __('rooms'), 'plummo' => __('plummo')],
+            'translations' => ['home' => __('home'), 'rooms' => __('rooms'), 'plummo' => __('plummo'), 'admin' => __('admin')],
         ];
     }
 }
