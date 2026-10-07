@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Plummo — Atelier vectoriel</title>
+        <style>
+            :root {
+                color-scheme: light;
+                --ink: #46305e;
+                --muted: #75667e;
+                --paper: #fffbf4;
+                --line: #e5dbec;
+                --wash: #f3edf8;
+                --accent: #7652ac;
+                --mint: #e5f2e9;
+                font-family:
+                    ui-rounded, 'Arial Rounded MT Bold', system-ui, sans-serif;
+                color: var(--ink);
+                background: var(--paper);
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+            }
+            button,
+            a {
+                font: inherit;
+            }
+            button {
+                cursor: pointer;
+            }
+            a {
+                color: inherit;
+                text-underline-offset: 4px;
+            }
+            button:focus-visible,
+            a:focus-visible {
+                outline: 3px solid #9269c6;
+                outline-offset: 4px;
+            }
+            ::selection {
+                background: #d9c5f0;
+                color: var(--ink);
+            }
+            header {
+                max-width: 1440px;
+                margin: auto;
+                padding: 30px 44px 24px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid var(--line);
+            }
+            .brand {
+                font-size: 32px;
+                font-weight: 850;
+                letter-spacing: -0.03em;
+            }
+            .languages {
+                display: flex;
+                gap: 6px;
+            }
+            .languages button {
+                background: transparent;
+                border: 0;
+                padding: 10px 14px;
+                border-radius: 10px;
+                color: var(--muted);
+            }
+            .languages button[aria-pressed='true'] {
+                background: var(--wash);
+                color: var(--ink);
+            }
+            main {
+                max-width: 1440px;
+                margin: auto;
+                padding: 36px 44px 64px;
+            }
+            .intro {
+                margin-bottom: 34px;
+            }
+            h1 {
+                font-size: clamp(30px, 3.6vw, 48px);
+                line-height: 1.1;
+                letter-spacing: -0.035em;
+                margin: 0 0 12px;
+                font-weight: 800;
+            }
+            p {
+                line-height: 1.5;
+                margin: 0;
+            }
+            .intro p {
+                font-size: 17px;
+                color: var(--muted);
+            }
+            .layout {
+                display: grid;
+                grid-template-columns: minmax(300px, 420px) minmax(0, 1fr);
+                gap: 56px;
+                align-items: start;
+            }
+            .preview {
+                position: sticky;
+                top: 24px;
+            }
+            .stage {
+                background: var(--mint);
+                border-radius: 36px;
+                padding: 20px 24px 22px;
+                text-align: center;
+            }
+            .stage h2 {
+                font-size: 18px;
+                margin: 0;
+                font-weight: 600;
+            }
+            .main-avatar {
+                width: 100%;
+                max-width: 350px;
+                height: auto;
+                display: block;
+                margin: 8px auto 0;
+            }
+            .stage .status {
+                font-size: 14px;
+                margin-top: 4px;
+                min-height: 21px;
+            }
+            .color-section {
+                margin: 25px 0;
+            }
+            .color-section h3 {
+                font-size: 16px;
+                margin: 0 0 12px;
+            }
+            .swatches {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            .swatch {
+                width: 46px;
+                height: 46px;
+                background: var(--swatch);
+                border: 4px solid var(--paper);
+                border-radius: 50%;
+                box-shadow: 0 0 0 1px var(--line);
+                font-size: 0;
+            }
+            .swatch[aria-pressed='true'] {
+                box-shadow: 0 0 0 3px var(--ink);
+            }
+            .color-name {
+                font-size: 14px;
+                color: var(--muted);
+                margin-top: 12px;
+            }
+            .actions {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            .action {
+                min-height: 44px;
+                border: 0;
+                border-radius: 12px;
+                background: var(--wash);
+                color: var(--ink);
+                padding: 12px 18px;
+                font-weight: 600;
+            }
+            .action.primary {
+                background: var(--ink);
+                color: var(--paper);
+            }
+            .message {
+                margin-top: 12px;
+                color: var(--muted);
+                font-size: 14px;
+                min-height: 42px;
+            }
+            .small-preview {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                margin-top: 16px;
+                padding-top: 20px;
+                border-top: 1px solid var(--line);
+            }
+            .small-preview svg {
+                width: 74px;
+                height: 74px;
+                flex: none;
+            }
+            .small-preview h3 {
+                margin: 0;
+                font-size: 14px;
+                font-weight: 600;
+            }
+            .small-preview span {
+                display: block;
+                font-size: 13px;
+                color: var(--muted);
+                margin-top: 4px;
+            }
+            .catalog-head {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+            .catalog-head h2 {
+                font-size: 26px;
+                letter-spacing: -0.025em;
+                margin: 0;
+            }
+            .view-buttons {
+                display: flex;
+                gap: 4px;
+                background: var(--wash);
+                border-radius: 12px;
+                padding: 4px;
+            }
+            .view-buttons button {
+                padding: 9px 11px;
+                border: 0;
+                color: var(--muted);
+                border-radius: 9px;
+                background: transparent;
+                font-size: 13px;
+            }
+            .view-buttons button[aria-pressed='true'] {
+                background: var(--paper);
+                color: var(--ink);
+            }
+            .limit {
+                color: var(--muted);
+                font-size: 14px;
+                margin: 10px 0 0;
+            }
+            .group {
+                margin-top: 30px;
+            }
+            .group h3 {
+                font-size: 17px;
+                font-weight: 650;
+                margin: 0 0 13px;
+            }
+            .tiles {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+                gap: 10px;
+            }
+            .tile {
+                position: relative;
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                background: transparent;
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                padding: 10px 6px 12px;
+                color: var(--ink);
+                text-align: center;
+                transition: background 0.15s;
+            }
+            .tile:hover {
+                background: var(--wash);
+            }
+            .tile[aria-pressed='true'] {
+                background: var(--wash);
+                border-color: var(--accent);
+                box-shadow: inset 0 0 0 1px var(--accent);
+            }
+            .tile svg {
+                display: block;
+                width: 100%;
+                height: 120px;
+            }
+            .tile span {
+                font-size: 13px;
+                line-height: 1.35;
+                min-height: 35px;
+                display: grid;
+                align-content: center;
+            }
+            .tile .selection {
+                position: absolute;
+                top: 7px;
+                right: 9px;
+                font-size: 12px;
+                font-weight: 700;
+                min-height: 0;
+                color: var(--accent);
+            }
+            .assembled {
+                margin-top: 30px;
+                padding-top: 22px;
+                border-top: 1px solid var(--line);
+            }
+            .assembled h3 {
+                margin: 0 0 16px;
+                font-size: 16px;
+            }
+            .layers {
+                display: flex;
+                align-items: flex-start;
+                gap: 14px;
+                flex-wrap: wrap;
+            }
+            .layer {
+                text-align: center;
+                flex: 1;
+                min-width: 88px;
+                max-width: 120px;
+            }
+            .layer svg {
+                width: 88px;
+                height: 88px;
+                display: block;
+                margin: auto;
+            }
+            .layer span {
+                font-size: 12px;
+                line-height: 1.3;
+                display: block;
+            }
+            .layer a {
+                font-size: 12px;
+                display: inline-block;
+                margin-top: 6px;
+            }
+            .remove {
+                margin-top: 8px;
+                border: 0;
+                background: transparent;
+                color: var(--muted);
+                text-decoration: underline;
+                text-underline-offset: 3px;
+                padding: 6px;
+                font-size: 12px;
+            }
+            footer {
+                padding-top: 40px;
+                color: var(--muted);
+                font-size: 14px;
+            }
+            @media (max-width: 950px) {
+                main {
+                    padding: 30px 24px;
+                }
+                .layout {
+                    gap: 28px;
+                    grid-template-columns: 300px minmax(0, 1fr);
+                }
+                header {
+                    padding: 24px;
+                }
+                .tiles {
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                }
+                .tile svg {
+                    height: 95px;
+                }
+            }
+            @media (max-width: 680px) {
+                .layout {
+                    grid-template-columns: 1fr;
+                }
+                .preview {
+                    position: static;
+                }
+                .stage {
+                    padding: 14px;
+                }
+                .main-avatar {
+                    max-width: 260px;
+                }
+                .intro {
+                    margin-bottom: 24px;
+                }
+                h1 {
+                    font-size: 32px;
+                }
+                .stage h2 {
+                    font-size: 16px;
+                }
+                .small-preview {
+                    margin: 8px 0 26px;
+                }
+                .color-section {
+                    margin: 20px 0;
+                }
+                .tile svg {
+                    height: 110px;
+                }
+                .catalog-head {
+                    align-items: flex-start;
+                }
+                .assembled {
+                    display: none;
+                }
+                main {
+                    padding: 25px 20px 40px;
+                }
+                header {
+                    padding: 18px 20px;
+                }
+                .brand {
+                    font-size: 28px;
+                }
+                .message {
+                    min-height: 21px;
+                }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    transition: none !important;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <span class="brand">Plummo</span>
+            <div class="languages" role="group" aria-label="Langue">
+                <button type="button" data-lang="fr" aria-pressed="true">
+                    FR</button
+                ><button type="button" data-lang="en" aria-pressed="false">
+                    EN
+                </button>
+            </div>
+        </header>
+        <main id="plummo-workshop">
+            <div class="intro">
+                <h1 data-text="title"></h1>
+                <p data-text="intro"></p>
+            </div>
+            <div class="layout">
+                <section class="preview" aria-labelledby="preview-title">
+                    <div class="stage">
+                        <h2 id="preview-title" data-text="preview"></h2>
+                        <div id="main-preview"></div>
+                        <p
+                            class="status"
+                            id="selection-status"
+                            aria-live="polite"
+                        ></p>
+                    </div>
+                    <div class="color-section">
+                        <h3 data-text="colors"></h3>
+                        <div id="swatches" class="swatches" role="group"></div>
+                        <p class="color-name" id="color-name"></p>
+                    </div>
+                    <div class="actions">
+                        <button
+                            type="button"
+                            class="action primary"
+                            id="download"
+                            data-text="download"
+                        ></button
+                        ><button
+                            type="button"
+                            class="action"
+                            id="random"
+                            data-text="random"
+                        ></button>
+                    </div>
+                    <p class="message" id="message" aria-live="polite"></p>
+                    <div class="small-preview">
+                        <div id="small-preview"></div>
+                        <div>
+                            <h3 data-text="small"></h3>
+                            <span id="small-caption"></span>
+                        </div>
+                    </div>
+                    <div class="assembled">
+                        <h3 data-text="assembly"></h3>
+                        <div id="layers" class="layers"></div>
+                    </div>
+                </section>
+                <section class="catalog" aria-labelledby="catalog-title">
+                    <div class="catalog-head">
+                        <h2 id="catalog-title" data-text="gallery"></h2>
+                        <div class="view-buttons" role="group">
+                            <button
+                                type="button"
+                                id="worn"
+                                aria-pressed="true"
+                                data-text="worn"
+                            ></button
+                            ><button
+                                type="button"
+                                id="pieces"
+                                aria-pressed="false"
+                                data-text="switch"
+                            ></button>
+                        </div>
+                    </div>
+                    <p class="limit" data-text="limit"></p>
+                    <div id="groups"></div>
+                </section>
+            </div>
+            <footer data-text="gallery_note"></footer>
+        </main>
+        <script>
+            (() => {
+                const bodies = {"base":"\u003Cdefs\u003E\n \u003ClinearGradient id=\"plummo-tone\" x1=\"0\" y1=\"0\" x2=\".8\" y2=\"1\"\u003E\u003Cstop stop-color=\"#b99aef\"\/\u003E\u003Cstop offset=\".55\" stop-color=\"#9672dc\"\/\u003E\u003Cstop offset=\"1\" stop-color=\"#6950ac\"\/\u003E\u003C\/linearGradient\u003E\n \u003ClinearGradient id=\"plummo-cream\" x2=\".3\" y2=\"1\"\u003E\u003Cstop stop-color=\"#fffaf0\"\/\u003E\u003Cstop offset=\"1\" stop-color=\"#f7eadb\"\/\u003E\u003C\/linearGradient\u003E\n \u003ClinearGradient id=\"plummo-iris\" x2=\"0\" y2=\"1\"\u003E\u003Cstop stop-color=\"#231744\"\/\u003E\u003Cstop offset=\".65\" stop-color=\"#382259\"\/\u003E\u003Cstop offset=\"1\" stop-color=\"#9672dc\"\/\u003E\u003C\/linearGradient\u003E\n \u003ClinearGradient id=\"plummo-pink\" x2=\".5\" y2=\"1\"\u003E\u003Cstop stop-color=\"#ffd0b3\"\/\u003E\u003Cstop offset=\"1\" stop-color=\"#f096b8\"\/\u003E\u003C\/linearGradient\u003E\n\u003C\/defs\u003E\n\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\n \u003Cg id=\"plummo-feet\" fill=\"url(#plummo-tone)\"\u003E\u003Cpath d=\"M178 439 Q174 452 180 464 C143 458 139 485 151 489 C169 496 205 494 216 486 Q229 477 216 451Z\"\/\u003E\u003Cpath d=\"M281 450 Q278 464 287 477 C280 491 313 497 337 491 C362 485 348 465 321 465 L319 442Z\"\/\u003E\u003C\/g\u003E\n \u003Cg id=\"plummo-plumes\"\u003E\u003Cpath fill=\"url(#plummo-tone)\" d=\"M240 167 C225 124 237 64 272 39 C313 9 354 29 355 61 C358 96 306 87 275 123 Q259 138 240 167Z\"\/\u003E\u003Cpath fill=\"url(#plummo-pink)\" d=\"M241 164 C221 144 186 136 187 102 C188 75 212 62 230 78 C245 93 239 124 241 164Z\"\/\u003E\u003Cpath fill=\"url(#plummo-tone)\" d=\"M248 169 C259 115 294 98 324 112 C361 132 351 157 319 158 Q285 158 248 169Z\"\/\u003E\n \u003Cpath d=\"M243 150 C244 106 267 57 305 40\" stroke=\"#d4b9fc\" stroke-width=\"9\" opacity=\".45\" fill=\"none\"\/\u003E\n \u003Cpath d=\"M250 156 C272 130 300 119 319 124\" stroke=\"#d4b9fc\" stroke-width=\"7\" opacity=\".45\" fill=\"none\"\/\u003E\n \u003C\/g\u003E\n \u003Cg id=\"plummo-hands\" fill=\"url(#plummo-tone)\"\u003E\u003Cpath d=\"M116 305 C100 302 88 292 80 283 C71 269 52 265 53 281 Q54 292 64 296 C44 283 37 305 51 321 C68 341 100 343 119 333Z\"\/\u003E\u003Cpath d=\"M391 313 C405 312 415 302 421 289 C428 276 443 277 440 293 C460 282 473 298 463 316 C451 341 422 348 389 337Z\"\/\u003E\n \u003Cpath d=\"M55 305 Q75 333 107 327 M419 319 Q440 324 456 308\" stroke=\"#d3b6ff\" stroke-width=\"6\" opacity=\".4\" fill=\"none\"\/\u003E\u003C\/g\u003E\n \u003Cpath id=\"plummo-body\" fill=\"url(#plummo-cream)\" d=\"M234 158 C210 137 180 139 169 152 Q158 160 179 164 C147 172 119 189 119 205 Q122 215 143 207 C123 223 100 248 101 262 Q102 271 121 260 Q100 279 105 287 L117 284 Q100 307 103 332 C92 362 100 390 114 379 C109 408 130 424 138 408 C141 439 159 445 163 432 C181 452 197 454 213 445 C237 461 267 460 283 448 C305 457 325 447 330 435 C350 450 371 428 369 413 C389 427 402 399 395 379 C414 388 417 366 412 346 C421 319 411 303 404 293 C414 306 405 268 391 248 C409 255 410 245 401 230 C385 207 357 187 331 178 C344 174 324 161 307 163 C319 151 295 151 281 163 C291 145 268 154 258 167 C248 154 241 151 234 158Z\"\/\u003E\n \u003Cpath id=\"plummo-fluff-shadow\" stroke=\"none\" fill=\"#9672dc\" opacity=\".2\" d=\"M105 329 C100 356 107 374 116 364 L126 351 C119 378 137 400 144 393 L148 378 Q149 418 170 420 L176 403 Q184 433 213 432 Q210 425 207 422 Q244 449 282 431 L284 419 Q301 430 321 415 L326 398 Q337 412 346 405 L354 385 Q373 390 376 364 L390 382 Q403 375 400 356 L411 336 C419 371 407 397 395 379 C402 410 386 427 369 413 Q365 444 330 435 Q307 459 283 448 Q247 469 213 445 Q185 462 163 432 Q145 452 138 408 Q115 437 114 379 Q91 391 105 329Z\"\/\u003E\n \u003Cg id=\"plummo-face\"\u003E\n \u003Cpath d=\"M182 211 C189 192 207 186 213 198 Q195 200 182 211Z\" fill=\"#392468\" stroke=\"none\"\/\u003E\u003Cpath d=\"M308 205 C316 186 334 204 339 221 Q325 205 308 205Z\" fill=\"#392468\" stroke=\"none\"\/\u003E\n \u003Cpath d=\"M157 263 C151 233 169 216 190 221 C216 225 222 261 208 280 C190 302 160 285 157 263Z\" fill=\"#fffdf8\" stroke-width=\"3\"\/\u003E\n \u003Cpath d=\"M284 274 C278 244 291 224 313 227 C342 230 351 264 337 286 C320 307 289 299 284 274Z\" fill=\"#fffdf8\" stroke-width=\"3\"\/\u003E\n \u003Cellipse cx=\"195\" cy=\"263\" rx=\"21\" ry=\"28\" fill=\"url(#plummo-iris)\" stroke=\"none\"\/\u003E\u003Cellipse cx=\"314\" cy=\"273\" rx=\"22\" ry=\"29\" fill=\"url(#plummo-iris)\" stroke=\"none\"\/\u003E\n \u003Cellipse cx=\"198\" cy=\"250\" rx=\"7\" ry=\"8\" fill=\"#fff\" stroke=\"none\"\/\u003E\u003Cellipse cx=\"306\" cy=\"259\" rx=\"7\" ry=\"8\" fill=\"#fff\" stroke=\"none\"\/\u003E\n \u003Cellipse cx=\"161\" cy=\"300\" rx=\"20\" ry=\"14\" transform=\"rotate(12 161 300)\" fill=\"#ffb9b4\" stroke=\"none\"\/\u003E\u003Cellipse cx=\"337\" cy=\"309\" rx=\"20\" ry=\"14\" transform=\"rotate(-12 337 309)\" fill=\"#ffb9b4\" stroke=\"none\"\/\u003E\n \u003Cpath d=\"M225 284 C219 294 222 311 229 324 C242 345 267 339 275 317 C281 300 280 286 273 287 Q247 293 225 284Z\" fill=\"#532044\" stroke=\"#392468\" stroke-width=\"3\"\/\u003E\n \u003Cpath d=\"M228 313 Q251 290 275 312 C266 342 243 347 228 313Z\" fill=\"#ef6e8e\" stroke=\"none\"\/\u003E\u003Cpath d=\"M233 322 Q252 308 267 321\" stroke=\"#ff91a0\" stroke-width=\"5\" fill=\"none\"\/\u003E\n \u003C\/g\u003E\n\u003C\/g\u003E","cap":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#82c4bb\" d=\"M140 166 C138 92 194 61 247 73 C294 77 327 107 326 159 L309 177Z\"\/\u003E\u003Cpath fill=\"#b4e2d3\" stroke=\"none\" d=\"M157 148 C159 103 190 83 219 81 Q206 115 211 160Z\"\/\u003E\u003Cpath fill=\"none\" stroke=\"#d1efdf\" d=\"M255 81 Q286 111 289 147\"\/\u003E\u003Cpath fill=\"#5d9798\" d=\"M129 164 Q220 142 322 158 L384 179 Q348 203 303 184 Q217 173 133 187Z\"\/\u003E\u003Ccircle cx=\"238\" cy=\"73\" r=\"7\" fill=\"#f9cb67\"\/\u003E\u003C\/g\u003E","crown":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#ffd679\" d=\"M139 109 L170 145 L199 94 L235 137 L274 93 L308 145 L359 108 L344 177 Q248 195 151 177Z\"\/\u003E\u003Cpath fill=\"#edb958\" d=\"M150 161 Q248 181 347 161 L344 177 Q249 195 151 177Z\"\/\u003E\u003Ccircle cx=\"139\" cy=\"107\" r=\"7\" fill=\"#ffe9a8\"\/\u003E\u003Ccircle cx=\"199\" cy=\"92\" r=\"7\" fill=\"#ffe9a8\"\/\u003E\u003Ccircle cx=\"274\" cy=\"91\" r=\"7\" fill=\"#ffe9a8\"\/\u003E\u003Ccircle cx=\"360\" cy=\"106\" r=\"7\" fill=\"#ffe9a8\"\/\u003E\u003Cpath d=\"M234 157 L248 143 L262 157 L248 172Z\" fill=\"#ec8a9e\"\/\u003E\u003Ccircle cx=\"180\" cy=\"162\" r=\"5\" fill=\"#fff0c4\"\/\u003E\u003Ccircle cx=\"316\" cy=\"162\" r=\"5\" fill=\"#fff0c4\"\/\u003E\u003C\/g\u003E","beanie":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#df94b5\" d=\"M142 162 C134 88 174 60 242 62 C309 62 346 94 342 165Z\"\/\u003E\u003Ccircle cx=\"242\" cy=\"55\" r=\"21\" fill=\"#f5c1d1\"\/\u003E\u003Cpath fill=\"none\" stroke=\"#b15f94\" d=\"M177 149 Q167 111 192 81 M213 147 Q205 103 222 73 M254 147 L254 75 M294 149 Q303 106 280 77 M324 154 Q331 117 309 92\"\/\u003E\u003Cpath fill=\"#f5c1d1\" d=\"M132 151 Q241 136 352 152 L355 182 Q246 197 130 181Z\"\/\u003E\u003Cpath fill=\"none\" stroke=\"#df94b5\" d=\"M151 157 L151 177 M179 154 L179 180 M208 151 L208 183 M238 151 L238 183 M269 152 L269 183 M300 155 L300 181 M331 157 L331 177\"\/\u003E\u003C\/g\u003E","wizard-hat":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#5b68ad\" d=\"M145 154 L216 44 Q240 12 280 19 L299 41 Q267 38 265 70 L342 156Z\"\/\u003E\u003Cpath fill=\"#8790d0\" stroke=\"none\" d=\"M159 146 L220 55 Q232 30 260 28 Q229 51 227 87 L196 149Z\"\/\u003E\u003Cpath fill=\"#e6bd70\" d=\"M157 133 Q246 146 331 133 L342 158 L147 159Z\"\/\u003E\u003Cpath fill=\"#5b68ad\" d=\"M113 157 Q246 135 380 157 L384 175 Q247 194 109 176Z\"\/\u003E\u003Cpath fill=\"#ffdc8c\" stroke-width=\"2\" d=\"M242 72 L246 81 L256 82 L249 89 L251 99 L242 94 L233 99 L235 89 L228 82 L238 81Z\"\/\u003E\u003Ccircle cx=\"292\" cy=\"113\" r=\"5\" fill=\"#ffdc8c\"\/\u003E\u003C\/g\u003E","bucket-hat":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#f4c46d\" d=\"M168 88 Q242 63 317 88 L340 155 L145 155Z\"\/\u003E\u003Cpath fill=\"#ffe0a0\" stroke=\"none\" d=\"M178 91 Q205 80 225 81 L211 146 L157 148Z\"\/\u003E\u003Cpath fill=\"#e9a854\" d=\"M146 142 Q244 124 339 142 L373 174 Q246 198 119 176Z\"\/\u003E\u003Cpath fill=\"none\" stroke=\"#fff0c4\" d=\"M159 162 Q245 146 333 162\"\/\u003E\u003Cpath fill=\"#82c4bb\" d=\"M248 108 Q264 95 276 107 Q279 119 263 124 Q247 120 248 108Z\"\/\u003E\u003C\/g\u003E","flower":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath d=\"M313 170 Q344 190 358 167\" stroke=\"#639779\" stroke-width=\"7\" fill=\"none\"\/\u003E\u003Cpath fill=\"#8fb993\" d=\"M335 184 Q331 161 353 153 Q360 179 335 184Z\"\/\u003E\u003Cg fill=\"#f7a2b5\"\u003E\u003Cellipse cx=\"320\" cy=\"146\" rx=\"13\" ry=\"21\"\/\u003E\u003Cellipse cx=\"338\" cy=\"160\" rx=\"21\" ry=\"13\" transform=\"rotate(-25 338 160)\"\/\u003E\u003Cellipse cx=\"329\" cy=\"182\" rx=\"13\" ry=\"21\" transform=\"rotate(-35 329 182)\"\/\u003E\u003Cellipse cx=\"306\" cy=\"182\" rx=\"13\" ry=\"21\" transform=\"rotate(35 306 182)\"\/\u003E\u003Cellipse cx=\"299\" cy=\"159\" rx=\"21\" ry=\"13\" transform=\"rotate(25 299 159)\"\/\u003E\u003C\/g\u003E\u003Ccircle cx=\"319\" cy=\"163\" r=\"15\" fill=\"#ffe089\"\/\u003E\u003Ccircle cx=\"314\" cy=\"160\" r=\"3\" fill=\"#fff4cf\" stroke=\"none\"\/\u003E\u003C\/g\u003E","round-glasses":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cg fill=\"#b2dbf0\" fill-opacity=\".18\" stroke=\"#67508f\" stroke-width=\"6\"\u003E\u003Ccircle cx=\"190\" cy=\"257\" r=\"38\"\/\u003E\u003Ccircle cx=\"313\" cy=\"267\" r=\"38\"\/\u003E\u003Cpath d=\"M228 258 Q250 245 275 266 M152 250 L139 244 M351 270 L364 265\" fill=\"none\"\/\u003E\u003C\/g\u003E\u003Cpath d=\"M164 243 L175 232 M288 252 L298 242\" stroke=\"#fffdf6\" stroke-width=\"5\"\/\u003E\u003C\/g\u003E","sunglasses":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#34244e\" d=\"M148 239 Q183 228 225 239 L221 268 Q209 286 177 279 Q153 275 150 253Z\"\/\u003E\u003Cpath fill=\"#34244e\" d=\"M277 248 Q315 237 355 250 L349 279 Q337 296 306 288 Q284 284 280 262Z\"\/\u003E\u003Cpath d=\"M225 246 Q253 238 278 256 M149 244 L138 237 M355 256 L367 250\" fill=\"none\" stroke-width=\"6\"\/\u003E\u003Cpath d=\"M168 240 L197 272 M180 238 L210 270 M298 248 L327 280 M310 246 L341 279\" stroke=\"#8067a2\" stroke-width=\"5\"\/\u003E\u003C\/g\u003E","heart-glasses":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cg fill=\"#f5b6cf\" fill-opacity=\".4\" stroke=\"#d96694\" stroke-width=\"6\"\u003E\u003Cpath d=\"M191 288 C176 277 143 258 151 239 C158 224 177 228 189 241 C200 220 222 230 226 246 Q229 269 191 288Z\"\/\u003E\u003Cpath d=\"M314 297 C299 286 267 267 275 248 C282 233 300 237 312 250 C324 229 346 239 350 255 Q353 278 314 297Z\"\/\u003E\u003Cpath d=\"M227 252 Q249 242 274 262 M149 242 L136 236 M351 257 L365 251\" fill=\"none\"\/\u003E\u003C\/g\u003E\u003C\/g\u003E","monocle":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Ccircle cx=\"313\" cy=\"267\" r=\"36\" fill=\"#ffdf8c\" fill-opacity=\".15\" stroke=\"#c8954b\" stroke-width=\"6\"\/\u003E\u003Cpath d=\"M337 296 Q364 348 331 382\" stroke=\"#c8954b\" stroke-width=\"3\" fill=\"none\"\/\u003E\u003Cpath d=\"M291 257 L305 243\" stroke=\"#fff9ec\" stroke-width=\"5\"\/\u003E\u003Ccircle cx=\"331\" cy=\"383\" r=\"4\" fill=\"#f9ce73\"\/\u003E\u003C\/g\u003E","pirate-patch":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath d=\"M135 214 L359 275\" stroke=\"#493653\" stroke-width=\"10\" fill=\"none\"\/\u003E\u003Cpath fill=\"#493653\" d=\"M153 234 Q186 218 219 236 L220 264 C217 299 163 299 158 266Z\"\/\u003E\u003Cpath d=\"M179 252 L197 269 M197 252 L179 269\" stroke=\"#f8e8d8\" stroke-width=\"5\"\/\u003E\u003Cpath d=\"M169 240 Q188 231 210 240\" stroke=\"#735b78\" stroke-width=\"3\" fill=\"none\"\/\u003E\u003C\/g\u003E","bow-tie":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#e8849c\" d=\"M240 364 C222 352 199 344 197 361 L200 386 C202 400 222 390 242 379Z\"\/\u003E\u003Cpath fill=\"#e8849c\" d=\"M255 364 C273 352 297 348 298 364 L294 389 C292 400 273 390 253 379Z\"\/\u003E\u003Cpath d=\"M218 363 L240 371 M220 381 L240 376 M276 362 L256 371 M276 384 L256 377\" stroke=\"#b65b82\" stroke-width=\"3\"\/\u003E\u003Crect x=\"237\" y=\"360\" width=\"23\" height=\"25\" rx=\"8\" fill=\"#f8b1b8\"\/\u003E\u003C\/g\u003E","tie":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath d=\"M214 354 Q249 369 279 356\" stroke=\"#518793\" stroke-width=\"6\" fill=\"none\"\/\u003E\u003Cpath fill=\"#a3d4d5\" d=\"M235 359 L260 360 L256 380 L239 381Z\"\/\u003E\u003Cpath fill=\"#6faeb7\" d=\"M240 379 L255 379 L270 420 L248 441 L227 419Z\"\/\u003E\u003Cpath d=\"M234 402 L260 411 M239 389 L256 394 M235 421 L251 427\" stroke=\"#bfdfdc\" stroke-width=\"5\"\/\u003E\u003C\/g\u003E","kerchief":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#f4bc72\" d=\"M203 353 Q247 369 291 353 L278 383 L251 408 L219 383Z\"\/\u003E\u003Cpath fill=\"#ffd695\" d=\"M203 353 Q246 378 291 353 L285 371 Q247 390 209 371Z\"\/\u003E\u003Cpath fill=\"#f4bc72\" d=\"M281 374 Q308 369 308 385 L288 390 L299 409 L281 402 L272 385Z\"\/\u003E\u003Ccircle cx=\"246\" cy=\"388\" r=\"4\" fill=\"#fff5db\" stroke=\"none\"\/\u003E\u003Ccircle cx=\"233\" cy=\"380\" r=\"3\" fill=\"#fff5db\" stroke=\"none\"\/\u003E\u003C\/g\u003E","scarf":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#82b3a1\" d=\"M201 352 Q249 369 296 351 L299 376 Q250 397 198 376Z\"\/\u003E\u003Cpath d=\"M215 364 Q249 378 284 364\" fill=\"none\" stroke=\"#b6d5b4\" stroke-width=\"7\"\/\u003E\u003Cpath fill=\"#82b3a1\" d=\"M274 377 L301 378 L307 433 L280 437Z\"\/\u003E\u003Cpath d=\"M281 435 L281 448 M289 434 L290 447 M298 434 L300 446 M280 411 L304 407 M278 392 L302 389\" stroke=\"#b6d5b4\" stroke-width=\"4\"\/\u003E\u003C\/g\u003E","scarf-back":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#82b3a1\" d=\"M202 355 Q181 369 177 419 L205 427 L219 366Z\"\/\u003E\u003Cpath d=\"M178 418 L174 434 M188 422 L185 438 M198 425 L195 440\" stroke=\"#82b3a1\" stroke-width=\"5\"\/\u003E\u003C\/g\u003E","medal":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath d=\"M210 350 Q210 392 248 413 Q287 391 287 351\" stroke=\"#ef94a7\" stroke-width=\"9\" fill=\"none\"\/\u003E\u003Ccircle cx=\"248\" cy=\"414\" r=\"22\" fill=\"#ffd477\"\/\u003E\u003Ccircle cx=\"248\" cy=\"414\" r=\"15\" fill=\"#ffe8a9\" stroke=\"#d4a653\" stroke-width=\"2\"\/\u003E\u003Cpath d=\"M248 403 L251 410 L259 411 L253 416 L255 424 L248 420 L241 424 L243 416 L237 411 L245 410Z\" fill=\"#d4a653\" stroke=\"none\"\/\u003E\u003C\/g\u003E","wand":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath d=\"M432 342 L426 387\" stroke=\"#8062b4\" stroke-width=\"9\"\/\u003E\u003Cpath d=\"M425 376 L427 387\" stroke=\"#ffd477\" stroke-width=\"9\"\/\u003E\u003C\/g\u003E","wand-back":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath d=\"M448 231 L434 304\" stroke=\"#8062b4\" stroke-width=\"9\"\/\u003E\u003Cpath fill=\"#ffdd88\" d=\"M453 189 L462 209 L484 212 L468 227 L471 249 L451 238 L431 247 L436 225 L420 209 L442 207Z\"\/\u003E\u003Cpath d=\"M414 183 L410 174 M484 188 L490 182 M487 248 L495 252\" stroke=\"#c69a58\" stroke-width=\"3\"\/\u003E\u003C\/g\u003E","fan":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath d=\"M431 325 L446 357\" stroke=\"#c18b66\" stroke-width=\"9\"\/\u003E\u003C\/g\u003E","fan-back":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#eda0b4\" d=\"M426 319 L393 253 Q400 231 421 226 Q444 216 463 229 Q481 238 489 259Z\"\/\u003E\u003Cpath d=\"M426 319 L404 242 M426 319 L424 226 M426 319 L449 225 M426 319 L473 239\" stroke=\"#c36b94\" stroke-width=\"3\"\/\u003E\u003Cpath d=\"M402 242 Q441 216 480 250\" stroke=\"#ffcfce\" stroke-width=\"7\" fill=\"none\"\/\u003E\u003C\/g\u003E","microphone":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#74698d\" d=\"M428 341 L447 342 L443 377 Q437 386 429 376Z\"\/\u003E\u003Cpath d=\"M436 382 Q455 401 435 416 Q418 431 446 440\" fill=\"none\" stroke=\"#74698d\" stroke-width=\"4\"\/\u003E\u003C\/g\u003E","microphone-back":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#74698d\" d=\"M427 272 L452 274 L449 307 L429 307Z\"\/\u003E\u003Cellipse cx=\"441\" cy=\"252\" rx=\"24\" ry=\"29\" fill=\"#b6afc8\"\/\u003E\u003Cpath d=\"M421 239 L459 243 M419 251 L462 255 M423 263 L458 266 M434 226 L430 277 M446 225 L443 279\" stroke=\"#817394\" stroke-width=\"3\"\/\u003E\u003Cpath d=\"M428 291 L450 292\" stroke=\"#d2c7e6\" stroke-width=\"4\"\/\u003E\u003C\/g\u003E","scepter":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath d=\"M436 341 L433 390\" stroke=\"#d5a352\" stroke-width=\"9\"\/\u003E\u003Ccircle cx=\"433\" cy=\"392\" r=\"6\" fill=\"#ffe08e\"\/\u003E\u003C\/g\u003E","scepter-back":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath d=\"M443 237 L438 304\" stroke=\"#d5a352\" stroke-width=\"9\"\/\u003E\u003Cpath fill=\"#ed98b4\" d=\"M443 189 L461 208 L442 233 L425 208Z\"\/\u003E\u003Cpath d=\"M443 189 L443 231 M425 208 L461 208\" stroke=\"#be6a93\" stroke-width=\"3\"\/\u003E\u003Cpath fill=\"#ffdc83\" d=\"M423 222 L444 235 L463 222 L457 244 L428 243Z\"\/\u003E\u003Cpath d=\"M420 190 L413 182 M470 191 L478 184\" stroke=\"#d5a352\" stroke-width=\"3\"\/\u003E\u003C\/g\u003E","top-hat":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#51446f\" d=\"M173 52 Q250 34 326 52 L317 160 L184 160Z\"\/\u003E\u003Cpath stroke=\"none\" fill=\"#78658f\" d=\"M184 62 L210 57 L214 145 L190 148Z\"\/\u003E\u003Cellipse cx=\"250\" cy=\"52\" rx=\"76\" ry=\"14\" fill=\"#78658f\"\/\u003E\u003Cpath fill=\"#de8cae\" d=\"M182 131 Q249 146 320 132 L317 156 L184 158Z\"\/\u003E\u003Cellipse cx=\"248\" cy=\"171\" rx=\"122\" ry=\"18\" fill=\"#51446f\"\/\u003E\u003Cpath fill=\"#f9cb67\" d=\"M277 138 L291 139 L290 153 L277 152Z\"\/\u003E\u003C\/g\u003E","cowboy-hat":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#d7a36c\" d=\"M161 152 L176 79 Q197 53 221 76 Q246 96 269 75 Q295 57 320 82 L336 152Z\"\/\u003E\u003Cpath fill=\"#f0c991\" stroke=\"none\" d=\"M181 91 Q194 68 211 86 L216 144 L170 148Z\"\/\u003E\u003Cpath fill=\"#8f6656\" d=\"M163 129 Q249 147 330 130 L336 153 L160 153Z\"\/\u003E\u003Cpath fill=\"#d7a36c\" d=\"M108 131 Q133 150 161 148 Q247 174 335 147 Q371 144 391 126 Q405 171 361 181 Q247 198 136 181 Q100 172 108 131Z\"\/\u003E\u003Cpath fill=\"#f9cb67\" d=\"M249 137 L254 144 L263 146 L257 152 L258 160 L250 156 L242 160 L243 152 L237 146 L246 144Z\"\/\u003E\u003C\/g\u003E","pirate-hat":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#51446f\" d=\"M109 111 Q145 89 174 113 Q202 60 250 49 Q296 64 321 115 Q353 89 386 112 L359 171 Q247 195 137 170Z\"\/\u003E\u003Cpath fill=\"none\" stroke=\"#f5d28d\" stroke-width=\"7\" d=\"M117 115 L143 161 Q249 183 353 162 L379 115\"\/\u003E\u003Cpath fill=\"#fff1d3\" d=\"M231 106 Q231 88 249 87 Q269 89 267 107 L260 119 L239 119Z\"\/\u003E\u003Ccircle cx=\"243\" cy=\"104\" r=\"3\" fill=\"#51446f\" stroke=\"none\"\/\u003E\u003Ccircle cx=\"257\" cy=\"104\" r=\"3\" fill=\"#51446f\" stroke=\"none\"\/\u003E\u003Cpath fill=\"none\" stroke=\"#fff1d3\" stroke-width=\"6\" d=\"M226 135 L272 123 M227 124 L271 136\"\/\u003E\u003C\/g\u003E","moustache":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#614659\" d=\"M249 286 Q259 276 269 286 Q284 299 293 279 Q298 304 277 302 Q259 303 249 295 Q238 304 222 301 Q203 299 207 280 Q216 298 230 286 Q240 277 249 286Z\"\/\u003E\u003C\/g\u003E","lollipop":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"none\" stroke=\"#fff1d3\" stroke-width=\"9\" d=\"M445 338 L449 387\"\/\u003E\u003C\/g\u003E","lollipop-back":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath stroke=\"#fff1d3\" stroke-width=\"9\" d=\"M442 249 L445 340\"\/\u003E\u003Ccircle cx=\"442\" cy=\"223\" r=\"35\" fill=\"#f5bdd0\"\/\u003E\u003Cpath fill=\"none\" stroke=\"#de8cae\" stroke-width=\"7\" d=\"M437 222 Q437 210 449 212 Q466 220 450 232 Q433 244 422 226 Q412 199 444 197 Q479 202 468 237\"\/\u003E\u003C\/g\u003E","paintbrush":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#d7a36c\" d=\"M434 338 L446 339 L451 390 Q438 401 436 387Z\"\/\u003E\u003C\/g\u003E","paintbrush-back":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#d7a36c\" d=\"M432 260 L446 259 L447 341 L434 341Z\"\/\u003E\u003Cpath fill=\"#b9c2d7\" d=\"M424 236 L453 235 L449 268 L429 270Z\"\/\u003E\u003Cpath fill=\"#f0c991\" d=\"M424 237 Q415 204 437 184 Q441 202 457 209 Q465 224 452 236Z\"\/\u003E\u003Cpath fill=\"#7cab90\" d=\"M437 184 Q441 202 457 209 L458 219 Q442 231 421 218 Q423 199 437 184Z\"\/\u003E\u003C\/g\u003E","maraca":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#f4c46d\" d=\"M437 338 L449 337 L457 386 Q452 398 441 389Z\"\/\u003E\u003C\/g\u003E","maraca-back":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"#f4c46d\" d=\"M431 253 L445 251 L450 340 L437 341Z\"\/\u003E\u003Cellipse cx=\"439\" cy=\"224\" rx=\"28\" ry=\"36\" transform=\"rotate(-12 439 224)\" fill=\"#de8cae\"\/\u003E\u003Cpath fill=\"#f9cb67\" d=\"M412 217 Q439 230 466 212 L467 232 Q441 247 415 236Z\"\/\u003E\u003Cpath fill=\"none\" stroke=\"#fff1d3\" d=\"M419 203 Q432 193 442 196\"\/\u003E\u003C\/g\u003E","balloon":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"none\" stroke=\"#c5a9ce\" stroke-width=\"3\" d=\"M445 338 Q434 367 451 391\"\/\u003E\u003C\/g\u003E","balloon-back":"\u003Cg stroke=\"#49317c\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\u003E\u003Cpath fill=\"none\" stroke=\"#c5a9ce\" stroke-width=\"3\" d=\"M462 207 Q477 241 449 276 L445 339\"\/\u003E\u003Cpath fill=\"#82c4bb\" d=\"M462 204 C412 188 416 119 458 115 C503 110 516 176 462 204Z\"\/\u003E\u003Cpath fill=\"#5d9798\" d=\"M458 202 L451 213 L470 212 L465 202Z\"\/\u003E\u003Cpath fill=\"none\" stroke=\"#d1efdf\" stroke-width=\"7\" d=\"M439 136 Q430 148 436 163\"\/\u003E\u003C\/g\u003E"};
+                const catalog = {"version":2,"viewBox":[0,0,512,512],"base":"base.svg","maxAccessories":2,"onePerSlot":true,"slots":["head","face","neck","hand"],"colors":[{"id":"violet","label":{"fr":"Violet","en":"Purple"},"color":"#9672dc","light":"#bca2ef","dark":"#6950ac"},{"id":"blue","label":{"fr":"Bleu","en":"Blue"},"color":"#6d9ed2","light":"#aaccec","dark":"#496da6"},{"id":"pink","label":{"fr":"Rose","en":"Pink"},"color":"#de8cae","light":"#f5bdd0","dark":"#aa598b"},{"id":"green","label":{"fr":"Vert","en":"Green"},"color":"#7cab90","light":"#b1d3ad","dark":"#4d816b"},{"id":"honey","label":{"fr":"Miel","en":"Honey"},"color":"#d5a25c","light":"#f5d28d","dark":"#aa753e"},{"id":"slate","label":{"fr":"Gris","en":"Slate"},"color":"#8b93ae","light":"#b9c2d7","dark":"#616882"}],"accessories":[{"id":"cap","slot":"head","label":{"fr":"Casquette","en":"Cap"},"front":"accessories\/cap.svg","bounds":[120,65,391,195],"coversPlumes":true},{"id":"crown","slot":"head","label":{"fr":"Couronne","en":"Crown"},"front":"accessories\/crown.svg","bounds":[130,82,369,190]},{"id":"beanie","slot":"head","label":{"fr":"Bonnet","en":"Beanie"},"front":"accessories\/beanie.svg","bounds":[123,32,367,193],"coversPlumes":true},{"id":"wizard-hat","slot":"head","label":{"fr":"Chapeau de sorcier","en":"Wizard hat"},"front":"accessories\/wizard-hat.svg","bounds":[104,11,391,187],"coversPlumes":true},{"id":"bucket-hat","slot":"head","label":{"fr":"Bob","en":"Bucket hat"},"front":"accessories\/bucket-hat.svg","bounds":[111,68,380,191],"coversPlumes":true},{"id":"flower","slot":"head","label":{"fr":"Fleur","en":"Flower"},"front":"accessories\/flower.svg","bounds":[270,117,368,211]},{"id":"round-glasses","slot":"face","label":{"fr":"Lunettes rondes","en":"Round glasses"},"front":"accessories\/round-glasses.svg","bounds":[132,212,371,312]},{"id":"sunglasses","slot":"face","label":{"fr":"Lunettes de soleil","en":"Sunglasses"},"front":"accessories\/sunglasses.svg","bounds":[130,224,375,304]},{"id":"heart-glasses","slot":"face","label":{"fr":"Lunettes en cœur","en":"Heart glasses"},"front":"accessories\/heart-glasses.svg","bounds":[129,219,373,308]},{"id":"monocle","slot":"face","label":{"fr":"Monocle","en":"Monocle"},"front":"accessories\/monocle.svg","bounds":[269,222,377,395]},{"id":"pirate-patch","slot":"face","label":{"fr":"Bandeau de pirate","en":"Pirate patch"},"front":"accessories\/pirate-patch.svg","bounds":[126,204,369,300]},{"id":"bow-tie","slot":"neck","label":{"fr":"Nœud papillon","en":"Bow tie"},"front":"accessories\/bow-tie.svg","bounds":[190,339,305,406]},{"id":"tie","slot":"neck","label":{"fr":"Cravate","en":"Tie"},"front":"accessories\/tie.svg","bounds":[205,345,288,449]},{"id":"kerchief","slot":"neck","label":{"fr":"Foulard","en":"Kerchief"},"front":"accessories\/kerchief.svg","bounds":[195,345,316,417]},{"id":"scarf","slot":"neck","label":{"fr":"Écharpe","en":"Scarf"},"front":"accessories\/scarf.svg","bounds":[162,344,320,456],"back":"accessories\/scarf-back.svg"},{"id":"medal","slot":"neck","label":{"fr":"Collier avec médaille","en":"Medal necklace"},"front":"accessories\/medal.svg","bounds":[201,342,298,445]},{"id":"wand","slot":"hand","label":{"fr":"Baguette magique","en":"Magic wand"},"front":"accessories\/wand.svg","bounds":[399,164,503,397],"back":"accessories\/wand-back.svg"},{"id":"fan","slot":"hand","label":{"fr":"Éventail","en":"Fan"},"front":"accessories\/fan.svg","bounds":[385,208,497,369],"back":"accessories\/fan-back.svg"},{"id":"microphone","slot":"hand","label":{"fr":"Micro","en":"Microphone"},"front":"accessories\/microphone.svg","bounds":[408,214,474,450],"back":"accessories\/microphone-back.svg"},{"id":"scepter","slot":"hand","label":{"fr":"Sceptre","en":"Scepter"},"front":"accessories\/scepter.svg","bounds":[403,173,487,405],"back":"accessories\/scepter-back.svg"},{"id":"top-hat","slot":"head","label":{"fr":"Haut-de-forme","en":"Top hat"},"front":"accessories\/top-hat.svg","bounds":[119,36,376,191],"coversPlumes":true},{"id":"cowboy-hat","slot":"head","label":{"fr":"Chapeau de cowboy","en":"Cowboy hat"},"front":"accessories\/cowboy-hat.svg","bounds":[99,58,401,190],"coversPlumes":true},{"id":"pirate-hat","slot":"head","label":{"fr":"Tricorne pirate","en":"Pirate hat"},"front":"accessories\/pirate-hat.svg","bounds":[101,42,394,190],"coversPlumes":true},{"id":"moustache","slot":"face","label":{"fr":"Moustache","en":"Moustache"},"front":"accessories\/moustache.svg","bounds":[203,273,298,306]},{"id":"lollipop","slot":"hand","label":{"fr":"Sucette","en":"Lollipop"},"front":"accessories\/lollipop.svg","bounds":[406,180,489,393],"back":"accessories\/lollipop-back.svg"},{"id":"paintbrush","slot":"hand","label":{"fr":"Pinceau","en":"Paintbrush"},"front":"accessories\/paintbrush.svg","bounds":[414,177,477,398],"back":"accessories\/paintbrush-back.svg"},{"id":"maraca","slot":"hand","label":{"fr":"Maracas","en":"Maraca"},"front":"accessories\/maraca.svg","bounds":[411,184,485,396],"back":"accessories\/maraca-back.svg"},{"id":"balloon","slot":"hand","label":{"fr":"Ballon","en":"Balloon"},"front":"accessories\/balloon.svg","bounds":[421,110,503,396],"back":"accessories\/balloon-back.svg"}]};
+                const messages = {"fr":{"title":"L’atelier des Plummos","intro":"Une petite boule de plumes. Beaucoup de personnalité.","preview":"Ton Plummo","colors":"Sa couleur","accessories":"Ses accessoires","limit":"Deux accessoires, une pièce par zone.","selected":"accessoires sélectionnés","empty":"Sans accessoire","full":"Deux accessoires sont déjà sélectionnés. Retire-en un pour en essayer un autre.","replace":"Cet accessoire remplace celui de la même zone.","gallery":"Toute la collection","gallery_note":"Chaque pièce est indépendante et se combine avec les autres zones.","small":"Sur le grand écran","download":"Télécharger ce Plummo","download_piece":"Télécharger la pièce","head":"Tête","face":"Visage","neck":"Cou","hand":"Mains","assembly":"Les pièces de ton Plummo","body":"Mascotte","language":"Langue","random":"Surprends-moi","remove":"Retirer","switch":"Pièces seules","worn":"Sur le Plummo","subtitle":"Choisis une couleur et touche les accessoires pour les essayer.","back":"Calque arrière","front":"Calque avant","downloaded":"Plummo téléchargé.","galleryview":"Présentation des accessoires","items":{"cap":"Casquette","crown":"Couronne","beanie":"Bonnet","wizard-hat":"Chapeau de sorcier","bucket-hat":"Bob","flower":"Fleur","round-glasses":"Lunettes rondes","sunglasses":"Lunettes de soleil","heart-glasses":"Lunettes en cœur","monocle":"Monocle","pirate-patch":"Bandeau de pirate","bow-tie":"Nœud papillon","tie":"Cravate","kerchief":"Foulard","scarf":"Écharpe","medal":"Collier avec médaille","wand":"Baguette magique","fan":"Éventail","microphone":"Micro","scepter":"Sceptre","top-hat":"Haut-de-forme","cowboy-hat":"Chapeau de cowboy","pirate-hat":"Tricorne pirate","moustache":"Moustache","lollipop":"Sucette","paintbrush":"Pinceau","maraca":"Maracas","balloon":"Ballon"},"palette":{"violet":"Violet","blue":"Bleu","pink":"Rose","green":"Vert","honey":"Miel","slate":"Gris"}},"en":{"title":"The Plummo workshop","intro":"A little ball of feathers. A lot of personality.","preview":"Your Plummo","colors":"Its colour","accessories":"Its accessories","limit":"Two accessories, one piece per area.","selected":"accessories selected","empty":"No accessories","full":"Two accessories are already selected. Remove one to try another.","replace":"This accessory replaces the one in the same area.","gallery":"The whole collection","gallery_note":"Each piece is independent and combines with other areas.","small":"On the big screen","download":"Download this Plummo","download_piece":"Download the piece","head":"Head","face":"Face","neck":"Neck","hand":"Hands","assembly":"Your Plummo’s pieces","body":"Mascot","language":"Language","random":"Surprise me","remove":"Remove","switch":"Pieces only","worn":"On the Plummo","subtitle":"Choose a colour and tap the accessories to try them.","back":"Back layer","front":"Front layer","downloaded":"Plummo downloaded.","galleryview":"Accessory presentation","items":{"cap":"Cap","crown":"Crown","beanie":"Beanie","wizard-hat":"Wizard hat","bucket-hat":"Bucket hat","flower":"Flower","round-glasses":"Round glasses","sunglasses":"Sunglasses","heart-glasses":"Heart glasses","monocle":"Monocle","pirate-patch":"Pirate patch","bow-tie":"Bow tie","tie":"Tie","kerchief":"Kerchief","scarf":"Scarf","medal":"Medal necklace","wand":"Magic wand","fan":"Fan","microphone":"Microphone","scepter":"Scepter","top-hat":"Top hat","cowboy-hat":"Cowboy hat","pirate-hat":"Pirate hat","moustache":"Moustache","lollipop":"Lollipop","paintbrush":"Paintbrush","maraca":"Maraca","balloon":"Balloon"},"palette":{"violet":"Purple","blue":"Blue","pink":"Pink","green":"Green","honey":"Honey","slate":"Slate"}}};
+                let locale = 'fr',
+                    color = catalog.colors[0],
+                    selection = ['crown', 'bow-tie'],
+                    pieces = false,
+                    serial = 0;
+                const root = document.getElementById('plummo-workshop');
+                const t = (key) => messages[locale][key];
+                const label = (item) => t('items')[item.id];
+                const byId = (id) =>
+                    catalog.accessories.find((item) => item.id === id);
+                function baseBody() {
+                    return bodies.base
+                        .replaceAll('#b99aef', color.light)
+                        .replaceAll('#9672dc', color.color)
+                        .replaceAll('#6950ac', color.dark);
+                }
+                function vector(ids = [], options = {}) {
+                    const n = ++serial;
+                    const chosen = ids.map(byId).filter(Boolean);
+                    let body = options.noBase ? '' : baseBody();
+                    if (
+                        !options.noBase &&
+                        chosen.some((item) => item.coversPlumes)
+                    ) {
+                        const doc = new DOMParser().parseFromString(
+                            `<svg xmlns="http://www.w3.org/2000/svg">${body}</svg>`,
+                            'image/svg+xml',
+                        );
+                        doc.querySelector('[id="plummo-plumes"]')?.remove();
+                        body = doc.documentElement.innerHTML;
+                    }
+                    const behind = chosen
+                        .map((i) => bodies[i.id + '-back'] || '')
+                        .join('');
+                    const ahead = chosen.map((i) => bodies[i.id]).join('');
+                    body = behind + body + ahead;
+                    body = body
+                        .replace(
+                            /id="(plummo-[^"]+)"/g,
+                            (_, id) => `id="${id}-${n}"`,
+                        )
+                        .replace(
+                            /url\(#(plummo-[^)]+)\)/g,
+                            (_, id) => `url(#${id}-${n})`,
+                        );
+                    const box = options.box || [0, 0, 512, 512];
+                    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${box.join(' ')}" role="img" aria-label="${options.title || t('preview')}"${options.main ? ' class="main-avatar"' : ''}><title>${options.title || t('preview')}</title>${body}</svg>`;
+                }
+                function crop(item) {
+                    const b = item.bounds;
+                    return [
+                        b[0] - 6,
+                        b[1] - 6,
+                        b[2] - b[0] + 12,
+                        b[3] - b[1] + 12,
+                    ];
+                }
+                function render() {
+                    document.documentElement.lang = locale;
+                    document.title = 'Plummo · ' + t('title');
+                    document
+                        .querySelectorAll('[data-text]')
+                        .forEach((el) => (el.textContent = t(el.dataset.text)));
+                    document
+                        .querySelectorAll('[data-lang]')
+                        .forEach((el) =>
+                            el.setAttribute(
+                                'aria-pressed',
+                                String(el.dataset.lang === locale),
+                            ),
+                        );
+                    document
+                        .querySelector('.languages')
+                        .setAttribute('aria-label', t('language'));
+                    document
+                        .querySelector('.view-buttons')
+                        .setAttribute('aria-label', t('galleryview'));
+                    root.querySelector('#main-preview').innerHTML = vector(
+                        selection,
+                        { main: true },
+                    );
+                    root.querySelector('#small-preview').innerHTML =
+                        vector(selection);
+                    root.querySelector('#small-caption').textContent =
+                        selection.length
+                            ? selection.map((id) => label(byId(id))).join(' + ')
+                            : t('empty');
+                    root.querySelector('#selection-status').textContent =
+                        `${selection.length} / 2 ${t('selected')}`;
+                    root.querySelector('#swatches').setAttribute(
+                        'aria-label',
+                        t('colors'),
+                    );
+                    root.querySelector('#swatches').innerHTML = catalog.colors
+                        .map(
+                            (c) =>
+                                `<button type="button" class="swatch" data-color="${c.id}" style="--swatch:${c.color}" aria-label="${t('palette')[c.id]}" aria-pressed="${color.id === c.id}">${t('palette')[c.id]}</button>`,
+                        )
+                        .join('');
+                    root.querySelector('#color-name').textContent =
+                        t('palette')[color.id];
+                    root.querySelector('#groups').innerHTML = catalog.slots
+                        .map(
+                            (slot) =>
+                                `<section class="group"><h3>${t(slot)}</h3><div class="tiles">${catalog.accessories
+                                    .filter((i) => i.slot === slot)
+                                    .map(
+                                        (i) =>
+                                            `<button type="button" class="tile" data-item="${i.id}" aria-pressed="${selection.includes(i.id)}" aria-label="${label(i)}">${vector([i.id], { noBase: pieces, box: pieces ? crop(i) : undefined, title: label(i) })}<span>${label(i)}</span>${selection.includes(i.id) ? '<span class="selection" aria-hidden="true">✓</span>' : ''}</button>`,
+                                    )
+                                    .join('')}</div></section>`,
+                        )
+                        .join('');
+                    root.querySelector('#layers').innerHTML =
+                        `<div class="layer">${vector([], { title: t('body') })}<span>${t('body')}</span><a href="base.svg" download>${t('download_piece')}</a></div>` +
+                        selection
+                            .map((id) => {
+                                const i = byId(id);
+                                return `<div class="layer">${vector([id], { noBase: true, box: crop(i), title: label(i) })}<span>${label(i)}</span><a href="${i.front}" download>${t('download_piece')}</a>${i.back ? `<br><a href="${i.back}" download>${t('back')}</a>` : ''}<br><button type="button" class="remove" data-remove="${id}">${t('remove')}</button></div>`;
+                            })
+                            .join('');
+                    root.querySelector('#pieces').setAttribute(
+                        'aria-pressed',
+                        String(pieces),
+                    );
+                    root.querySelector('#worn').setAttribute(
+                        'aria-pressed',
+                        String(!pieces),
+                    );
+                }
+                root.addEventListener('click', (event) => {
+                    const target = event.target.closest('button');
+                    if (!target) return;
+                    const message = root.querySelector('#message');
+                    message.textContent = '';
+                    if (target.dataset.color) {
+                        color = catalog.colors.find(
+                            (c) => c.id === target.dataset.color,
+                        );
+                        render();
+                        return;
+                    }
+                    const id = target.dataset.item || target.dataset.remove;
+                    if (id) {
+                        const i = byId(id);
+                        if (selection.includes(id))
+                            selection = selection.filter((x) => x !== id);
+                        else {
+                            const same = selection.find(
+                                (x) => byId(x).slot === i.slot,
+                            );
+                            if (same) {
+                                selection = selection.map((x) =>
+                                    x === same ? id : x,
+                                );
+                                message.textContent = t('replace');
+                            } else if (selection.length < 2) selection.push(id);
+                            else {
+                                message.textContent = t('full');
+                                return;
+                            }
+                        }
+                        render();
+                        return;
+                    }
+                    if (target.id === 'pieces' || target.id === 'worn') {
+                        pieces = target.id === 'pieces';
+                        render();
+                        return;
+                    }
+                    if (target.id === 'random') {
+                        color =
+                            catalog.colors[
+                                Math.floor(
+                                    Math.random() * catalog.colors.length,
+                                )
+                            ];
+                        const first =
+                            catalog.accessories[
+                                Math.floor(
+                                    Math.random() * catalog.accessories.length,
+                                )
+                            ];
+                        const others = catalog.accessories.filter(
+                            (i) => i.slot !== first.slot,
+                        );
+                        selection = [
+                            first.id,
+                            others[Math.floor(Math.random() * others.length)]
+                                .id,
+                        ];
+                        render();
+                        return;
+                    }
+                    if (target.id === 'download') {
+                        const svg = vector(selection);
+                        const blob = new Blob(
+                            ['<?xml version="1.0" encoding="UTF-8"?>\n' + svg],
+                            { type: 'image/svg+xml' },
+                        );
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `plummo-${color.id}${selection.length ? '-' + selection.join('-') : ''}.svg`;
+                        a.click();
+                        setTimeout(() => URL.revokeObjectURL(url), 1000);
+                        message.textContent = t('downloaded');
+                    }
+                });
+                document.querySelectorAll('[data-lang]').forEach((button) =>
+                    button.addEventListener('click', () => {
+                        locale = button.dataset.lang;
+                        root.querySelector('#message').textContent = '';
+                        render();
+                    }),
+                );
+                render();
+            })();
+        </script>
+    </body>
+</html>

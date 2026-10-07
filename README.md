@@ -53,3 +53,7 @@ Les tests utilisent `plummo_testing` pour tout futur accès MySQL. Aucun test ac
 - [Contribuer](CONTRIBUTING.md)
 
 Aucun hébergement de production n’est configuré. Les sources publiques ne constituent pas une autorisation de réutilisation des créations graphiques.
+
+## Kit vectoriel Plummo
+
+La [planche de personnalisation](public/plummo/index.html) présente la mascotte et 28 accessoires indépendants. Sur un serveur du dossier public, ouvrir `/plummo/index.html`. Les [conventions du kit](public/plummo/README.md) expliquent les calques, les couleurs et l’ajout de pièces. Reconstruire la planche après modification des SVG ou des libellés : `php scripts/build-plummo-preview.php`.
