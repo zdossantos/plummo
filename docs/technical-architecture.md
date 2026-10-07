@@ -33,3 +33,7 @@ Playwright est épinglé à 1.63.0. Chaque mise à jour doit passer la suite Pes
 ## Session et barèmes
 
 `Scoring` porte les trois calculs validés (rapidité/ex æquo, dessinateur, votes) et rejette les effectifs impossibles. `SessionController` utilise le verrou du salon et exige le chef connecté pour configurer/prolonger/recommencer. Les entiers sont bornés au type MySQL ; les reprises conservent les identités. Le classement conserve les joueurs partis et des rangs partagés ; le grand écran bascule entre invitation et classement pour préserver la lisibilité. Le moteur de manches complétera le verrouillage de configuration et l’arrêt après la manche au seuil.
+
+## Historique des contenus
+
+`RoomContentCatalog` sélectionne et inscrit les contenus révélés sous verrou du salon. L’historique survit à la suppression du contenu source et aux remises à zéro des scores ; il disparaît à la fermeture du salon. Les contenus inédits restent prioritaires même lorsque le chef autorise des répétitions. Le moteur de manches consommera ce contrat ; aucun contenu n’est marqué lors d’un simple aperçu des quantités disponibles.

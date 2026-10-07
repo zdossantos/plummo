@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'invalid_content_count' => 'Quantité de contenus invalide.',
+    'contents_exhausted' => 'Pas assez de contenus non joués. Changez de pack ou autorisez les répétitions.',
     'title' => 'Le salon',
     'join_title' => 'Rejoins la bande.',
     'screen_title' => 'Tout le monde joue.',

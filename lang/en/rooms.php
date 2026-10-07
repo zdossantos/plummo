@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'invalid_content_count' => 'Invalid content count.',
+    'contents_exhausted' => 'Not enough unseen content. Change packs or allow repeats.',
     'title' => 'The room',
     'join_title' => 'Join the gang.',
     'screen_title' => 'Everyone plays.',
