@@ -29,6 +29,7 @@ function chatGame(string $type): array
 }
 
 it('publishes one escaped text bubble per connected player for exactly five seconds', function () {
+    $this->travelTo(now()->microsecond(750000));
     $room = openRoom();
     [$id, $token] = enterRoom($room);
     $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('canChat', true);

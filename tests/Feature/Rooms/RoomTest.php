@@ -153,6 +153,7 @@ it('allows only the chief to close a confirmed room and erases all its data', fu
 });
 
 it('expires a room only after thirty minutes with no connected players', function () {
+    $this->travelTo(now()->microsecond(750000));
     $room = openRoom();
     [, $token] = enterRoom($room);
     foreach (range(1, 7) as $i) {

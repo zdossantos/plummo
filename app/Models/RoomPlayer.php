@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -16,9 +17,15 @@ class RoomPlayer extends Model
 {
     protected $fillable = ['room_id', 'identity_hash', 'name', 'color', 'accessories', 'score', 'last_seen_at', 'connected_since', 'disconnected_at', 'left_at', 'waiting', 'chat_message', 'chat_sent_at'];
 
-    protected $dateFormat = 'Y-m-d H:i:s.u';
-
     protected $hidden = ['identity_hash'];
+
+    /** @return Attribute<CarbonImmutable|null, string|null> */
+    protected function chatSentAt(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $value === null ? null : $this->asDateTime($value)->format('Y-m-d H:i:s.u'),
+        );
+    }
 
     protected function casts(): array
     {

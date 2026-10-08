@@ -6,6 +6,7 @@ use App\Models\Room;
 use App\Models\RoomPlayer;
 use App\Services\GameEngine;
 use App\Services\PhraseGame;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 uses(DatabaseTransactions::class);
@@ -70,6 +71,8 @@ it('requires three players, valid settings and chief authorization', function ()
 });
 
 it('keeps drafts private, locks submitted text and counts Unicode suffix characters', function () {
+    // Reproduces a timestamp whose JSON round trip changes the last floating-point bit.
+    $this->travelTo(CarbonImmutable::createFromTimestamp('1791464054.078858'));
     [$room, $players] = phraseSetup();
     [, $one] = $players[0];
     [, $two] = $players[1];
@@ -83,7 +86,7 @@ it('keeps drafts private, locks submitted text and counts Unicode suffix charact
     phrasePost($room, $one, 'submit', ['suffix' => 'changed'])->assertConflict();
     phrasePost($room, $two, 'submit', ['suffix' => ''])->assertOk();
     phrasePost($room, $players[2][1], 'submit', ['suffix' => ''])->assertJsonPath('game.phase', 'presenting');
-    expect(Game::where('room_id', $room->id)->sole()->state['deadline'])->toBe(app(GameEngine::class)->time() + 11.05);
+    expect(Game::where('room_id', $room->id)->sole()->state['deadline'])->toEqualWithDelta(app(GameEngine::class)->time() + 11.05, 0.000001);
 });
 
 it('automatically submits saved drafts at expiry and presents anonymously with bounded duration', function () {
