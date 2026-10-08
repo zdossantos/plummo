@@ -36,6 +36,6 @@ class BlindChoices
         }
         $choices = $false->map(fn (Content $song) => $this->label($song))->push($this->label($correct))->shuffle()->values()->all();
 
-        return ['choices' => $choices, 'correct' => (int) array_search($this->label($correct), $choices, true)];
+        return ['choices' => array_values($choices), 'correct' => (int) array_search($this->label($correct), $choices, true)];
     }
 }

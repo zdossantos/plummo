@@ -42,3 +42,9 @@ GameSetup propose Quiz/Blind test et garde durées/quantités séparées. L’ap
 ## Review Focus
 
 Vérifier concurrence suppression source/copie, absence de chemins et d’URL audio sur téléphone, requêtes audio périmées, catalogue global insuffisant et couples dupliqués, reprise audio sans nouvelle lecture du début et répétitions qui ne marquent pas les distracteurs.
+
+## Journal
+
+- Tâche 1 : `BlindChoicesTest` RED service absent → GREEN 3 tests / 10 assertions, commit eae6f07.
+- Tâche 2 : `BlindGameTest` RED type refusé → GREEN ; quiz + blind 23 tests / 248 assertions. Test complémentaire RED historique consommé malgré audio disparu → transaction de préparation → GREEN.
+- Décision : les copies résident dans `games/{room-id}/{game-id}/{round}` pour permettre leur nettoyage après suppression du salon, y compris lorsque les parties sont supprimées par cascade.

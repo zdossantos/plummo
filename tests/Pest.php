@@ -55,3 +55,15 @@ function blindSong(string $title, array $tags = [], bool $published = true): Con
 
     return $song;
 }
+
+function blindPack(): int
+{
+    $tag = Tag::create(['name' => 'Music']);
+    $pack = Pack::create(['name' => 'Music']);
+    $pack->tags()->sync([$tag->id]);
+    foreach (range(1, 8) as $number) {
+        blindSong('Song '.$number, [$tag->id]);
+    }
+
+    return $pack->id;
+}

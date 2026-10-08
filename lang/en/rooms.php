@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'blind_audio_missing' => 'This audio clip is unavailable. Choose another pack or fix the content.',
+    'blind_listen' => 'Which song is playing?',
+
     'blind_catalogue_small' => 'The catalogue needs at least eight published songs with distinct title and artist pairs.',
     'invalid_content_count' => 'Invalid content count.',
     'contents_exhausted' => 'Not enough unseen content. Change packs or allow repeats.',

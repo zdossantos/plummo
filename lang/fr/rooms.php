@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'blind_audio_missing' => 'Cet extrait audio est indisponible. Choisissez un autre pack ou corrigez le contenu.',
+    'blind_listen' => 'Quelle chanson entendez-vous ?',
+
     'blind_catalogue_small' => 'Le catalogue doit contenir au moins huit chansons publiées avec des titres et artistes distincts.',
     'invalid_content_count' => 'Quantité de contenus invalide.',
     'contents_exhausted' => 'Pas assez de contenus non joués. Changez de pack ou autorisez les répétitions.',
