@@ -1,6 +1,13 @@
 <?php
 
 return [
+    'chat_label' => 'Say something to the group',
+    'chat_hint' => 'Your message appears on the big screen for five seconds.',
+    'chat_send' => 'Send message',
+    'chat_wait' => 'Wait {count} s',
+    'chat_from' => 'Message from {name}',
+
+    'chat_cooldown' => 'Wait three seconds between messages.',
     'blind_audio_missing' => 'This audio clip is unavailable. Choose another pack or fix the content.',
     'blind_listen' => 'Which song is playing?',
 

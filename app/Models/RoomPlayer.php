@@ -3,19 +3,29 @@
 namespace App\Models;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property CarbonImmutable $last_seen_at
  * @property CarbonImmutable|null $disconnected_at
  * @property CarbonImmutable|null $left_at
+ * @property CarbonImmutable|null $chat_sent_at
  * @property list<string> $accessories
  */
 class RoomPlayer extends Model
 {
-    protected $fillable = ['room_id', 'identity_hash', 'name', 'color', 'accessories', 'score', 'last_seen_at', 'connected_since', 'disconnected_at', 'left_at', 'waiting'];
+    protected $fillable = ['room_id', 'identity_hash', 'name', 'color', 'accessories', 'score', 'last_seen_at', 'connected_since', 'disconnected_at', 'left_at', 'waiting', 'chat_message', 'chat_sent_at'];
 
     protected $hidden = ['identity_hash'];
+
+    /** @return Attribute<CarbonImmutable|null, string|null> */
+    protected function chatSentAt(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $value === null ? null : $this->asDateTime($value)->format('Y-m-d H:i:s.u'),
+        );
+    }
 
     protected function casts(): array
     {
@@ -26,6 +36,7 @@ class RoomPlayer extends Model
             'disconnected_at' => 'immutable_datetime',
             'left_at' => 'immutable_datetime',
             'waiting' => 'boolean',
+            'chat_sent_at' => 'immutable_datetime',
             'score' => 'integer',
         ];
     }
@@ -51,10 +62,11 @@ class RoomPlayer extends Model
         };
     }
 
-    /** @return array{id: int, name: string, color: string, accessories: list<string>, score: int, status: string} */
+    /** @return array{id: int, name: string, color: string, accessories: list<string>, score: int, status: string, chat: array{message: string, expiresAt: float}|null} */
     public function publicData(): array
     {
         return ['id' => $this->id, 'name' => $this->name, 'color' => $this->color,
-            'accessories' => $this->accessories, 'score' => $this->score, 'status' => $this->status()];
+            'accessories' => $this->accessories, 'score' => $this->score, 'status' => $this->status(),
+            'chat' => $this->connected() && $this->chat_sent_at?->addSeconds(5)->gt(now()) ? ['message' => $this->chat_message, 'expiresAt' => (float) $this->chat_sent_at->addSeconds(5)->format('U.u')] : null];
     }
 }

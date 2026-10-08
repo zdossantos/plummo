@@ -7,7 +7,7 @@ const { t } = useTranslations('rooms');
 </script>
 <template>
     <section
-        class="mt-6 rounded-3xl bg-card p-5 lg:p-7"
+        class="@container mt-6 rounded-3xl bg-card p-5 lg:p-7"
         :aria-label="t('ranking')"
     >
         <div class="flex flex-wrap items-center justify-between gap-3">
@@ -20,7 +20,7 @@ const { t } = useTranslations('rooms');
                 }}
             </p>
         </div>
-        <ol class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <ol class="mt-4 grid gap-3 @md:grid-cols-2 @4xl:grid-cols-4">
             <li
                 v-for="player in room.ranking"
                 :key="player.id"

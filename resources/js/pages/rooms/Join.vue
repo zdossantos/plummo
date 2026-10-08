@@ -4,6 +4,7 @@ import { computed, onMounted, ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import PlummoPicker from '@/components/PlummoPicker.vue';
+import ChatComposer from '@/components/ChatComposer.vue';
 import GamePlay from '@/components/GamePlay.vue';
 import GameSetup from '@/components/GameSetup.vue';
 import SessionSettings from '@/components/SessionSettings.vue';
@@ -19,8 +20,19 @@ const props = defineProps<{
 }>();
 const { t } = useTranslations('rooms');
 const manual = useForm({ code: '' });
-const { room, me, game, seconds, error, closed, busy, connected, request } =
-    useRoom(props.code, undefined, true);
+const {
+    room,
+    me,
+    game,
+    seconds,
+    serverNow,
+    canChat,
+    error,
+    closed,
+    busy,
+    connected,
+    request,
+} = useRoom(props.code, undefined, true);
 const name = ref(props.me?.name ?? '');
 const color = ref(props.me?.color ?? 'violet');
 const accessories = ref<string[]>(props.me?.accessories ?? []);
@@ -294,6 +306,15 @@ onMounted(async () => {
                             })
                         "
                         @control="request('game/' + $event)"
+                    />
+                    <ChatComposer
+                        v-if="canChat && me"
+                        :me="me"
+                        :game="game"
+                        :server-now="serverNow"
+                        :busy="busy"
+                        :connected="connected"
+                        :send="(values) => request('chat', 'POST', values)"
                     />
                     <RoomRanking v-if="room" :room="room" />
                     <p class="mt-5 text-center text-sm text-muted-foreground">

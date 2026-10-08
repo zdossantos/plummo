@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import GameWinners from '@/components/GameWinners.vue';
 import PhrasePlay from '@/components/PhrasePlay.vue';
 import DrawingPlay from '@/components/DrawingPlay.vue';
 import AudioClip from '@/components/AudioClip.vue';
@@ -122,29 +123,13 @@ const ranking = computed(() => {
                 class="mb-8 rounded-2xl bg-primary/10 p-5"
             >
                 <h2 class="text-3xl font-black">{{ t('session_results') }}</h2>
-                <p class="mt-3 text-xl font-bold">
-                    {{
-                        t('game_winners', {
-                            names: room.ranking
-                                .filter((p) => p.rank === 1)
-                                .map((p) => p.name)
-                                .join(', '),
-                        })
-                    }}
-                </p>
+                <GameWinners
+                    :winners="room.ranking.filter((p) => p.rank === 1)"
+                />
                 <p class="mt-3">{{ t('target_reached') }}</p>
             </div>
             <h1 class="mt-6 text-3xl font-black">{{ t('game_results') }}</h1>
-            <p v-if="ranking.length" class="mt-4 text-2xl font-bold">
-                {{
-                    t('game_winners', {
-                        names: ranking
-                            .filter((p) => p.rank === 1)
-                            .map((p) => p.name)
-                            .join(', '),
-                    })
-                }}
-            </p>
+            <GameWinners :winners="ranking.filter((p) => p.rank === 1)" />
             <ol class="mt-6 space-y-3">
                 <li
                     v-for="player in ranking"

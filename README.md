@@ -2,7 +2,7 @@
 
 Jeux entre amis et en famille : un grand écran commun et un téléphone par joueur.
 
-Le dépôt contient le socle technique, les salons sans compte, la personnalisation des Plummos et les réglages de session. Le catalogue administrateur, le quiz, le blind test et le dessin sont disponibles. Le prochain mini-jeu est le jeu de phrases.
+Le dépôt contient le socle technique, les salons sans compte, la personnalisation des Plummos et les réglages de session. Le catalogue administrateur, les quatre mini-jeux, les bulles de chat et les animations sont disponibles.
 
 ## Installation
 
@@ -57,6 +57,7 @@ Aucun compte n’est créé par les seeders.
 - [Maquettes Figma](https://www.figma.com/design/6kioGGc1qTiFtyAjvsHSqw/Projet-jeu-tel---pc)
 - [Architecture technique](docs/technical-architecture.md)
 - [Contribuer](CONTRIBUTING.md)
+- [Validation V1 et essai sur appareils](docs/validation-v1.md)
 
 Aucun hébergement de production n’est configuré. Les sources publiques ne constituent pas une autorisation de réutilisation des créations graphiques.
 
@@ -122,3 +123,9 @@ Le chef lance de un à cinq tours pour au moins trois joueurs connectés, avec u
 Les phrases complètes sont présentées anonymement une à une : cinq secondes jusqu’à 40 caractères, puis 0,05 seconde par caractère, au maximum douze secondes. Les téléphones et le grand écran affichent ensuite toutes les propositions pendant le vote (30 secondes maximum). Chaque joueur peut envoyer un vote définitif pour une autre phrase ; aucune abstention n’est remplacée par un vote automatique. Les auteurs, leurs Plummos, les votes et les points sont révélés ensemble. Chaque vote reçu rapporte exactement 65 points, y compris à un auteur ayant quitté le salon ou n’ayant pas voté.
 
 Les nouveaux arrivants et les joueurs de retour participent au prochain tour. La pause conserve les brouillons et gèle les délais ; la reprise laisse cinq secondes. L’arrêt depuis la pause conserve uniquement les scores des tours terminés. L’objectif de session et la récupération après épuisement des packs utilisent le moteur commun.
+
+## Chat et célébrations
+
+Le chat apparaît sur le téléphone lorsqu’aucune action de jeu n’est attendue : dans le salon, pendant une pause ou après une réponse, un mot trouvé, une phrase validée ou un vote. Le serveur vérifie cette disponibilité à chaque envoi et refuse les messages d’une ancienne partie ou manche. Les messages sont limités à 80 caractères Unicode, avec trois secondes entre deux envois ; une bulle reste visible cinq secondes au-dessus du Plummo sur le grand écran. Un nouvel envoi remplace la bulle précédente.
+
+Les gains sont célébrés une fois à la révélation et les gagnants du mini-jeu sont affichés avec leurs Plummos, y compris les ex æquo. Les animations respectent la préférence de réduction des mouvements. Appliquer explicitement les migrations sur la base souhaitée avant de démarrer cette version.
