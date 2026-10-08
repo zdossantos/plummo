@@ -57,6 +57,7 @@ Aucun compte n’est créé par les seeders.
 - [Maquettes Figma](https://www.figma.com/design/6kioGGc1qTiFtyAjvsHSqw/Projet-jeu-tel---pc)
 - [Architecture technique](docs/technical-architecture.md)
 - [Contribuer](CONTRIBUTING.md)
+- [Validation V1 et essai sur appareils](docs/validation-v1.md)
 
 Aucun hébergement de production n’est configuré. Les sources publiques ne constituent pas une autorisation de réutilisation des créations graphiques.
 

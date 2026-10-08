@@ -37,6 +37,13 @@ it('plays a quiz with a shared screen and two separate phones then returns to th
         $first->page()->locator('button:has-text("Back to lobby")')->click(['noWaitAfter' => true]);
         $first->assertSee('The session')->assertDontSee('Prepare a quiz');
         $screen->assertSee('Everyone plays.')->assertSee('Camille')->assertSee('100 points');
+        $identity = $room->players()->where('name', 'Camille')->sole()->id;
+        $first->refresh()->assertSee('Camille')->assertSee('100 points')->assertDontSee('Prepare a quiz');
+        expect($room->players()->where('name', 'Camille')->sole()->id)->toBe($identity);
+        $first->fill('session-extra', '500')->click('Extend session')->assertSee('Target: 600 points')->assertSee('Prepare a quiz');
+        $screen->assertSee('Target: 600 points')->assertSee('100 points');
+        $second->refresh()->assertSee('Alex')->assertSee('0 points');
+        expect($room->fresh()->point_target)->toBe(600);
         $first->assertNoJavaScriptErrors();
         $second->assertNoJavaScriptErrors();
         expect($room->players()->count())->toBe(2);
