@@ -1,6 +1,13 @@
 <?php
 
 return [
+    'chat_label' => 'Un mot au groupe',
+    'chat_hint' => 'Votre message apparaît cinq secondes sur le grand écran.',
+    'chat_send' => 'Envoyer le message',
+    'chat_wait' => 'Patientez {count} s',
+    'chat_from' => 'Message de {name}',
+
+    'chat_cooldown' => 'Attendez trois secondes entre deux messages.',
     'blind_audio_missing' => 'Cet extrait audio est indisponible. Choisissez un autre pack ou corrigez le contenu.',
     'blind_listen' => 'Quelle chanson entendez-vous ?',
 

@@ -199,6 +199,7 @@ class RoomService
 
         return [
             'serverTime' => app(GameEngine::class)->time(),
+            'canChat' => app(RoomChat::class)->available($me, $game),
             'game' => $game,
             'room' => [
                 'code' => $room->code, 'capacity' => 8, 'occupied' => $this->occupied($room), 'chiefId' => $this->chiefId($room),
