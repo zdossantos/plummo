@@ -54,3 +54,11 @@ Décisions prises pendant l’exécution :
 - Séparer les builds Vite des tests navigateur : un serveur de test peut conserver les anciens noms de bundles. Le coût est une exécution séquentielle plus longue.
 
 Les fixtures temporaires ont été retirées par identifiants exacts et vérifications de leurs relations. Le helper de vérification refuse toute base autre que plummo_testing et vérifie le serveur par un compte temporaire exclusivement présent dans cette base.
+
+## Ajustements après essais téléphone
+
+Les champs partagent un fond papier lisible, des dimensions de 44 px (32 px en hauteur réduite), une police de 16 px et les mêmes espacements que les boutons. Tous les boutons ont une ombre pleine et un état enfoncé. La navigation par onglets est remplacée par une commande dans le HUD ouvrant le Drawer Shadcn Vue. Salon et Session présentent leurs actions ensemble ; prolonger ouvre un drawer dédié. La connexion regroupe les champs lorsque la place suffit et conserve le champ actif lorsque le viewport rétrécit.
+
+Validation finale : 158 tests Laravel/Pest, 1 682 assertions, 126,89 s ; frontend : 8 tests, 34 assertions. Types, ESLint (avertissement PlummoAvatar préexistant), Prettier, Pint, PHPStan et builds passent. Matrices de géométrie : 143 contrôles joueurs FR sur quatre formats et 144 contrôles administration FR/EN sur six formats, sans débordement ; contraste des champs et relief des boutons contrôlés. Le défaut du champ actif a été reproduit par un test en échec, puis corrigé et vérifié dans la suite finale. Docker reconstruit, champs et bouton de connexion mesurés à 44 px et réduction de hauteur vérifiée sur le runtime.
+
+Aucun changement au catalogue ni aux assets des Plummos. compose.yaml reste une modification utilisateur exclue du commit.

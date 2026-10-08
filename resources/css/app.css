@@ -401,24 +401,6 @@
 .drawer-accessories small {
     font-size: 10px;
 }
-.phone-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    flex-shrink: 0;
-}
-.phone-tabs button {
-    flex: 1;
-    padding: 8px 6px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-    background: var(--accent);
-}
-.phone-tabs button[aria-pressed='true'] {
-    background: var(--primary);
-    color: var(--ink);
-}
 .phone-scene {
     flex: 1;
     min-height: 0;
@@ -963,4 +945,272 @@
 }
 .viewport-shell[data-compact] .drawing-scene {
     gap: 4px;
+}
+
+/* Physical game controls: a raised face, a solid base, and a pressed state. */
+.viewport-shell,
+.game-drawer {
+    --control-height: 44px;
+    --control-padding: 10px 12px;
+}
+.viewport-shell button,
+.game-drawer button {
+    --button-depth: 6px;
+    border: 2px solid var(--edge);
+    border-radius: 14px;
+    box-shadow: 0 var(--button-depth) 0 var(--edge);
+    margin-bottom: var(--button-depth);
+    font-weight: 700;
+    transition:
+        transform 100ms ease-out,
+        box-shadow 100ms ease-out;
+}
+.viewport-shell button:active:not(:disabled),
+.game-drawer button:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 var(--edge);
+}
+.viewport-shell [data-slot='button'],
+.game-drawer [data-slot='button'] {
+    background: var(--primary);
+    color: var(--ink);
+    min-height: var(--control-height);
+    height: auto;
+    white-space: normal;
+    font-size: 16px;
+    line-height: 20px;
+    padding: var(--control-padding);
+}
+.viewport-shell [data-slot='button'][data-variant='outline'],
+.game-drawer [data-slot='button'][data-variant='outline'] {
+    background: var(--paper);
+}
+.viewport-shell [data-slot='button'][data-variant='secondary'],
+.game-drawer [data-slot='button'][data-variant='secondary'] {
+    background: var(--purple);
+}
+.viewport-shell [data-slot='button'][data-variant='ghost'],
+.game-drawer [data-slot='button'][data-variant='ghost'] {
+    background: var(--pink);
+}
+.viewport-shell
+    input:not([type='checkbox']):not([type='radio']):not([type='range']):not(
+        [type='file']
+    ),
+.viewport-shell select,
+.viewport-shell textarea,
+.game-drawer
+    input:not([type='checkbox']):not([type='radio']):not([type='range']):not(
+        [type='file']
+    ),
+.game-drawer select,
+.game-drawer textarea {
+    color: var(--ink);
+    -webkit-text-fill-color: var(--ink);
+    background: var(--paper);
+    caret-color: var(--ink);
+    font-size: 16px;
+    line-height: 20px;
+    min-height: var(--control-height);
+    padding: var(--control-padding);
+    border: 2px solid var(--edge);
+    border-radius: 14px;
+}
+.viewport-shell input::placeholder,
+.viewport-shell textarea::placeholder,
+.game-drawer input::placeholder,
+.game-drawer textarea::placeholder {
+    color: #6b5477;
+    -webkit-text-fill-color: #6b5477;
+    opacity: 1;
+}
+.game-hud-controls {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.phone-status {
+    flex-wrap: wrap;
+}
+.phone-status > .text-primary {
+    margin-left: auto;
+}
+.command-trigger {
+    font-family: Fredoka, sans-serif;
+}
+.command-grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-content: center;
+}
+.command-grid [data-slot='button'] {
+    flex-direction: column;
+    padding: 12px;
+    min-height: 72px;
+    font-family: Fredoka, sans-serif;
+    font-size: 17px;
+}
+.command-grid svg {
+    width: 24px;
+    height: 24px;
+}
+.command-grid .command-play {
+    grid-column: 1 / -1;
+    background: var(--mint);
+}
+.room-command-board,
+.session-command-board {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 24px;
+}
+.room-primary-actions {
+    display: grid;
+    gap: 12px;
+}
+.chief-transfer {
+    display: grid;
+    gap: 10px;
+}
+.session-secondary-actions {
+    display: grid;
+    gap: 12px;
+}
+.session-command-board > form {
+    gap: 12px;
+}
+.session-drawer form {
+    display: grid;
+    gap: 12px;
+    margin-block: auto;
+}
+@media (min-width: 768px) {
+    .session-command-board {
+        max-width: 580px;
+        width: 100%;
+        align-self: center;
+    }
+    .session-secondary-actions {
+        grid-template-columns: 1fr 1fr;
+    }
+    .room-command-board {
+        max-width: 580px;
+        width: 100%;
+        align-self: center;
+    }
+}
+@media (max-height: 500px) {
+    .viewport-shell,
+    .game-drawer {
+        --control-height: 32px;
+        --control-padding: 4px 10px;
+    }
+    .viewport-shell button,
+    .game-drawer button {
+        --button-depth: 4px;
+    }
+    .viewport-shell [data-slot='button'],
+    .game-drawer [data-slot='button'] {
+        min-height: var(--control-height);
+        padding: var(--control-padding);
+    }
+    .room-command-board,
+    .session-command-board {
+        gap: 10px;
+    }
+    .room-primary-actions {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    .room-primary-actions h2 {
+        grid-column: 1 / -1;
+    }
+    .chief-transfer {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        align-items: center;
+    }
+    .chief-transfer label {
+        grid-column: 1 / -1;
+    }
+    .session-command-board > form {
+        gap: 4px;
+    }
+    .session-secondary-actions {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    .session-board {
+        gap: 4px;
+    }
+    .session-board > p {
+        margin: 0;
+    }
+    .command-grid {
+        gap: 8px;
+    }
+    .command-grid [data-slot='button'] {
+        min-height: 52px;
+        font-size: 14px;
+    }
+    .command-grid svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+.phone-status > .text-summary {
+    flex: 1;
+    min-width: 0;
+    -webkit-line-clamp: 1;
+}
+.viewport-shell[data-compact] .command-trigger span {
+    display: none;
+}
+.viewport-shell [data-slot='button'][data-size='icon-sm'] {
+    width: var(--control-height);
+    height: var(--control-height);
+    padding: 6px;
+}
+.viewport-shell[data-compact] .session-board label[for='session-target'] {
+    margin-bottom: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+    .viewport-shell button,
+    .game-drawer button {
+        transition: none;
+    }
+}
+
+.viewport-shell[data-compact] {
+    --control-height: 32px;
+    --control-padding: 4px 10px;
+}
+.viewport-shell[data-compact] .admin-content input:not([type='checkbox']),
+.viewport-shell[data-compact] .admin-content select,
+.viewport-shell[data-compact] .admin-content [data-slot='button'] {
+    min-height: var(--control-height);
+    padding: var(--control-padding);
+}
+
+.admin-content .paged-items > label .text-summary {
+    line-height: 20px;
+}
+
+@media (max-width: 600px) {
+    .command-trigger span {
+        display: none;
+    }
+    .viewport-shell .command-trigger {
+        width: var(--control-height);
+        padding: 6px;
+    }
+    .phone-status > .text-summary {
+        font-size: 14px;
+    }
 }

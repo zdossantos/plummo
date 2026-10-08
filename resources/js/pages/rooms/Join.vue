@@ -10,7 +10,7 @@ import GameSetup from '@/components/GameSetup.vue';
 import SessionSettings from '@/components/SessionSettings.vue';
 import RoomRanking from '@/components/RoomRanking.vue';
 import ViewportShell from '@/components/ViewportShell.vue';
-import PageDeck from '@/components/PageDeck.vue';
+import GameControls from '@/components/GameControls.vue';
 import TextReader from '@/components/TextReader.vue';
 import { useRoom } from '@/composables/useRoom';
 import { useTranslations } from '@/composables/useTranslations';
@@ -216,6 +216,12 @@ watch(chief, (value) => {
                     <span class="text-summary"
                         >{{ me.name }} · {{ me.score }} {{ t('score') }}</span
                     ><span class="text-primary">{{ code }}</span>
+                    <GameControls
+                        v-if="me.status !== 'left'"
+                        v-model="view"
+                        :session="chief && !game"
+                        :chat="canChat"
+                    />
                 </div>
                 <p v-if="me.status === 'left'" role="status">{{ t('left') }}</p>
                 <Button
@@ -335,8 +341,8 @@ watch(chief, (value) => {
                         :send="(values) => request('chat', 'POST', values)"
                     />
                     <div v-if="view === 'more'" class="game-panel">
-                        <PageDeck>
-                            <div class="flex flex-col gap-3">
+                        <div class="room-command-board">
+                            <div class="room-primary-actions">
                                 <h2 class="text-2xl">{{ ui.t('more') }}</h2>
                                 <Button
                                     v-if="!game"
@@ -362,7 +368,7 @@ watch(chief, (value) => {
                                     >{{ t('close') }}</Button
                                 >
                             </div>
-                            <div v-if="chief" class="flex flex-col gap-3">
+                            <div v-if="chief" class="chief-transfer">
                                 <label for="new-chief">{{
                                     t('transfer_to')
                                 }}</label
@@ -391,47 +397,8 @@ watch(chief, (value) => {
                                     >{{ t('transfer') }}</Button
                                 >
                             </div>
-                        </PageDeck>
+                        </div>
                     </div>
-                    <nav class="phone-tabs">
-                        <button
-                            type="button"
-                            :aria-pressed="view === 'play'"
-                            @click="view = 'play'"
-                        >
-                            {{ ui.t('play') }}
-                        </button>
-                        <button
-                            v-if="chief && !game"
-                            type="button"
-                            :aria-pressed="view === 'settings'"
-                            @click="view = 'settings'"
-                        >
-                            {{ ui.t('settings') }}
-                        </button>
-                        <button
-                            type="button"
-                            :aria-pressed="view === 'ranking'"
-                            @click="view = 'ranking'"
-                        >
-                            {{ t('ranking') }}
-                        </button>
-                        <button
-                            v-if="canChat"
-                            type="button"
-                            :aria-pressed="view === 'chat'"
-                            @click="view = 'chat'"
-                        >
-                            {{ ui.t('chat') }}
-                        </button>
-                        <button
-                            type="button"
-                            :aria-pressed="view === 'more'"
-                            @click="view = 'more'"
-                        >
-                            {{ ui.t('more') }}
-                        </button>
-                    </nav>
                 </template>
             </template>
         </div>

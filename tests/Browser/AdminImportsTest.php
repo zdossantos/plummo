@@ -15,7 +15,7 @@ it('reviews an import and explicitly confirms valid rows from the browser', func
     $path = $file->store('imports', 'local');
     $batch = ContentImport::create(['user_id' => $admin->id, 'type' => ContentType::Drawing, 'table_name' => 'words.csv', 'table_path' => $path, 'audios' => [], 'preview' => app(ContentImportPreview::class)->read(ContentType::Drawing, $file, []), 'expires_at' => now()->addHour()]);
     try {
-        $page = visit('/admin/login')->withLocale('en-US')->fill('admin-email', $admin->email)->click('.page-deck:visible > .page-controls > button[aria-label="Next"]')->fill('admin-password', 'password')->click('Sign in')->assertSee('Welcome to Plummo administration.');
+        $page = visit('/admin/login')->withLocale('en-US')->fill('admin-email', $admin->email)->fill('admin-password', 'password')->click('Sign in')->assertSee('Welcome to Plummo administration.');
         $page->navigate('/admin/imports/'.$batch->id)->click('.page-deck:visible > .page-controls > button[aria-label="Next"]')->assertSee($word)->click('.page-deck:visible > .page-controls > button[aria-label="Previous"]')->click('Add and publish valid rows')->assertSee('1 contents added')->assertNoJavaScriptErrors();
         expect(Content::where('payload->word', $word)->firstOrFail()->published)->toBeTrue();
     } finally {

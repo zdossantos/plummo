@@ -14,5 +14,7 @@ return [
     'selected' => 'Equipped',
     'continue' => 'Continue',
     'edit' => 'Edit',
+    'controls' => 'Controls',
+    'controls_hint' => 'Control the game and access room commands.',
     'overview' => 'Overview',
 ];

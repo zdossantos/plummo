@@ -121,9 +121,14 @@ try {
             await page.goto(base + '/admin/login');
             await fits(page, 'admin-login-email ' + width);
             await page.locator('#admin-email').fill(fixtures.email);
-            await page
-                .getByRole('button', { name: labels.next, exact: true })
-                .click();
+            if (
+                await page
+                    .getByRole('button', { name: labels.next, exact: true })
+                    .isVisible()
+            )
+                await page
+                    .getByRole('button', { name: labels.next, exact: true })
+                    .click();
             await fits(page, 'admin-login-password');
             await page.locator('#admin-password').fill(fixtures.password);
             await page

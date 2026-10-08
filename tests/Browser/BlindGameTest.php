@@ -25,8 +25,8 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
     try {
         $phone = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')
             ->fill('player-name', 'Camille')->click('Continue')->click('Enter the room')->assertSee('Prepare a quiz');
-        $phone->click('Session')->fill('session-target', '50')->click('Save target')->assertSee('Target: 50 points');
-        $phone->click('Play')->assertSee('Mini-game');
+        $phone->click('button[aria-label="Controls"]')->click('Session')->fill('session-target', '50')->click('Save target')->assertSee('Target: 50 points');
+        $phone->click('button[aria-label="Play"]')->assertSee('Mini-game');
         $phone->select('game-type', 'blind_test');
         $phone->click('Continue')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('Continue')->assertSee('8 unseen clips')->fill('game-rounds', '5');
         // Simulate an autoplay restriction, then use native playback after consent.

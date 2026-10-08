@@ -24,6 +24,23 @@ async function fits(page, label) {
         const visible = (e) => e.checkVisibility() && !e.closest('[inert]');
         const issues = [];
         for (const e of document.querySelectorAll(
+            'input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select,textarea',
+        )) {
+            if (!visible(e)) continue;
+            const s = getComputedStyle(e);
+            if (
+                s.backgroundColor !== 'rgb(255, 247, 230)' ||
+                s.color !== 'rgb(33, 24, 47)'
+            )
+                issues.push('field contrast ' + e.id);
+        }
+        for (const e of document.querySelectorAll(
+            '.viewport-shell button,.game-drawer button',
+        )) {
+            if (visible(e) && getComputedStyle(e).boxShadow === 'none')
+                issues.push('missing button depth');
+        }
+        for (const e of document.querySelectorAll(
             'button,input,select,textarea,a,[role=dialog]',
         )) {
             if (!visible(e)) continue;
@@ -117,6 +134,8 @@ const locales = {
         ranking: 'Overall leaderboard',
         chat: 'Bubble',
         more: 'Room',
+        controls: 'Controls',
+        extend: 'Extend session',
     },
     fr: {
         continue: 'Continuer',
@@ -133,6 +152,8 @@ const locales = {
         ranking: 'Classement global',
         chat: 'Bulle',
         more: 'Salon',
+        controls: 'Commandes',
+        extend: 'Prolonger la session',
     },
 };
 try {
@@ -141,7 +162,14 @@ try {
     const probePage = await probe.newPage();
     await probePage.goto(base + '/admin/login');
     await probePage.locator('#admin-email').fill(fixtures.email);
-    await probePage.getByRole('button', { name: 'Next', exact: true }).click();
+    if (
+        await probePage
+            .getByRole('button', { name: 'Next', exact: true })
+            .isVisible()
+    )
+        await probePage
+            .getByRole('button', { name: 'Next', exact: true })
+            .click();
     await probePage.locator('#admin-password').fill(fixtures.password);
     await probePage
         .getByRole('button', { name: 'Sign in', exact: true })
@@ -211,7 +239,7 @@ try {
             let snapshot = await (await response).json();
             assert.equal(snapshot.me.accessories.length, 4);
             await page
-                .getByRole('button', { name: t.play, exact: true })
+                .getByRole('button', { name: t.controls, exact: true })
                 .waitFor();
             const me = snapshot.me;
             const players = Array.from({ length: 8 }, (_, i) => ({
@@ -231,7 +259,7 @@ try {
                         id: me.id + i,
                         rank: i + 1,
                     })),
-                    pointTarget: null,
+                    pointTarget: 1000,
                 },
                 me,
                 canChat: true,
@@ -265,31 +293,52 @@ try {
                 .click();
             await fits(page, 'setup-settings');
             await page
+                .getByRole('button', { name: t.controls, exact: true })
+                .click();
+            await page
                 .getByRole('button', { name: t.session, exact: true })
                 .click();
             await fits(page, 'session');
-            await page
-                .locator('.page-deck')
-                .getByRole('button', { name: t.next, exact: true })
-                .click();
+            await page.screenshot({path: `/tmp/plummo-session-${locale}-${width}.png`});
+            assert.equal(
+                await page.locator('.session-board .page-controls').count(),
+                0,
+            );
+            await page.locator('[data-session-extend]').click();
             await fits(page, 'session-extend');
             await page
-                .locator('.page-deck')
-                .getByRole('button', { name: t.next, exact: true })
+                .getByRole('button', { name: t.close, exact: true })
                 .click();
-            await fits(page, 'session-reset');
+            await page
+                .getByRole('button', { name: t.controls, exact: true })
+                .click();
             await page
                 .getByRole('button', { name: t.ranking, exact: true })
                 .click();
             await fits(page, 'ranking-30');
             await page
+                .getByRole('button', { name: t.controls, exact: true })
+                .click();
+            await page
                 .getByRole('button', { name: t.chat, exact: true })
                 .click();
             await fits(page, 'chat');
+
+            await page
+                .getByRole('button', { name: t.controls, exact: true })
+                .click();
             await page
                 .getByRole('button', { name: t.more, exact: true })
                 .click();
             await fits(page, 'more');
+            await page.screenshot({path: `/tmp/plummo-salon-${locale}-${width}.png`});
+            assert.equal(
+                await page
+                    .locator('.room-command-board .page-controls')
+                    .count(),
+                0,
+            );
+            assert.equal(await page.locator('.phone-tabs').count(), 0);
             const game = {
                 id: 1,
                 type: 'blind_test',

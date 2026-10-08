@@ -14,5 +14,7 @@ return [
     'selected' => 'Équipé',
     'continue' => 'Continuer',
     'edit' => 'Modifier',
+    'controls' => 'Commandes',
+    'controls_hint' => 'Piloter la partie et retrouver les commandes du salon.',
     'overview' => 'Vue d’ensemble',
 ];

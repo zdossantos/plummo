@@ -21,7 +21,7 @@ function submit() {
                 class="flex flex-1 min-h-0 flex-col gap-3"
                 @submit.prevent="submit"
             >
-                <PageDeck
+                <PageDeck :combine-above="220"
                     ><label for="admin-email" class="grid gap-2">
                         {{ t('email') }}
                         <input

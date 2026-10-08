@@ -20,8 +20,8 @@ it('plays a quiz with a shared screen and two separate phones then returns to th
             ->fill('player-name', 'Camille')->click('Continue')->click('Enter the room')->assertSee('Prepare a quiz');
         $second = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')
             ->fill('player-name', 'Alex')->click('Continue')->click('Enter the room')->assertSee('Alex');
-        $first->click('Session')->fill('session-target', '50')->click('Save target')->assertSee('Target: 50 points');
-        $first->click('Play')->click('Continue')->click('input[type="checkbox"][value="'.$pack->id.'"]');
+        $first->click('button[aria-label="Controls"]')->click('Session')->fill('session-target', '50')->click('Save target')->assertSee('Target: 50 points');
+        $first->click('button[aria-label="Play"]')->click('Continue')->click('input[type="checkbox"][value="'.$pack->id.'"]');
         $first->click('Continue')->assertSee('5 unseen questions')->fill('game-rounds', '5');
         $first->page()->locator('button:has-text("Start quiz")')->click(['noWaitAfter' => true]);
         $first->assertSee('Quiz · Question 1 / 5');
@@ -35,12 +35,12 @@ it('plays a quiz with a shared screen and two separate phones then returns to th
         $screen->assertSee('Mini-game leaderboard')->assertSee('Well done, Camille!')->click('.page-deck:visible > .page-controls > button[aria-label="Next"]')->assertSee('Session target reached');
         $first->assertSee('Mini-game leaderboard');
         $first->page()->locator('button:has-text("Back to lobby")')->click(['noWaitAfter' => true]);
-        $first->click('Session')->assertSee('The session')->assertDontSee('Prepare a quiz');
+        $first->click('button[aria-label="Controls"]')->click('Session')->assertSee('The session')->assertDontSee('Prepare a quiz');
         $screen->assertSee('Everyone plays.')->assertSee('Camille')->assertSee('100 Points');
         $identity = $room->players()->where('name', 'Camille')->sole()->id;
         $first->refresh()->assertSee('Camille')->assertSee('100 Points')->assertDontSee('Prepare a quiz');
         expect($room->players()->where('name', 'Camille')->sole()->id)->toBe($identity);
-        $first->click('Session')->click('.page-deck:visible > .page-controls > button[aria-label="Next"]')->fill('session-extra', '500')->click('Extend session')->assertSee('Target: 600 points')->click('Play')->assertSee('Prepare a quiz');
+        $first->click('button[aria-label="Controls"]')->click('Session')->click('[data-session-extend]')->fill('session-extra', '500')->click('[data-slot="drawer-content"] button[type="submit"]')->assertSee('Target: 600 points')->click('button[aria-label="Play"]')->assertSee('Prepare a quiz');
         $screen->assertSee('Target: 600 points')->assertSee('100 Points');
         $second->refresh()->assertSee('Alex')->assertSee('0 Points');
         expect($room->fresh()->point_target)->toBe(600);

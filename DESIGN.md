@@ -196,14 +196,20 @@ Le chrono est un anneau citron portant un chiffre central. La troupe utilise les
 
 ### Do:
 
-- **Do** limiter ces tokens et composants à public/maquettes tant que la direction graphique reste à valider.
+- **Do** appliquer les tokens communs aux interfaces Vue et conserver la galerie comme référence.
 - **Do** conserver les SVG et palettes du catalogue des Plummos ; composer leur placement sans contenant individuel.
 - **Do** préserver l’accès au texte intégral par pagination et une commande de lecture dédiée.
 - **Do** respecter prefers-reduced-motion et conserver un focus visible.
 
 ### Don't:
 
-- **Don’t** présenter cette proposition comme la DA approuvée ou appliquée en production.
+- **Don’t** réintroduire une barre d’onglets en bas du téléphone : les commandes sont accessibles depuis le bouton de manette du HUD.
 - **Don’t** introduire de scroll de document ou de panneau dans ces maquettes.
 - **Don’t** placer les personnages dans des cartes, cases ou bordures individuelles.
 - **Don’t** étendre les contrôles de galerie au produit.
+
+## Retouches après essai sur téléphone
+
+Les champs utilisent le fond crème et une encre sombre, y compris les champs portant une classe de fond Tailwind. Tous les boutons ont une bordure et une ombre pleine de 6 px (4 px en faible hauteur), avec un état enfoncé au toucher. Salon et Session regroupent leurs actions sans pagination ; la prolongation ouvre un drawer shadcn Vue. La connexion rassemble ses champs lorsque la hauteur disponible le permet. La pagination reste réservée aux listes et aux contenus qui dépassent la place disponible.
+
+Les contrôles de formulaire partagent une hauteur minimale de 44 px, une police de 16 px, une bordure de 2 px et un rayon de 14 px. En faible hauteur, le minimum commun passe à 32 px. Les libellés longs peuvent prendre deux lignes ; les zones de texte et commandes illustrées gardent la place nécessaire à leur contenu.

@@ -12,7 +12,7 @@ it('prepares a tagged drawing word and a dynamic pack through the administration
     $packName = 'Pack '.$suffix;
     $word = 'Chat'.$suffix;
     try {
-        $page = visit('/admin/login')->withLocale('en-US')->fill('admin-email', $admin->email)->click('.page-deck:visible > .page-controls > button[aria-label="Next"]')->fill('admin-password', 'password')->click('Sign in')->assertSee('Welcome to Plummo administration.');
+        $page = visit('/admin/login')->withLocale('en-US')->fill('admin-email', $admin->email)->fill('admin-password', 'password')->click('Sign in')->assertSee('Welcome to Plummo administration.');
         $page->click('.admin-nav a[href="/admin/tags"]')->click('Add tag')->fill('#tag-name', $tagName)->click('Add tag')->assertSee($tagName);
         $page->click('.admin-nav a[href="/admin/contents"]')->click('Add content')->select('#content-type', 'drawing')->click('.page-deck:visible > .page-controls > button[aria-label="Next"]')->fill('#content-word', $word)->click('.page-deck:visible > .page-controls > button[aria-label="Next"]')->check($tagName)->click('Publish')->assertSee('Edit content')->assertNoJavaScriptErrors();
         $content = Content::where('payload->word', $word)->firstOrFail();
