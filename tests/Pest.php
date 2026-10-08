@@ -47,3 +47,11 @@ function quizAnswer(Room $room, int $choice): array
 
     return ['choice' => $choice, 'game_id' => $game->id, 'round' => $game->state['number']];
 }
+
+function blindSong(string $title, array $tags = [], bool $published = true): Content
+{
+    $song = Content::create(['type' => ContentType::BlindTest, 'published' => $published, 'payload' => ['title' => $title, 'artist' => 'Artist', 'audio_path' => 'audio/test.wav']]);
+    $song->tags()->sync($tags);
+
+    return $song;
+}

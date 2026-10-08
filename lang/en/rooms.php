@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'blind_catalogue_small' => 'The catalogue needs at least eight published songs with distinct title and artist pairs.',
     'invalid_content_count' => 'Invalid content count.',
     'contents_exhausted' => 'Not enough unseen content. Change packs or allow repeats.',
     'title' => 'The room',

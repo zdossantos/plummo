@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'blind_catalogue_small' => 'Le catalogue doit contenir au moins huit chansons publiées avec des titres et artistes distincts.',
     'invalid_content_count' => 'Quantité de contenus invalide.',
     'contents_exhausted' => 'Pas assez de contenus non joués. Changez de pack ou autorisez les répétitions.',
     'title' => 'Le salon',
