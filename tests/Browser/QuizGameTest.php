@@ -17,32 +17,32 @@ it('plays a quiz with a shared screen and two separate phones then returns to th
     $room = Room::latest('id')->firstOrFail();
     try {
         $first = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')
-            ->fill('player-name', 'Camille')->click('Enter the room')->assertSee('Prepare a quiz');
+            ->fill('player-name', 'Camille')->click('Continue')->click('Enter the room')->assertSee('Prepare a quiz');
         $second = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')
-            ->fill('player-name', 'Alex')->click('Enter the room')->assertSee('Alex');
-        $first->fill('session-target', '50')->click('Save target')->assertSee('Target: 50 points');
-        $first->click('input[type="checkbox"][value="'.$pack->id.'"]');
+            ->fill('player-name', 'Alex')->click('Continue')->click('Enter the room')->assertSee('Alex');
+        $first->click('button[aria-label="Controls"]')->click('Session')->fill('session-target', '50')->click('Save target')->assertSee('Target: 50 points');
+        $first->click('button[aria-label="Play"]')->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")');
         $first->assertSee('5 unseen questions')->fill('game-rounds', '5');
         $first->page()->locator('button:has-text("Start quiz")')->click(['noWaitAfter' => true]);
         $first->assertSee('Quiz · Question 1 / 5');
         $second->assertSee('Quiz · Question 1 / 5');
         $screen->assertSee('Quiz · Question 1 / 5')->assertNoJavaScriptErrors();
-        $first->page()->locator('button:has-text("AA")')->click(['noWaitAfter' => true]);
+        $first->page()->locator('.game-choices button:has-text("AA")')->click(['noWaitAfter' => true]);
         $first->assertSee('Answer saved.');
-        $second->page()->locator('button:has-text("BB")')->click(['noWaitAfter' => true]);
+        $second->page()->locator('.game-choices button:has-text("BB")')->click(['noWaitAfter' => true]);
         $second->assertSee('0 points for this question');
         $first->assertSee('100 points for this question');
         $screen->assertSee('Mini-game leaderboard')->assertSee('Well done, Camille!')->assertSee('Session target reached');
-        $first->assertSee('Mini-game leaderboard');
+        $first->assertSee('Mini-game leaderboard')->assertPresent('.podium')->assertMissing('.page-deck');
         $first->page()->locator('button:has-text("Back to lobby")')->click(['noWaitAfter' => true]);
-        $first->assertSee('The session')->assertDontSee('Prepare a quiz');
-        $screen->assertSee('Everyone plays.')->assertSee('Camille')->assertSee('100 points');
+        $first->click('button[aria-label="Controls"]')->click('Session')->assertSee('The session')->assertDontSee('Prepare a quiz');
+        $screen->assertSee('Everyone plays.')->assertSee('Camille')->assertSee('100 Points');
         $identity = $room->players()->where('name', 'Camille')->sole()->id;
-        $first->refresh()->assertSee('Camille')->assertSee('100 points')->assertDontSee('Prepare a quiz');
+        $first->refresh()->assertSee('Camille')->assertSee('100 Points')->assertDontSee('Prepare a quiz');
         expect($room->players()->where('name', 'Camille')->sole()->id)->toBe($identity);
-        $first->fill('session-extra', '500')->click('Extend session')->assertSee('Target: 600 points')->assertSee('Prepare a quiz');
-        $screen->assertSee('Target: 600 points')->assertSee('100 points');
-        $second->refresh()->assertSee('Alex')->assertSee('0 points');
+        $first->click('button[aria-label="Controls"]')->click('Session')->click('[data-session-extend]')->fill('session-extra', '500')->click('[data-slot="drawer-content"] button[type="submit"]')->assertSee('Target: 600 points')->click('button[aria-label="Play"]')->assertSee('Prepare a quiz');
+        $screen->assertSee('Target: 600 points')->assertSee('100 Points');
+        $second->refresh()->assertSee('Alex')->assertSee('0 Points');
         expect($room->fresh()->point_target)->toBe(600);
         $first->assertNoJavaScriptErrors();
         $second->assertNoJavaScriptErrors();

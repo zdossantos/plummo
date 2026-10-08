@@ -50,3 +50,27 @@ export function composePlummo(
         .replace(/id="([^"]+)"/g, `id="${prefix}-$1"`)
         .replace(/url\(#([^)]+)\)/g, `url(#${prefix}-$1)`);
 }
+
+/** Select independently from each occupied accessory slot. */
+export function randomAppearance(
+    catalog: Catalog,
+    random: () => number = Math.random,
+): { color: string; accessories: string[] } {
+    const pick = <T>(items: T[]): T | undefined =>
+        items[
+            Math.min(
+                items.length - 1,
+                Math.max(0, Math.floor(random() * items.length)),
+            )
+        ];
+    const slots = [...new Set(catalog.accessories.map((item) => item.slot))];
+    return {
+        color: pick(catalog.colors)?.id ?? 'violet',
+        accessories: slots.flatMap((slot) => {
+            const item = pick(
+                catalog.accessories.filter((item) => item.slot === slot),
+            );
+            return item ? [item.id] : [];
+        }),
+    };
+}

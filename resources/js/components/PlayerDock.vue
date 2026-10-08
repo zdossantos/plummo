@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from 'vue';
+import { onUnmounted, ref, watch } from 'vue';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import { roundCelebration } from '@/lib/celebration';
 import { useTranslations } from '@/composables/useTranslations';
@@ -10,9 +10,6 @@ const props = defineProps<{
     serverNow: number;
 }>();
 const { t } = useTranslations('rooms');
-const slots = computed(() =>
-    Array.from({ length: 8 }, (_, index) => props.room.players[index] ?? null),
-);
 const gains = ref<Record<number, number>>({});
 let lastCelebrated = '';
 let timer: ReturnType<typeof setTimeout> | undefined;
@@ -34,80 +31,48 @@ onUnmounted(() => clearTimeout(timer));
 </script>
 <template>
     <section
-        class="mt-auto w-full max-w-3xl self-end rounded-3xl bg-accent/35 p-4"
+        class="player-cast"
         :aria-label="t('players')"
         data-testid="player-dock"
     >
-        <div class="mb-2 flex items-center justify-between gap-4">
-            <h2 class="font-bold">{{ t('players') }}</h2>
-            <span class="text-sm text-muted-foreground">{{
-                t('count', { count: room.occupied })
-            }}</span>
-        </div>
-        <div class="grid grid-cols-4 gap-x-3 gap-y-2">
-            <article
-                v-for="(player, index) in slots"
-                :key="player?.id ?? 'empty-' + index"
-                class="flex min-w-0 flex-col text-center"
+        <article
+            v-for="player in room.players"
+            :key="player.id"
+            class="player-character"
+        >
+            <p
+                v-if="player.chat && player.chat.expiresAt > serverNow"
+                data-testid="chat-bubble"
+                class="chat-bubble rounded-2xl bg-white px-2 py-2 leading-tight break-words"
+                :aria-label="t('chat_from', { name: player.name })"
             >
-                <template v-if="player">
-                    <div
-                        class="flex min-h-24 flex-1 items-end justify-center pb-2"
-                    >
-                        <p
-                            v-if="
-                                player.chat && player.chat.expiresAt > serverNow
-                            "
-                            data-testid="chat-bubble"
-                            class="chat-bubble w-full rounded-2xl bg-card px-2 py-2 text-xs leading-[1.15] break-words shadow-sm"
-                            :aria-label="t('chat_from', { name: player.name })"
-                        >
-                            {{ player.chat.message }}
-                        </p>
-                    </div>
-                    <div
-                        class="relative mx-auto w-14"
-                        :class="{ 'plummo-hop': gains[player.id] }"
-                    >
-                        <PlummoAvatar
-                            :color="player.color"
-                            :accessories="player.accessories"
-                            :label="player.name"
-                        />
-                        <p
-                            v-if="gains[player.id]"
-                            class="points-rise absolute -top-2 left-1/2 z-10 -translate-x-1/2 rounded-full bg-primary px-2 py-1 text-sm font-black whitespace-nowrap text-primary-foreground"
-                            role="status"
-                        >
-                            +{{ gains[player.id] }} {{ t('score') }}
-                        </p>
-                    </div>
-                    <p class="truncate text-sm font-bold" :title="player.name">
-                        {{ player.name }}
-                        <span
-                            v-if="player.id === room.chiefId"
-                            class="text-primary"
-                            >· {{ t('chief') }}</span
-                        >
-                    </p>
-                    <p class="text-xs text-muted-foreground">
-                        {{ player.score }} {{ t('score') }}
-                    </p>
-                    <p
-                        v-if="player.status === 'disconnected'"
-                        class="text-xs text-muted-foreground"
-                    >
-                        {{ t('disconnected') }}
-                    </p>
-                </template>
-                <div
-                    v-else
-                    class="flex h-full min-h-32 items-end justify-center rounded-2xl border border-dashed border-primary/15 p-3 text-xs text-muted-foreground"
+                {{ player.chat.message }}
+            </p>
+            <p class="player-name">
+                {{ player.name
+                }}<span v-if="player.id === room.chiefId" class="text-primary">
+                    ♛</span
                 >
-                    {{ t('empty_slot') }}
-                </div>
-            </article>
-        </div>
+            </p>
+            <p class="player-score">{{ player.score }} {{ t('score') }}</p>
+            <p v-if="player.status === 'disconnected'" class="text-[10px]">
+                {{ t('disconnected') }}
+            </p>
+            <div class="relative" :class="{ 'plummo-hop': gains[player.id] }">
+                <PlummoAvatar
+                    :color="player.color"
+                    :accessories="player.accessories"
+                    :label="player.name"
+                />
+                <p
+                    v-if="gains[player.id]"
+                    class="points-rise absolute -top-2 left-1/2 z-10 -translate-x-1/2 rounded-full bg-primary px-2 py-1 text-sm font-black whitespace-nowrap text-primary-foreground"
+                    role="status"
+                >
+                    +{{ gains[player.id] }} {{ t('score') }}
+                </p>
+            </div>
+        </article>
     </section>
 </template>
 <style scoped>

@@ -1,0 +1,298 @@
+{
+    "schemaVersion": 2,
+    "generatedAt": "2026-10-08T13:36:23.441232+00:00",
+    "title": "Design System: Plummo — maquettes HTML provisoires",
+    "extensions": {
+        "colorMeta": {
+            "world": {
+                "role": "neutral",
+                "displayName": "Aubergine",
+                "tonalRamp": [
+                    "oklch(15% 0.0629 302.95)",
+                    "oklch(26% 0.0629 302.95)",
+                    "oklch(38% 0.0629 302.95)",
+                    "oklch(49% 0.0629 302.95)",
+                    "oklch(61% 0.0629 302.95)",
+                    "oklch(72% 0.0629 302.95)",
+                    "oklch(84% 0.0629 302.95)",
+                    "oklch(95% 0.0629 302.95)"
+                ]
+            },
+            "paper": {
+                "role": "neutral",
+                "displayName": "Crème",
+                "tonalRamp": [
+                    "oklch(15% 0.0239 85.79)",
+                    "oklch(26% 0.0239 85.79)",
+                    "oklch(38% 0.0239 85.79)",
+                    "oklch(49% 0.0239 85.79)",
+                    "oklch(61% 0.0239 85.79)",
+                    "oklch(72% 0.0239 85.79)",
+                    "oklch(84% 0.0239 85.79)",
+                    "oklch(95% 0.0239 85.79)"
+                ]
+            },
+            "lime": {
+                "role": "primary",
+                "displayName": "Citron",
+                "tonalRamp": [
+                    "oklch(15% 0.1234 104.06)",
+                    "oklch(26% 0.1234 104.06)",
+                    "oklch(38% 0.1234 104.06)",
+                    "oklch(49% 0.1234 104.06)",
+                    "oklch(61% 0.1234 104.06)",
+                    "oklch(72% 0.1234 104.06)",
+                    "oklch(84% 0.1234 104.06)",
+                    "oklch(95% 0.1234 104.06)"
+                ]
+            },
+            "purple": {
+                "role": "secondary",
+                "displayName": "Lilas",
+                "tonalRamp": [
+                    "oklch(15% 0.1537 299.50)",
+                    "oklch(26% 0.1537 299.50)",
+                    "oklch(38% 0.1537 299.50)",
+                    "oklch(49% 0.1537 299.50)",
+                    "oklch(61% 0.1537 299.50)",
+                    "oklch(72% 0.1537 299.50)",
+                    "oklch(84% 0.1537 299.50)",
+                    "oklch(95% 0.1537 299.50)"
+                ]
+            },
+            "mint": {
+                "role": "secondary",
+                "displayName": "Menthe",
+                "tonalRamp": [
+                    "oklch(15% 0.0602 153.94)",
+                    "oklch(26% 0.0602 153.94)",
+                    "oklch(38% 0.0602 153.94)",
+                    "oklch(49% 0.0602 153.94)",
+                    "oklch(61% 0.0602 153.94)",
+                    "oklch(72% 0.0602 153.94)",
+                    "oklch(84% 0.0602 153.94)",
+                    "oklch(95% 0.0602 153.94)"
+                ]
+            },
+            "pink": {
+                "role": "secondary",
+                "displayName": "Rose",
+                "tonalRamp": [
+                    "oklch(15% 0.0734 358.04)",
+                    "oklch(26% 0.0734 358.04)",
+                    "oklch(38% 0.0734 358.04)",
+                    "oklch(49% 0.0734 358.04)",
+                    "oklch(61% 0.0734 358.04)",
+                    "oklch(72% 0.0734 358.04)",
+                    "oklch(84% 0.0734 358.04)",
+                    "oklch(95% 0.0734 358.04)"
+                ]
+            },
+            "ink": {
+                "role": "neutral",
+                "displayName": "Encre",
+                "tonalRamp": [
+                    "oklch(15% 0.0447 301.02)",
+                    "oklch(26% 0.0447 301.02)",
+                    "oklch(38% 0.0447 301.02)",
+                    "oklch(49% 0.0447 301.02)",
+                    "oklch(61% 0.0447 301.02)",
+                    "oklch(72% 0.0447 301.02)",
+                    "oklch(84% 0.0447 301.02)",
+                    "oklch(95% 0.0447 301.02)"
+                ]
+            },
+            "edge": {
+                "role": "neutral",
+                "displayName": "Bord profond",
+                "tonalRamp": [
+                    "oklch(15% 0.0462 300.19)",
+                    "oklch(26% 0.0462 300.19)",
+                    "oklch(38% 0.0462 300.19)",
+                    "oklch(49% 0.0462 300.19)",
+                    "oklch(61% 0.0462 300.19)",
+                    "oklch(72% 0.0462 300.19)",
+                    "oklch(84% 0.0462 300.19)",
+                    "oklch(95% 0.0462 300.19)"
+                ]
+            },
+            "muted": {
+                "role": "neutral",
+                "displayName": "Lavande atténuée",
+                "tonalRamp": [
+                    "oklch(15% 0.0448 309.25)",
+                    "oklch(26% 0.0448 309.25)",
+                    "oklch(38% 0.0448 309.25)",
+                    "oklch(49% 0.0448 309.25)",
+                    "oklch(61% 0.0448 309.25)",
+                    "oklch(72% 0.0448 309.25)",
+                    "oklch(84% 0.0448 309.25)",
+                    "oklch(95% 0.0448 309.25)"
+                ]
+            },
+            "secondary-surface": {
+                "role": "neutral",
+                "displayName": "Surface secondaire",
+                "tonalRamp": [
+                    "oklch(15% 0.0725 306.79)",
+                    "oklch(26% 0.0725 306.79)",
+                    "oklch(38% 0.0725 306.79)",
+                    "oklch(49% 0.0725 306.79)",
+                    "oklch(61% 0.0725 306.79)",
+                    "oklch(72% 0.0725 306.79)",
+                    "oklch(84% 0.0725 306.79)",
+                    "oklch(95% 0.0725 306.79)"
+                ]
+            }
+        },
+        "typographyMeta": {
+            "display": {
+                "displayName": "Titre principal",
+                "purpose": "Fredoka locale sur les scènes de maquette."
+            },
+            "body": {
+                "displayName": "Corps d’interface",
+                "purpose": "Formulaires et commandes."
+            }
+        },
+        "shadows": [
+            {
+                "name": "action",
+                "value": "0 5px 0 var(--edge)",
+                "purpose": "Commande de base"
+            },
+            {
+                "name": "answer",
+                "value": "0 6px 0 var(--edge)",
+                "purpose": "Réponses et dessin"
+            },
+            {
+                "name": "answer-mobile",
+                "value": "0 4px 0 var(--edge)",
+                "purpose": "Réponses sur téléphone"
+            },
+            {
+                "name": "compact",
+                "value": "0 3px 0 var(--edge)",
+                "purpose": "Palette et faible hauteur"
+            }
+        ],
+        "motion": [
+            {
+                "name": "press",
+                "value": "translateY(3px)",
+                "purpose": "Pression du bouton et suppression de son ombre."
+            },
+            {
+                "name": "cheer",
+                "value": "cheer 0.7s ease-out 1",
+                "purpose": "Célébration ponctuelle des personnages ; désactivée avec prefers-reduced-motion."
+            }
+        ],
+        "breakpoints": [
+            {
+                "name": "mobile-max",
+                "value": "760px"
+            },
+            {
+                "name": "desktop-min",
+                "value": "761px"
+            },
+            {
+                "name": "blind-waveform-height",
+                "value": "850px"
+            },
+            {
+                "name": "blind-compact-height",
+                "value": "720px"
+            },
+            {
+                "name": "compact-height",
+                "value": "650px"
+            },
+            {
+                "name": "short-height",
+                "value": "450px"
+            }
+        ]
+    },
+    "components": [
+        {
+            "name": "Action principale",
+            "kind": "button",
+            "refersTo": "button-primary",
+            "description": "Commande de la maquette avec relief et états interactifs.",
+            "html": "<button class=\"ds-action\">Continuer</button>",
+            "css": ".ds-action{font-family:'Trebuchet MS',ui-rounded,system-ui,sans-serif;border:2px solid var(--edge,#180f26);border-radius:12px;padding:13px 22px;font-size:16px;font-weight:800;min-height:48px;cursor:pointer;box-shadow:0 5px 0 var(--edge,#180f26);background:var(--lime,#efe681);color:var(--ink,#21182f);}.ds-action:hover:not(:disabled){filter:brightness(1.06)}.ds-action:focus-visible{outline:3px solid var(--lime,#efe681);outline-offset:4px}.ds-action:active:not(:disabled){transform:translateY(3px);box-shadow:none}.ds-action:disabled{opacity:.55;box-shadow:none;cursor:default}"
+        },
+        {
+            "name": "Action secondaire",
+            "kind": "button",
+            "refersTo": "button-secondary",
+            "description": "Commande de la maquette avec relief et états interactifs.",
+            "html": "<button class=\"ds-action\">Retour</button>",
+            "css": ".ds-action{font-family:'Trebuchet MS',ui-rounded,system-ui,sans-serif;border:2px solid var(--edge,#180f26);border-radius:12px;padding:13px 22px;font-size:16px;font-weight:800;min-height:48px;cursor:pointer;box-shadow:0 5px 0 var(--edge,#180f26);background:#4b365f;color:var(--paper,#fff7e6);}.ds-action:hover:not(:disabled){filter:brightness(1.06)}.ds-action:focus-visible{outline:3px solid var(--lime,#efe681);outline-offset:4px}.ds-action:active:not(:disabled){transform:translateY(3px);box-shadow:none}.ds-action:disabled{opacity:.55;box-shadow:none;cursor:default}"
+        },
+        {
+            "name": "Action de danger",
+            "kind": "button",
+            "refersTo": "button-danger",
+            "description": "Commande de la maquette avec relief et états interactifs.",
+            "html": "<button class=\"ds-action\">Arrêter</button>",
+            "css": ".ds-action{font-family:'Trebuchet MS',ui-rounded,system-ui,sans-serif;border:2px solid var(--edge,#180f26);border-radius:12px;padding:13px 22px;font-size:16px;font-weight:800;min-height:48px;cursor:pointer;box-shadow:0 5px 0 var(--edge,#180f26);background:var(--pink,#f1b5c8);color:var(--ink,#21182f);}.ds-action:hover:not(:disabled){filter:brightness(1.06)}.ds-action:focus-visible{outline:3px solid var(--lime,#efe681);outline-offset:4px}.ds-action:active:not(:disabled){transform:translateY(3px);box-shadow:none}.ds-action:disabled{opacity:.55;box-shadow:none;cursor:default}"
+        },
+        {
+            "name": "Réponse",
+            "kind": "button",
+            "refersTo": "answer",
+            "description": "Choix lilas ; les autres couleurs alternent dans la grille.",
+            "html": "<button class=\"ds-answer\"><span class=\"ds-letter\">A</span>Une réponse</button>",
+            "css": ".ds-answer{display:flex;align-items:center;gap:18px;width:100%;min-height:88px;border:2px solid var(--edge,#180f26);border-radius:16px;padding:20px 54px 20px 20px;background:var(--purple,#aa83ec);color:var(--ink,#21182f);box-shadow:0 6px 0 var(--edge,#180f26);text-align:left;font:800 24px \"Trebuchet MS\",sans-serif;cursor:pointer}.ds-letter{display:grid;place-items:center;width:30px;height:30px;font-size:15px;border:2px solid currentColor;border-radius:50%}.ds-answer:hover{filter:brightness(1.06)}.ds-answer:focus-visible{outline:3px solid var(--lime,#efe681);outline-offset:4px}.ds-answer:active{transform:translateY(3px);box-shadow:none}"
+        },
+        {
+            "name": "Champ",
+            "kind": "input",
+            "refersTo": "input",
+            "description": "Saisie claire avec label supérieur.",
+            "html": "<label class=\"ds-label\">Pseudo<input class=\"ds-input\" value=\"Luna\"></label>",
+            "css": ".ds-label{display:grid;gap:8px;font:700 16px \"Trebuchet MS\",sans-serif;color:var(--ink,#21182f)}.ds-input{min-width:0;color:var(--ink,#21182f);background:var(--paper,#fff7e6);padding:14px 16px;border:2px solid var(--edge,#180f26);border-radius:12px;font:400 16px \"Trebuchet MS\",sans-serif}.ds-input:focus-visible{outline:3px solid var(--lime,#efe681);outline-offset:4px}"
+        },
+        {
+            "name": "Lecteur",
+            "kind": "card",
+            "refersTo": "reader",
+            "description": "Matériau de la lecture paginée ; ce spécimen montre la surface.",
+            "html": "<article class=\"ds-reader\">Texte intégral de la proposition.</article>",
+            "css": ".ds-reader{background:var(--paper,#fff7e6);color:var(--ink,#21182f);border:2px solid var(--edge,#180f26);border-radius:16px;padding:24px;font:400 18px/1.45 \"Trebuchet MS\",sans-serif;overflow-wrap:anywhere;white-space:pre-wrap}"
+        },
+        {
+            "name": "Chrono",
+            "kind": "custom",
+            "description": "Anneau de temps de la scène de jeu.",
+            "html": "<span class=\"ds-timer\" aria-label=\"20 secondes\">20</span>",
+            "css": ".ds-timer{display:grid;place-items:center;width:78px;height:78px;border:6px solid var(--lime,#efe681);border-radius:50%;color:var(--paper,#fff7e6);background:var(--world,#302143);font:900 28px \"Trebuchet MS\",sans-serif;font-variant-numeric:tabular-nums}"
+        }
+    ],
+    "narrative": {
+        "northStar": "Le jeu de salon habité",
+        "overview": "Système provisoire extrait des maquettes HTML de public/maquettes uniquement. La demande de jeu, le rôle PC/scène et téléphone/manette, les Plummos existants libres en bas à droite et l’absence de scroll sont des décisions utilisateur. La palette, Fredoka, les silhouettes des commandes et leur relief constituent une proposition graphique encore à valider visuellement. Ce document ne prescrit aucune modification ni migration de l’application Laravel/Vue.\n\nLe monde construit associe un fond profond, des surfaces claires et des commandes tactiles à contours sombres. Les ombres pleines appartiennent ici au matériau de jeu proposé : elles soutiennent les réponses et les actions. Les personnages restent les assets existants ; la nouvelle direction porte leur environnement et leur composition.",
+        "keyCharacteristics": [
+            "Scène de jeu aubergine et commandes pastel contrastées.",
+            "Titres ronds, commandes épaisses et chiffres faciles à repérer.",
+            "Personnages existants réutilisés sans refonte de leurs SVG ni de leurs palettes catalogue."
+        ],
+        "rules": [],
+        "dos": [
+            "Do limiter ces tokens et composants à public/maquettes tant que la direction graphique reste à valider.",
+            "Do conserver les SVG et palettes du catalogue des Plummos ; composer leur placement sans contenant individuel.",
+            "Do préserver l’accès au texte intégral par pagination et une commande de lecture dédiée.",
+            "Do respecter prefers-reduced-motion et conserver un focus visible."
+        ],
+        "donts": [
+            "Don’t présenter cette proposition comme la DA approuvée ou appliquée en production.",
+            "Don’t introduire de scroll de document ou de panneau dans ces maquettes.",
+            "Don’t placer les personnages dans des cartes, cases ou bordures individuelles.",
+            "Don’t étendre les contrôles de galerie au produit."
+        ]
+    }
+}

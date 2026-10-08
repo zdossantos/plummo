@@ -60,7 +60,7 @@ watch(
 );
 </script>
 <template>
-    <div class="mt-6">
+    <div class="drawing-scene">
         <h1
             v-if="game.phase === 'waiting'"
             class="my-8 text-center text-3xl font-black"
@@ -68,7 +68,7 @@ watch(
             {{ t('drawing_waiting') }}
         </h1>
         <template v-else-if="game.phase === 'selecting'">
-            <h1 class="mb-6 text-2xl font-black lg:text-4xl">
+            <h1 class="text-lg font-black lg:text-2xl">
                 {{
                     t(
                         phone && game.me?.words.length
@@ -91,7 +91,10 @@ watch(
             </div>
         </template>
         <template v-else>
-            <h1 class="mb-5 text-2xl font-black lg:text-4xl">
+            <h1
+                v-if="!phone || !game.me?.canDraw"
+                class="text-summary text-lg font-black lg:text-2xl"
+            >
                 {{
                     t(game.round.word ? 'drawing_revealed' : 'drawing_artist', {
                         word: game.round.word ?? '',
@@ -101,13 +104,13 @@ watch(
             </h1>
             <p
                 v-if="game.phase === 'artist_missing'"
-                class="mb-5 font-semibold"
+                class="text-sm font-semibold"
             >
                 {{ t('drawing_absent') }}
             </p>
             <p
                 v-if="phone && game.me?.word && !game.round.word"
-                class="mb-4 text-xl font-bold"
+                class="text-sm font-bold"
             >
                 {{ t('drawing_secret', { word: game.me.word }) }}
             </p>
@@ -121,7 +124,7 @@ watch(
                 :send="(values) => sendDrawingAction('stroke', values)"
                 @pending="pending = $event"
             />
-            <div v-if="editable" class="mt-4 flex flex-wrap items-center gap-3">
+            <div v-if="editable" class="drawing-tools">
                 <button
                     v-for="(value, index) in palette"
                     :key="value"
@@ -129,7 +132,7 @@ watch(
                     :aria-label="t('drawing_color', { number: index + 1 })"
                     :aria-pressed="color === value"
                     :style="{ backgroundColor: value }"
-                    class="size-10 rounded-full border-2"
+                    class="size-7 rounded-full border-2"
                     :class="
                         color === value
                             ? 'ring-2 ring-primary ring-offset-2'
@@ -160,7 +163,7 @@ watch(
             </div>
             <form
                 v-if="canGuess"
-                class="mt-5 flex gap-3"
+                class="mt-2 flex gap-2"
                 @submit.prevent="submit"
             >
                 <label class="min-w-0 flex-1"
@@ -181,14 +184,14 @@ watch(
             <p
                 v-if="canGuess && game.me?.near"
                 role="status"
-                class="mt-4 font-bold"
+                class="text-sm font-bold"
             >
                 {{ t('drawing_near') }}
             </p>
             <p
                 v-if="phone && game.me?.found"
                 role="status"
-                class="mt-4 font-bold"
+                class="text-sm font-bold"
             >
                 {{ t('drawing_found', { count: game.me.points }) }}
             </p>
@@ -212,7 +215,7 @@ watch(
                     t(game.me.votedSkip ? 'drawing_skip_saved' : 'drawing_skip')
                 }}</Button
             >
-            <p v-if="phone && game.round.word" class="mt-4 text-xl font-bold">
+            <p v-if="phone && game.round.word" class="text-sm font-bold">
                 {{ t('drawing_points', { count: game.me?.points ?? 0 }) }}
             </p>
         </template>

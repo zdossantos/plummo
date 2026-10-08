@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'chat_unavailable' => 'Finish your game action to send a message to the group.',
     'chat_label' => 'Say something to the group',
     'chat_hint' => 'Your message appears on the big screen for five seconds.',
     'chat_send' => 'Send message',
@@ -93,6 +94,12 @@ return [
     'target_reached' => 'Choose an extension, no point limit or a new session in the lobby before playing again.',
     'launch_quiz' => 'Prepare a quiz',
     'packs_hint' => 'Choose up to three packs. Shared contents are counted only once.',
+    'packs_selected' => '{count} packs',
+    'pack_selected' => '1 pack',
+    'phrase_short' => 'Sentences',
+    'drawing_short' => 'Drawing',
+    'drawing_setup_count' => '{count} drawings · {players} players',
+    'packs_all' => 'All packs',
     'packs_label' => 'Content packs',
     'no_packs' => 'No packs available. An administrator needs to prepare contents.',
     'available_questions' => '{unseen} unseen questions out of {total} available.',
@@ -127,6 +134,7 @@ return [
     'clip_duration' => 'Time per clip (s)',
     'blind_round' => 'Blind test · Clip {number} / {total}',
     'play_sound' => 'Play sound',
+    'audio_autoplay_blocked' => 'Your browser blocks automatic sound. Allow autoplay for this site in its settings.',
     'audio_error' => 'Playback failed. Try again or pause the game.',
     'drawing_minimum' => 'Drawing requires at least two connected players.',
     'drawing_limit' => 'The drawing is full. Undo a stroke or clear to continue.',

@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'chat_unavailable' => 'Termine ton action de jeu pour envoyer un message au groupe.',
     'chat_label' => 'Un mot au groupe',
     'chat_hint' => 'Votre message apparaît cinq secondes sur le grand écran.',
     'chat_send' => 'Envoyer le message',
@@ -93,6 +94,12 @@ return [
     'target_reached' => 'Choisissez une prolongation, le mode sans limite ou une nouvelle session au salon pour rejouer.',
     'launch_quiz' => 'Préparer un quiz',
     'packs_hint' => 'Choisis jusqu’à trois packs. Les contenus communs ne sont comptées qu’une fois.',
+    'packs_selected' => '{count} packs',
+    'pack_selected' => '1 pack',
+    'phrase_short' => 'Phrases',
+    'drawing_short' => 'Dessin',
+    'drawing_setup_count' => '{count} dessins · {players} joueurs',
+    'packs_all' => 'Tous les packs',
     'packs_label' => 'Les packs',
     'no_packs' => 'Aucun pack disponible. Un administrateur doit préparer des contenus.',
     'available_questions' => '{unseen} questions inédites sur {total} disponibles.',
@@ -127,6 +134,7 @@ return [
     'clip_duration' => 'Temps par extrait (s)',
     'blind_round' => 'Blind test · Extrait {number} / {total}',
     'play_sound' => 'Activer le son',
+    'audio_autoplay_blocked' => 'Le navigateur bloque le son automatique. Autorisez la lecture automatique pour ce site dans ses réglages.',
     'audio_error' => 'Lecture impossible. Réessaie ou mets la partie en pause.',
     'drawing_minimum' => 'Le dessin nécessite au moins deux joueurs connectés.',
     'drawing_limit' => 'Le dessin est plein. Annule un trait ou efface pour continuer.',

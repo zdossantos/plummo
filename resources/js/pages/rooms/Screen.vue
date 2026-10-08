@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Head } from '@inertiajs/vue3';
 import PlayerDock from '@/components/PlayerDock.vue';
-import RoomRanking from '@/components/RoomRanking.vue';
+import RoomNotice from '@/components/RoomNotice.vue';
 import GamePlay from '@/components/GamePlay.vue';
-import RoomHeader from '@/components/RoomHeader.vue';
+import ViewportShell from '@/components/ViewportShell.vue';
 import { useRoom } from '@/composables/useRoom';
 import { useTranslations } from '@/composables/useTranslations';
 import type { GameState, RoomState } from '@/types/rooms';
@@ -25,135 +24,61 @@ const { room, game, seconds, serverNow, closed, error, connected } = useRoom(
     },
 );
 const { t } = useTranslations('rooms');
-const showRanking = ref(false);
 </script>
 <template>
     <Head :title="t('title')" />
-    <main
-        class="mx-auto flex min-h-screen max-w-[1600px] flex-col px-8 py-8 lg:px-10 lg:py-6"
-    >
-        <RoomHeader />
-        <div v-if="closed" class="my-auto py-20 text-center">
-            <h1 class="text-4xl font-black">{{ t('closed') }}</h1>
-            <Link
-                href="/"
-                class="mt-8 inline-block rounded-xl bg-primary px-6 py-4 font-bold text-primary-foreground"
-                >{{ t('create') }}</Link
-            >
+    <ViewportShell class="display-screen" display-only>
+        <RoomNotice :message="error" />
+        <template #header
+            ><span class="font-bold text-primary">{{ room?.code }}</span
+            ><small>{{
+                room?.pointTarget === null
+                    ? t('nonstop')
+                    : t('point_target', { count: room?.pointTarget ?? 0 })
+            }}</small></template
+        >
+        <div v-if="closed" class="game-panel justify-center text-center">
+            <h1 class="text-4xl">{{ t('closed') }}</h1>
         </div>
         <template v-else>
-            <p v-if="error" role="status" class="mt-4 rounded-xl bg-accent p-3">
-                {{ error }}
-            </p>
-            <div
-                v-if="room?.ranking.length"
-                class="mt-5 flex items-center justify-between gap-4"
-            >
-                <p class="font-semibold text-primary">
-                    {{
-                        room.pointTarget === null
-                            ? t('nonstop')
-                            : t('point_target', { count: room.pointTarget })
-                    }}
-                </p>
-                <button
-                    class="rounded-xl bg-accent px-4 py-3 font-bold"
-                    :aria-expanded="showRanking"
-                    @click="showRanking = !showRanking"
-                >
-                    {{ showRanking ? t('back_lobby') : t('ranking') }}
-                </button>
-            </div>
-            <div
-                class="mt-6 grid flex-1 items-start gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,640px)]"
-            >
-                <div data-testid="screen-content">
-                    <section
-                        v-if="!showRanking && !game"
-                        class="grid items-center gap-8 py-6 md:grid-cols-[1fr_220px]"
-                    >
-                        <div>
-                            <p
-                                class="mb-4 text-base font-semibold text-primary"
-                            >
-                                {{ t('screen_intro') }}
-                            </p>
-                            <h1
-                                class="max-w-2xl text-4xl leading-tight font-black tracking-tight 2xl:text-5xl"
-                            >
-                                {{ t('screen_title') }}
-                            </h1>
-                            <p
-                                class="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground"
-                            >
-                                {{ t('invite') }}
-                            </p>
-                            <p class="mt-8 text-lg font-semibold">
-                                {{
-                                    room?.players.length
-                                        ? t('waiting_chief')
-                                        : t('waiting_first')
-                                }}
-                            </p>
-                        </div>
-                        <div
-                            class="rounded-[2rem] bg-card p-5 text-center shadow-sm"
-                        >
-                            <img
-                                :src="`/rooms/${room?.code}/qr`"
-                                :alt="t('qr_alt')"
-                                class="mx-auto w-48 rounded-2xl bg-white p-2"
-                                width="256"
-                                height="256"
-                            />
-                            <p
-                                class="mt-5 text-sm font-semibold text-muted-foreground"
-                            >
-                                {{ t('code') }}
-                            </p>
-                            <p
-                                class="mt-2 font-mono text-3xl font-black tracking-[.15em]"
-                                data-testid="room-code"
-                            >
-                                {{ room?.code }}
-                            </p>
-                            <p class="mt-5 text-sm text-muted-foreground">
-                                {{ t('manual') }}
-                            </p>
-                            <p class="mt-2 text-sm font-bold break-all">
-                                {{ manualUrl }}
-                            </p>
-                        </div>
-                    </section>
-                    <GamePlay
-                        v-if="game && room"
-                        v-show="!showRanking"
-                        :game="game"
-                        :room="room"
-                        :seconds="seconds"
-                        :connected="connected"
-                    />
-                    <RoomRanking v-if="room && showRanking" :room="room" />
-                </div>
-                <PlayerDock
-                    class="screen-players"
-                    v-if="room"
-                    :room="room"
+            <div class="phone-scene max-w-none" data-testid="screen-content">
+                <section v-if="!game" class="screen-lobby">
+                    <div>
+                        <p class="mb-4 font-bold text-primary">
+                            {{ t('screen_intro') }}
+                        </p>
+                        <h1>{{ t('screen_title') }}</h1>
+                        <p class="my-4 text-lg text-muted-foreground">
+                            {{ t('invite') }}
+                        </p>
+                        <p class="screen-code">{{ room?.code }}</p>
+                        <p class="mt-3 text-sm">
+                            {{ t('manual') }}
+                            <span>{{ manualUrl }}</span>
+                        </p>
+                    </div>
+                    <div class="flex flex-col items-center gap-3">
+                        <img
+                            :src="`/rooms/${room?.code}/qr`"
+                            :alt="t('qr_alt')"
+                        /><span class="text-sm font-bold">{{ t('join') }}</span>
+                    </div>
+                </section>
+                <GamePlay
+                    v-if="game && room"
                     :game="game"
-                    :server-now="serverNow"
+                    :room="room"
+                    :seconds="seconds"
+                    :connected="connected"
                 />
             </div>
         </template>
-    </main>
+        <template #footer
+            ><PlayerDock
+                v-if="room && !closed"
+                :room="room"
+                :game="game"
+                :server-now="serverNow"
+        /></template>
+    </ViewportShell>
 </template>
-
-<style scoped>
-@media (min-width: 80rem) {
-    .screen-players {
-        position: fixed;
-        right: max(2.5rem, calc((100vw - 1600px) / 2 + 2.5rem));
-        bottom: 1.5rem;
-        width: 640px;
-    }
-}
-</style>

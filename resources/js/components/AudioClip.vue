@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { playAudio } from '@/lib/audio';
 import { ref, watch, onUnmounted } from 'vue';
-import { Button } from '@/components/ui/button';
 import { useTranslations } from '@/composables/useTranslations';
 const props = defineProps<{ src: string; playing: boolean }>();
 const { t } = useTranslations('rooms');
@@ -51,6 +50,6 @@ onUnmounted(() => {
     />
     <div v-if="blocked && playing" class="mt-5">
         <p v-if="failed" role="alert">{{ t('audio_error') }}</p>
-        <Button @click="play">{{ t('play_sound') }}</Button>
+        <p v-else role="status">{{ t('audio_autoplay_blocked') }}</p>
     </div>
 </template>

@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { ref, watch, onUnmounted } from 'vue';
+import { computed, ref, watch, onUnmounted } from 'vue';
+import { useElementSize } from '@vueuse/core';
+const surface = ref<HTMLElement>();
+const { width: surfaceWidth, height: surfaceHeight } = useElementSize(surface);
+const canvasWidth = computed(() =>
+    Math.min(surfaceWidth.value, (surfaceHeight.value * 5) / 3),
+);
 import { Button } from '@/components/ui/button';
 import { useTranslations } from '@/composables/useTranslations';
 import type { Stroke } from '@/types/rooms';
@@ -143,41 +149,47 @@ onUnmounted(() => {
 });
 </script>
 <template>
-    <div>
-        <svg
-            data-testid="drawing-board"
-            viewBox="0 0 1000 600"
-            :aria-label="t('drawing_canvas')"
-            class="w-full rounded-2xl border-2 border-primary/20 bg-white"
-            :class="editable ? 'touch-none cursor-crosshair' : ''"
-            @pointerdown.prevent="down"
-            @pointermove="move"
-            @pointerup="up"
-            @pointercancel="up"
-        >
-            <polyline
-                v-for="stroke in local"
-                :key="stroke.id"
-                :points="
-                    stroke.points
-                        .map(([x, y]) => `${x * 1000},${y * 600}`)
-                        .join(' ')
-                "
-                :stroke="stroke.color"
-                :stroke-width="stroke.width"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                fill="none"
-            />
-            <circle
-                v-for="stroke in local.filter((s) => s.points.length === 1)"
-                :key="`dot-${stroke.id}`"
-                :cx="stroke.points[0][0] * 1000"
-                :cy="stroke.points[0][1] * 600"
-                :r="stroke.width / 2"
-                :fill="stroke.color"
-            />
-        </svg>
+    <div class="drawing-board">
+        <div ref="surface" class="drawing-space">
+            <svg
+                :style="{
+                    width: canvasWidth + 'px',
+                    height: (canvasWidth * 3) / 5 + 'px',
+                }"
+                data-testid="drawing-board"
+                viewBox="0 0 1000 600"
+                :aria-label="t('drawing_canvas')"
+                class="drawing-surface rounded-2xl border-2 border-primary/20 bg-white"
+                :class="editable ? 'touch-none cursor-crosshair' : ''"
+                @pointerdown.prevent="down"
+                @pointermove="move"
+                @pointerup="up"
+                @pointercancel="up"
+            >
+                <polyline
+                    v-for="stroke in local"
+                    :key="stroke.id"
+                    :points="
+                        stroke.points
+                            .map(([x, y]) => `${x * 1000},${y * 600}`)
+                            .join(' ')
+                    "
+                    :stroke="stroke.color"
+                    :stroke-width="stroke.width"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    fill="none"
+                />
+                <circle
+                    v-for="stroke in local.filter((s) => s.points.length === 1)"
+                    :key="`dot-${stroke.id}`"
+                    :cx="stroke.points[0][0] * 1000"
+                    :cy="stroke.points[0][1] * 600"
+                    :r="stroke.width / 2"
+                    :fill="stroke.color"
+                />
+            </svg>
+        </div>
         <p v-if="failed" class="mt-3" role="alert">
             {{ t('drawing_sync_error') }}
             <Button

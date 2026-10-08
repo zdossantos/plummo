@@ -2,6 +2,7 @@ import { onMounted, onUnmounted, ref, computed, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
+import { RoomRequests } from '@/lib/room-requests';
 import { useTranslations } from '@/composables/useTranslations';
 import type { GameState, Player, RoomState, Snapshot } from '@/types/rooms';
 
@@ -44,7 +45,7 @@ export function useRoom(
     const errors = ref<Record<string, string[]>>({});
     const { t } = useTranslations('rooms');
     let timer: ReturnType<typeof setTimeout> | undefined;
-    let controller: AbortController | undefined;
+    const requests = new RoomRequests();
     let stopped = false;
 
     async function request(
@@ -54,16 +55,17 @@ export function useRoom(
         background = false,
     ): Promise<boolean> {
         if (!code || busy.value || closed.value || stopped) return false;
-        busy.value = true;
+        const ticket = requests.begin(background);
+        if (!ticket) return false;
+        busy.value = requests.busy;
         if (!background) errors.value = {};
-        controller = new AbortController();
-        const timeout = setTimeout(() => controller?.abort(), 8000);
+        const timeout = setTimeout(() => ticket.controller.abort(), 8000);
         try {
             const response = await fetch(
                 `/rooms/${code}${action ? '/' + action : ''}`,
                 {
                     method,
-                    signal: controller.signal,
+                    signal: ticket.controller.signal,
                     credentials: 'same-origin',
                     headers: {
                         Accept: 'application/json',
@@ -76,7 +78,7 @@ export function useRoom(
                     body: body === undefined ? undefined : JSON.stringify(body),
                 },
             );
-            if (stopped) return false;
+            if (stopped || !requests.current(ticket)) return false;
             connected.value = response.status < 500;
             if (response.status === 404) {
                 closed.value = true;
@@ -89,6 +91,7 @@ export function useRoom(
             }
             if (response.status === 422) {
                 const data = await response.json();
+                if (!requests.current(ticket)) return false;
                 errors.value = data.errors;
                 error.value =
                     Object.values(errors.value).flat()[0] ?? t('room_error');
@@ -105,6 +108,7 @@ export function useRoom(
                 return true;
             }
             const data: Snapshot = await response.json();
+            if (stopped || !requests.current(ticket)) return false;
             canChat.value = data.canChat ?? false;
             room.value = data.room;
             me.value = data.me;
@@ -112,14 +116,15 @@ export function useRoom(
             if (data.serverTime) offset = data.serverTime - Date.now() / 1000;
             return true;
         } catch {
-            if (!stopped) {
+            if (!stopped && requests.current(ticket)) {
                 connected.value = false;
                 error.value = t('network');
             }
             return false;
         } finally {
             clearTimeout(timeout);
-            busy.value = false;
+            requests.finish(ticket);
+            busy.value = requests.busy;
         }
     }
     async function poll() {
@@ -212,7 +217,7 @@ export function useRoom(
         clearTimeout(timer);
         clearInterval(clockTimer);
         echo?.disconnect();
-        controller?.abort();
+        requests.abort();
     });
     return {
         room,

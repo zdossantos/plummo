@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue';
+import TextReader from '@/components/TextReader.vue';
+import PagedTextField from '@/components/PagedTextField.vue';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from '@/composables/useTranslations';
@@ -69,10 +71,7 @@ async function save(submit = false) {
     failed.value = !ok;
     schedule();
 }
-function input(event: Event) {
-    const field = event.target as HTMLTextAreaElement;
-    draft.value = Array.from(field.value).slice(0, 150).join('');
-    field.value = draft.value;
+function input() {
     dirty.value = true;
     failed.value = false;
     schedule();
@@ -96,20 +95,23 @@ const author = (id?: number) =>
     props.room.ranking.find((player) => player.id === id);
 </script>
 <template>
-    <div v-show="!['paused', 'resuming'].includes(game.phase)" class="mt-7">
-        <h1 class="mb-6 text-2xl font-black leading-tight lg:text-5xl">
+    <div
+        v-show="!['paused', 'resuming'].includes(game.phase)"
+        class="phrase-scene"
+    >
+        <h1 class="text-summary text-xl leading-tight lg:text-3xl">
             {{ game.round.prompt }}
         </h1>
+        <TextReader v-if="phone" :text="game.round.prompt" />
         <template v-if="game.phase === 'writing'">
             <form v-if="canWrite" @submit.prevent="save(true)">
                 <label for="phrase-suffix" class="font-bold">{{
                     t('phrase_suffix')
                 }}</label>
-                <textarea
+                <PagedTextField
                     id="phrase-suffix"
-                    :value="draft"
-                    rows="4"
-                    class="mt-3 w-full rounded-2xl border-2 border-primary/25 bg-background p-4 text-xl"
+                    v-model="draft"
+                    :maxlength="150"
                     :disabled="connected === false || submitting"
                     @input="input"
                 />
@@ -141,7 +143,7 @@ const author = (id?: number) =>
                     >{{ t('phrase_retry') }}</Button
                 >
                 <Button
-                    class="mt-5 w-full"
+                    class="mt-2 w-full"
                     type="submit"
                     :disabled="busy || pending || connected === false"
                     >{{ t('phrase_submit') }}</Button
@@ -160,75 +162,70 @@ const author = (id?: number) =>
             </p>
         </template>
         <template v-else-if="game.phase === 'presenting'">
-            <p class="mb-4 font-semibold">{{ t('phrase_presenting') }}</p>
+            <p class="text-sm font-semibold">{{ t('phrase_presenting') }}</p>
             <blockquote
                 v-for="entry in game.round.entries"
                 :key="entry.id"
-                class="rounded-3xl bg-accent/30 p-7 text-2xl font-bold leading-relaxed lg:p-12 lg:text-5xl"
+                class="rounded-2xl bg-accent/30 p-3 text-xl font-bold"
             >
-                {{ entry.text }}
+                <span class="text-summary">{{ entry.text }}</span
+                ><TextReader v-if="phone" :text="entry.text" />
             </blockquote>
         </template>
         <template v-else>
-            <h2 class="mb-5 text-xl font-bold lg:text-3xl">
+            <h2 class="text-lg font-bold">
                 {{
                     t(game.phase === 'voting' ? 'phrase_vote' : 'phrase_reveal')
                 }}
             </h2>
-            <div
-                class="grid gap-4"
-                :class="phone ? 'grid-cols-1' : 'lg:grid-cols-2'"
-            >
-                <component
-                    :is="
-                        phone && game.phase === 'voting' ? 'button' : 'article'
-                    "
+            <div class="game-choices">
+                <article
                     v-for="entry in game.round.entries"
                     :key="entry.id"
-                    :data-testid="'phrase-entry-' + entry.id"
-                    class="rounded-2xl border-2 border-primary/15 bg-accent/20 p-5 text-left text-xl font-bold lg:text-2xl"
-                    :class="
-                        game.me?.choice === entry.id
-                            ? 'border-primary bg-accent'
-                            : ''
-                    "
-                    :disabled="
-                        busy ||
-                        connected === false ||
-                        !game.me?.eligible ||
-                        game.me?.voted ||
-                        entry.id === game.me?.ownEntry
-                    "
-                    @click="
-                        phone &&
-                        game.phase === 'voting' &&
-                        sendAction('vote', { choice: entry.id })
-                    "
+                    class="game-choice"
+                    :class="{ chosen: game.me?.choice === entry.id }"
                 >
-                    <p>{{ entry.text }}</p>
-                    <p
-                        v-if="
-                            phone &&
-                            game.phase === 'voting' &&
+                    <button
+                        v-if="phone && game.phase === 'voting'"
+                        type="button"
+                        :data-testid="'phrase-entry-' + entry.id"
+                        :disabled="
+                            busy ||
+                            connected === false ||
+                            !game.me?.eligible ||
+                            game.me?.voted ||
                             entry.id === game.me?.ownEntry
                         "
-                        class="mt-3 text-sm"
+                        @click="sendAction('vote', { choice: entry.id })"
                     >
-                        {{ t('phrase_own') }}
+                        <span class="text-summary">{{ entry.text }}</span
+                        ><small v-if="entry.id === game.me?.ownEntry">{{
+                            t('phrase_own')
+                        }}</small>
+                    </button>
+                    <p
+                        v-else
+                        :data-testid="'phrase-entry-' + entry.id"
+                        class="text-summary"
+                    >
+                        {{ entry.text }}
                     </p>
+                    <TextReader v-if="phone" :text="entry.text" />
                     <div
                         v-if="entry.author !== undefined"
-                        class="mt-5 flex items-center gap-4"
+                        class="flex items-center gap-1"
                     >
                         <PlummoAvatar
                             v-if="author(entry.author)"
                             :color="author(entry.author)!.color"
                             :accessories="author(entry.author)!.accessories"
-                            class="h-20 w-20 shrink-0"
+                            class="w-6 shrink-0"
                         />
-                        <div>
-                            <p>{{ author(entry.author)?.name }}</p>
-                            <p class="mt-2 text-base">
+                        <div class="min-w-0 text-[10px]">
+                            <p class="text-summary">
+                                {{ author(entry.author)?.name }}
+                            </p>
+                            <p>
                                 {{
                                     t('phrase_votes', {
                                         count: entry.votes ?? 0,
@@ -238,11 +235,11 @@ const author = (id?: number) =>
                             </p>
                         </div>
                     </div>
-                </component>
+                </article>
             </div>
             <p
                 v-if="phone && game.phase === 'voting' && game.me?.voted"
-                class="mt-5 font-bold"
+                class="text-sm font-bold"
                 role="status"
             >
                 {{ t('phrase_vote_saved') }}
