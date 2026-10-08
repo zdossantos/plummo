@@ -19,11 +19,8 @@ const props = defineProps<{
 }>();
 const { t } = useTranslations('rooms');
 const manual = useForm({ code: '' });
-const { room, me, game, seconds, error, closed, busy, request } = useRoom(
-    props.code,
-    undefined,
-    true,
-);
+const { room, me, game, seconds, error, closed, busy, connected, request } =
+    useRoom(props.code, undefined, true);
 const name = ref(props.me?.name ?? '');
 const color = ref(props.me?.color ?? 'violet');
 const accessories = ref<string[]>(props.me?.accessories ?? []);
@@ -280,6 +277,11 @@ onMounted(async () => {
                         :chief="chief"
                         :busy="busy"
                         phone
+                        :connected="connected"
+                        :send-drawing="
+                            (action, values) =>
+                                request('drawing/' + action, 'POST', values)
+                        "
                         @answer="
                             request('answer', 'POST', {
                                 choice: $event,

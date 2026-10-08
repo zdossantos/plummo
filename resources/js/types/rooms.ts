@@ -15,7 +15,7 @@ export type RoomState = {
     pointTarget: number | null;
     ranking: (Player & { rank: number })[];
 };
-export type GameState = {
+export type ChoiceGame = {
     id: number;
     settings: {
         packs: number[];
@@ -45,6 +45,53 @@ export type GameState = {
         points: number | null;
     } | null;
 };
+export type Stroke = {
+    id: number;
+    color: string;
+    width: number;
+    points: [number, number][];
+};
+export type DrawingGameState = Omit<
+    ChoiceGame,
+    'type' | 'phase' | 'round' | 'me'
+> & {
+    type: 'drawing';
+    phase:
+        | 'selecting'
+        | 'drawing'
+        | 'artist_missing'
+        | 'waiting'
+        | 'reveal'
+        | 'paused'
+        | 'resuming'
+        | 'results';
+    round: {
+        number: number;
+        total: number;
+        tour: number;
+        artistId: number;
+        word: string | null;
+        canvas: Stroke[];
+        revision: number;
+        awards: Record<number, number>;
+    };
+    me: {
+        eligible: boolean;
+        found: boolean;
+        near: boolean;
+        points: number;
+        words: string[];
+        word: string | null;
+        canDraw: boolean;
+        canSkip: boolean;
+        votedSkip: boolean;
+    } | null;
+};
+export type GameState = ChoiceGame | DrawingGameState;
+export type DrawingSender = (
+    action: string,
+    values: Record<string, unknown>,
+) => Promise<boolean>;
 export type Snapshot = {
     room: RoomState;
     me: Player | null;

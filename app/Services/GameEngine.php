@@ -24,6 +24,9 @@ class GameEngine
         if ($room->point_target !== null && (int) $room->players()->max('score') >= $room->point_target) {
             throw ValidationException::withMessages(['target' => __('rooms.target_reached')]);
         }
+        if ($settings['type'] === 'drawing') {
+            return app(DrawingGame::class)->start($room, $settings);
+        }
         $counts = app(RoomContentCatalog::class)->availability($room, ContentType::from($settings['type'] ?? 'quiz'), $settings['packs']);
         if (($settings['allow_repeats'] ?? false) ? $counts['total'] < 1 : $counts['unseen'] < $settings['rounds']) {
             throw ValidationException::withMessages(['packs' => __('rooms.contents_exhausted')]);
@@ -38,7 +41,7 @@ class GameEngine
     }
 
     /** @param array<string, mixed> $changes */
-    private function save(Game $game, array $changes): void
+    public function save(Game $game, array $changes): void
     {
         $game->update($changes);
         if (config('broadcasting.default') !== 'null') {
@@ -110,7 +113,13 @@ class GameEngine
             }
             $state['phase'] = $state['previous_phase'];
             $state['deadline'] += $state['remaining'];
+            if ($game->type === 'drawing') {
+                $state = app(DrawingGame::class)->resumed($room, $state);
+            }
             $this->save($game, ['state' => $state]);
+        }
+        if ($game->type === 'drawing') {
+            return app(DrawingGame::class)->tick($room, $game);
         }
         if ($state['phase'] === 'answer') {
             $waiting = $room->players()->get()->filter(fn (RoomPlayer $player) => $this->eligible($player, $state) && ! isset($state['round']['answers'][$player->id]));
@@ -159,14 +168,20 @@ class GameEngine
             return;
         }
         $state = $game->state;
+        if ($game->type === 'drawing') {
+            $state['queue'] = array_values(array_diff($state['queue'], [$player->id]));
+        }
         $state['excluded'] = array_values(array_unique([...($state['excluded'] ?? []), $player->id]));
         $this->save($game, ['state' => $state]);
     }
 
     public function answer(Room $room, RoomPlayer $player, int $choice, int $gameId, int $roundNumber): void
     {
+        $current = $this->active($room);
+        abort_unless($current !== null && $current->id === $gameId && $current->state['number'] === $roundNumber, 409);
         $game = $this->tick($room);
         abort_unless($game !== null && $game->id === $gameId && $game->state['number'] === $roundNumber && $game->state['phase'] === 'answer', 409);
+        abort_unless(in_array($game->type, ['quiz', 'blind_test'], true), 409);
         $state = $game->state;
         abort_unless($this->eligible($player, $state), 403);
         abort_if(isset($state['round']['answers'][$player->id]), 409);
@@ -178,7 +193,7 @@ class GameEngine
     private function finishRound(Room $room, Game $game): void
     {
         $state = $game->state;
-        $correct = collect($state['round']['answers'])->filter(fn ($answer) => $answer['choice'] === $state['round']['payload']['correct'])->sortBy('at');
+        $correct = collect($game->answers())->filter(fn ($answer) => ($answer['choice'] ?? null) === $state['round']['payload']['correct'])->sortBy('at');
         $rank = 1;
         foreach ($correct->groupBy(fn ($answer) => sprintf('%.6f', $answer['at']), true) as $tied) {
             $points = app(Scoring::class)->rapid(count($state['round']['participants']), $rank, $tied->count());
@@ -229,7 +244,8 @@ class GameEngine
         $game = $this->active($room);
         abort_unless($game !== null && $game->state['phase'] === 'paused' && ($game->state['exhausted'] ?? false), 409);
         $counts = app(RoomContentCatalog::class)->availability($room, ContentType::from($settings['type'] ?? $game->type), $settings['packs']);
-        if (($settings['allow_repeats'] ?? false) ? $counts['total'] < 1 : $counts['unseen'] < 1) {
+        $required = $game->type === 'drawing' ? 3 : 1;
+        if (($settings['allow_repeats'] ?? false) ? $counts['total'] < $required : $counts['unseen'] < $required) {
             throw ValidationException::withMessages(['packs' => __('rooms.contents_exhausted')]);
         }
         $state = $game->state;
@@ -244,6 +260,9 @@ class GameEngine
         $game = $this->tick($room) ?? Game::where('room_id', $room->id)->latest('id')->first();
         if ($game?->status !== 'active' && $game?->status !== 'finished') {
             return null;
+        }
+        if ($game->type === 'drawing') {
+            return app(DrawingGame::class)->view($room, $game, $me);
         }
         $state = $game->state;
         $round = $state['round'];
