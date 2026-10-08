@@ -45,6 +45,9 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         $screen->assertSee('Game paused');
         $position = $screen->page()->evaluate('document.querySelector("audio").currentTime');
         expect($screen->page()->evaluate('document.querySelector("audio").paused'))->toBeTrue();
+        $screen->page()->evaluate('() => { window.pausedAudio = document.querySelector("audio"); }');
+        $screen->click('Overall leaderboard')->click('Back to lobby');
+        expect($screen->page()->evaluate('document.querySelector("audio") === window.pausedAudio'))->toBeTrue();
         $phone->page()->locator('button:has-text("Resume")')->click(['noWaitAfter' => true]);
         $phone->assertSee('Resuming in…');
         $screen->assertSee('Resuming in…');
@@ -52,6 +55,10 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         expect($screen->page()->evaluate('document.querySelector("audio").currentTime'))->toBe($position);
         Playwright::usingTimeout(10000, fn () => $screen->assertSee('Which song is playing?'));
         expect($screen->page()->evaluate('!document.querySelector("audio").paused'))->toBeTrue();
+        $screen->page()->evaluate('() => { window.dispatchEvent(new Event("offline")); }');
+        expect($screen->page()->evaluate('document.querySelector("audio").paused'))->toBeTrue();
+        $screen->page()->evaluate('() => { window.dispatchEvent(new Event("online")); }');
+        $screen->assertDontSee('Connection interrupted. Trying again…');
         $game = Game::where('room_id', $room->id)->sole();
         $choice = $game->state['round']['payload']['correct'];
         $phone->assertSee('Which song is playing?');
@@ -59,6 +66,7 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         $phone->assertSee('65 points for this question');
         $screen->assertSee('Mini-game leaderboard')->assertSee('Well done, Camille!');
         $phone->assertSee('Mini-game leaderboard');
+        Storage::disk('local')->assertMissing($game->state['round']['payload']['audio_path']);
         $phone->page()->locator('button:has-text("Back to lobby")')->click(['noWaitAfter' => true]);
         $screen->assertSee('Everyone plays.')->assertSee('65 points')->assertNoJavaScriptErrors();
         $phone->assertNoJavaScriptErrors();

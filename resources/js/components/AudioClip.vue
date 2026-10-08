@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { playAudio } from '@/lib/audio';
 import { ref, watch, onUnmounted } from 'vue';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from '@/composables/useTranslations';
@@ -13,7 +14,7 @@ async function play() {
     if (!element || !props.playing) return;
     const attempt = generation;
     try {
-        await element.play();
+        await playAudio(element);
         if (attempt !== generation || !props.playing) element.pause();
         else {
             blocked.value = false;

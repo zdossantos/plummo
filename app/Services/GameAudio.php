@@ -4,11 +4,19 @@ namespace App\Services;
 
 use App\Models\Content;
 use App\Models\Game;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class GameAudio
 {
+    public function retire(?string $path): void
+    {
+        if ($path !== null) {
+            DB::afterCommit(fn () => Storage::disk('local')->delete($path));
+        }
+    }
+
     public function copy(Game $game, Content $song): string
     {
         $source = $song->payload['audio_path'] ?? '';

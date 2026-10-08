@@ -11,6 +11,7 @@ const props = defineProps<{
     phone?: boolean;
     chief?: boolean;
     busy?: boolean;
+    connected?: boolean;
 }>();
 const emit = defineEmits<{
     answer: [choice: number];
@@ -59,7 +60,9 @@ const ranking = computed(() => {
         <AudioClip
             v-if="!phone && game.round.audio"
             :src="game.round.audio"
-            :playing="game.phase === 'answer'"
+            :playing="
+                game.phase === 'answer' && seconds > 0 && connected !== false
+            "
         />
         <h1
             v-if="game.phase === 'paused'"

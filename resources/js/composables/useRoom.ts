@@ -26,6 +26,18 @@ export function useRoom(
     const me = ref<Player | null>(initial?.me ?? null);
     const error = ref('');
     const closed = ref(false);
+    const connected = ref(true);
+    const offline = () => {
+        connected.value = false;
+    };
+    const online = () => {
+        void request(
+            phone ? 'presence' : 'screen-presence',
+            'POST',
+            undefined,
+            true,
+        );
+    };
     const busy = ref(false);
     const errors = ref<Record<string, string[]>>({});
     const { t } = useTranslations('rooms');
@@ -63,6 +75,7 @@ export function useRoom(
                 },
             );
             if (stopped) return false;
+            connected.value = response.status < 500;
             if (response.status === 404) {
                 closed.value = true;
                 error.value = t('closed');
@@ -96,7 +109,10 @@ export function useRoom(
             if (data.serverTime) offset = data.serverTime - Date.now() / 1000;
             return true;
         } catch {
-            if (!stopped) error.value = t('network');
+            if (!stopped) {
+                connected.value = false;
+                error.value = t('network');
+            }
             return false;
         } finally {
             clearTimeout(timeout);
@@ -119,6 +135,9 @@ export function useRoom(
         timer = setTimeout(() => void poll(), 2000);
     }
     onMounted(() => {
+        connected.value = navigator.onLine;
+        window.addEventListener('offline', offline);
+        window.addEventListener('online', online);
         clockTimer = setInterval(() => (clock.value = Date.now() / 1000), 100);
         const realtime = page.props.realtime as {
             key: string;
@@ -178,10 +197,23 @@ export function useRoom(
     });
     onUnmounted(() => {
         stopped = true;
+        window.removeEventListener('offline', offline);
+        window.removeEventListener('online', online);
         clearTimeout(timer);
         clearInterval(clockTimer);
         echo?.disconnect();
         controller?.abort();
     });
-    return { room, me, game, seconds, error, errors, closed, busy, request };
+    return {
+        room,
+        me,
+        game,
+        seconds,
+        error,
+        errors,
+        closed,
+        busy,
+        connected,
+        request,
+    };
 }

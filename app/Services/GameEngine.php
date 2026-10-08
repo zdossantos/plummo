@@ -73,6 +73,7 @@ class GameEngine
 
             return;
         }
+        app(GameAudio::class)->retire($game->state['round']['payload']['audio_path'] ?? null);
         $this->save($game, ['state' => ['scores' => $game->state['scores'] + array_fill_keys($players, 0), 'number' => $game->state['number'] + 1, 'phase' => 'answer', 'previous_phase' => 'answer', 'remaining' => 0.0, 'manual_pause' => false, 'started_at' => $this->time(), 'deadline' => $this->time() + $game->settings['duration'], 'round' => ['content_id' => $content->id, 'payload' => $payload, 'participants' => $players, 'answers' => [], 'awards' => []]]]);
     }
 
@@ -119,6 +120,7 @@ class GameEngine
         } elseif ($state['phase'] === 'reveal' && $state['deadline'] <= $this->time()) {
             $targetReached = $room->point_target !== null && (int) $room->players()->max('score') >= $room->point_target;
             if ($state['number'] >= $game->settings['rounds'] || $targetReached) {
+                app(GameAudio::class)->retire($state['round']['payload']['audio_path'] ?? null);
                 $state['phase'] = 'results';
                 $this->save($game, ['state' => $state, 'status' => 'finished']);
             } else {
@@ -213,6 +215,7 @@ class GameEngine
             $state['deadline'] = $this->time() + 5;
         } else {
             abort_unless($state['phase'] === 'paused', 409);
+            app(GameAudio::class)->retire($state['round']['payload']['audio_path'] ?? null);
             $this->save($game, ['status' => 'stopped']);
 
             return;

@@ -4,7 +4,9 @@ use App\Models\Content;
 use App\Models\Game;
 use App\Models\RoomPlayer;
 use App\Models\Tag;
+use App\Services\GameEngine;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 uses(DatabaseTransactions::class);
@@ -104,4 +106,28 @@ it('does not consume a song when its audio disappears before the next round', fu
     $this->travel(3)->seconds();
     $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.phase', 'paused')->assertJsonPath('game.exhausted', true);
     $this->assertDatabaseCount('room_content_history', 1);
+});
+
+it('retires private audio only after committed round replacement or stop', function () {
+    $room = openRoom();
+    [, $token] = enterRoom($room);
+    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', ['type' => 'blind_test', 'packs' => [blindPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
+    $game = Game::where('room_id', $room->id)->sole();
+    $first = $game->state['round']['payload']['audio_path'];
+    $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk();
+    Storage::disk('local')->assertExists($first);
+    $this->travel(3)->seconds();
+    $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.round.number', 2);
+    Storage::disk('local')->assertMissing($first);
+    $second = $game->fresh()->state['round']['payload']['audio_path'];
+    Storage::disk('local')->assertExists($second);
+    $this->postJson('/rooms/'.$room->code.'/game/pause')->assertOk();
+    Storage::disk('local')->assertExists($second);
+    DB::beginTransaction();
+    app(GameEngine::class)->control($room, 'stop');
+    Storage::disk('local')->assertExists($second);
+    DB::rollBack();
+    expect($game->fresh()->status)->toBe('active');
+    $this->postJson('/rooms/'.$room->code.'/game/stop')->assertOk();
+    Storage::disk('local')->assertMissing($second);
 });
