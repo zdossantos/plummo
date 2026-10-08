@@ -1,13 +1,11 @@
 <?php
 
-use App\Enums\ContentType;
 use App\Models\Content;
 use App\Models\Game;
-use App\Models\Pack;
 use App\Models\Room;
 use App\Models\RoomPlayer;
-use App\Models\Tag;
 use App\Services\GameEngine;
+use App\Services\PhraseGame;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 uses(DatabaseTransactions::class);
@@ -16,18 +14,6 @@ beforeEach(function () {
     $this->freezeTime();
 });
 
-function phrasePack(int $count = 5): int
-{
-    $tag = Tag::create(['name' => 'Phrases']);
-    $pack = Pack::create(['name' => 'Phrases']);
-    $pack->tags()->sync([$tag->id]);
-    foreach (range(1, $count) as $number) {
-        $content = Content::create(['type' => ContentType::Phrase, 'published' => true, 'payload' => ['prompt' => 'Un jour '.$number.',']]);
-        $content->tags()->sync([$tag->id]);
-    }
-
-    return $pack->id;
-}
 function phraseAction(Room $room, array $values = []): array
 {
     $game = Game::where('room_id', $room->id)->latest('id')->firstOrFail();
@@ -200,4 +186,30 @@ it('pauses on exhausted prefixes and resumes with explicit repeats without losin
     phraseAdvance($room, 5);
     $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.round.number', 2);
     expect(RoomPlayer::findOrFail($players[0][0])->score)->toBe(65);
+});
+
+it('uses the validated Unicode presentation durations', function (int $length, float $seconds) {
+    expect(app(PhraseGame::class)->displayDuration(str_repeat('é', $length)))->toBe($seconds);
+})->with([[0, 5.0], [40, 5.0], [80, 7.0], [120, 9.0], [160, 11.0], [180, 12.0], [390, 12.0]]);
+
+it('keeps late arrivals waiting and freezes anonymous presentation across a screen outage', function () {
+    [$room, $players] = phraseSetup(2);
+    [, $late] = enterRoom($room, 'Pat');
+    phrasePost($room, $late, 'draft', ['suffix' => 'late'])->assertForbidden();
+    foreach ($players as [$id, $token]) {
+        phrasePost($room, $token, 'submit', ['suffix' => 'texte'])->assertOk();
+    }
+    phraseAdvance($room, 2);
+    $room->update(['screen_seen_at' => now()->subSeconds(16)]);
+    $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.phase', 'paused');
+    phraseAdvance($room, 20);
+    $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.phase', 'resuming');
+    phraseAdvance($room, 5);
+    $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.phase', 'presenting')->assertJsonMissingPath('game.round.entries.0.author');
+    expect(Game::where('room_id', $room->id)->sole()->state['deadline'])->toBe(app(GameEngine::class)->time() + 3.0);
+    phraseAdvance($room, 13);
+    $this->withCookie('plummo_player_'.$room->code, $late)->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.me.eligible', false);
+    phraseAdvance($room, 30);
+    phraseAdvance($room, 3);
+    $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.me.eligible', true);
 });

@@ -7,20 +7,21 @@ const props = defineProps<{
     busy: boolean;
     recover?: boolean;
     initialPacks?: number[];
-    initialType?: 'quiz' | 'blind_test' | 'drawing';
+    initialType?: 'quiz' | 'blind_test' | 'drawing' | 'phrase';
 }>();
 const emit = defineEmits<{ start: [settings: object] }>();
 const { t } = useTranslations('rooms');
 const packs = ref<{ id: number; name: string }[]>([]);
 const selected = ref<number[]>(props.initialPacks ?? []);
 const availability = ref<{ total: number; unseen: number } | null>(null);
-const gameType = ref<'quiz' | 'blind_test' | 'drawing'>(
+const gameType = ref<'quiz' | 'blind_test' | 'drawing' | 'phrase'>(
     props.initialType ?? 'quiz',
 );
 const settings = ref({
     quiz: { rounds: 10, duration: 30 },
     blind_test: { rounds: 10, duration: 30 },
     drawing: { rounds: 1, duration: 90 },
+    phrase: { rounds: 1, duration: 60 },
 });
 const rounds = computed({
     get: () => settings.value[gameType.value].rounds,
@@ -36,29 +37,37 @@ const duration = computed({
 });
 const connectedPlayers = ref(0);
 const labels = computed(() =>
-    gameType.value === 'drawing'
+    gameType.value === 'phrase'
         ? {
-              launch: 'launch_drawing',
-              available: 'available_words',
-              count: 'drawing_tours',
-              duration: 'drawing_duration',
-              start: 'start_drawing',
+              launch: 'launch_phrase',
+              available: 'available_phrases',
+              count: 'phrase_tours',
+              duration: 'phrase_duration',
+              start: 'start_phrase',
           }
-        : gameType.value === 'quiz'
+        : gameType.value === 'drawing'
           ? {
-                launch: 'launch_quiz',
-                available: 'available_questions',
-                count: 'question_count',
-                duration: 'answer_duration',
-                start: 'start_game',
+                launch: 'launch_drawing',
+                available: 'available_words',
+                count: 'drawing_tours',
+                duration: 'drawing_duration',
+                start: 'start_drawing',
             }
-          : {
-                launch: 'launch_blind',
-                available: 'available_clips',
-                count: 'clip_count',
-                duration: 'clip_duration',
-                start: 'start_blind',
-            },
+          : gameType.value === 'quiz'
+            ? {
+                  launch: 'launch_quiz',
+                  available: 'available_questions',
+                  count: 'question_count',
+                  duration: 'answer_duration',
+                  start: 'start_game',
+              }
+            : {
+                  launch: 'launch_blind',
+                  available: 'available_clips',
+                  count: 'clip_count',
+                  duration: 'clip_duration',
+                  start: 'start_blind',
+              },
 );
 const required = computed(() =>
     gameType.value === 'drawing'
@@ -87,6 +96,9 @@ const valid = computed(
         (gameType.value !== 'drawing' ||
             props.recover ||
             connectedPlayers.value >= 2) &&
+        (gameType.value !== 'phrase' ||
+            props.recover ||
+            connectedPlayers.value >= 3) &&
         count.value >= required.value,
 );
 async function load() {
@@ -157,6 +169,7 @@ onUnmounted(() => controller?.abort());
                 <option value="quiz">{{ t('quiz_name') }}</option>
                 <option value="blind_test">{{ t('blind_name') }}</option>
                 <option value="drawing">{{ t('drawing_name') }}</option>
+                <option value="phrase">{{ t('phrase_name') }}</option>
             </select>
         </label>
         <p class="mt-2 text-sm text-muted-foreground">{{ t('packs_hint') }}</p>
@@ -193,8 +206,8 @@ onUnmounted(() => controller?.abort());
                     id="game-rounds"
                     v-model.number="rounds"
                     type="number"
-                    :min="gameType === 'drawing' ? 1 : 5"
-                    :max="gameType === 'drawing' ? 5 : 30"
+                    :min="['drawing', 'phrase'].includes(gameType) ? 1 : 5"
+                    :max="['drawing', 'phrase'].includes(gameType) ? 5 : 30"
                     required
                     class="mt-2 w-full rounded-xl border bg-background p-3"
             /></label>
@@ -204,7 +217,7 @@ onUnmounted(() => controller?.abort());
                     id="game-duration"
                     v-model.number="duration"
                     type="number"
-                    :min="gameType === 'drawing' ? 30 : 10"
+                    :min="['drawing', 'phrase'].includes(gameType) ? 30 : 10"
                     max="150"
                     required
                     class="mt-2 w-full rounded-xl border bg-background p-3"
@@ -216,7 +229,12 @@ onUnmounted(() => controller?.abort());
                     count: Math.ceil(
                         (rounds *
                             (gameType === 'drawing' ? connectedPlayers : 1) *
-                            (duration + (gameType === 'drawing' ? 18 : 3))) /
+                            (duration +
+                                (gameType === 'phrase'
+                                    ? connectedPlayers * 12 + 33
+                                    : gameType === 'drawing'
+                                      ? 18
+                                      : 3))) /
                             60,
                     ),
                 })
@@ -240,11 +258,16 @@ onUnmounted(() => controller?.abort());
         <p v-else-if="availability && !valid" class="mt-3 text-sm">
             {{
                 t(
-                    gameType === 'drawing' && !recover && connectedPlayers < 2
-                        ? 'drawing_minimum'
-                        : gameType === 'blind_test' && (distinctSongs ?? 0) < 8
-                          ? 'blind_catalogue_small'
-                          : 'contents_exhausted',
+                    gameType === 'phrase' && !recover && connectedPlayers < 3
+                        ? 'phrase_minimum'
+                        : gameType === 'drawing' &&
+                            !recover &&
+                            connectedPlayers < 2
+                          ? 'drawing_minimum'
+                          : gameType === 'blind_test' &&
+                              (distinctSongs ?? 0) < 8
+                            ? 'blind_catalogue_small'
+                            : 'contents_exhausted',
                 )
             }}
         </p>

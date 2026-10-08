@@ -89,7 +89,13 @@ class PhraseGame
         $game = $this->current($room, $player, $gameId, $round, 'voting');
         $state = $game->state;
         abort_if(isset($state['round']['votes'][$player->id]), 409);
-        $entry = collect($state['round']['entries'])->firstWhere('id', $choice);
+        $entry = null;
+        foreach ($state['round']['entries'] as $candidate) {
+            if ($candidate['id'] === $choice) {
+                $entry = $candidate;
+                break;
+            }
+        }
         if ($entry === null) {
             throw ValidationException::withMessages(['choice' => __('rooms.phrase_invalid_vote')]);
         }
@@ -176,7 +182,13 @@ class PhraseGame
         $phase = in_array($state['phase'], ['paused', 'resuming'], true) ? $state['previous_phase'] : $state['phase'];
         $revealed = in_array($phase, ['reveal', 'results'], true);
         $entries = $phase === 'writing' ? [] : ($phase === 'presenting' ? array_slice($round['entries'], $round['index'], 1) : $round['entries']);
-        $own = $me === null ? null : collect($round['entries'])->firstWhere('author', $me->id);
+        $own = null;
+        foreach ($round['entries'] as $entry) {
+            if ($entry['author'] === $me?->id) {
+                $own = $entry;
+                break;
+            }
+        }
 
         return ['id' => $game->id, 'type' => 'phrase', 'settings' => $game->settings, 'exhausted' => $state['exhausted'] ?? false,
             'targetReached' => $game->status === 'finished' && $room->point_target !== null && (int) $room->players()->max('score') >= $room->point_target,

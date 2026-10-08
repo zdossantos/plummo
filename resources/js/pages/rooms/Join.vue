@@ -278,6 +278,10 @@ onMounted(async () => {
                         :busy="busy"
                         phone
                         :connected="connected"
+                        :send-phrase="
+                            (action, values) =>
+                                request('phrases/' + action, 'POST', values)
+                        "
                         :send-drawing="
                             (action, values) =>
                                 request('drawing/' + action, 'POST', values)

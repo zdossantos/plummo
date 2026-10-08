@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PhrasePlay from '@/components/PhrasePlay.vue';
 import DrawingPlay from '@/components/DrawingPlay.vue';
 import AudioClip from '@/components/AudioClip.vue';
 import { computed } from 'vue';
@@ -14,6 +15,7 @@ const props = defineProps<{
     busy?: boolean;
     connected?: boolean;
     sendDrawing?: DrawingSender;
+    sendPhrase?: DrawingSender;
 }>();
 const emit = defineEmits<{
     answer: [choice: number];
@@ -21,7 +23,10 @@ const emit = defineEmits<{
 }>();
 const { t } = useTranslations('rooms');
 const revealed = computed(
-    () => props.game.type !== 'drawing' && props.game.round.correct !== null,
+    () =>
+        ['quiz', 'blind_test'].includes(props.game.type) &&
+        'correct' in props.game.round &&
+        props.game.round.correct !== null,
 );
 const ranking = computed(() => {
     let rank = 0;
@@ -48,11 +53,13 @@ const ranking = computed(() => {
             <p>
                 {{
                     t(
-                        game.type === 'drawing'
-                            ? 'drawing_round'
-                            : game.type === 'quiz'
-                              ? 'quiz_round'
-                              : 'blind_round',
+                        game.type === 'phrase'
+                            ? 'phrase_round'
+                            : game.type === 'drawing'
+                              ? 'drawing_round'
+                              : game.type === 'quiz'
+                                ? 'quiz_round'
+                                : 'blind_round',
                         {
                             number:
                                 game.type === 'drawing'
@@ -65,9 +72,15 @@ const ranking = computed(() => {
             </p>
             <p
                 v-if="
-                    ['answer', 'selecting', 'drawing', 'resuming'].includes(
-                        game.phase,
-                    )
+                    [
+                        'answer',
+                        'selecting',
+                        'drawing',
+                        'writing',
+                        'presenting',
+                        'voting',
+                        'resuming',
+                    ].includes(game.phase)
                 "
                 class="text-3xl tabular-nums"
                 role="timer"
@@ -76,11 +89,20 @@ const ranking = computed(() => {
             </p>
         </div>
         <AudioClip
-            v-if="!phone && game.type !== 'drawing' && game.round.audio"
+            v-if="!phone && game.type === 'blind_test' && game.round.audio"
             :src="game.round.audio"
             :playing="
                 game.phase === 'answer' && seconds > 0 && connected !== false
             "
+        />
+        <PhrasePlay
+            v-if="game.type === 'phrase' && game.phase !== 'results'"
+            :game="game"
+            :room="room"
+            :phone="phone"
+            :busy="busy"
+            :connected="connected"
+            :send="sendPhrase"
         />
         <h1
             v-if="game.phase === 'paused'"
@@ -150,7 +172,7 @@ const ranking = computed(() => {
             :connected="connected"
             :send="sendDrawing"
         />
-        <template v-else>
+        <template v-else-if="game.type !== 'phrase'">
             <h1 class="my-7 text-2xl font-black leading-tight lg:text-5xl">
                 {{ game.round.question }}
             </h1>
