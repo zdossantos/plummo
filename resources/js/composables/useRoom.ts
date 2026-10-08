@@ -1,6 +1,9 @@
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, computed, watch } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
 import { useTranslations } from '@/composables/useTranslations';
-import type { Player, RoomState, Snapshot } from '@/types/rooms';
+import type { GameState, Player, RoomState, Snapshot } from '@/types/rooms';
 
 export function useRoom(
     code: string | null,
@@ -8,6 +11,18 @@ export function useRoom(
     phone = false,
 ) {
     const room = ref<RoomState | null>(initial?.room ?? null);
+    const game = ref<GameState | null>(initial?.game ?? null);
+    const clock = ref(Date.now() / 1000);
+    let offset = (initial?.serverTime ?? clock.value) - clock.value;
+    const seconds = computed(() =>
+        Math.max(
+            0,
+            Math.ceil((game.value?.deadline ?? 0) - clock.value - offset),
+        ),
+    );
+    const page = usePage();
+    let echo: Echo<'reverb'> | undefined;
+    let clockTimer: ReturnType<typeof setInterval> | undefined;
     const me = ref<Player | null>(initial?.me ?? null);
     const error = ref('');
     const closed = ref(false);
@@ -77,6 +92,8 @@ export function useRoom(
             const data: Snapshot = await response.json();
             room.value = data.room;
             me.value = data.me;
+            game.value = data.game ?? null;
+            if (data.serverTime) offset = data.serverTime - Date.now() / 1000;
             return true;
         } catch {
             if (!stopped) error.value = t('network');
@@ -93,19 +110,78 @@ export function useRoom(
             (!phone || (me.value && me.value.status !== 'left'))
         ) {
             await request(
-                phone ? 'presence' : 'state',
-                phone ? 'POST' : 'GET',
+                phone ? 'presence' : 'screen-presence',
+                'POST',
                 undefined,
                 true,
             );
         }
-        timer = setTimeout(() => void poll(), 5000);
+        timer = setTimeout(() => void poll(), 2000);
     }
-    onMounted(() => void poll());
+    onMounted(() => {
+        clockTimer = setInterval(() => (clock.value = Date.now() / 1000), 100);
+        const realtime = page.props.realtime as {
+            key: string;
+            host: string;
+            port: number;
+            scheme: string;
+        } | null;
+        if (code && realtime?.key) {
+            echo = new Echo({
+                broadcaster: 'reverb',
+                client: new Pusher(realtime.key, {
+                    wsHost: realtime.host,
+                    wsPort: realtime.port,
+                    wssPort: realtime.port,
+                    forceTLS: realtime.scheme === 'https',
+                    enabledTransports: ['ws', 'wss'],
+                    cluster: '',
+                    disableStats: true,
+                    channelAuthorization: {
+                        endpoint: `/rooms/${code}/broadcast-auth`,
+                        transport: 'ajax',
+                        headers: {
+                            'X-CSRF-TOKEN':
+                                document.querySelector<HTMLMetaElement>(
+                                    'meta[name="csrf-token"]',
+                                )?.content ?? '',
+                        },
+                    },
+                }),
+            });
+            const subscribe = () => {
+                if (phone && me.value?.status !== 'connected') return;
+                echo?.private(`room.${code}`).listen('.room.changed', () => {
+                    if (
+                        !busy.value &&
+                        (!phone || me.value?.status === 'connected')
+                    )
+                        void request(
+                            phone ? 'presence' : 'screen-presence',
+                            'POST',
+                            undefined,
+                            true,
+                        );
+                });
+            };
+            subscribe();
+            watch(
+                () => me.value?.status,
+                (status, previous) => {
+                    if (!phone || status === previous) return;
+                    echo?.leave(`room.${code}`);
+                    subscribe();
+                },
+            );
+        }
+        void poll();
+    });
     onUnmounted(() => {
         stopped = true;
         clearTimeout(timer);
+        clearInterval(clockTimer);
+        echo?.disconnect();
         controller?.abort();
     });
-    return { room, me, error, errors, closed, busy, request };
+    return { room, me, game, seconds, error, errors, closed, busy, request };
 }

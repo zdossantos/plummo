@@ -1,59 +1,83 @@
 services:
-  web:
-    build:
-      context: .
-      target: runtime
-    ports: ["127.0.0.1:8090:80"]
-    env_file: .env
-    environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-  scheduler:
-    build:
-      context: .
-      target: runtime
-    command: ["php", "artisan", "schedule:work"]
-    env_file: .env
-    environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-    healthcheck:
-      disable: true
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-  mysql:
-    image: mysql:8.4
-    environment:
-      MYSQL_DATABASE: plummo
-      MYSQL_USER: plummo
-      MYSQL_PASSWORD: local-only
-      MYSQL_ROOT_PASSWORD: local-root-only
-    ports: ["127.0.0.1:3309:3306"]
-    volumes:
-      - mysql-data:/var/lib/mysql
-      - ./docker/mysql/testing.sql:/docker-entrypoint-initdb.d/testing.sql:ro
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      retries: 20
-  redis:
-    image: redis:7.4-alpine
-    ports: ["127.0.0.1:6380:6379"]
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      retries: 10
+    web:
+        build:
+            context: .
+            target: runtime
+        ports: ['127.0.0.1:8090:80']
+        env_file: .env
+        environment: &application-environment
+            DB_HOST: mysql
+            DB_PORT: 3306
+            REDIS_HOST: redis
+            REDIS_PORT: 6379
+            REVERB_HOST: reverb
+            REVERB_PORT: 8080
+            REVERB_SCHEME: http
+        volumes: ['app-storage:/var/www/html/storage']
+        depends_on: &application-dependencies
+            mysql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+    scheduler:
+        build:
+            context: .
+            target: runtime
+        command: ['php', 'artisan', 'schedule:work']
+        env_file: .env
+        environment: *application-environment
+        healthcheck:
+            disable: true
+        volumes: ['app-storage:/var/www/html/storage']
+        depends_on: *application-dependencies
+    worker:
+        build:
+            context: .
+            target: runtime
+        command: ['php', 'artisan', 'queue:work', '--tries=3', '--timeout=60']
+        env_file: .env
+        environment: *application-environment
+        healthcheck:
+            disable: true
+        volumes: ['app-storage:/var/www/html/storage']
+        depends_on: *application-dependencies
+    reverb:
+        build:
+            context: .
+            target: runtime
+        command:
+            ['php', 'artisan', 'reverb:start', '--host=0.0.0.0', '--port=8080']
+        env_file: .env
+        environment: *application-environment
+        ports: ['127.0.0.1:8081:8080']
+        healthcheck:
+            disable: true
+        volumes: ['app-storage:/var/www/html/storage']
+        depends_on:
+            redis:
+                condition: service_healthy
+    mysql:
+        image: mysql:8.4
+        environment:
+            MYSQL_DATABASE: plummo
+            MYSQL_USER: plummo
+            MYSQL_PASSWORD: local-only
+            MYSQL_ROOT_PASSWORD: local-root-only
+        ports: ['127.0.0.1:3309:3306']
+        volumes:
+            - mysql-data:/var/lib/mysql
+            - ./docker/mysql/testing.sql:/docker-entrypoint-initdb.d/testing.sql:ro
+        healthcheck:
+            test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+            interval: 5s
+            retries: 20
+    redis:
+        image: redis:7.4-alpine
+        ports: ['127.0.0.1:6380:6379']
+        healthcheck:
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 5s
+            retries: 10
 volumes:
-  mysql-data:
+    mysql-data:
+    app-storage:

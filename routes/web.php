@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ContentController;
 use App\Http\Controllers\Admin\ImportController;
 use App\Http\Controllers\Admin\PackController;
 use App\Http\Controllers\Admin\TagController;
+use App\Http\Controllers\Rooms\GameController;
 use App\Http\Controllers\Rooms\PlayerController;
 use App\Http\Controllers\Rooms\RoomController;
 use App\Http\Controllers\Rooms\SessionController;
@@ -16,7 +17,14 @@ Route::get('/join', [RoomController::class, 'joinPage'])->name('join');
 Route::post('/join', [RoomController::class, 'find'])->middleware('throttle:30,1');
 Route::get('/join/{code}', [RoomController::class, 'joinPage'])->name('rooms.join');
 Route::get('/screen/{code}', [RoomController::class, 'screen'])->name('rooms.screen');
-Route::prefix('rooms/{code}')->middleware('throttle:180,1')->group(function (): void {
+Route::prefix('rooms/{code}')->middleware('throttle:900,1')->group(function (): void {
+    Route::post('screen-presence', [RoomController::class, 'screenPresence']);
+    Route::post('broadcast-auth', [RoomController::class, 'broadcastAuth']);
+    Route::post('games', [GameController::class, 'store']);
+    Route::post('game-recovery', [GameController::class, 'recover']);
+    Route::post('game-options', [GameController::class, 'options']);
+    Route::post('answer', [GameController::class, 'answer']);
+    Route::post('game/{action}', [GameController::class, 'control']);
     Route::get('qr', [RoomController::class, 'qr'])->name('rooms.qr');
     Route::get('state', [RoomController::class, 'state']);
     Route::post('players', [PlayerController::class, 'store']);

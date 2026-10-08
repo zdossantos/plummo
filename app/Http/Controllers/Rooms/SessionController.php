@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Rooms;
 
 use App\Http\Controllers\Controller;
 use App\Models\Room;
+use App\Services\GameEngine;
 use App\Services\RoomService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,6 +19,7 @@ class SessionController extends Controller
         return $this->rooms->locked($code, function (Room $room) use ($request): JsonResponse {
             $player = $this->rooms->requirePlayer($room, $request);
             $this->rooms->requireChief($room, $player);
+            abort_if(app(GameEngine::class)->active($room) !== null, 409);
             $data = $request->validate([
                 'action' => ['required', 'in:configure,extend,restart'],
                 'target' => ['present_unless:action,extend', 'nullable', 'integer', 'min:1', 'max:4294967295'],

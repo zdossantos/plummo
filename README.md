@@ -2,7 +2,7 @@
 
 Jeux entre amis et en famille : un grand écran commun et un téléphone par joueur.
 
-Le dépôt contient le socle technique, les salons sans compte, la personnalisation des Plummos et les réglages de session. Le catalogue administrateur est disponible ; les mini-jeux restent à développer.
+Le dépôt contient le socle technique, les salons sans compte, la personnalisation des Plummos et les réglages de session. Le catalogue administrateur et le quiz sont disponibles ; les autres mini-jeux suivent dans des PR distinctes.
 
 ## Installation
 
@@ -70,7 +70,7 @@ Ouvrir `/` sur le grand écran crée un salon (une actualisation retrouve le mê
 
 Le navigateur du téléphone conserve une identité privée dans un cookie chiffré HttpOnly : revenir avec ce même navigateur retrouve le Plummo et les points. Effacer les cookies ou utiliser un autre navigateur crée une autre identité. Un départ volontaire libère la place immédiatement ; une déconnexion détectée après quinze secondes réserve la place deux minutes. Un retour dans un salon plein attend une place disponible.
 
-Les listes se synchronisent toutes les cinq secondes. Les mini-jeux ne sont pas encore disponibles : les points sont conservés et affichés, sans gain possible pour le moment. Reverb/Echo sera intégré aux interactions de jeu.
+Les états se synchronisent toutes les deux secondes et immédiatement à réception des événements Reverb lorsque celui-ci est activé. Chaque téléphone relit son état privé ; aucune réponse secrète ne passe par les événements.
 
 Pour tester avec de vrais téléphones sur le même réseau, définir `APP_URL=http://ADRESSE_LOCALE_DU_PC:8000` dans `.env`, exécuter les migrations de développement puis lancer `composer dev`. Ouvrir cette adresse sur le grand écran et les téléphones. Les liens QR et de saisie utilisent `APP_URL` ; `localhost` n’est joignable que depuis le PC. Les ports Compose restent accessibles uniquement depuis le PC.
 
@@ -80,7 +80,7 @@ Un salon sans joueur connecté expire après trente minutes, même si le grand �
 
 Le chef règle un objectif entier (1 000 points par défaut) ou choisit le mode sans limite depuis son téléphone. Prolonger fixe le nouvel objectif au meilleur score actuel, augmenté des points demandés. Recommencer remet tous les scores à zéro après confirmation, en conservant les identités et les Plummos. Le classement global inclut les joueurs partis et partage les rangs en cas d’égalité.
 
-Le service serveur `Scoring` centralise les barèmes validés et leurs arrondis. Aucun téléphone ne peut attribuer des points ; les futurs mini-jeux appliqueront ces calculs. L’arrêt après la manche atteignant l’objectif et le verrouillage des réglages pendant un mini-jeu seront intégrés avec le moteur de manches.
+Le service serveur `Scoring` centralise les barèmes validés et leurs arrondis. Aucun téléphone ne peut attribuer des points. Le quiz applique ce calcul côté serveur. La manche qui atteint l’objectif se termine, puis le salon conserve les scores ; le chef choisit une prolongation, le mode sans limite ou une remise à zéro avant de rejouer. Les réglages de session sont verrouillés pendant un mini-jeu.
 
 ## Administration
 
@@ -91,3 +91,13 @@ La connexion utilise Fortify, limitée à cinq tentatives par minute et combinai
 Les extraits préparés (MP3, WAV, OGG ou M4A, 20 Mio maximum) sont stockés sur le disque privé et écoutables uniquement par un administrateur. Les fichiers remplacés ou supprimés sont nettoyés. Aucun contenu ni audio de démonstration n’est fourni. L’onglet Imports accepte CSV UTF-8 (virgule ou point-virgule) et Excel XLSX (première feuille), avec modèles CSV par jeu. Les tags doivent exister et sont séparés par `|` ; une bonne réponse quiz utilise A/B/C/D. L’aperçu indique les erreurs par ligne, les doublons potentiels et les noms audio absents, ambigus ou inutilisés. Après vérification, ajouter les lignes valides en brouillon ou les publier explicitement. Aucune ligne ne remplace un contenu existant. Les erreurs restent exportables jusqu’à expiration du lot.
 
 Limites V1 : 500 lignes, tableau 5 Mio, 50 extraits de 20 Mio. Les lots sont privés à leur administrateur, expirent après une heure et refusent une seconde confirmation. Le serveur revalide les lignes avant ajout. `imports:prune` nettoie les fichiers temporaires via le scheduler ; aucune migration automatique. L’image runtime fixe les limites PHP compatibles avec ces uploads ; configurer aussi la limite du proxy et l’espace temporaire lors du déploiement. En développement hors Docker, ajuster les limites PHP locales en conséquence.
+
+## Quiz et temps réel
+
+Le chef connecté choisit jusqu’à trois packs, 5 à 30 questions et une durée de 10 à 150 secondes (30 par défaut). Quatre choix sont affichés dès le début ; une réponse est définitive et porte l’identifiant de partie et de manche pour refuser les requêtes retardées. La manche finit quand les participants encore disponibles ont répondu, ou à l’échéance ; la bonne réponse reste affichée trois secondes. Les points sont validés une seule fois. Les résultats distinguent le classement du mini-jeu et celui de la session.
+
+Les arrivants et joueurs reconnectés attendent la prochaine question. La perte du grand écran ou de tous les joueurs met automatiquement en pause ; le chef peut aussi mettre en pause puis arrêter, en conservant les points des manches terminées. Toute reprise laisse cinq secondes pour se préparer. Si le catalogue est épuisé après une modification administrative, le chef choisit d’autres packs ou autorise explicitement la répétition ; l’historique reste conservé.
+
+Compose fournit `scheduler`, `worker` et `reverb` avec stockage privé partagé. Le scheduler traite les échéances chaque seconde, même si aucun téléphone ne fait de requête. Pour activer Reverb, définir `BROADCAST_CONNECTION=reverb`, renseigner `REVERB_APP_ID`, une clé publique `REVERB_APP_KEY` et un secret serveur `REVERB_APP_SECRET` dans `.env`. Choisir `REVERB_ALLOWED_ORIGINS` comme liste de noms d’hôtes séparés par des virgules. Le navigateur utilise `REVERB_PUBLIC_HOST/PORT/SCHEME` (localhost:8081 en Compose) ; le backend utilise l’adresse interne `reverb:8080`. Aucune valeur `VITE_*` secrète n’est nécessaire. La relecture HTTP reste disponible si le WebSocket est absent.
+
+Hors Docker, lancer également `php artisan queue:work` et `php artisan reverb:start --port=8081` avec `REVERB_HOST=127.0.0.1` et `REVERB_PORT=8081`. Sur réseau local, remplacer le nom d’hôte public par celui joignable depuis les téléphones et autoriser cette origine. La CI vérifie le démarrage réel du serveur et la négociation WebSocket.

@@ -15,7 +15,41 @@ export type RoomState = {
     pointTarget: number | null;
     ranking: (Player & { rank: number })[];
 };
-export type Snapshot = { room: RoomState; me: Player | null };
+export type GameState = {
+    id: number;
+    settings: {
+        packs: number[];
+        rounds: number;
+        duration: number;
+        allow_repeats?: boolean;
+    };
+    exhausted: boolean;
+    targetReached: boolean;
+    type: 'quiz';
+    phase: 'answer' | 'reveal' | 'paused' | 'resuming' | 'results';
+    deadline: number;
+    scores: Record<number, number>;
+    round: {
+        number: number;
+        total: number;
+        question: string;
+        choices: string[];
+        correct: number | null;
+        awards: Record<number, number>;
+    };
+    me: {
+        eligible: boolean;
+        answered: boolean;
+        choice: number | null;
+        points: number | null;
+    } | null;
+};
+export type Snapshot = {
+    room: RoomState;
+    me: Player | null;
+    game?: GameState | null;
+    serverTime?: number;
+};
 export type Accessory = {
     id: string;
     slot: string;

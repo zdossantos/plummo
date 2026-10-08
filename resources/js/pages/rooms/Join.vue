@@ -4,6 +4,8 @@ import { computed, onMounted, ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import PlummoPicker from '@/components/PlummoPicker.vue';
+import GamePlay from '@/components/GamePlay.vue';
+import GameSetup from '@/components/GameSetup.vue';
 import SessionSettings from '@/components/SessionSettings.vue';
 import RoomRanking from '@/components/RoomRanking.vue';
 import RoomHeader from '@/components/RoomHeader.vue';
@@ -17,7 +19,7 @@ const props = defineProps<{
 }>();
 const { t } = useTranslations('rooms');
 const manual = useForm({ code: '' });
-const { room, me, error, closed, busy, request } = useRoom(
+const { room, me, game, seconds, error, closed, busy, request } = useRoom(
     props.code,
     undefined,
     true,
@@ -240,20 +242,61 @@ onMounted(async () => {
                 >
                 <template v-else>
                     <SessionSettings
-                        v-if="chief && room"
+                        v-if="chief && room && !game"
                         :key="room.chiefId ?? 0"
                         :room="room"
                         :busy="busy"
                         @save="request('session', 'PATCH', $event)"
                     />
+                    <GameSetup
+                        v-if="
+                            chief &&
+                            code &&
+                            (!game || game.exhausted) &&
+                            (game?.exhausted ||
+                                room?.pointTarget === null ||
+                                (room?.ranking[0]?.score ?? 0) <
+                                    (room?.pointTarget ?? 0))
+                        "
+                        :key="game?.id ?? 0"
+                        :code="code"
+                        :busy="busy"
+                        :recover="game?.exhausted"
+                        :initial-packs="game?.settings.packs"
+                        @start="
+                            request(
+                                game?.exhausted ? 'game-recovery' : 'games',
+                                'POST',
+                                $event,
+                            )
+                        "
+                    />
+                    <GamePlay
+                        v-if="game && room"
+                        :game="game"
+                        :room="room"
+                        :seconds="seconds"
+                        :chief="chief"
+                        :busy="busy"
+                        phone
+                        @answer="
+                            request('answer', 'POST', {
+                                choice: $event,
+                                game_id: game.id,
+                                round: game.round.number,
+                            })
+                        "
+                        @control="request('game/' + $event)"
+                    />
                     <RoomRanking v-if="room" :room="room" />
                     <p class="mt-5 text-center text-sm text-muted-foreground">
-                        {{ t('games_soon') }}
+                        {{ t('phone_hint') }}
                     </p>
                     <Button
                         variant="outline"
                         class="mt-5 w-full"
                         :disabled="busy"
+                        v-if="!game"
                         @click="edit"
                         >{{ t('edit') }}</Button
                     >
@@ -293,6 +336,11 @@ onMounted(async () => {
                             variant="ghost"
                             class="mt-4 w-full text-destructive"
                             :disabled="busy"
+                            v-if="
+                                !game ||
+                                game.phase === 'paused' ||
+                                game.phase === 'results'
+                            "
                             @click="close"
                             >{{ t('close') }}</Button
                         >
