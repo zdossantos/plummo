@@ -33,11 +33,17 @@
 ### Task 2: Téléphones et grand écran
 **Files:** ChatComposer, PlayerDock, GameWinners, useRoom, types, Join, Screen, GamePlay, tests/Browser/ChatTest.php.
 **Interfaces:** horloge serveur reactive, canChat réactif, sender sérialisé existant ; gain affiché une fois par révélation et gagnants ex æquo selon classement mini-jeu/global.
-- [ ] Écrire test navigateur envoi, remplacement/expiration, verrou action et retour au formulaire, gagnants ; vérifier RED.
-- [ ] Implémenter composants et styles reduced-motion ; tester front/build/navigateur.
-- [ ] Mettre à jour README et suite-v1 puis commit feat: show chat bubbles and celebrate Plummo winners.
+- [x] Écrire test navigateur envoi, remplacement/expiration, verrou action et retour au formulaire, gagnants ; vérifier RED.
+- [x] Implémenter composants et styles reduced-motion ; tester front/build/navigateur.
+- [x] Mettre à jour README et suite-v1 puis commit feat: show chat bubbles and celebrate Plummo winners.
 
 ### Task 3: Vérification et livraison
-- [ ] composer ci:check complet ; review indépendante selon skill requesting-code-review.
-- [ ] Corriger tout défaut important avec RED/GREEN, refaire les contrôles affectés.
+- [x] composer ci:check complet ; review indépendante selon skill requesting-code-review.
+- [x] Corriger tout défaut important avec RED/GREEN, refaire les contrôles affectés.
 - [ ] Push branche, PR, attachement, contrôles GitHub, squash merge ; main à jour.
+
+## Preuves
+
+- Revue indépendante : cas devinette/vote et visibilité TV corrigés ; aucune anomalie importante restante.
+- `composer ci:check` : 153 tests PHP/navigateur, 1 597 assertions ; analyse, lint, types, tests frontend et build réussis.
+- RED/GREEN : droits chat, expiration/cooldown, célébration unique, chevauchement huit bulles/avatars, viewport 1366 × 768 et contenu long.

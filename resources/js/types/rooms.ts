@@ -4,6 +4,7 @@ export type Player = {
     color: string;
     accessories: string[];
     score: number;
+    chat: { message: string; expiresAt: number } | null;
     status: 'connected' | 'disconnected' | 'waiting' | 'left';
 };
 export type RoomState = {
@@ -85,6 +86,7 @@ export type DrawingGameState = Omit<
         canDraw: boolean;
         canSkip: boolean;
         votedSkip: boolean;
+        canGuess: boolean;
     } | null;
 };
 export type PhraseGameState = Omit<
@@ -129,6 +131,7 @@ export type DrawingSender = (
     values: Record<string, unknown>,
 ) => Promise<boolean>;
 export type Snapshot = {
+    canChat?: boolean;
     room: RoomState;
     me: Player | null;
     game?: GameState | null;

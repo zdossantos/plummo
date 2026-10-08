@@ -20,6 +20,8 @@ export function useRoom(
             Math.ceil((game.value?.deadline ?? 0) - clock.value - offset),
         ),
     );
+    const serverNow = computed(() => clock.value + offset);
+    const canChat = ref(initial?.canChat ?? false);
     const page = usePage();
     let echo: Echo<'reverb'> | undefined;
     let clockTimer: ReturnType<typeof setInterval> | undefined;
@@ -103,6 +105,7 @@ export function useRoom(
                 return true;
             }
             const data: Snapshot = await response.json();
+            canChat.value = data.canChat ?? false;
             room.value = data.room;
             me.value = data.me;
             game.value = data.game ?? null;
@@ -216,6 +219,8 @@ export function useRoom(
         me,
         game,
         seconds,
+        serverNow,
+        canChat,
         error,
         errors,
         closed,

@@ -33,13 +33,7 @@ const artist = computed(
 const editable = computed(
     () => !!props.phone && props.game.me?.canDraw && props.connected !== false,
 );
-const canGuess = computed(
-    () =>
-        !!props.phone &&
-        props.game.me?.eligible &&
-        !props.game.me.found &&
-        ['drawing', 'artist_missing'].includes(props.game.phase),
-);
+const canGuess = computed(() => !!props.phone && props.game.me?.canGuess);
 async function sendDrawingAction(
     action: string,
     values: Record<string, unknown>,
