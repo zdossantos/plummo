@@ -213,3 +213,15 @@ it('keeps late arrivals waiting and freezes anonymous presentation across a scre
     phraseAdvance($room, 3);
     $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.me.eligible', true);
 });
+
+it('ends voting when all players with an available choice have voted', function () {
+    [$room, $players] = phraseSetup();
+    phrasePost($room, $players[0][1], 'submit', ['suffix' => 'seule proposition'])->assertOk();
+    phrasePost($room, $players[1][1], 'submit', ['suffix' => ''])->assertOk();
+    phrasePost($room, $players[2][1], 'submit', ['suffix' => ''])->assertOk();
+    phraseAdvance($room, 5);
+    $entry = Game::where('room_id', $room->id)->sole()->state['round']['entries'][0];
+    phrasePost($room, $players[1][1], 'vote', ['choice' => $entry['id']])->assertOk();
+    phrasePost($room, $players[2][1], 'vote', ['choice' => $entry['id']])->assertJsonPath('game.phase', 'reveal');
+    expect(RoomPlayer::findOrFail($players[0][0])->score)->toBe(130);
+});

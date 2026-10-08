@@ -266,7 +266,7 @@ class GameEngine
     /** @return array<string, mixed>|null */
     public function view(Room $room, ?RoomPlayer $me, bool $screen = false): ?array
     {
-        $game = $this->tick($room) ?? Game::where('room_id', $room->id)->latest('id')->first();
+        $game = $this->tick($room) ?? Game::where('room_id', $room->id)->latest('id')->first(['id'])?->refresh();
         if ($game?->status !== 'active' && $game?->status !== 'finished') {
             return null;
         }

@@ -154,7 +154,7 @@ class PhraseGame
                 $state['deadline'] += $this->displayDuration($state['round']['entries'][$state['round']['index']]['text']);
             } while ($state['deadline'] <= $time);
             app(GameEngine::class)->save($game, ['state' => $state]);
-        } elseif ($state['phase'] === 'voting' && ($state['deadline'] <= $time || $players->every(fn ($player) => isset($state['round']['votes'][$player->id])))) {
+        } elseif ($state['phase'] === 'voting' && ($state['deadline'] <= $time || $players->filter(fn ($player) => array_filter($state['round']['entries'], fn ($entry) => $entry['author'] !== $player->id) !== [])->every(fn ($player) => isset($state['round']['votes'][$player->id])))) {
             $this->finishRound($room, $game, $state);
         } elseif ($state['phase'] === 'reveal' && $state['deadline'] <= $time) {
             $target = $room->point_target !== null && (int) $room->players()->max('score') >= $room->point_target;
