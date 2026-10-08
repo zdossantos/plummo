@@ -192,9 +192,9 @@ class RoomService
     }
 
     /** @return array<string, mixed> */
-    public function state(Room $room, ?RoomPlayer $me = null): array
+    public function state(Room $room, ?RoomPlayer $me = null, bool $screen = false): array
     {
-        $game = app(GameEngine::class)->view($room, $me);
+        $game = app(GameEngine::class)->view($room, $me, $screen);
         $me?->refresh();
 
         return [

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AudioClip from '@/components/AudioClip.vue';
 import { computed } from 'vue';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from '@/composables/useTranslations';
@@ -10,6 +11,7 @@ const props = defineProps<{
     phone?: boolean;
     chief?: boolean;
     busy?: boolean;
+    connected?: boolean;
 }>();
 const emit = defineEmits<{
     answer: [choice: number];
@@ -41,7 +43,7 @@ const ranking = computed(() => {
         >
             <p>
                 {{
-                    t('quiz_round', {
+                    t(game.type === 'quiz' ? 'quiz_round' : 'blind_round', {
                         number: game.round.number,
                         total: game.round.total,
                     })
@@ -55,6 +57,13 @@ const ranking = computed(() => {
                 {{ seconds }} {{ t('seconds') }}
             </p>
         </div>
+        <AudioClip
+            v-if="!phone && game.round.audio"
+            :src="game.round.audio"
+            :playing="
+                game.phase === 'answer' && seconds > 0 && connected !== false
+            "
+        />
         <h1
             v-if="game.phase === 'paused'"
             class="my-8 text-center text-3xl font-black"

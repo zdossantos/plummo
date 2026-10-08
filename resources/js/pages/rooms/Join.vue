@@ -263,6 +263,7 @@ onMounted(async () => {
                         :busy="busy"
                         :recover="game?.exhausted"
                         :initial-packs="game?.settings.packs"
+                        :initial-type="game?.type"
                         @start="
                             request(
                                 game?.exhausted ? 'game-recovery' : 'games',

@@ -20,6 +20,7 @@ Route::get('/screen/{code}', [RoomController::class, 'screen'])->name('rooms.scr
 Route::prefix('rooms/{code}')->middleware('throttle:900,1')->group(function (): void {
     Route::post('screen-presence', [RoomController::class, 'screenPresence']);
     Route::post('broadcast-auth', [RoomController::class, 'broadcastAuth']);
+    Route::get('games/{game}/rounds/{round}/audio', [GameController::class, 'audio'])->whereNumber(['game', 'round']);
     Route::post('games', [GameController::class, 'store']);
     Route::post('game-recovery', [GameController::class, 'recover']);
     Route::post('game-options', [GameController::class, 'options']);

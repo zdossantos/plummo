@@ -51,10 +51,10 @@ class RoomController extends Controller
         return redirect()->route('rooms.screen', $room->code);
     }
 
-    public function screen(string $code): InertiaResponse
+    public function screen(Request $request, string $code): InertiaResponse
     {
         return $this->rooms->locked($code, fn (Room $room): InertiaResponse => Inertia::render('rooms/Screen', [
-            ...$this->rooms->state($room), 'joinUrl' => rtrim(config('app.url'), '/').route('rooms.join', $room->code, false), 'manualUrl' => rtrim(config('app.url'), '/').route('join', absolute: false),
+            ...$this->rooms->state($room, screen: $request->session()->get('plummo.screen') === $room->id), 'joinUrl' => rtrim(config('app.url'), '/').route('rooms.join', $room->code, false), 'manualUrl' => rtrim(config('app.url'), '/').route('join', absolute: false),
         ]));
     }
 
@@ -91,7 +91,7 @@ class RoomController extends Controller
             abort_unless($request->session()->get('plummo.screen') === $room->id, 403);
             $room->update(['screen_seen_at' => now()]);
 
-            return response()->json($this->rooms->state($room));
+            return response()->json($this->rooms->state($room, screen: true));
         });
     }
 

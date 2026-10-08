@@ -15,12 +15,15 @@ const props = defineProps<{
     joinUrl: string;
     manualUrl: string;
 }>();
-const { room, game, seconds, closed, error } = useRoom(props.room.code, {
-    room: props.room,
-    me: null,
-    game: props.game,
-    serverTime: props.serverTime,
-});
+const { room, game, seconds, closed, error, connected } = useRoom(
+    props.room.code,
+    {
+        room: props.room,
+        me: null,
+        game: props.game,
+        serverTime: props.serverTime,
+    },
+);
 const { t } = useTranslations('rooms');
 const showRanking = ref(false);
 const slots = computed(() =>
@@ -116,10 +119,12 @@ const slots = computed(() =>
                 </div>
             </section>
             <GamePlay
-                v-if="game && room && !showRanking"
+                v-if="game && room"
+                v-show="!showRanking"
                 :game="game"
                 :room="room"
                 :seconds="seconds"
+                :connected="connected"
             />
             <section
                 class="rounded-3xl bg-accent/35 p-5 lg:p-7"

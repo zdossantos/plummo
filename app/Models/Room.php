@@ -5,6 +5,8 @@ namespace App\Models;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @property CarbonImmutable|null $empty_since
@@ -12,6 +14,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Room extends Model
 {
+    protected static function booted(): void
+    {
+        static::deleted(function (Room $room): void {
+            DB::afterCommit(fn () => Storage::disk('local')->deleteDirectory('games/'.$room->id));
+        });
+    }
+
     protected $fillable = ['code', 'owner_id', 'empty_since', 'point_target', 'screen_seen_at'];
 
     protected function casts(): array

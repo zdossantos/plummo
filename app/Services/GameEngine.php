@@ -7,6 +7,7 @@ use App\Events\RoomChanged;
 use App\Models\Game;
 use App\Models\Room;
 use App\Models\RoomPlayer;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class GameEngine
@@ -23,11 +24,14 @@ class GameEngine
         if ($room->point_target !== null && (int) $room->players()->max('score') >= $room->point_target) {
             throw ValidationException::withMessages(['target' => __('rooms.target_reached')]);
         }
-        $counts = app(RoomContentCatalog::class)->availability($room, ContentType::Quiz, $settings['packs']);
+        $counts = app(RoomContentCatalog::class)->availability($room, ContentType::from($settings['type'] ?? 'quiz'), $settings['packs']);
         if (($settings['allow_repeats'] ?? false) ? $counts['total'] < 1 : $counts['unseen'] < $settings['rounds']) {
             throw ValidationException::withMessages(['packs' => __('rooms.contents_exhausted')]);
         }
-        $game = Game::create(['room_id' => $room->id, 'type' => 'quiz', 'settings' => $settings, 'state' => ['scores' => [], 'number' => 0]]);
+        if ($settings['type'] === 'blind_test' && app(BlindChoices::class)->count() < 8) {
+            throw ValidationException::withMessages(['packs' => __('rooms.blind_catalogue_small')]);
+        }
+        $game = Game::create(['room_id' => $room->id, 'type' => $settings['type'], 'settings' => $settings, 'state' => ['scores' => [], 'number' => 0]]);
         $this->nextRound($room, $game);
 
         return $game;
@@ -49,7 +53,15 @@ class GameEngine
             return;
         }
         try {
-            $content = app(RoomContentCatalog::class)->reveal($room, ContentType::Quiz, $game->settings['packs'], 1, $game->settings['allow_repeats'] ?? false)->firstOrFail();
+            [$content, $payload] = DB::transaction(function () use ($room, $game) {
+                $content = app(RoomContentCatalog::class)->reveal($room, ContentType::from($game->type), $game->settings['packs'], 1, $game->settings['allow_repeats'] ?? false)->firstOrFail();
+                $payload = $content->payload;
+                if ($game->type === 'blind_test') {
+                    $payload = [...app(BlindChoices::class)->prepare($content), 'question' => __('rooms.blind_listen'), 'audio_path' => app(GameAudio::class)->copy($game, $content)];
+                }
+
+                return [$content, $payload];
+            });
         } catch (ValidationException $exception) {
             if (! isset($game->state['round'])) {
                 throw $exception;
@@ -61,7 +73,8 @@ class GameEngine
 
             return;
         }
-        $this->save($game, ['state' => ['scores' => $game->state['scores'] + array_fill_keys($players, 0), 'number' => $game->state['number'] + 1, 'phase' => 'answer', 'previous_phase' => 'answer', 'remaining' => 0.0, 'manual_pause' => false, 'started_at' => $this->time(), 'deadline' => $this->time() + $game->settings['duration'], 'round' => ['content_id' => $content->id, 'payload' => $content->payload, 'participants' => $players, 'answers' => [], 'awards' => []]]]);
+        app(GameAudio::class)->retire($game->state['round']['payload']['audio_path'] ?? null);
+        $this->save($game, ['state' => ['scores' => $game->state['scores'] + array_fill_keys($players, 0), 'number' => $game->state['number'] + 1, 'phase' => 'answer', 'previous_phase' => 'answer', 'remaining' => 0.0, 'manual_pause' => false, 'started_at' => $this->time(), 'deadline' => $this->time() + $game->settings['duration'], 'round' => ['content_id' => $content->id, 'payload' => $payload, 'participants' => $players, 'answers' => [], 'awards' => []]]]);
     }
 
     public function time(): float
@@ -107,6 +120,7 @@ class GameEngine
         } elseif ($state['phase'] === 'reveal' && $state['deadline'] <= $this->time()) {
             $targetReached = $room->point_target !== null && (int) $room->players()->max('score') >= $room->point_target;
             if ($state['number'] >= $game->settings['rounds'] || $targetReached) {
+                app(GameAudio::class)->retire($state['round']['payload']['audio_path'] ?? null);
                 $state['phase'] = 'results';
                 $this->save($game, ['state' => $state, 'status' => 'finished']);
             } else {
@@ -201,6 +215,7 @@ class GameEngine
             $state['deadline'] = $this->time() + 5;
         } else {
             abort_unless($state['phase'] === 'paused', 409);
+            app(GameAudio::class)->retire($state['round']['payload']['audio_path'] ?? null);
             $this->save($game, ['status' => 'stopped']);
 
             return;
@@ -213,7 +228,7 @@ class GameEngine
     {
         $game = $this->active($room);
         abort_unless($game !== null && $game->state['phase'] === 'paused' && ($game->state['exhausted'] ?? false), 409);
-        $counts = app(RoomContentCatalog::class)->availability($room, ContentType::Quiz, $settings['packs']);
+        $counts = app(RoomContentCatalog::class)->availability($room, ContentType::from($settings['type'] ?? $game->type), $settings['packs']);
         if (($settings['allow_repeats'] ?? false) ? $counts['total'] < 1 : $counts['unseen'] < 1) {
             throw ValidationException::withMessages(['packs' => __('rooms.contents_exhausted')]);
         }
@@ -224,7 +239,7 @@ class GameEngine
     }
 
     /** @return array<string, mixed>|null */
-    public function view(Room $room, ?RoomPlayer $me): ?array
+    public function view(Room $room, ?RoomPlayer $me, bool $screen = false): ?array
     {
         $game = $this->tick($room) ?? Game::where('room_id', $room->id)->latest('id')->first();
         if ($game?->status !== 'active' && $game?->status !== 'finished') {
@@ -234,6 +249,6 @@ class GameEngine
         $round = $state['round'];
         $revealed = $state['phase'] === 'reveal' || $state['phase'] === 'results' || ($state['previous_phase'] === 'reveal' && in_array($state['phase'], ['paused', 'resuming'], true));
 
-        return ['id' => $game->id, 'settings' => $game->settings, 'exhausted' => $state['exhausted'] ?? false, 'targetReached' => $game->status === 'finished' && $room->point_target !== null && (int) $room->players()->max('score') >= $room->point_target, 'type' => $game->type, 'phase' => $state['phase'], 'deadline' => $state['deadline'], 'scores' => $state['scores'], 'round' => ['number' => $state['number'], 'total' => $game->settings['rounds'], 'question' => $round['payload']['question'], 'choices' => $round['payload']['choices'], 'correct' => $revealed ? $round['payload']['correct'] : null, 'awards' => $revealed ? $round['awards'] : []], 'me' => $me === null ? null : ['eligible' => $this->eligible($me, $state), 'answered' => isset($round['answers'][$me->id]), 'choice' => $round['answers'][$me->id]['choice'] ?? null, 'points' => $revealed ? ($round['awards'][$me->id] ?? 0) : null]];
+        return ['id' => $game->id, 'settings' => $game->settings, 'exhausted' => $state['exhausted'] ?? false, 'targetReached' => $game->status === 'finished' && $room->point_target !== null && (int) $room->players()->max('score') >= $room->point_target, 'type' => $game->type, 'phase' => $state['phase'], 'deadline' => $state['deadline'], 'scores' => $state['scores'], 'round' => ['number' => $state['number'], 'total' => $game->settings['rounds'], 'question' => $game->type === 'blind_test' ? __('rooms.blind_listen') : $round['payload']['question'], 'audio' => $screen && $game->type === 'blind_test' && $game->status === 'active' ? '/rooms/'.$room->code.'/games/'.$game->id.'/rounds/'.$state['number'].'/audio' : null, 'choices' => $round['payload']['choices'], 'correct' => $revealed ? $round['payload']['correct'] : null, 'awards' => $revealed ? $round['awards'] : []], 'me' => $me === null ? null : ['eligible' => $this->eligible($me, $state), 'answered' => isset($round['answers'][$me->id]), 'choice' => $round['answers'][$me->id]['choice'] ?? null, 'points' => $revealed ? ($round['awards'][$me->id] ?? 0) : null]];
     }
 }

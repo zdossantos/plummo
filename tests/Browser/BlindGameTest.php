@@ -1,0 +1,79 @@
+<?php
+
+use App\Models\Content;
+use App\Models\Game;
+use App\Models\Pack;
+use App\Models\Room;
+use Illuminate\Support\Facades\Storage;
+use Pest\Browser\Playwright\Playwright;
+
+it('plays looping audio on the screen and pauses it while phones select eight choices', function () {
+    app()->terminating(function () {
+        app('cookie')->flushQueuedCookies();
+        app('session.store')->flush();
+    });
+    Storage::fake('local');
+    // Pest trims streamed bodies: keep the final PCM byte non-whitespace.
+    $samples = str_repeat("\x01\x01", 8000);
+    $wav = 'RIFF'.pack('V', 36 + strlen($samples)).'WAVEfmt '.pack('VvvVVvv', 16, 1, 1, 8000, 16000, 2, 16).'data'.pack('V', strlen($samples)).$samples;
+    Storage::disk('local')->put('audio/test.wav', $wav);
+    $pack = Pack::findOrFail(blindPack());
+    $tag = $pack->tags()->sole();
+    $ids = $tag->contents()->pluck('contents.id');
+    $screen = visit('/')->withLocale('en-US')->assertSee('Everyone plays.');
+    $room = Room::latest('id')->firstOrFail();
+    try {
+        $phone = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')
+            ->fill('player-name', 'Camille')->click('Enter the room')->assertSee('Prepare a quiz');
+        $phone->fill('session-target', '50')->click('Save target')->assertSee('Target: 50 points');
+        $phone->assertSee('Mini-game');
+        $phone->select('game-type', 'blind_test');
+        $phone->click('input[type="checkbox"][value="'.$pack->id.'"]')->assertSee('8 unseen clips')->fill('game-rounds', '5');
+        // Simulate an autoplay restriction, then use native playback after consent.
+        $screen->page()->evaluate('() => { window.nativePlay = HTMLMediaElement.prototype.play; HTMLMediaElement.prototype.play = function () { return Promise.reject(new DOMException("Autoplay blocked", "NotAllowedError")); }; }');
+        $phone->page()->locator('button:has-text("Start blind test")')->click(['noWaitAfter' => true]);
+        $phone->assertSee('Blind test · Clip 1 / 5');
+        $screen->assertSee('Blind test · Clip 1 / 5')->assertSee('Play sound');
+        $screen->page()->evaluate('() => { HTMLMediaElement.prototype.play = window.nativePlay; }');
+        $screen->page()->locator('button:has-text("Play sound")')->click(['noWaitAfter' => true]);
+        $screen->assertDontSee('Play sound');
+        expect($screen->page()->evaluate('document.querySelector("audio").loop && !document.querySelector("audio").paused'))->toBeTrue();
+        expect($phone->page()->evaluate('document.querySelectorAll("[data-testid=game-play] button:not([data-control])").length'))->toBe(9);
+        expect($phone->page()->evaluate('document.querySelector("audio") === null'))->toBeTrue();
+        $phone->page()->locator('button:has-text("Pause")')->click(['noWaitAfter' => true]);
+        $phone->assertSee('Game paused');
+        $screen->assertSee('Game paused');
+        $position = $screen->page()->evaluate('document.querySelector("audio").currentTime');
+        expect($screen->page()->evaluate('document.querySelector("audio").paused'))->toBeTrue();
+        $screen->page()->evaluate('() => { window.pausedAudio = document.querySelector("audio"); }');
+        $screen->click('Overall leaderboard')->click('Back to lobby');
+        expect($screen->page()->evaluate('document.querySelector("audio") === window.pausedAudio'))->toBeTrue();
+        $phone->page()->locator('button:has-text("Resume")')->click(['noWaitAfter' => true]);
+        $phone->assertSee('Resuming in…');
+        $screen->assertSee('Resuming in…');
+        expect($screen->page()->evaluate('document.querySelector("audio").paused'))->toBeTrue();
+        expect($screen->page()->evaluate('document.querySelector("audio").currentTime'))->toBe($position);
+        Playwright::usingTimeout(10000, fn () => $screen->assertSee('Which song is playing?'));
+        expect($screen->page()->evaluate('!document.querySelector("audio").paused'))->toBeTrue();
+        $screen->page()->evaluate('() => { window.dispatchEvent(new Event("offline")); }');
+        expect($screen->page()->evaluate('document.querySelector("audio").paused'))->toBeTrue();
+        $screen->page()->evaluate('() => { window.dispatchEvent(new Event("online")); }');
+        $screen->assertDontSee('Connection interrupted. Trying again…');
+        $game = Game::where('room_id', $room->id)->sole();
+        $choice = $game->state['round']['payload']['correct'];
+        $phone->assertSee('Which song is playing?');
+        $phone->page()->locator('[data-testid="game-play"] button')->nth($choice)->click(['noWaitAfter' => true]);
+        $phone->assertSee('65 points for this question');
+        $screen->assertSee('Mini-game leaderboard')->assertSee('Well done, Camille!');
+        $phone->assertSee('Mini-game leaderboard');
+        Storage::disk('local')->assertMissing($game->state['round']['payload']['audio_path']);
+        $phone->page()->locator('button:has-text("Back to lobby")')->click(['noWaitAfter' => true]);
+        $screen->assertSee('Everyone plays.')->assertSee('65 points')->assertNoJavaScriptErrors();
+        $phone->assertNoJavaScriptErrors();
+    } finally {
+        $room->delete();
+        Content::whereIn('id', $ids)->delete();
+        $pack->delete();
+        $tag->delete();
+    }
+});

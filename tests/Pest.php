@@ -47,3 +47,23 @@ function quizAnswer(Room $room, int $choice): array
 
     return ['choice' => $choice, 'game_id' => $game->id, 'round' => $game->state['number']];
 }
+
+function blindSong(string $title, array $tags = [], bool $published = true): Content
+{
+    $song = Content::create(['type' => ContentType::BlindTest, 'published' => $published, 'payload' => ['title' => $title, 'artist' => 'Artist', 'audio_path' => 'audio/test.wav']]);
+    $song->tags()->sync($tags);
+
+    return $song;
+}
+
+function blindPack(): int
+{
+    $tag = Tag::create(['name' => 'Music']);
+    $pack = Pack::create(['name' => 'Music']);
+    $pack->tags()->sync([$tag->id]);
+    foreach (range(1, 8) as $number) {
+        blindSong('Song '.$number, [$tag->id]);
+    }
+
+    return $pack->id;
+}
