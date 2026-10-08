@@ -24,7 +24,7 @@ class GameController extends Controller
         return $this->rooms->locked($code, function (Room $room) use ($request): JsonResponse {
             $player = $this->rooms->requirePlayer($room, $request);
             $this->rooms->requireChief($room, $player);
-            $settings = $request->validate(['type' => ['required', 'in:quiz,blind_test,drawing'], 'packs' => ['required', 'array', 'min:1', 'max:3'], 'packs.*' => ['integer', 'distinct', 'exists:packs,id'], 'rounds' => ['required', 'integer', $request->input('type') === 'drawing' ? 'min:1' : 'min:5', $request->input('type') === 'drawing' ? 'max:5' : 'max:30'], 'duration' => ['required', 'integer', $request->input('type') === 'drawing' ? 'min:30' : 'min:10', 'max:150'], 'allow_repeats' => ['sometimes', 'boolean']]);
+            $settings = $request->validate(['type' => ['required', 'in:quiz,blind_test,drawing,phrase'], 'packs' => ['required', 'array', 'min:1', 'max:3'], 'packs.*' => ['integer', 'distinct', 'exists:packs,id'], 'rounds' => ['required', 'integer', in_array($request->input('type'), ['drawing', 'phrase'], true) ? 'min:1' : 'min:5', in_array($request->input('type'), ['drawing', 'phrase'], true) ? 'max:5' : 'max:30'], 'duration' => ['required', 'integer', in_array($request->input('type'), ['drawing', 'phrase'], true) ? 'min:30' : 'min:10', 'max:150'], 'allow_repeats' => ['sometimes', 'boolean']]);
             $this->games->start($room, $settings);
 
             return response()->json($this->rooms->state($room, $player), 201);
@@ -35,7 +35,7 @@ class GameController extends Controller
     {
         return $this->rooms->locked($code, function (Room $room) use ($request): JsonResponse {
             $this->rooms->requireChief($room, $this->rooms->requirePlayer($room, $request));
-            $packs = $request->validate(['type' => ['sometimes', 'in:quiz,blind_test,drawing'], 'packs' => ['sometimes', 'array', 'min:1', 'max:3'], 'packs.*' => ['integer', 'distinct', 'exists:packs,id']]);
+            $packs = $request->validate(['type' => ['sometimes', 'in:quiz,blind_test,drawing,phrase'], 'packs' => ['sometimes', 'array', 'min:1', 'max:3'], 'packs.*' => ['integer', 'distinct', 'exists:packs,id']]);
             $type = ContentType::from($packs['type'] ?? 'quiz');
             $packs = $packs['packs'] ?? [];
 
