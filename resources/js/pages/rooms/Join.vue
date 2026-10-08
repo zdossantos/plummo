@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import PlummoPicker from '@/components/PlummoPicker.vue';
@@ -9,7 +9,9 @@ import GamePlay from '@/components/GamePlay.vue';
 import GameSetup from '@/components/GameSetup.vue';
 import SessionSettings from '@/components/SessionSettings.vue';
 import RoomRanking from '@/components/RoomRanking.vue';
-import RoomHeader from '@/components/RoomHeader.vue';
+import ViewportShell from '@/components/ViewportShell.vue';
+import PageDeck from '@/components/PageDeck.vue';
+import TextReader from '@/components/TextReader.vue';
 import { useRoom } from '@/composables/useRoom';
 import { useTranslations } from '@/composables/useTranslations';
 import type { Catalog, Player } from '@/types/rooms';
@@ -39,6 +41,9 @@ const accessories = ref<string[]>(props.me?.accessories ?? []);
 const editing = ref(false);
 const returning = ref(!!props.me);
 const target = ref('');
+const view = ref('play');
+const profileStage = ref(0);
+const ui = useTranslations('interface');
 const chief = computed(
     () =>
         me.value?.status === 'connected' && room.value?.chiefId === me.value.id,
@@ -64,6 +69,7 @@ function edit() {
     color.value = me.value.color;
     accessories.value = [...me.value.accessories];
     editing.value = true;
+    profileStage.value = 0;
 }
 async function leave() {
     if (window.confirm(t('confirm_leave'))) await request('leave');
@@ -78,30 +84,31 @@ onMounted(async () => {
         returning.value = false;
     }
 });
+watch([() => game.value?.id, () => game.value?.phase], () => {
+    if (game.value && !['paused', 'results'].includes(game.value.phase))
+        view.value = 'play';
+});
+watch(canChat, (available) => {
+    if (!available && view.value === 'chat') view.value = 'play';
+});
+watch(chief, (value) => {
+    if (!value && view.value === 'settings') view.value = 'play';
+});
 </script>
 <template>
     <Head :title="t('join_title')" />
-    <main class="mx-auto min-h-screen max-w-4xl px-5 py-6 md:px-10 md:py-8">
-        <RoomHeader />
-        <section v-if="closed" class="py-20 text-center">
-            <h1 class="text-3xl font-black">{{ t('closed') }}</h1>
-            <Link
-                href="/join"
-                class="mt-8 inline-block font-bold text-primary"
-                >{{ t('back') }}</Link
-            >
+    <ViewportShell>
+        <section v-if="closed" class="game-panel justify-center text-center">
+            <h1>{{ t('closed') }}</h1>
+            <Link href="/join">{{ t('back') }}</Link>
         </section>
-        <template v-else>
-            <p
-                v-if="error"
-                role="alert"
-                class="mt-5 rounded-2xl bg-accent p-4 font-semibold"
-            >
-                {{ error }}
+        <div v-else class="phone-scene">
+            <p v-if="error" role="alert" class="text-summary">
+                {{ error }}<TextReader :text="error" />
             </p>
             <form
                 v-if="!code"
-                class="mx-auto max-w-md py-16"
+                class="game-panel justify-center"
                 @submit.prevent="
                     manual
                         .transform((data) => ({
@@ -110,13 +117,9 @@ onMounted(async () => {
                         .post('/join', { preserveState: false })
                 "
             >
-                <h1 class="mb-4 text-4xl font-black tracking-tight">
-                    {{ t('join_title') }}
-                </h1>
-                <p class="mb-8 text-muted-foreground">{{ t('phone_hint') }}</p>
-                <label for="room-code" class="mb-2 block font-bold">{{
-                    t('code')
-                }}</label>
+                <h1 class="text-4xl">{{ t('join_title') }}</h1>
+                <p>{{ t('phone_hint') }}</p>
+                <label for="room-code" class="font-bold">{{ t('code') }}</label>
                 <input
                     id="room-code"
                     v-model="manual.code"
@@ -124,65 +127,60 @@ onMounted(async () => {
                     autocapitalize="characters"
                     maxlength="6"
                     required
-                    class="w-full rounded-2xl border-2 border-primary/25 bg-card px-4 py-4 font-mono text-3xl tracking-widest uppercase focus:border-primary focus:outline-none"
+                    class="text-3xl tracking-widest uppercase"
                     :aria-invalid="!!manual.errors.code"
                 />
-                <p
-                    v-if="manual.errors.code"
-                    role="alert"
-                    class="mt-3 text-sm font-semibold text-destructive"
-                >
+                <p v-if="manual.errors.code" role="alert">
                     {{ manual.errors.code }}
                 </p>
-                <Button
-                    type="submit"
-                    class="mt-6 w-full"
-                    size="lg"
-                    :disabled="manual.processing"
-                    >{{ t('join') }}</Button
-                >
+                <Button type="submit" size="lg" :disabled="manual.processing">{{
+                    t('join')
+                }}</Button>
             </form>
-            <p v-else-if="returning" role="status" class="py-16 text-center">
-                {{ t('loading') }}
-            </p>
+            <p v-else-if="returning" role="status">{{ t('loading') }}</p>
             <form
                 v-else-if="!me || editing"
-                class="py-8"
-                @submit.prevent="submit"
+                class="game-panel"
+                @submit.prevent="
+                    profileStage === 0 ? (profileStage = 1) : submit()
+                "
             >
-                <div class="mb-7">
-                    <p class="mb-2 text-sm font-bold text-primary">
-                        {{ t('code') }} · {{ code }}
-                    </p>
-                    <h1 class="text-3xl font-black tracking-tight">
-                        {{ t('customize') }}
-                    </h1>
-                    <p class="mt-2 text-muted-foreground">
-                        {{ t('customize_intro') }}
+                <p class="text-xs font-bold text-primary">
+                    {{ t('code') }} · {{ code }}
+                </p>
+                <h1 class="text-3xl">{{ t('customize') }}</h1>
+                <div
+                    v-show="profileStage === 0"
+                    class="flex flex-1 flex-col justify-center gap-3"
+                >
+                    <label for="player-name" class="font-bold">{{
+                        t('name')
+                    }}</label>
+                    <input
+                        id="player-name"
+                        v-model="name"
+                        maxlength="30"
+                        required
+                        autocomplete="nickname"
+                    />
+                    <p class="text-sm text-muted-foreground">
+                        {{ t('name_hint') }}
                     </p>
                 </div>
-                <label for="player-name" class="mb-2 block font-bold">{{
-                    t('name')
-                }}</label>
-                <input
-                    id="player-name"
-                    v-model="name"
-                    maxlength="30"
-                    required
-                    autocomplete="nickname"
-                    class="w-full rounded-xl border-2 border-primary/20 bg-card px-4 py-3 focus:border-primary focus:outline-none"
-                />
-                <p class="mt-2 mb-7 text-sm text-muted-foreground">
-                    {{ t('name_hint') }}
-                </p>
                 <PlummoPicker
+                    v-show="profileStage === 1"
                     v-model:color="color"
                     v-model:accessories="accessories"
                     :catalog="catalog"
                 />
-                <div
-                    class="sticky bottom-0 mt-6 flex gap-3 bg-background/95 py-4"
-                >
+                <div class="profile-actions flex gap-2">
+                    <Button
+                        v-if="profileStage === 1"
+                        type="button"
+                        variant="outline"
+                        @click="profileStage = 0"
+                        >{{ t('back') }}</Button
+                    >
                     <Button
                         v-if="editing"
                         type="button"
@@ -194,121 +192,141 @@ onMounted(async () => {
                     <Button
                         type="submit"
                         class="flex-1"
-                        size="lg"
                         :disabled="busy || !name.trim()"
                         >{{
-                            busy
-                                ? t('joining')
-                                : editing
-                                  ? t('save')
-                                  : t('enter')
+                            profileStage === 0
+                                ? ui.t('continue')
+                                : busy
+                                  ? t('joining')
+                                  : editing
+                                    ? t('save')
+                                    : t('enter')
                         }}</Button
                     >
                 </div>
                 <Link
-                    v-if="!editing"
+                    v-if="!editing && profileStage === 0"
                     href="/join"
-                    class="block pb-4 text-center text-sm font-semibold text-primary"
+                    class="text-center text-sm"
                     >{{ t('back') }}</Link
                 >
             </form>
-            <section v-else class="py-8">
-                <p class="text-center text-sm font-bold text-primary">
-                    {{ t('code') }} · {{ code }}
-                </p>
-                <PlummoAvatar
-                    :color="me.color"
-                    :accessories="me.accessories"
-                    :label="me.name"
-                    class="mx-auto mt-5 w-52"
-                />
-                <h1 class="mt-2 text-center text-3xl font-black break-words">
-                    {{ me.name }}
-                </h1>
-                <p class="mt-2 text-center text-muted-foreground">
-                    {{ me.score }} {{ t('score') }}
-                </p>
-                <div
-                    class="mt-6 rounded-2xl bg-card p-5 text-center"
-                    role="status"
-                >
-                    <template v-if="me.status === 'waiting'">{{
-                        t('waiting')
-                    }}</template>
-                    <template v-else-if="me.status === 'left'">{{
-                        t('left')
-                    }}</template>
-                    <template v-else>{{
-                        chief ? t('chief_hint') : t('waiting_chief')
-                    }}</template>
+            <template v-else>
+                <div class="phone-status">
+                    <span class="text-summary"
+                        >{{ me.name }} · {{ me.score }} {{ t('score') }}</span
+                    ><span class="text-primary">{{ code }}</span>
                 </div>
+                <p v-if="me.status === 'left'" role="status">{{ t('left') }}</p>
                 <Button
                     v-if="me.status === 'left'"
-                    class="mt-5 w-full"
                     :disabled="busy"
                     @click="request('return')"
                     >{{ t('return') }}</Button
                 >
                 <template v-else>
+                    <div v-show="view === 'play'" class="phone-scene">
+                        <GameSetup
+                            v-if="
+                                chief &&
+                                code &&
+                                (!game || game.exhausted) &&
+                                (game?.exhausted ||
+                                    room?.pointTarget === null ||
+                                    (room?.ranking[0]?.score ?? 0) <
+                                        (room?.pointTarget ?? 0))
+                            "
+                            :key="game?.id ?? 0"
+                            :code="code"
+                            :busy="busy"
+                            :recover="game?.exhausted"
+                            :initial-packs="game?.settings.packs"
+                            :initial-type="game?.type"
+                            @start="
+                                request(
+                                    game?.exhausted ? 'game-recovery' : 'games',
+                                    'POST',
+                                    $event,
+                                )
+                            "
+                        />
+                        <GamePlay
+                            v-if="game && room && !game.exhausted"
+                            :game="game"
+                            :room="room"
+                            :seconds="seconds"
+                            :chief="chief"
+                            :busy="busy"
+                            phone
+                            :connected="connected"
+                            :send-phrase="
+                                (action, values) =>
+                                    request('phrases/' + action, 'POST', values)
+                            "
+                            :send-drawing="
+                                (action, values) =>
+                                    request('drawing/' + action, 'POST', values)
+                            "
+                            @answer="
+                                request('answer', 'POST', {
+                                    choice: $event,
+                                    game_id: game.id,
+                                    round: game.round.number,
+                                })
+                            "
+                            @control="request('game/' + $event)"
+                        />
+                        <div
+                            v-if="!game || me.status === 'waiting'"
+                            v-show="
+                                !chief ||
+                                (room?.pointTarget !== null &&
+                                    (room?.ranking[0]?.score ?? 0) >=
+                                        (room?.pointTarget ?? 0))
+                            "
+                            class="game-panel justify-center"
+                        >
+                            <h1 class="text-3xl">
+                                {{
+                                    me.status === 'waiting'
+                                        ? t('waiting')
+                                        : chief
+                                          ? t('session_results')
+                                          : t('waiting_chief')
+                                }}
+                            </h1>
+                            <p>
+                                {{
+                                    chief
+                                        ? t('target_reached')
+                                        : t('phone_hint')
+                                }}
+                            </p>
+                            <PlummoAvatar
+                                :color="me.color"
+                                :accessories="me.accessories"
+                                class="phone-plummo"
+                            />
+                        </div>
+                        <p
+                            v-if="chief && !game"
+                            class="text-xs text-muted-foreground"
+                        >
+                            {{ t('chief_hint') }}
+                        </p>
+                    </div>
                     <SessionSettings
-                        v-if="chief && room && !game"
-                        :key="room.chiefId ?? 0"
+                        v-if="view === 'settings' && chief && room && !game"
                         :room="room"
                         :busy="busy"
                         @save="request('session', 'PATCH', $event)"
                     />
-                    <GameSetup
-                        v-if="
-                            chief &&
-                            code &&
-                            (!game || game.exhausted) &&
-                            (game?.exhausted ||
-                                room?.pointTarget === null ||
-                                (room?.ranking[0]?.score ?? 0) <
-                                    (room?.pointTarget ?? 0))
-                        "
-                        :key="game?.id ?? 0"
-                        :code="code"
-                        :busy="busy"
-                        :recover="game?.exhausted"
-                        :initial-packs="game?.settings.packs"
-                        :initial-type="game?.type"
-                        @start="
-                            request(
-                                game?.exhausted ? 'game-recovery' : 'games',
-                                'POST',
-                                $event,
-                            )
-                        "
-                    />
-                    <GamePlay
-                        v-if="game && room"
-                        :game="game"
+                    <RoomRanking
+                        v-if="view === 'ranking' && room"
                         :room="room"
-                        :seconds="seconds"
-                        :chief="chief"
-                        :busy="busy"
-                        phone
-                        :connected="connected"
-                        :send-phrase="
-                            (action, values) =>
-                                request('phrases/' + action, 'POST', values)
-                        "
-                        :send-drawing="
-                            (action, values) =>
-                                request('drawing/' + action, 'POST', values)
-                        "
-                        @answer="
-                            request('answer', 'POST', {
-                                choice: $event,
-                                game_id: game.id,
-                                round: game.round.number,
-                            })
-                        "
-                        @control="request('game/' + $event)"
                     />
                     <ChatComposer
-                        v-if="canChat && me"
+                        v-if="view === 'chat' && canChat"
                         :me="me"
                         :game="game"
                         :server-now="serverNow"
@@ -316,72 +334,106 @@ onMounted(async () => {
                         :connected="connected"
                         :send="(values) => request('chat', 'POST', values)"
                     />
-                    <RoomRanking v-if="room" :room="room" />
-                    <p class="mt-5 text-center text-sm text-muted-foreground">
-                        {{ t('phone_hint') }}
-                    </p>
-                    <Button
-                        variant="outline"
-                        class="mt-5 w-full"
-                        :disabled="busy"
-                        v-if="!game"
-                        @click="edit"
-                        >{{ t('edit') }}</Button
-                    >
-                    <div v-if="chief" class="mt-6 rounded-2xl bg-accent/40 p-5">
-                        <label for="new-chief" class="mb-3 block font-bold">{{
-                            t('transfer_to')
-                        }}</label>
-                        <select
-                            id="new-chief"
-                            v-model="target"
-                            class="w-full rounded-xl bg-card px-3 py-3"
-                        >
-                            <option value="">{{ t('transfer_to') }}</option>
-                            <option
-                                v-for="player in room?.players.filter(
-                                    (player) =>
-                                        player.id !== me?.id &&
-                                        player.status === 'connected',
-                                )"
-                                :key="player.id"
-                                :value="player.id"
-                            >
-                                {{ player.name }}
-                            </option>
-                        </select>
-                        <Button
-                            class="mt-3 w-full"
-                            :disabled="busy || !target"
-                            @click="
-                                request('chief', 'POST', {
-                                    playerId: Number(target),
-                                })
-                            "
-                            >{{ t('transfer') }}</Button
-                        >
-                        <Button
-                            variant="ghost"
-                            class="mt-4 w-full text-destructive"
-                            :disabled="busy"
-                            v-if="
-                                !game ||
-                                game.phase === 'paused' ||
-                                game.phase === 'results'
-                            "
-                            @click="close"
-                            >{{ t('close') }}</Button
-                        >
+                    <div v-if="view === 'more'" class="game-panel">
+                        <PageDeck>
+                            <div class="flex flex-col gap-3">
+                                <h2 class="text-2xl">{{ ui.t('more') }}</h2>
+                                <Button
+                                    v-if="!game"
+                                    variant="outline"
+                                    :disabled="busy"
+                                    @click="edit"
+                                    >{{ t('edit') }}</Button
+                                ><Button
+                                    variant="outline"
+                                    :disabled="busy"
+                                    @click="leave"
+                                    >{{ t('leave') }}</Button
+                                ><Button
+                                    v-if="
+                                        chief &&
+                                        (!game ||
+                                            game.phase === 'paused' ||
+                                            game.phase === 'results')
+                                    "
+                                    variant="outline"
+                                    :disabled="busy"
+                                    @click="close"
+                                    >{{ t('close') }}</Button
+                                >
+                            </div>
+                            <div v-if="chief" class="flex flex-col gap-3">
+                                <label for="new-chief">{{
+                                    t('transfer_to')
+                                }}</label
+                                ><select id="new-chief" v-model="target">
+                                    <option value="">
+                                        {{ t('transfer_to') }}
+                                    </option>
+                                    <option
+                                        v-for="player in room?.players.filter(
+                                            (player) =>
+                                                player.id !== me?.id &&
+                                                player.status === 'connected',
+                                        )"
+                                        :key="player.id"
+                                        :value="player.id"
+                                    >
+                                        {{ player.name }}
+                                    </option></select
+                                ><Button
+                                    :disabled="busy || !target"
+                                    @click="
+                                        request('chief', 'POST', {
+                                            playerId: Number(target),
+                                        })
+                                    "
+                                    >{{ t('transfer') }}</Button
+                                >
+                            </div>
+                        </PageDeck>
                     </div>
-                    <Button
-                        variant="ghost"
-                        class="mt-6 w-full"
-                        :disabled="busy"
-                        @click="leave"
-                        >{{ t('leave') }}</Button
-                    >
+                    <nav class="phone-tabs">
+                        <button
+                            type="button"
+                            :aria-pressed="view === 'play'"
+                            @click="view = 'play'"
+                        >
+                            {{ ui.t('play') }}
+                        </button>
+                        <button
+                            v-if="chief && !game"
+                            type="button"
+                            :aria-pressed="view === 'settings'"
+                            @click="view = 'settings'"
+                        >
+                            {{ ui.t('settings') }}
+                        </button>
+                        <button
+                            type="button"
+                            :aria-pressed="view === 'ranking'"
+                            @click="view = 'ranking'"
+                        >
+                            {{ t('ranking') }}
+                        </button>
+                        <button
+                            v-if="canChat"
+                            type="button"
+                            :aria-pressed="view === 'chat'"
+                            @click="view = 'chat'"
+                        >
+                            {{ ui.t('chat') }}
+                        </button>
+                        <button
+                            type="button"
+                            :aria-pressed="view === 'more'"
+                            @click="view = 'more'"
+                        >
+                            {{ ui.t('more') }}
+                        </button>
+                    </nav>
                 </template>
-            </section>
-        </template>
-    </main>
+            </template>
+        </div>
+    </ViewportShell>
 </template>

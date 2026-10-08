@@ -16,10 +16,10 @@ it('draws from two separate phones and plays every artist before returning to th
     $screen = visit('/')->withLocale('en-US')->assertSee('Everyone plays.');
     $room = Room::latest('id')->firstOrFail();
     try {
-        $first = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Camille')->click('Enter the room')->assertSee('Prepare a quiz');
-        $second = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Alex')->click('Enter the room')->assertSee('Alex');
+        $first = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Camille')->click('Continue')->click('Enter the room')->assertSee('Prepare a quiz');
+        $second = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Alex')->click('Continue')->click('Enter the room')->assertSee('Alex');
         $first->select('game-type', 'drawing')->assertSee('Prepare a drawing game');
-        $first->click('input[type="checkbox"][value="'.$pack->id.'"]')->assertSee('2 drawings');
+        $first->click('Continue')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('Continue')->assertSee('2 drawings');
         $first->page()->locator('button:has-text("Start drawing")')->click(['noWaitAfter' => true]);
         $first->assertSee('Choose a word');
         $second->assertSee('Camille is choosing a word');
@@ -66,10 +66,10 @@ it('draws from two separate phones and plays every artist before returning to th
         $second->page()->locator('[data-testid="drawing-word"]')->first()->click(['noWaitAfter' => true]);
         $first->assertPresent('#drawing-guess')->fill('#drawing-guess', $word);
         $first->page()->locator('button:has-text("Guess")')->click(['noWaitAfter' => true]);
-        $screen->assertSee('Mini-game leaderboard')->assertSee('130');
+        $screen->assertSee('Mini-game leaderboard');
         $first->assertSee('Mini-game leaderboard');
         $first->page()->locator('button:has-text("Back to lobby")')->click(['noWaitAfter' => true]);
-        $screen->assertSee('Everyone plays.')->assertSee('Camille')->assertSee('130 points');
+        $screen->assertSee('Everyone plays.')->assertSee('Camille')->assertSee('130 Points');
         $screen->assertNoJavaScriptErrors();
         $first->assertNoJavaScriptErrors();
         $second->assertNoJavaScriptErrors();

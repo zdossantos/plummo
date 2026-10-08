@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import { composePlummo, selectAccessory } from '../../resources/js/lib/plummo';
+import { composePlummo, selectAccessory, randomAppearance } from '../../resources/js/lib/plummo';
 
 const catalog = { colors: [{ id: 'blue', color: '#123456', light: '#abcdef', dark: '#654321' }], accessories: [
     { id: 'cap', slot: 'head', front: 'cap.svg', coversPlumes: true },
@@ -25,4 +25,14 @@ test('composes back and front layers with recolored base, covered plumes and uni
     expect(svg.indexOf('avatar-1-behind')).toBeLessThan(svg.indexOf('avatar-1-tone'));
     expect(svg.indexOf('avatar-1-cap')).toBeGreaterThan(svg.indexOf('avatar-1-tone'));
     expect(composePlummo('blue', ['crown'], catalog, parts, 'avatar-2')).toContain('avatar-2-plummo-plumes');
+});
+
+test('random appearance selects a valid color and one item from every available slot', () => {
+    for (const value of [0, 0.3, 0.999999]) {
+        const result = randomAppearance(catalog, () => value);
+        expect(result.color).toBe('blue');
+        expect(result.accessories).toHaveLength(4);
+        expect(new Set(result.accessories.map(id => catalog.accessories.find(item => item.id === id)?.slot)).size).toBe(4);
+    }
+    expect(randomAppearance({ colors: [], accessories: [] }, () => 0)).toEqual({ color: 'violet', accessories: [] });
 });

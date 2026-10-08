@@ -24,11 +24,11 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
     $room = Room::latest('id')->firstOrFail();
     try {
         $phone = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')
-            ->fill('player-name', 'Camille')->click('Enter the room')->assertSee('Prepare a quiz');
-        $phone->fill('session-target', '50')->click('Save target')->assertSee('Target: 50 points');
-        $phone->assertSee('Mini-game');
+            ->fill('player-name', 'Camille')->click('Continue')->click('Enter the room')->assertSee('Prepare a quiz');
+        $phone->click('Session')->fill('session-target', '50')->click('Save target')->assertSee('Target: 50 points');
+        $phone->click('Play')->assertSee('Mini-game');
         $phone->select('game-type', 'blind_test');
-        $phone->click('input[type="checkbox"][value="'.$pack->id.'"]')->assertSee('8 unseen clips')->fill('game-rounds', '5');
+        $phone->click('Continue')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('Continue')->assertSee('8 unseen clips')->fill('game-rounds', '5');
         // Simulate an autoplay restriction, then use native playback after consent.
         $screen->page()->evaluate('() => { window.nativePlay = HTMLMediaElement.prototype.play; HTMLMediaElement.prototype.play = function () { return Promise.reject(new DOMException("Autoplay blocked", "NotAllowedError")); }; }');
         $phone->page()->locator('button:has-text("Start blind test")')->click(['noWaitAfter' => true]);
@@ -38,7 +38,7 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         $screen->page()->locator('button:has-text("Play sound")')->click(['noWaitAfter' => true]);
         $screen->assertDontSee('Play sound');
         expect($screen->page()->evaluate('document.querySelector("audio").loop && !document.querySelector("audio").paused'))->toBeTrue();
-        expect($phone->page()->evaluate('document.querySelectorAll("[data-testid=game-play] button:not([data-control])").length'))->toBe(9);
+        expect($phone->page()->evaluate('document.querySelectorAll(".game-choice > button:first-child").length'))->toBe(8);
         expect($phone->page()->evaluate('document.querySelector("audio") === null'))->toBeTrue();
         $phone->page()->locator('button:has-text("Pause")')->click(['noWaitAfter' => true]);
         $phone->assertSee('Game paused');
@@ -62,13 +62,13 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         $game = Game::where('room_id', $room->id)->sole();
         $choice = $game->state['round']['payload']['correct'];
         $phone->assertSee('Which song is playing?');
-        $phone->page()->locator('[data-testid="game-play"] button')->nth($choice)->click(['noWaitAfter' => true]);
+        $phone->page()->locator('.game-choice > button:first-child')->nth($choice)->click(['noWaitAfter' => true]);
         $phone->assertSee('65 points for this question');
         $screen->assertSee('Mini-game leaderboard')->assertSee('Well done, Camille!');
         $phone->assertSee('Mini-game leaderboard');
         Storage::disk('local')->assertMissing($game->state['round']['payload']['audio_path']);
         $phone->page()->locator('button:has-text("Back to lobby")')->click(['noWaitAfter' => true]);
-        $screen->assertSee('Everyone plays.')->assertSee('65 points')->assertNoJavaScriptErrors();
+        $screen->assertSee('Everyone plays.')->assertSee('65 Points')->assertNoJavaScriptErrors();
         $phone->assertNoJavaScriptErrors();
     } finally {
         $room->delete();

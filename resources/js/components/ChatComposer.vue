@@ -52,7 +52,7 @@ async function submit() {
 }
 </script>
 <template>
-    <form class="my-6 rounded-2xl bg-card p-5" @submit.prevent="submit">
+    <form class="game-panel justify-center" @submit.prevent="submit">
         <label for="chat-message" class="block font-bold">{{
             t('chat_label')
         }}</label>

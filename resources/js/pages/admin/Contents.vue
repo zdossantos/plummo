@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+import PagedList from '@/components/PagedList.vue';
+import TextReader from '@/components/TextReader.vue';
 import { Link, router, useForm } from '@inertiajs/vue3';
 import AdminLayout from '@/components/AdminLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -16,6 +19,8 @@ const props = defineProps<{
     filters: { type?: string; search?: string; status?: string };
 }>();
 const { t } = useTranslations('admin');
+const ui = useTranslations('interface');
+const showFilters = ref(false);
 const filters = useForm({
     type: props.filters.type ?? '',
     status: props.filters.status ?? '',
@@ -37,11 +42,25 @@ function title(content: Content) {
 </script>
 <template>
     <AdminLayout :title="t('contents')">
-        <div class="mb-6 flex flex-wrap justify-between gap-4">
+        <div class="flex items-center justify-between gap-2">
+            <Button variant="outline" @click="showFilters = !showFilters">{{
+                t('filter')
+            }}</Button>
             <form
-                class="flex flex-wrap gap-3"
-                @submit.prevent="filters.get('/admin/contents')"
+                v-if="showFilters"
+                class="contents-filters"
+                @submit.prevent="
+                    filters.get('/admin/contents', {
+                        onSuccess: () => (showFilters = false),
+                    })
+                "
             >
+                <Button
+                    type="button"
+                    variant="outline"
+                    @click="showFilters = false"
+                    >{{ ui.t('close') }}</Button
+                >
                 <label class="grid gap-1"
                     >{{ t('type')
                     }}<select
@@ -92,32 +111,35 @@ function title(content: Content) {
         >
             {{ t('no_content') }}
         </p>
-        <ul v-else class="grid gap-3">
-            <li
-                v-for="content in contents.data"
-                :key="content.id"
-                class="flex flex-wrap items-center justify-between gap-4 rounded-2xl border p-5"
-            >
-                <div class="min-w-0 flex-1">
-                    <p class="text-sm text-muted-foreground">
-                        {{ t(content.type) }} ·
-                        {{ t(content.published ? 'published' : 'draft') }}
-                    </p>
-                    <Link
-                        :href="`/admin/contents/${content.id}/edit`"
-                        class="block truncate text-lg font-bold underline"
-                        >{{ title(content) }}</Link
-                    >
-                    <p class="text-sm text-muted-foreground">
-                        {{ content.tags.map((tag) => tag.name).join(' · ') }}
-                    </p>
-                </div>
-                <Button variant="outline" @click="remove(content)">{{
-                    t('delete')
-                }}</Button>
-            </li>
-        </ul>
-        <div class="mt-6 flex items-center justify-between gap-4">
+        <PagedList v-else :items="contents.data" :row-height="110"
+            ><template #default="{ item: content }">
+                <li
+                    class="flex items-center justify-between gap-2 rounded-2xl border p-3"
+                >
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm text-muted-foreground">
+                            {{ t(content.type) }} ·
+                            {{ t(content.published ? 'published' : 'draft') }}
+                        </p>
+                        <Link
+                            :href="`/admin/contents/${content.id}/edit`"
+                            class="block truncate text-lg font-bold underline"
+                            >{{ title(content) }}</Link
+                        >
+                        <TextReader :text="String(title(content))" />
+                        <p class="text-summary text-xs text-muted-foreground">
+                            {{
+                                content.tags.map((tag) => tag.name).join(' · ')
+                            }}
+                        </p>
+                    </div>
+                    <Button variant="outline" @click="remove(content)">{{
+                        t('delete')
+                    }}</Button>
+                </li>
+            </template></PagedList
+        >
+        <div class="mt-2 flex items-center justify-between gap-4">
             <Link
                 v-if="contents.prev_page_url"
                 :href="contents.prev_page_url"

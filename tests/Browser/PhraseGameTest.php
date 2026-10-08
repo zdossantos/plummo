@@ -16,10 +16,10 @@ it('writes privately on three phones, presents anonymously, votes and returns to
     $screen = visit('/')->withLocale('en-US')->assertSee('Everyone plays.');
     $room = Room::latest('id')->firstOrFail();
     try {
-        $first = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Camille')->click('Enter the room')->assertSee('Prepare a quiz');
-        $second = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Alex')->click('Enter the room')->assertSee('Alex');
-        $third = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Sam')->click('Enter the room')->assertSee('Sam');
-        $first->select('game-type', 'phrase')->assertSee('Prepare sentences')->click('input[type="checkbox"][value="'.$pack->id.'"]')->assertSee('5 unseen prompts');
+        $first = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Camille')->click('Continue')->click('Enter the room')->assertSee('Prepare a quiz');
+        $second = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Alex')->click('Continue')->click('Enter the room')->assertSee('Alex');
+        $third = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Sam')->click('Continue')->click('Enter the room')->assertSee('Sam');
+        $first->select('game-type', 'phrase')->assertSee('Prepare sentences')->click('Continue')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('Continue')->assertSee('5 unseen prompts');
         $first->page()->locator('button:has-text("Start sentences")')->click(['noWaitAfter' => true]);
         $first->assertSee('Your secret ending');
         $second->assertSee('Your secret ending');
@@ -54,7 +54,7 @@ it('writes privately on three phones, presents anonymously, votes and returns to
         $screen->assertSee('Mini-game leaderboard')->assertSee('Well done, Camille!');
         $first->assertSee('Mini-game leaderboard');
         $first->page()->locator('button:has-text("Back to lobby")')->click(['noWaitAfter' => true]);
-        $screen->assertSee('Everyone plays.')->assertSee('130 points');
+        $screen->assertSee('Everyone plays.')->assertSee('130 Points');
         $first->assertNoJavaScriptErrors();
         $second->assertNoJavaScriptErrors();
         $third->assertNoJavaScriptErrors();

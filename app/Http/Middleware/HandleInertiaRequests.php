@@ -45,7 +45,7 @@ class HandleInertiaRequests extends Middleware
                 'port' => config('reverb.public.port'),
                 'scheme' => config('reverb.public.scheme'),
             ] : null,
-            'translations' => ['home' => __('home'), 'rooms' => __('rooms'), 'plummo' => __('plummo'), 'admin' => __('admin')],
+            'translations' => ['home' => __('home'), 'rooms' => __('rooms'), 'plummo' => __('plummo'), 'admin' => __('admin'), 'interface' => __('interface')],
         ];
     }
 }

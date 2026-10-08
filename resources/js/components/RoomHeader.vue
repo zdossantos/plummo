@@ -8,7 +8,7 @@ const { t } = useTranslations('rooms');
 const themes: Appearance[] = ['light', 'dark', 'system'];
 </script>
 <template>
-    <header class="flex flex-wrap items-center justify-between gap-4">
+    <header class="room-header">
         <span class="text-3xl font-black tracking-tight text-primary"
             >plummo</span
         >
@@ -23,5 +23,6 @@ const themes: Appearance[] = ['light', 'dark', 'system'];
                 >{{ t(theme) }}</Button
             >
         </div>
+        <slot />
     </header>
 </template>

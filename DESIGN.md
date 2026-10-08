@@ -1,6 +1,6 @@
 ---
-name: 'Plummo — maquettes HTML provisoires'
-description: 'Proposition de scène de jeu, limitée à public/maquettes et en attente de validation visuelle.'
+name: 'Plummo — interface de jeu'
+description: 'Direction validée le 8 octobre 2026, intégrée aux parcours Vue et conservée dans public/maquettes.'
 colors:
     world: '#302143'
     paper: '#fff7e6'
@@ -88,13 +88,13 @@ components:
         padding: '24px'
 ---
 
-# Design System: Plummo — maquettes HTML provisoires
+# Design System: Plummo — interface de jeu
 
 ## Overview
 
 **Creative North Star: "Le jeu de salon habité"**
 
-Système provisoire extrait des maquettes HTML de public/maquettes uniquement. La demande de jeu, le rôle PC/scène et téléphone/manette, les Plummos existants libres en bas à droite et l’absence de scroll sont des décisions utilisateur. La palette, Fredoka, les silhouettes des commandes et leur relief constituent une proposition graphique encore à valider visuellement. Ce document ne prescrit aucune modification ni migration de l’application Laravel/Vue.
+Système issu des maquettes HTML de public/maquettes, validé le 8 octobre 2026 et intégré aux composants Vue. La demande de jeu, le rôle PC/scène et téléphone/manette, les Plummos existants libres en bas à droite et l’absence de scroll sont des décisions utilisateur. La palette, Fredoka, les silhouettes des commandes et leur relief sont la direction retenue pour les salons, jeux et formulaires d’administration.
 
 Le monde construit associe un fond profond, des surfaces claires et des commandes tactiles à contours sombres. Les ombres pleines appartiennent ici au matériau de jeu proposé : elles soutiennent les réponses et les actions. Les personnages restent les assets existants ; la nouvelle direction porte leur environnement et leur composition.
 

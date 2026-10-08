@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import TextReader from '@/components/TextReader.vue';
+import PageDeck from '@/components/PageDeck.vue';
+import PagedList from '@/components/PagedList.vue';
+import PagedTextField from '@/components/PagedTextField.vue';
 import { computed } from 'vue';
 import { Link, useForm } from '@inertiajs/vue3';
 import AdminLayout from '@/components/AdminLayout.vue';
@@ -45,142 +49,146 @@ function upload(event: Event) {
 </script>
 <template>
     <AdminLayout :title="t(content ? 'edit_content' : 'new_content')">
-        <Link href="/admin/contents" class="mb-6 inline-block underline">{{
+        <Link href="/admin/contents" class="text-sm underline">{{
             t('back_contents')
         }}</Link>
         <form
-            class="grid max-w-3xl gap-5"
+            class="flex min-h-0 flex-1 flex-col gap-3"
             @submit.prevent="submit(form.published)"
         >
-            <ul
+            <div
                 v-if="errors.length"
                 role="alert"
-                class="rounded-xl border border-destructive p-4 text-destructive"
+                class="flex items-center gap-2 text-destructive"
             >
-                <li v-for="error in errors" :key="error">{{ error }}</li>
-            </ul>
-            <label class="grid gap-2"
-                >{{ t('type')
-                }}<select
-                    id="content-type"
-                    v-model="form.type"
-                    class="rounded-xl border bg-background p-3"
-                >
-                    <option
-                        v-for="type in contentTypes"
-                        :key="type"
-                        :value="type"
-                    >
-                        {{ t(type) }}
-                    </option>
-                </select></label
-            >
-            <template v-if="form.type === 'quiz'">
-                <label class="grid gap-2"
-                    >{{ t('question')
-                    }}<textarea
-                        v-model="form.payload.question"
-                        maxlength="500"
-                        class="rounded-xl border bg-background p-3"
-                    />
-                </label>
-                <label
-                    v-for="(_, index) in form.payload.choices"
-                    :key="index"
-                    class="grid gap-2"
-                    >{{ t('choice', { number: index + 1 })
-                    }}<input
-                        v-model="form.payload.choices[index]"
-                        maxlength="200"
-                        class="rounded-xl border bg-background p-3"
-                /></label>
-                <label class="grid gap-2"
-                    >{{ t('correct')
+                <p class="text-summary">
+                    {{ Object.values(form.errors).join(' · ') }}
+                </p>
+                <TextReader :text="Object.values(form.errors).join(' · ')" />
+            </div>
+            <PageDeck
+                ><label class="grid gap-2"
+                    >{{ t('type')
                     }}<select
-                        v-model="form.payload.correct"
+                        id="content-type"
+                        v-model="form.type"
                         class="rounded-xl border bg-background p-3"
                     >
                         <option
-                            v-for="(_, index) in form.payload.choices"
-                            :key="index"
-                            :value="index"
+                            v-for="type in contentTypes"
+                            :key="type"
+                            :value="type"
                         >
-                            {{ t('choice', { number: index + 1 }) }}
+                            {{ t(type) }}
                         </option>
                     </select></label
                 >
-            </template>
-            <template v-else-if="form.type === 'blind_test'">
-                <label class="grid gap-2"
-                    >{{ t('song_title')
-                    }}<input
-                        v-model="form.payload.title"
-                        maxlength="200"
-                        class="rounded-xl border bg-background p-3"
-                /></label>
-                <label class="grid gap-2"
-                    >{{ t('artist')
-                    }}<input
-                        v-model="form.payload.artist"
-                        maxlength="200"
-                        class="rounded-xl border bg-background p-3"
-                /></label>
-                <label class="grid gap-2"
-                    >{{ t('audio')
-                    }}<input
-                        type="file"
-                        accept=".mp3,.wav,.ogg,.m4a"
-                        @change="upload"
-                /></label>
-                <p class="text-sm text-muted-foreground">
-                    {{ t('audio_help') }}
-                </p>
-                <audio
-                    v-if="content?.payload.audio_path"
-                    :src="`/admin/contents/${content.id}/audio`"
-                    controls
-                    class="w-full"
-                />
-            </template>
-            <label
-                v-else-if="form.type === 'drawing'"
-                for="content-word"
-                class="grid gap-2"
-                >{{ t('word')
-                }}<input
-                    id="content-word"
-                    v-model="form.payload.word"
-                    maxlength="100"
-                    class="rounded-xl border bg-background p-3"
-                /><span class="text-sm text-muted-foreground">{{
-                    t('word_help')
-                }}</span></label
-            >
-            <label v-else class="grid gap-2"
-                >{{ t('prompt')
-                }}<textarea
-                    v-model="form.payload.prompt"
-                    maxlength="240"
-                    class="rounded-xl border bg-background p-3"
-                />
-            </label>
-            <fieldset class="rounded-xl border p-4">
-                <legend class="px-2 font-bold">{{ t('tags') }}</legend>
-                <p v-if="!tags.length">{{ t('no_tags') }}</p>
-                <div class="flex flex-wrap gap-4">
+                <template v-if="form.type === 'quiz'">
+                    <label class="grid gap-2"
+                        >{{ t('question')
+                        }}<PagedTextField
+                            v-model="form.payload.question"
+                            :maxlength="500"
+                        />
+                    </label>
                     <label
-                        v-for="tag in tags"
-                        :key="tag.id"
-                        class="flex items-center gap-2"
-                        ><input
-                            v-model="form.tag_ids"
-                            type="checkbox"
-                            :value="tag.id"
-                        />{{ tag.name }}</label
+                        v-for="(_, index) in form.payload.choices"
+                        :key="index"
+                        class="grid gap-2"
+                        >{{ t('choice', { number: index + 1 })
+                        }}<PagedTextField
+                            v-model="form.payload.choices[index]"
+                            :maxlength="200"
+                    /></label>
+                    <label class="grid gap-2"
+                        >{{ t('correct')
+                        }}<select
+                            v-model="form.payload.correct"
+                            class="rounded-xl border bg-background p-3"
+                        >
+                            <option
+                                v-for="(_, index) in form.payload.choices"
+                                :key="index"
+                                :value="index"
+                            >
+                                {{ t('choice', { number: index + 1 }) }}
+                            </option>
+                        </select></label
                     >
-                </div>
-            </fieldset>
-            <p class="text-sm text-muted-foreground">{{ t('publish_help') }}</p>
+                </template>
+                <template v-else-if="form.type === 'blind_test'">
+                    <label class="grid gap-2"
+                        >{{ t('song_title')
+                        }}<PagedTextField
+                            v-model="form.payload.title"
+                            :maxlength="200"
+                    /></label>
+                    <label class="grid gap-2"
+                        >{{ t('artist')
+                        }}<PagedTextField
+                            v-model="form.payload.artist"
+                            :maxlength="200"
+                    /></label>
+                    <label class="grid gap-2"
+                        >{{ t('audio')
+                        }}<input
+                            type="file"
+                            accept=".mp3,.wav,.ogg,.m4a"
+                            @change="upload"
+                    /></label>
+                    <p class="text-sm text-muted-foreground">
+                        {{ t('audio_help') }}
+                    </p>
+                    <audio
+                        v-if="content?.payload.audio_path"
+                        :src="`/admin/contents/${content.id}/audio`"
+                        controls
+                        class="w-full"
+                    />
+                </template>
+                <label
+                    v-else-if="form.type === 'drawing'"
+                    for="content-word"
+                    class="grid gap-2"
+                    >{{ t('word')
+                    }}<input
+                        id="content-word"
+                        v-model="form.payload.word"
+                        maxlength="100"
+                        class="rounded-xl border bg-background p-3"
+                    /><span class="text-sm text-muted-foreground">{{
+                        t('word_help')
+                    }}</span></label
+                >
+                <label v-else class="grid gap-2"
+                    >{{ t('prompt')
+                    }}<PagedTextField
+                        v-model="form.payload.prompt"
+                        :maxlength="240"
+                    />
+                </label>
+                <fieldset
+                    class="flex min-h-0 flex-1 flex-col gap-3 rounded-xl border p-4"
+                >
+                    <legend class="px-2 font-bold">{{ t('tags') }}</legend>
+                    <p v-if="!tags.length">{{ t('no_tags') }}</p>
+                    <PagedList :items="tags" :row-height="72"
+                        ><template #default="{ item: tag }">
+                            <label class="flex items-center gap-2"
+                                ><input
+                                    v-model="form.tag_ids"
+                                    type="checkbox"
+                                    :value="tag.id" /><span
+                                    class="text-summary flex-1 min-w-0"
+                                    >{{ tag.name }}</span
+                                ><TextReader :text="tag.name"
+                            /></label> </template
+                    ></PagedList>
+                </fieldset>
+                <p class="text-sm text-muted-foreground">
+                    {{ t('publish_help') }}
+                </p></PageDeck
+            >
             <div class="flex flex-wrap gap-4">
                 <Button
                     type="button"

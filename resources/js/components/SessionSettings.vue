@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageDeck from '@/components/PageDeck.vue';
 import { ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from '@/composables/useTranslations';
@@ -35,10 +36,7 @@ function configure(action: 'configure' | 'restart') {
 }
 </script>
 <template>
-    <section
-        class="mt-6 rounded-2xl bg-card p-5"
-        :aria-label="t('session_settings')"
-    >
+    <section class="game-panel" :aria-label="t('session_settings')">
         <h2 class="text-xl font-bold">{{ t('session_settings') }}</h2>
         <p class="mt-2 text-sm text-muted-foreground">
             {{
@@ -47,21 +45,49 @@ function configure(action: 'configure' | 'restart') {
                     : t('point_target', { count: room.pointTarget })
             }}
         </p>
-        <form class="mt-4 space-y-4" @submit.prevent="configure('configure')">
-            <label class="flex items-center gap-3 font-semibold">
-                <input
-                    v-model="unlimited"
-                    type="checkbox"
-                    class="size-5 accent-primary"
-                />{{ t('nonstop') }}
-            </label>
-            <div v-if="!unlimited">
-                <label for="session-target" class="mb-2 block font-bold">{{
-                    t('target_label')
+        <PageDeck
+            ><form class="grid gap-2" @submit.prevent="configure('configure')">
+                <label class="flex items-center gap-3 font-semibold">
+                    <input
+                        v-model="unlimited"
+                        type="checkbox"
+                        class="size-5 accent-primary"
+                    />{{ t('nonstop') }}
+                </label>
+                <div v-if="!unlimited">
+                    <label for="session-target" class="mb-2 block font-bold">{{
+                        t('target_label')
+                    }}</label>
+                    <input
+                        id="session-target"
+                        v-model="target"
+                        type="number"
+                        min="1"
+                        max="4294967295"
+                        step="1"
+                        required
+                        class="w-full rounded-xl border border-primary/25 bg-background p-3"
+                    />
+                </div>
+                <Button type="submit" :disabled="busy" class="w-full">{{
+                    t('save_target')
+                }}</Button>
+            </form>
+            <form
+                class="grid gap-2"
+                @submit.prevent="
+                    emit('save', { action: 'extend', extra: Number(extra) })
+                "
+            >
+                <label for="session-extra" class="block font-bold">{{
+                    t('extend_label')
                 }}</label>
+                <p class="text-sm text-muted-foreground">
+                    {{ t('extend_hint') }}
+                </p>
                 <input
-                    id="session-target"
-                    v-model="target"
+                    id="session-extra"
+                    v-model="extra"
                     type="number"
                     min="1"
                     max="4294967295"
@@ -69,45 +95,21 @@ function configure(action: 'configure' | 'restart') {
                     required
                     class="w-full rounded-xl border border-primary/25 bg-background p-3"
                 />
-            </div>
-            <Button type="submit" :disabled="busy" class="w-full">{{
-                t('save_target')
-            }}</Button>
-        </form>
-        <form
-            class="mt-5 space-y-3 border-t pt-5"
-            @submit.prevent="
-                emit('save', { action: 'extend', extra: Number(extra) })
-            "
-        >
-            <label for="session-extra" class="block font-bold">{{
-                t('extend_label')
-            }}</label>
-            <p class="text-sm text-muted-foreground">{{ t('extend_hint') }}</p>
-            <input
-                id="session-extra"
-                v-model="extra"
-                type="number"
-                min="1"
-                max="4294967295"
-                step="1"
-                required
-                class="w-full rounded-xl border border-primary/25 bg-background p-3"
-            />
+                <Button
+                    type="submit"
+                    variant="outline"
+                    :disabled="busy"
+                    class="w-full"
+                    >{{ t('extend') }}</Button
+                >
+            </form>
             <Button
-                type="submit"
-                variant="outline"
+                variant="ghost"
                 :disabled="busy"
-                class="w-full"
-                >{{ t('extend') }}</Button
+                class="mt-4 w-full text-destructive"
+                @click="configure('restart')"
+                >{{ t('restart') }}</Button
             >
-        </form>
-        <Button
-            variant="ghost"
-            :disabled="busy"
-            class="mt-4 w-full text-destructive"
-            @click="configure('restart')"
-            >{{ t('restart') }}</Button
-        >
+        </PageDeck>
     </section>
 </template>

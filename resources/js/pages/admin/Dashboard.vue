@@ -7,17 +7,15 @@ const { t } = useTranslations('admin');
 <template>
     <AdminLayout :title="t('title')">
         <p class="text-lg">{{ t('dashboard_intro') }}</p>
-        <div class="mt-8 grid gap-5 sm:grid-cols-3">
+        <div class="grid flex-1 grid-cols-2 gap-3">
             <Link
-                v-for="section in ['contents', 'tags', 'packs']"
+                v-for="section in ['contents', 'tags', 'packs', 'imports']"
                 :key="section"
                 :href="`/admin/${section}`"
-                class="rounded-2xl border p-6 text-xl font-bold hover:bg-muted"
+                class="flex items-center justify-center rounded-2xl border bg-accent p-3 text-lg font-bold"
                 >{{ t(section) }}</Link
             >
         </div>
-        <Link href="/" class="mt-8 inline-block underline">{{
-            t('play')
-        }}</Link>
+        <Link href="/" class="text-sm underline">{{ t('play') }}</Link>
     </AdminLayout>
 </template>
