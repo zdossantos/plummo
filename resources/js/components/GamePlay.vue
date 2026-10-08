@@ -178,10 +178,13 @@ const ranking = computed(() => {
                     class="rounded-2xl border-2 px-5 py-5 text-left text-xl font-bold transition-colors lg:text-2xl"
                     :class="
                         game.round.correct === index
-                            ? 'border-primary bg-primary text-primary-foreground'
-                            : game.me?.choice === index
-                              ? 'border-primary bg-accent'
-                              : 'border-primary/15 bg-accent/20'
+                            ? 'border-emerald-600 bg-emerald-500 text-white'
+                            : game.round.correct !== null &&
+                                game.me?.choice === index
+                              ? 'border-rose-600 bg-rose-500 text-white'
+                              : game.me?.choice === index
+                                ? 'border-primary bg-accent'
+                                : 'border-primary/15 bg-accent/20'
                     "
                     @click="phone && emit('answer', index)"
                 >
