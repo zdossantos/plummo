@@ -72,3 +72,16 @@ Les champs et sélecteurs ont une base pleine, une face crème et la police Fred
 Le nouveau test a d’abord échoué sur les quatre formats car les réglages étaient masqués par les étapes. Les contrôles de géométrie vérifient maintenant l’alignement des champs, les régions titre/réglages/lancement et les débordements internes. Le salon en attente de joueurs a également reproduit un débordement en hauteur réduite, corrigé par l’affichage du message utile à la place de l’estimation.
 
 Validation des retouches : 13 tests navigateur réussis, 253 assertions, 77,24 s. Les matrices FR/EN comptent 358 contrôles après la refonte des champs sur quatre formats, 186 contrôles après le décor mobile et 42 contrôles supplémentaires de préparation/attente en 320 × 400. Captures des petits écrans, du téléphone et du PC inspectées visuellement. Types, ESLint (avertissement existant PlummoAvatar), Prettier, Pint, Vite et Docker passent. Les sources finales du formulaire, du CSS et des traductions françaises ont les mêmes empreintes dans Docker et dans le workspace ; le runtime répond HTTP 200.
+
+
+## Réponses et affichage passif après essais
+
+Les propositions ont une seule face colorée avec des compositions SVG, une lettre dans une bulle en coin et une séquence jaune, rose, vert, violet. Sur huit réponses, les colonnes contiennent les quatre couleurs. Le podium possède trois hauteurs réelles et une base commune ; les Plummos restent inchangés. Le compte à rebours de reprise est central et agrandi. Bulle est toujours accessible dans le HUD téléphone. Les lecteurs utilisent une icône SVG et un libellé court, uniquement lorsqu’un texte déborde.
+
+La présence en arrière-plan ne verrouille plus les boutons. Un test a reproduit le clignotement ; les tests de concurrence vérifient maintenant le remplacement des requêtes et le rejet des réponses périmées. Frontend : 10 tests, 47 assertions.
+
+Le grand écran ne contient aucune commande, aucun lien interactif ni pagination. Il affiche le podium des trois premiers et laisse les détails au téléphone. Le panneau violet disparaît au profit du décor commun, avec arcs, losanges et points SVG aux bords, en mouvement lent respectant la réduction des animations. L’audio est automatique ; son autorisation reste soumise aux réglages du navigateur.
+
+Validation navigateur : huit scénarios admin, messages et jeux ont réussi lors du contrôle général ; les douze scénarios restants ont réussi après adaptation des tests au grand écran passif (194 assertions). Les matrices FR/EN ont passé 99 et 92 contrôles sur téléphone, hauteur réduite, paysage et PC ; le grand écran passif a passé 44 contrôles supplémentaires. Les assertions vérifient la palette, les trois hauteurs du podium, l’absence de clignotement des boutons et l’absence de commandes sur le grand écran. Types, ESLint (avertissement PlummoAvatar existant), Prettier et Pint passent. Builds Vite et Docker réussis. compose.yaml reste exclu.
+
+Décor télé final : 90 contrôles supplémentaires réussis en français sur 1440 × 900 et 390 × 844, avec vérification du fond transparent et des motifs SVG. Capture télé inspectée ; sources CSS, shell et Screen identiques dans Docker et le workspace, runtime HTTP 200.

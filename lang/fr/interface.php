@@ -5,6 +5,7 @@ return [
     'next' => 'Suivant',
     'page' => 'Page {current} sur {total}',
     'close' => 'Fermer',
+    'read_short' => 'Lire',
     'read' => 'Lire en entier',
     'play' => 'Jouer',
     'settings' => 'Session',

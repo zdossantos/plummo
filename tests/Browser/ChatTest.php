@@ -18,21 +18,20 @@ it('shows escaped chat bubbles, returns to game controls and celebrates tied win
     try {
         $first = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Camille')->click('Continue')->click('Enter the room')->assertSee('Prepare a quiz');
         $second = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Alex')->click('Continue')->click('Enter the room')->assertSee('Alex');
-        $first->click('button[aria-label="Controls"]')->click('Bubble')->fill('#chat-message', '<b>Salut</b>');
+        $first->click('.message-shortcut')->fill('#chat-message', '<b>Salut</b>');
         $first->page()->locator('button:has-text("Send message")')->click(['noWaitAfter' => true]);
         $screen->assertSee('<b>Salut</b>')->assertNoJavaScriptErrors();
         expect($screen->page()->locator('[data-testid="chat-bubble"] b')->count())->toBe(0);
         expect($screen->page()->evaluate('() => getComputedStyle(document.querySelector("[data-testid=chat-bubble]")).animationName'))->toBe('none');
         $first->assertSee('Wait');
-        $first->click('button[aria-label="Play"]')->click('Continue');
-        $first->click('input[type="checkbox"][value="'.$pack->id.'"]');
-        $first->click('Continue')->fill('game-rounds', '5');
+        $first->click('button[aria-label="Play"]')->click('[data-choose-packs]');
+        $first->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")')->fill('game-rounds', '5');
         $first->page()->locator('button:has-text("Start quiz")')->click(['noWaitAfter' => true]);
         $first->assertSee('Question')->assertMissing('#chat-message');
         $second->assertSee('Question')->assertMissing('#chat-message');
         // Select a wrong definitive answer: chatting is allowed while Alex still plays.
         $first->page()->locator('.game-choice > button:first-child')->nth(1)->click(['noWaitAfter' => true]);
-        $first->assertSee('Answer saved')->click('button[aria-label="Controls"]')->click('Bubble')->assertPresent('#chat-message');
+        $first->assertSee('Answer saved')->click('.message-shortcut')->assertPresent('#chat-message');
         $screen->page()->locator('[data-testid="chat-bubble"]')->waitFor(['state' => 'hidden', 'timeout' => 9000]);
         $first->fill('#chat-message', 'À toi Alex');
         $first->page()->locator('button:has-text("Send message")')->click(['noWaitAfter' => true]);
@@ -48,11 +47,11 @@ it('shows escaped chat bubbles, returns to game controls and celebrates tied win
         $state['round']['awards'] = $state['scores'];
         $room->players()->update(['score' => 65]);
         $game->update(['state' => $state]);
-        $screen->assertSee('Mini-game leaderboard')->assertSee('Well done, Camille, Alex!');
+        $screen->assertSee('Mini-game leaderboard')->assertPresent('.podium-slot-1')->assertPresent('.podium-slot-2');
         expect($screen->page()->locator('[data-testid="winner-avatar"]')->count())->toBe(2);
         expect($screen->page()->evaluate('() => getComputedStyle(document.querySelector("[data-testid=winner-avatar]")).animationName'))->toBe('none');
         $screen->assertNoJavaScriptErrors();
-        $first->click('button[aria-label="Controls"]')->click('Bubble')->assertPresent('#chat-message');
+        $first->click('.message-shortcut')->assertPresent('#chat-message');
     } finally {
         $room->delete();
         $pack->delete();

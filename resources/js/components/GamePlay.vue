@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import PagedList from '@/components/PagedList.vue';
-import PageDeck from '@/components/PageDeck.vue';
 import TextReader from '@/components/TextReader.vue';
+import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import GameWinners from '@/components/GameWinners.vue';
 import PhrasePlay from '@/components/PhrasePlay.vue';
 import DrawingPlay from '@/components/DrawingPlay.vue';
+import AnswerTexture from '@/components/AnswerTexture.vue';
 import AudioClip from '@/components/AudioClip.vue';
 import { computed } from 'vue';
 import { Button } from '@/components/ui/button';
@@ -47,7 +48,14 @@ const ranking = computed(() => {
 });
 </script>
 <template>
-    <section class="game-panel game-play" data-testid="game-play">
+    <section
+        class="game-panel game-play"
+        :class="{
+            'game-results-scene': game.phase === 'results',
+            'has-ranking-list': phone && ranking.length > 3,
+        }"
+        data-testid="game-play"
+    >
         <div
             class="flex items-center justify-between gap-5 font-bold text-primary"
         >
@@ -80,7 +88,6 @@ const ranking = computed(() => {
                         'writing',
                         'presenting',
                         'voting',
-                        'resuming',
                     ].includes(game.phase)
                 "
                 class="game-timer tabular-nums"
@@ -97,7 +104,10 @@ const ranking = computed(() => {
             "
         />
         <PhrasePlay
-            v-if="game.type === 'phrase' && game.phase !== 'results'"
+            v-if="
+                game.type === 'phrase' &&
+                !['results', 'paused', 'resuming'].includes(game.phase)
+            "
             :game="game"
             :room="room"
             :phone="phone"
@@ -111,42 +121,55 @@ const ranking = computed(() => {
         >
             {{ t('game_paused') }}
         </h1>
-        <h1
+        <div
             v-else-if="game.phase === 'resuming'"
-            class="my-auto text-center text-3xl font-black"
+            class="resume-scene"
+            role="status"
         >
-            {{ t('game_resuming') }}
-        </h1>
+            <h1>{{ t('game_resuming') }}</h1>
+            <strong :key="seconds" class="resume-count" role="timer">{{
+                seconds
+            }}</strong>
+        </div>
         <template v-else-if="game.phase === 'results'">
-            <p v-if="game.targetReached" class="font-bold text-primary">
+            <h1 class="text-2xl">{{ t('game_results') }}</h1>
+            <p
+                v-if="ranking.filter((p) => p.rank === 1).length === 1"
+                class="results-congratulations text-summary"
+            >
+                {{
+                    t('game_winners', {
+                        names: ranking
+                            .filter((p) => p.rank === 1)
+                            .map((p) => p.name)
+                            .join(', '),
+                    })
+                }}
+            </p>
+            <GameWinners :winners="ranking.slice(0, 3)" />
+            <p v-if="game.targetReached" class="text-sm">
                 {{ t('session_results') }}
             </p>
-            <PageDeck>
-                <div class="flex flex-col gap-2">
-                    <h1 class="text-2xl">{{ t('game_results') }}</h1>
-                    <GameWinners
-                        :winners="ranking.filter((p) => p.rank === 1)"
-                    />
-                </div>
-                <div v-if="game.targetReached" class="flex flex-col gap-2">
-                    <h2 class="text-2xl">{{ t('session_results') }}</h2>
-                    <GameWinners
-                        :winners="room.ranking.filter((p) => p.rank === 1)"
-                    />
-                    <p>{{ t('target_reached') }}</p>
-                </div>
-                <PagedList :items="ranking" :row-height="56"
-                    ><template #default="{ item: player }"
-                        ><div
-                            class="flex justify-between gap-3 rounded-xl bg-accent/30 p-3 font-bold"
+            <PagedList
+                v-if="phone && ranking.length > 3"
+                :items="ranking.slice(3)"
+                :row-height="40"
+            >
+                <template #default="{ item: player }">
+                    <div class="results-row flex items-center gap-2 font-bold">
+                        <PlummoAvatar
+                            :color="player.color"
+                            :accessories="player.accessories"
+                            :label="player.name"
+                            class="w-7 shrink-0"
+                        />
+                        <span class="text-summary"
+                            >{{ player.rank }} · {{ player.name }}</span
                         >
-                            <span class="text-summary"
-                                >{{ player.rank }} · {{ player.name }}</span
-                            ><span>{{ player.score }} {{ t('score') }}</span>
-                        </div></template
-                    ></PagedList
-                >
-            </PageDeck>
+                        <span>{{ player.score }} {{ t('score') }}</span>
+                    </div>
+                </template>
+            </PagedList>
             <Button
                 v-if="chief && phone"
                 :disabled="busy"
@@ -168,7 +191,7 @@ const ranking = computed(() => {
                 <h1 class="text-summary text-xl lg:text-3xl">
                     {{ game.round.question }}
                 </h1>
-                <TextReader :text="game.round.question" />
+                <TextReader v-if="phone" :text="game.round.question" />
             </div>
             <p v-if="phone && !game.me?.eligible && !revealed" class="text-sm">
                 {{ t('next_round_wait') }}
@@ -189,6 +212,7 @@ const ranking = computed(() => {
                 >
                     <button
                         v-if="phone"
+                        class="choice-face"
                         type="button"
                         :disabled="
                             busy ||
@@ -198,18 +222,21 @@ const ranking = computed(() => {
                         "
                         @click="emit('answer', index)"
                     >
-                        <span class="mr-2">{{
+                        <AnswerTexture :variant="index % 4" />
+                        <span class="choice-letter">{{
                             String.fromCharCode(65 + index)
                         }}</span
                         ><span class="text-summary">{{ choice }}</span>
                     </button>
-                    <p v-else class="font-bold">
-                        <span class="mr-2">{{
+                    <p v-else class="choice-face font-bold">
+                        <AnswerTexture :variant="index % 4" />
+                        <span class="choice-letter">{{
                             String.fromCharCode(65 + index)
                         }}</span
                         ><span class="text-summary">{{ choice }}</span>
                     </p>
                     <TextReader
+                        v-if="phone"
                         :text="choice"
                         :label="String.fromCharCode(65 + index)"
                     />

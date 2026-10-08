@@ -46,6 +46,13 @@ function choose(next: string) {
             @click="open = true"
             ><Gamepad2 /><span>{{ t('controls') }}</span></Button
         >
+        <Button
+            variant="outline"
+            class="message-shortcut"
+            :aria-label="rooms.t('chat_label')"
+            @click="choose('chat')"
+            ><MessageCircle /><span>{{ t('chat') }}</span></Button
+        >
         <Drawer
             v-model:open="open"
             :swipe-direction="desktop ? 'right' : 'down'"

@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'chat_unavailable' => 'Finish your game action to send a message to the group.',
     'chat_label' => 'Say something to the group',
     'chat_hint' => 'Your message appears on the big screen for five seconds.',
     'chat_send' => 'Send message',
@@ -133,6 +134,7 @@ return [
     'clip_duration' => 'Time per clip (s)',
     'blind_round' => 'Blind test · Clip {number} / {total}',
     'play_sound' => 'Play sound',
+    'audio_autoplay_blocked' => 'Your browser blocks automatic sound. Allow autoplay for this site in its settings.',
     'audio_error' => 'Playback failed. Try again or pause the game.',
     'drawing_minimum' => 'Drawing requires at least two connected players.',
     'drawing_limit' => 'The drawing is full. Undo a stroke or clear to continue.',

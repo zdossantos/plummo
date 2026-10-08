@@ -340,6 +340,17 @@ watch(chief, (value) => {
                         :connected="connected"
                         :send="(values) => request('chat', 'POST', values)"
                     />
+                    <div
+                        v-if="view === 'chat' && !canChat"
+                        class="game-panel justify-center text-center"
+                        role="status"
+                    >
+                        <h2>{{ t('chat_label') }}</h2>
+                        <p>{{ t('chat_unavailable') }}</p>
+                        <Button @click="view = 'play'">{{
+                            ui.t('play')
+                        }}</Button>
+                    </div>
                     <div v-if="view === 'more'" class="game-panel">
                         <div class="room-command-board">
                             <div class="room-primary-actions">

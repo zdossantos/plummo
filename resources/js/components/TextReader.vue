@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import { useElementSize, useMediaQuery } from '@vueuse/core';
 import {
     Drawer,
@@ -9,12 +9,46 @@ import {
     DrawerTrigger,
     DrawerClose,
 } from '@/components/ui/drawer';
+import { BookOpen } from '@lucide/vue';
 import PageControls from '@/components/PageControls.vue';
 import { useTranslations } from '@/composables/useTranslations';
 const props = defineProps<{ text: string; label?: string }>();
 const { t } = useTranslations('interface');
 const desktop = useMediaQuery('(min-width: 768px)');
 const page = ref(0);
+const open = ref(false);
+const anchor = ref<HTMLElement>();
+const truncated = ref(false);
+let observer: ResizeObserver | undefined;
+function measure() {
+    const parent = anchor.value?.parentElement;
+    const text =
+        parent?.closest('.text-summary') ??
+        parent?.querySelector('.text-summary');
+    truncated.value =
+        !!text &&
+        (text.scrollHeight > text.clientHeight + 1 ||
+            text.scrollWidth > text.clientWidth + 1);
+}
+onMounted(() => {
+    observer = new ResizeObserver(measure);
+    const parent = anchor.value?.parentElement;
+    if (parent) observer.observe(parent);
+    const text =
+        parent?.closest('.text-summary') ??
+        parent?.querySelector('.text-summary');
+    if (text) observer.observe(text);
+    measure();
+    void document.fonts.ready.then(measure);
+});
+watch(
+    () => props.text,
+    async () => {
+        await nextTick();
+        measure();
+    },
+);
+onUnmounted(() => observer?.disconnect());
 const reader = ref<HTMLElement>();
 const { width, height } = useElementSize(reader);
 const parts = computed(() => {
@@ -55,20 +89,25 @@ watch(parts, () => {
 });
 </script>
 <template>
+    <span ref="anchor" hidden aria-hidden="true" />
     <Drawer
+        v-model:open="open"
         :swipe-direction="desktop ? 'right' : 'down'"
         @update:open="page = 0"
     >
         <DrawerTrigger as-child
             ><button
+                v-if="truncated"
                 type="button"
                 class="text-reader-trigger"
                 :aria-label="t('read') + (label ? ' · ' + label : '')"
             >
-                ↗ <span>{{ t('read') }}</span>
+                <BookOpen aria-hidden="true" /><span>{{
+                    t('read_short')
+                }}</span>
             </button></DrawerTrigger
         >
-        <DrawerContent class="game-drawer">
+        <DrawerContent v-if="open" class="game-drawer">
             <DrawerTitle>{{ label || t('read') }}</DrawerTitle>
             <DrawerDescription class="sr-only">{{
                 t('read')

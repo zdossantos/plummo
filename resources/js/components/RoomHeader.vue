@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useAppearance } from '@/composables/useAppearance';
 import { useTranslations } from '@/composables/useTranslations';
 import type { Appearance } from '@/types';
+defineProps<{ displayOnly?: boolean }>();
 const { appearance, updateAppearance } = useAppearance();
 const { t } = useTranslations('rooms');
 const themes: Appearance[] = ['light', 'dark', 'system'];
@@ -12,7 +13,12 @@ const themes: Appearance[] = ['light', 'dark', 'system'];
         <span class="text-3xl font-black tracking-tight text-primary"
             >plummo</span
         >
-        <div role="group" :aria-label="t('theme')" class="flex gap-1">
+        <div
+            v-if="!displayOnly"
+            role="group"
+            :aria-label="t('theme')"
+            class="flex gap-1"
+        >
             <Button
                 v-for="theme in themes"
                 :key="theme"

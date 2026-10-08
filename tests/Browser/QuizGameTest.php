@@ -27,13 +27,13 @@ it('plays a quiz with a shared screen and two separate phones then returns to th
         $first->assertSee('Quiz · Question 1 / 5');
         $second->assertSee('Quiz · Question 1 / 5');
         $screen->assertSee('Quiz · Question 1 / 5')->assertNoJavaScriptErrors();
-        $first->page()->locator('button:has-text("AA")')->click(['noWaitAfter' => true]);
+        $first->page()->locator('.game-choices button:has-text("AA")')->click(['noWaitAfter' => true]);
         $first->assertSee('Answer saved.');
-        $second->page()->locator('button:has-text("BB")')->click(['noWaitAfter' => true]);
+        $second->page()->locator('.game-choices button:has-text("BB")')->click(['noWaitAfter' => true]);
         $second->assertSee('0 points for this question');
         $first->assertSee('100 points for this question');
-        $screen->assertSee('Mini-game leaderboard')->assertSee('Well done, Camille!')->click('.page-deck:visible > .page-controls > button[aria-label="Next"]')->assertSee('Session target reached');
-        $first->assertSee('Mini-game leaderboard');
+        $screen->assertSee('Mini-game leaderboard')->assertSee('Well done, Camille!')->assertSee('Session target reached');
+        $first->assertSee('Mini-game leaderboard')->assertPresent('.podium')->assertMissing('.page-deck');
         $first->page()->locator('button:has-text("Back to lobby")')->click(['noWaitAfter' => true]);
         $first->click('button[aria-label="Controls"]')->click('Session')->assertSee('The session')->assertDontSee('Prepare a quiz');
         $screen->assertSee('Everyone plays.')->assertSee('Camille')->assertSee('100 Points');

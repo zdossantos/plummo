@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'chat_unavailable' => 'Termine ton action de jeu pour envoyer un message au groupe.',
     'chat_label' => 'Un mot au groupe',
     'chat_hint' => 'Votre message apparaît cinq secondes sur le grand écran.',
     'chat_send' => 'Envoyer le message',
@@ -133,6 +134,7 @@ return [
     'clip_duration' => 'Temps par extrait (s)',
     'blind_round' => 'Blind test · Extrait {number} / {total}',
     'play_sound' => 'Activer le son',
+    'audio_autoplay_blocked' => 'Le navigateur bloque le son automatique. Autorisez la lecture automatique pour ce site dans ses réglages.',
     'audio_error' => 'Lecture impossible. Réessaie ou mets la partie en pause.',
     'drawing_minimum' => 'Le dessin nécessite au moins deux joueurs connectés.',
     'drawing_limit' => 'Le dessin est plein. Annule un trait ou efface pour continuer.',

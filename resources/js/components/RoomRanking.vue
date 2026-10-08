@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import GameWinners from '@/components/GameWinners.vue';
 import PagedList from '@/components/PagedList.vue';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import { useTranslations } from '@/composables/useTranslations';
@@ -7,7 +8,11 @@ defineProps<{ room: RoomState }>();
 const { t } = useTranslations('rooms');
 </script>
 <template>
-    <section class="game-panel" :aria-label="t('ranking')">
+    <section
+        class="game-panel"
+        :class="{ 'has-ranking-list': room.ranking.length > 3 }"
+        :aria-label="t('ranking')"
+    >
         <div class="flex flex-wrap items-center justify-between gap-3">
             <h2 class="text-xl font-bold">{{ t('ranking') }}</h2>
             <p class="font-semibold text-primary">
@@ -18,7 +23,12 @@ const { t } = useTranslations('rooms');
                 }}
             </p>
         </div>
-        <PagedList :items="room.ranking" :row-height="80">
+        <GameWinners :winners="room.ranking.slice(0, 3)" />
+        <PagedList
+            v-if="room.ranking.length > 3"
+            :items="room.ranking.slice(3)"
+            :row-height="80"
+        >
             <template #default="{ item: player }">
                 <li
                     class="flex items-center gap-3 rounded-2xl bg-accent/30 px-4 py-3"

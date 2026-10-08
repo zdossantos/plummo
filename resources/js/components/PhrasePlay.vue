@@ -102,7 +102,7 @@ const author = (id?: number) =>
         <h1 class="text-summary text-xl leading-tight lg:text-3xl">
             {{ game.round.prompt }}
         </h1>
-        <TextReader :text="game.round.prompt" />
+        <TextReader v-if="phone" :text="game.round.prompt" />
         <template v-if="game.phase === 'writing'">
             <form v-if="canWrite" @submit.prevent="save(true)">
                 <label for="phrase-suffix" class="font-bold">{{
@@ -169,7 +169,7 @@ const author = (id?: number) =>
                 class="rounded-2xl bg-accent/30 p-3 text-xl font-bold"
             >
                 <span class="text-summary">{{ entry.text }}</span
-                ><TextReader :text="entry.text" />
+                ><TextReader v-if="phone" :text="entry.text" />
             </blockquote>
         </template>
         <template v-else>
@@ -210,7 +210,7 @@ const author = (id?: number) =>
                     >
                         {{ entry.text }}
                     </p>
-                    <TextReader :text="entry.text" />
+                    <TextReader v-if="phone" :text="entry.text" />
                     <div
                         v-if="entry.author !== undefined"
                         class="flex items-center gap-1"

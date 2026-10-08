@@ -363,7 +363,7 @@ try {
                 .getByRole('button', { name: t.controls, exact: true })
                 .click();
             await page
-                .getByRole('button', { name: t.chat, exact: true })
+                .locator('.command-drawer').getByRole('button', { name: t.chat, exact: true })
                 .click();
             await fits(page, 'chat');
 
@@ -428,6 +428,46 @@ try {
                     .click();
             await fits(page, 'choice-reader-next');
             await page.keyboard.press('Escape');
+            snapshot.game.round.question = 'Short question';
+            snapshot.game.round.choices = Array.from({length: 8}, (_, i) => 'Answer ' + i);
+            await page.waitForTimeout(2100);
+            await page.screenshot({path: `/tmp/plummo-answer-${locale}-${width}.png`});
+            assert.equal(await page.locator('.game-play .text-reader-trigger').count(), 0);
+            assert.equal(await page.locator('.answer-texture').count(), 8);
+            const answerColors = await page.locator('.choice-face').evaluateAll(elements => elements.map(e => getComputedStyle(e).backgroundColor));
+            assert.deepEqual(answerColors.slice(0, 4), ['rgb(239, 230, 129)', 'rgb(241, 181, 200)', 'rgb(183, 225, 195)', 'rgb(170, 131, 236)']);
+            assert.equal(new Set(answerColors.filter((_, i) => i % 2 === 0)).size, 4);
+            assert.equal(new Set(answerColors.filter((_, i) => i % 2 === 1)).size, 4);
+            const faceStyles = await page.locator('.choice-face').first().evaluate(e => {
+                const face = getComputedStyle(e), wrapper = getComputedStyle(e.parentElement);
+                return {align: face.textAlign, justify: face.justifyContent, wrapper: wrapper.backgroundColor};
+            });
+            assert.deepEqual(faceStyles, {align: 'center', justify: 'center', wrapper: 'rgba(0, 0, 0, 0)'});
+            await page.route('**/rooms/' + code + '/presence', async r => {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                await r.fulfill({json: snapshot});
+            });
+            await page.evaluate(() => {
+                window.disabledFlashes = 0;
+                window.answerObserver = new MutationObserver(records => {
+                    for (const record of records) if(record.attributeName === 'disabled' && record.target.disabled) window.disabledFlashes++;
+                });
+                document.querySelectorAll('.choice-face').forEach(e => window.answerObserver.observe(e, {attributes: true}));
+            });
+            await page.waitForTimeout(5300);
+            assert.equal(await page.evaluate(() => {window.answerObserver.disconnect(); return window.disabledFlashes;}), 0, 'presence must never flash disabled answers');
+            await page.locator('.message-shortcut').click();
+            await fits(page, 'message-shortcut-action-pending');
+            await page.getByRole('button', {name: t.play, exact: true}).last().click();
+            snapshot.game.phase = 'resuming';
+            snapshot.game.deadline = Date.now() / 1000 + 15;
+            await page.waitForTimeout(2600);
+            await fits(page, 'large-resume-countdown');
+            assert.equal(await page.locator('.resume-count').count(), 1);
+            await page.screenshot({path: `/tmp/plummo-resume-${locale}-${width}.png`});
+            snapshot.game.phase = 'answer';
+            snapshot.game.deadline = Date.now() / 1000 + 60;
+            await page.waitForTimeout(2600);
             const longQuestion = '😀\n'.repeat(80) + 'W'.repeat(500);
             snapshot.game.round.question = longQuestion;
             await page.waitForTimeout(2100);
@@ -570,7 +610,35 @@ try {
                 players.map((p) => [p.id, 100]),
             );
             await page.waitForTimeout(2100);
+            await page.locator('.podium-place').first().waitFor({state: 'visible', timeout: 10000});
             await fits(page, 'eight-winners');
+            assert.equal(await page.locator('.podium-place').count(), 3);
+            const steps = await page.locator('.podium-step').evaluateAll(elements => elements.map(e => {
+                const r = e.getBoundingClientRect();
+                return {top: r.top, bottom: r.bottom};
+            }));
+            assert.ok(steps[0].top < steps[1].top && steps[1].top < steps[2].top, 'podium must have three distinct levels');
+            assert.ok(steps.every(step => Math.abs(step.bottom - steps[0].bottom) < 1), 'podium steps must share a baseline');
+            await page.screenshot({path: `/tmp/plummo-podium-${locale}-${width}.png`});
+            const display = await context.newPage();
+            await display.route('**/rooms/' + code + '/screen-presence', route => route.fulfill({json: {...snapshot, me: null, game: {...snapshot.game, me: null}}}));
+            await display.goto(base + '/screen/' + code);
+            await display.locator('.podium-place').first().waitFor({state: 'visible', timeout: 10000});
+            await fits(display, 'passive-display-results');
+            assert.equal(await display.locator('.podium-place').count(), 3);
+            assert.equal(await display.locator('button,a,input,select,textarea,.page-controls,.text-reader-trigger').count(), 0);
+            assert.equal(await display.locator('.game-panel').first().evaluate(e => getComputedStyle(e).backgroundColor), 'rgba(0, 0, 0, 0)');
+            assert.equal(await display.locator('.display-decor').count(), 1);
+            await display.screenshot({path: `/tmp/plummo-display-${locale}-${width}.png`});
+            await display.close();
+            snapshot.game.scores = {[me.id]: 100};
+            snapshot.game.targetReached = false;
+            await page.waitForTimeout(2600);
+            await fits(page, 'solo-podium');
+            assert.equal(await page.locator('.podium-place').count(), 3);
+            assert.equal(await page.locator('[data-testid=winner-avatar]').count(), 1);
+            assert.equal(await page.locator('.game-play .page-controls').count(), 0);
+            await page.screenshot({path: `/tmp/plummo-solo-${locale}-${width}.png`});
             assert.deepEqual(errors, []);
             await page.screenshot({
                 path: `/tmp/plummo-integrated-${locale}-${width}.png`,

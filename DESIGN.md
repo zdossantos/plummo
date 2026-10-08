@@ -174,7 +174,7 @@ Commandes épaisses et lisibles, citron pour l’action principale, sombre pour 
 
 ### Answers
 
-Deux colonnes de réponses avec lettre circulaire. Les quatre accents alternent lilas, citron, menthe et rose. Le texte résumé ouvre sa lecture intégrale par une commande indépendante. Les réponses musicales gardent des lignes de hauteur fixe, adaptées à la hauteur disponible. Leur mise en page est propre à ces maquettes.
+Les réponses ont une seule face colorée, un texte centré et une ombre pleine. La séquence jaune, rose, vert, violet se décale sur les réponses suivantes : les huit réponses répartissent les quatre couleurs dans chaque colonne. Quatre compositions SVG occupent les bords : vagues, diagonales, courbes et arcs. Des aplats papier à 55 %, des zones sombres et des points contrastés donnent une identité visible à chaque réponse ; le centre reste dégagé pour la lecture. La lettre apparaît dans une petite bulle crème en haut à gauche ; sa taille diminue en faible hauteur. La commande « Lire », avec une icône Lucide, apparaît uniquement lorsque le texte est tronqué.
 
 ### Inputs / Fields
 
@@ -218,4 +218,15 @@ La préparation du mini-jeu rassemble type, packs, manches, durée, répétition
 
 Les champs et sélecteurs reprennent le relief des commandes de jeu : base pleine, face crème et typographie Fredoka. Le sélecteur possède une commande violette avec chevron dessiné. Les cases à cocher ont le même contour, une base pleine et une coche sur fond jaune ; le focus clavier garde un halo jaune visible. Les hauteurs et l’alignement restent communs, avec un relief réduit en faible hauteur.
 
-Sur téléphone, les scènes abandonnent le grand panneau arrondi. Un fond profond, quelques points lumineux et un sol en diagonale constituent le décor commun. Les titres de scène portent un bandeau découpé ; les contrôles restent directement dans cet univers. Les surfaces de bureau et les drawers gardent leur structure.
+Sur téléphone, les scènes abandonnent le grand panneau arrondi. Un fond profond, quelques points lumineux et un sol en diagonale constituent le décor commun. Les titres de scène portent un bandeau découpé ; les contrôles restent directement dans cet univers. Les drawers gardent leur structure. Le grand écran partage la scène ouverte : aucun panneau en fond, un sol diagonal et des motifs SVG géométriques aux bords. Leur dérive lente reste hors des zones de lecture et respecte la réduction des animations.
+
+
+## Réponses, reprise et podium
+
+La présence en arrière-plan ne désactive pas les commandes. Une action du joueur remplace la requête de présence en cours ; une ancienne réponse ne remplace jamais son nouvel état. Les réponses verrouillées conservent leur couleur ; leur sélection et les messages de confirmation expliquent l’état.
+
+La reprise dispose d’un grand compte à rebours citron au centre de la scène. Le classement affiche une estrade continue à trois hauteurs dans l’ordre 2–1–3, avec les Plummos posés sur les marches et leur identité sur la face. Les rangs ex æquo sont conservés ; les marches vides restent visibles. Les joueurs suivants ont une liste paginée seulement si elle dépasse la place disponible. Aucun écran intermédiaire n’est ajouté pour les résultats.
+
+Une commande Bulle avec icône et petit libellé reste visible dans le HUD du téléphone. Elle donne accès aux messages ou explique qu’une action de jeu doit d’abord être terminée ; les autorisations Laravel restent appliquées.
+
+Le grand écran est strictement passif : aucun contrôle, lien interactif, sélecteur de thème, lecteur de texte ou pagination. Les résultats affichent uniquement le podium des trois premiers ; les détails et le classement complet restent sur les téléphones. La lecture audio démarre automatiquement. Si le navigateur interdit l’autoplay, un statut explique le réglage à autoriser sans ajouter une commande de jeu au grand écran.
