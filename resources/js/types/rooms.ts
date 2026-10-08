@@ -25,7 +25,7 @@ export type GameState = {
     };
     exhausted: boolean;
     targetReached: boolean;
-    type: 'quiz';
+    type: 'quiz' | 'blind_test';
     phase: 'answer' | 'reveal' | 'paused' | 'resuming' | 'results';
     deadline: number;
     scores: Record<number, number>;
@@ -33,6 +33,7 @@ export type GameState = {
         number: number;
         total: number;
         question: string;
+        audio: string | null;
         choices: string[];
         correct: number | null;
         awards: Record<number, number>;

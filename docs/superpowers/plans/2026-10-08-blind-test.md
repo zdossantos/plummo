@@ -48,3 +48,5 @@ Vérifier concurrence suppression source/copie, absence de chemins et d’URL au
 - Tâche 1 : `BlindChoicesTest` RED service absent → GREEN 3 tests / 10 assertions, commit eae6f07.
 - Tâche 2 : `BlindGameTest` RED type refusé → GREEN ; quiz + blind 23 tests / 248 assertions. Test complémentaire RED historique consommé malgré audio disparu → transaction de préparation → GREEN.
 - Décision : les copies résident dans `games/{room-id}/{game-id}/{round}` pour permettre leur nettoyage après suppression du salon, y compris lorsque les parties sont supprimées par cascade.
+- Tâche 3 : parcours navigateur RED sélecteur absent → GREEN 1 test / 30 assertions : huit choix, restriction autoplay simulée puis lecture native, boucle, arrêt et position conservée pendant pause/reprise, résultat et retour salon avec score. La fixture WAV finit par un octet PCM non blanc car le serveur Pest applique `mb_trim` aux réponses binaires ; aucun contournement dans le code produit.
+- Validation complète : `composer ci:check` GREEN — 106 tests Pest/navigateur, 875 assertions et 4 tests Bun ; lint, analyse, format, types et build passent. Image runtime `plummo:blind-check` construite.

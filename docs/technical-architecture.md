@@ -45,3 +45,9 @@ Playwright est épinglé à 1.63.0. Chaque mise à jour doit passer la suite Pes
 `RoomChanged` diffuse uniquement une invalidation vide après commit ; les appareils relisent leur projection autorisée. Une seule requête à la fois sur chaque appareil évite l’écrasement par une réponse plus ancienne. `games:tick`, planifié chaque seconde, assure expiration et pause sans dépendre d’un téléphone. Compose partage le stockage entre web/scheduler/worker/Reverb. L’image PHP inclut `pcntl`, nécessaire au serveur Reverb ; la CI vérifie sa connexion WebSocket réelle.
 
 Les versions verrouillées incluent Reverb 1.12, Echo 2.6 et Pusher JS 8.6. Reverb requiert `guzzlehttp/psr7` 2.x : Composer a résolu 2.13.1 au lieu de 3.1, sans contourner les contraintes des dépendances.
+
+## Blind test
+
+Le type `blind_test` consomme le moteur de choix du quiz avec huit propositions. `BlindChoices` déduplique les couples titre/artiste et privilégie l’intersection des tags avant le catalogue global. Les distracteurs restent disponibles et ne sont jamais inscrits dans l’historique. La transaction de préparation annule l’inscription d’un extrait si son audio ou ses choix ne peuvent plus être préparés.
+
+`GameAudio` copie le fichier privé sous `games/{room-id}/{game-id}/{round}`. La route audio vérifie la session grand écran et la manche actuelle, avec cache privé désactivé. Le téléphone ne reçoit aucun chemin ni URL audio. La suppression du salon nettoie son dossier après commit. `AudioClip` conserve son élément audio pendant pause/reprise et gère le refus d’autoplay localement.
