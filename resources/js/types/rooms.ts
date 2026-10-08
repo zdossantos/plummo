@@ -87,7 +87,43 @@ export type DrawingGameState = Omit<
         votedSkip: boolean;
     } | null;
 };
-export type GameState = ChoiceGame | DrawingGameState;
+export type PhraseGameState = Omit<
+    ChoiceGame,
+    'type' | 'phase' | 'round' | 'me'
+> & {
+    type: 'phrase';
+    phase:
+        | 'writing'
+        | 'presenting'
+        | 'voting'
+        | 'reveal'
+        | 'paused'
+        | 'resuming'
+        | 'results';
+    round: {
+        number: number;
+        total: number;
+        prompt: string;
+        entries: {
+            id: string;
+            text: string;
+            author?: number;
+            votes?: number;
+            points?: number;
+        }[];
+        awards: Record<number, number>;
+    };
+    me: {
+        eligible: boolean;
+        draft: string;
+        submitted: boolean;
+        ownEntry: string | null;
+        voted: boolean;
+        choice: string | null;
+        points: number | null;
+    } | null;
+};
+export type GameState = ChoiceGame | DrawingGameState | PhraseGameState;
 export type DrawingSender = (
     action: string,
     values: Record<string, unknown>,

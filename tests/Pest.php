@@ -80,3 +80,16 @@ function drawingPack(int $count = 30): int
 
     return $pack->id;
 }
+
+function phrasePack(int $count = 5): int
+{
+    $tag = Tag::create(['name' => 'Phrases']);
+    $pack = Pack::create(['name' => 'Phrases']);
+    $pack->tags()->sync([$tag->id]);
+    foreach (range(1, $count) as $number) {
+        $content = Content::create(['type' => ContentType::Phrase, 'published' => true, 'payload' => ['prompt' => 'Un jour '.$number.',']]);
+        $content->tags()->sync([$tag->id]);
+    }
+
+    return $pack->id;
+}

@@ -114,3 +114,11 @@ Le chef peut lancer le dessin à deviner pour deux à huit joueurs, de un à cin
 Les autres joueurs écrivent leur proposition sur leur téléphone. La comparaison est insensible à la casse et reste volontairement exacte pour le reste ; une réponse proche reçoit un indice privé. Les bonnes réponses donnent davantage de points aux premiers joueurs, tandis que le dessinateur reçoit une part proportionnelle aux joueurs qui ont trouvé. Le tour passe immédiatement à la révélation quand tout le monde a trouvé. Les points acquis sont conservés pendant une pause ou une déconnexion. Un arrêt depuis la pause annule les points du dessin en cours et conserve ceux des dessins terminés ou passés.
 
 Le dessin est transmis par traits SVG normalisés avec révision et identifiants idempotents. Une reconnexion reprend le joueur à sa place ; un dessinateur absent gèle le tour et les joueurs connectés peuvent voter unanimement pour le passer. Le mot choisi reste privé jusqu’à la révélation.
+
+## Phrase à compléter
+
+Le chef lance de un à cinq tours pour au moins trois joueurs connectés, avec une durée d’écriture de 30 à 150 secondes (60 par défaut). Tous reçoivent le même début de phrase ; chaque suite privée est limitée à 150 caractères Unicode. Le brouillon est sauvegardé pendant la frappe. La validation le verrouille ; l’échéance soumet les brouillons sauvegardés non vides, sans créer de proposition pour un champ vide.
+
+Les phrases complètes sont présentées anonymement une à une : cinq secondes jusqu’à 40 caractères, puis 0,05 seconde par caractère, au maximum douze secondes. Les téléphones et le grand écran affichent ensuite toutes les propositions pendant le vote (30 secondes maximum). Chaque joueur peut envoyer un vote définitif pour une autre phrase ; aucune abstention n’est remplacée par un vote automatique. Les auteurs, leurs Plummos, les votes et les points sont révélés ensemble. Chaque vote reçu rapporte exactement 65 points, y compris à un auteur ayant quitté le salon ou n’ayant pas voté.
+
+Les nouveaux arrivants et les joueurs de retour participent au prochain tour. La pause conserve les brouillons et gèle les délais ; la reprise laisse cinq secondes. L’arrêt depuis la pause conserve uniquement les scores des tours terminés. L’objectif de session et la récupération après épuisement des packs utilisent le moteur commun.
