@@ -9,11 +9,17 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $type
  * @property string $status
  * @property array<string, mixed> $settings
- * @property array{scores: array<int,int>, number: int, phase: string, deadline: float, previous_phase: string, remaining: float, started_at: float, manual_pause: bool, excluded?: list<int>, exhausted?: bool, round: array{content_id: int, payload: array<string,mixed>, participants: list<int>, answers: array<int,array{choice:int,at:float}>, awards: array<int,int>}} $state
+ * @property array<string,mixed> $state
  */
 class Game extends Model
 {
     protected $fillable = ['room_id', 'type', 'status', 'settings', 'state'];
+
+    /** @return array<int,array{at:float,choice?:int}> */
+    public function answers(): array
+    {
+        return $this->state['round']['answers'];
+    }
 
     protected function casts(): array
     {

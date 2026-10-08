@@ -67,3 +67,16 @@ function blindPack(): int
 
     return $pack->id;
 }
+
+function drawingPack(int $count = 30): int
+{
+    $tag = Tag::create(['name' => 'Drawing']);
+    $pack = Pack::create(['name' => 'Drawing']);
+    $pack->tags()->sync([$tag->id]);
+    foreach (range(1, $count) as $number) {
+        $content = Content::create(['type' => ContentType::Drawing, 'published' => true, 'payload' => ['word' => 'Éléphant '.$number]]);
+        $content->tags()->sync([$tag->id]);
+    }
+
+    return $pack->id;
+}

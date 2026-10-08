@@ -65,7 +65,6 @@ it('validates customization on the server', function (array $attributes, string 
     [['accessories' => ['helmet']], 'accessories.0'],
     [['accessories' => ['cap', 'crown']], 'accessories'],
     [['accessories' => ['cap', 'cap']], 'accessories.0'],
-    [['accessories' => ['cap', 'bow-tie', 'wand']], 'accessories'],
 ]);
 
 it('edits only the recognized participant and preserves points and chief role', function () {

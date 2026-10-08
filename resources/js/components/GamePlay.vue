@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import DrawingPlay from '@/components/DrawingPlay.vue';
 import AudioClip from '@/components/AudioClip.vue';
 import { computed } from 'vue';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from '@/composables/useTranslations';
-import type { GameState, RoomState } from '@/types/rooms';
+import type { GameState, RoomState, DrawingSender } from '@/types/rooms';
 const props = defineProps<{
     game: GameState;
     room: RoomState;
@@ -12,13 +13,16 @@ const props = defineProps<{
     chief?: boolean;
     busy?: boolean;
     connected?: boolean;
+    sendDrawing?: DrawingSender;
 }>();
 const emit = defineEmits<{
     answer: [choice: number];
     control: [action: string];
 }>();
 const { t } = useTranslations('rooms');
-const revealed = computed(() => props.game.round.correct !== null);
+const revealed = computed(
+    () => props.game.type !== 'drawing' && props.game.round.correct !== null,
+);
 const ranking = computed(() => {
     let rank = 0;
     let last: number | null = null;
@@ -43,14 +47,28 @@ const ranking = computed(() => {
         >
             <p>
                 {{
-                    t(game.type === 'quiz' ? 'quiz_round' : 'blind_round', {
-                        number: game.round.number,
-                        total: game.round.total,
-                    })
+                    t(
+                        game.type === 'drawing'
+                            ? 'drawing_round'
+                            : game.type === 'quiz'
+                              ? 'quiz_round'
+                              : 'blind_round',
+                        {
+                            number:
+                                game.type === 'drawing'
+                                    ? game.round.tour
+                                    : game.round.number,
+                            total: game.round.total,
+                        },
+                    )
                 }}
             </p>
             <p
-                v-if="game.phase === 'answer' || game.phase === 'resuming'"
+                v-if="
+                    ['answer', 'selecting', 'drawing', 'resuming'].includes(
+                        game.phase,
+                    )
+                "
                 class="text-3xl tabular-nums"
                 role="timer"
             >
@@ -58,7 +76,7 @@ const ranking = computed(() => {
             </p>
         </div>
         <AudioClip
-            v-if="!phone && game.round.audio"
+            v-if="!phone && game.type !== 'drawing' && game.round.audio"
             :src="game.round.audio"
             :playing="
                 game.phase === 'answer' && seconds > 0 && connected !== false
@@ -123,6 +141,15 @@ const ranking = computed(() => {
                 >{{ t('back_lobby') }}</Button
             >
         </template>
+        <DrawingPlay
+            v-else-if="game.type === 'drawing'"
+            :game="game"
+            :room="room"
+            :phone="phone"
+            :busy="busy"
+            :connected="connected"
+            :send="sendDrawing"
+        />
         <template v-else>
             <h1 class="my-7 text-2xl font-black leading-tight lg:text-5xl">
                 {{ game.round.question }}
@@ -151,10 +178,13 @@ const ranking = computed(() => {
                     class="rounded-2xl border-2 px-5 py-5 text-left text-xl font-bold transition-colors lg:text-2xl"
                     :class="
                         game.round.correct === index
-                            ? 'border-primary bg-primary text-primary-foreground'
-                            : game.me?.choice === index
-                              ? 'border-primary bg-accent'
-                              : 'border-primary/15 bg-accent/20'
+                            ? 'border-emerald-600 bg-emerald-500 text-white'
+                            : game.round.correct !== null &&
+                                game.me?.choice === index
+                              ? 'border-rose-600 bg-rose-500 text-white'
+                              : game.me?.choice === index
+                                ? 'border-primary bg-accent'
+                                : 'border-primary/15 bg-accent/20'
                     "
                     @click="phone && emit('answer', index)"
                 >

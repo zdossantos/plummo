@@ -25,5 +25,11 @@ const svg = computed(() =>
 <template>
     <!-- Only repository-owned SVG layers are composed; user input never becomes markup. -->
     <!-- eslint-disable-next-line vue/no-v-html -- Trusted SVG files, catalog-only colors and accessories. -->
-    <svg viewBox="0 0 512 512" role="img" :aria-label="label" v-html="svg" />
+    <svg
+        class="pointer-events-none"
+        viewBox="0 0 512 512"
+        role="img"
+        :aria-label="label"
+        v-html="svg"
+    />
 </template>

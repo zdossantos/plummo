@@ -13,7 +13,7 @@ export function selectAccessory(
             accessories.find((entry) => entry.id === item)?.slot !==
             accessory.slot,
     );
-    return next.length >= 2 ? selected : [...next, id];
+    return [...next, id];
 }
 
 export function composePlummo(

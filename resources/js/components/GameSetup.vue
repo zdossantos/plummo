@@ -7,17 +7,20 @@ const props = defineProps<{
     busy: boolean;
     recover?: boolean;
     initialPacks?: number[];
-    initialType?: 'quiz' | 'blind_test';
+    initialType?: 'quiz' | 'blind_test' | 'drawing';
 }>();
 const emit = defineEmits<{ start: [settings: object] }>();
 const { t } = useTranslations('rooms');
 const packs = ref<{ id: number; name: string }[]>([]);
 const selected = ref<number[]>(props.initialPacks ?? []);
 const availability = ref<{ total: number; unseen: number } | null>(null);
-const gameType = ref<'quiz' | 'blind_test'>(props.initialType ?? 'quiz');
+const gameType = ref<'quiz' | 'blind_test' | 'drawing'>(
+    props.initialType ?? 'quiz',
+);
 const settings = ref({
     quiz: { rounds: 10, duration: 30 },
     blind_test: { rounds: 10, duration: 30 },
+    drawing: { rounds: 1, duration: 90 },
 });
 const rounds = computed({
     get: () => settings.value[gameType.value].rounds,
@@ -31,6 +34,41 @@ const duration = computed({
         settings.value[gameType.value].duration = value;
     },
 });
+const connectedPlayers = ref(0);
+const labels = computed(() =>
+    gameType.value === 'drawing'
+        ? {
+              launch: 'launch_drawing',
+              available: 'available_words',
+              count: 'drawing_tours',
+              duration: 'drawing_duration',
+              start: 'start_drawing',
+          }
+        : gameType.value === 'quiz'
+          ? {
+                launch: 'launch_quiz',
+                available: 'available_questions',
+                count: 'question_count',
+                duration: 'answer_duration',
+                start: 'start_game',
+            }
+          : {
+                launch: 'launch_blind',
+                available: 'available_clips',
+                count: 'clip_count',
+                duration: 'clip_duration',
+                start: 'start_blind',
+            },
+);
+const required = computed(() =>
+    gameType.value === 'drawing'
+        ? props.recover || repeats.value
+            ? 3
+            : connectedPlayers.value * rounds.value * 3
+        : props.recover || repeats.value
+          ? 1
+          : rounds.value,
+);
 const distinctSongs = ref<number | null>(null);
 const repeats = ref(false);
 const loading = ref(true);
@@ -46,9 +84,10 @@ const valid = computed(
     () =>
         !!availability.value &&
         (gameType.value !== 'blind_test' || (distinctSongs.value ?? 0) >= 8) &&
-        (repeats.value
-            ? count.value > 0
-            : count.value >= (props.recover ? 1 : rounds.value)),
+        (gameType.value !== 'drawing' ||
+            props.recover ||
+            connectedPlayers.value >= 2) &&
+        count.value >= required.value,
 );
 async function load() {
     controller?.abort();
@@ -79,6 +118,7 @@ async function load() {
         const data = await response.json();
         if (controller !== current) return;
         packs.value = data.packs;
+        connectedPlayers.value = data.connectedPlayers;
         distinctSongs.value = data.distinctSongs;
         availability.value = data.availability;
     } catch {
@@ -105,15 +145,7 @@ onUnmounted(() => controller?.abort());
         "
     >
         <h2 class="text-2xl font-black">
-            {{
-                t(
-                    recover
-                        ? 'recover_packs'
-                        : gameType === 'quiz'
-                          ? 'launch_quiz'
-                          : 'launch_blind',
-                )
-            }}
+            {{ t(recover ? 'recover_packs' : labels.launch) }}
         </h2>
         <label v-if="!recover" class="mt-5 block font-bold">
             {{ t('game_type') }}
@@ -124,6 +156,7 @@ onUnmounted(() => controller?.abort());
             >
                 <option value="quiz">{{ t('quiz_name') }}</option>
                 <option value="blind_test">{{ t('blind_name') }}</option>
+                <option value="drawing">{{ t('drawing_name') }}</option>
             </select>
         </label>
         <p class="mt-2 text-sm text-muted-foreground">{{ t('packs_hint') }}</p>
@@ -147,41 +180,31 @@ onUnmounted(() => controller?.abort());
         <p v-if="!loading && !packs.length" class="mt-4">{{ t('no_packs') }}</p>
         <p v-if="availability" class="mt-4 text-sm">
             {{
-                t(
-                    gameType === 'quiz'
-                        ? 'available_questions'
-                        : 'available_clips',
-                    {
-                        unseen: availability.unseen,
-                        total: availability.total,
-                    },
-                )
+                t(labels.available, {
+                    unseen: availability.unseen,
+                    total: availability.total,
+                })
             }}
         </p>
         <div v-if="!recover" class="mt-5 grid grid-cols-2 gap-4">
             <label class="font-semibold"
-                >{{ t(gameType === 'quiz' ? 'question_count' : 'clip_count')
+                >{{ t(labels.count)
                 }}<input
                     id="game-rounds"
                     v-model.number="rounds"
                     type="number"
-                    min="5"
-                    max="30"
+                    :min="gameType === 'drawing' ? 1 : 5"
+                    :max="gameType === 'drawing' ? 5 : 30"
                     required
                     class="mt-2 w-full rounded-xl border bg-background p-3"
             /></label>
             <label class="font-semibold"
-                >{{
-                    t(
-                        gameType === 'quiz'
-                            ? 'answer_duration'
-                            : 'clip_duration',
-                    )
+                >{{ t(labels.duration)
                 }}<input
                     id="game-duration"
                     v-model.number="duration"
                     type="number"
-                    min="10"
+                    :min="gameType === 'drawing' ? 30 : 10"
                     max="150"
                     required
                     class="mt-2 w-full rounded-xl border bg-background p-3"
@@ -190,7 +213,21 @@ onUnmounted(() => controller?.abort());
         <p v-if="!recover" class="mt-3 text-sm text-muted-foreground">
             {{
                 t('estimated_minutes', {
-                    count: Math.ceil((rounds * (duration + 3)) / 60),
+                    count: Math.ceil(
+                        (rounds *
+                            (gameType === 'drawing' ? connectedPlayers : 1) *
+                            (duration + (gameType === 'drawing' ? 18 : 3))) /
+                            60,
+                    ),
+                })
+            }}
+        </p>
+        <p v-if="!recover && gameType === 'drawing'" class="mt-3 text-sm">
+            {{
+                t('drawing_count', {
+                    count: connectedPlayers * rounds,
+                    players: connectedPlayers,
+                    tours: rounds,
                 })
             }}
         </p>
@@ -203,9 +240,11 @@ onUnmounted(() => controller?.abort());
         <p v-else-if="availability && !valid" class="mt-3 text-sm">
             {{
                 t(
-                    gameType === 'blind_test' && (distinctSongs ?? 0) < 8
-                        ? 'blind_catalogue_small'
-                        : 'contents_exhausted',
+                    gameType === 'drawing' && !recover && connectedPlayers < 2
+                        ? 'drawing_minimum'
+                        : gameType === 'blind_test' && (distinctSongs ?? 0) < 8
+                          ? 'blind_catalogue_small'
+                          : 'contents_exhausted',
                 )
             }}
         </p>
@@ -213,15 +252,7 @@ onUnmounted(() => controller?.abort());
             class="mt-5 w-full"
             type="submit"
             :disabled="busy || loading || !valid"
-            >{{
-                t(
-                    recover
-                        ? 'recover_game'
-                        : gameType === 'quiz'
-                          ? 'start_game'
-                          : 'start_blind',
-                )
-            }}</Button
+            >{{ t(recover ? 'recover_game' : labels.start) }}</Button
         >
     </form>
 </template>

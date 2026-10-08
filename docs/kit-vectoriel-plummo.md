@@ -2,7 +2,7 @@
 
 Le kit se trouve dans [public/plummo](../public/plummo/README.md). Il contient une base, six palettes et 28 accessoires indépendants répartis sur quatre zones. Aucun dessin de combinaison n'est stocké. Les objets de main et l'écharpe ont des calques avant/arrière pour gérer les recouvrements.
 
-Le porteur du projet a validé le corps crème avec recoloration des zones violettes, ainsi que le principe de pièces composables. La proposition de deux accessoires maximum, un par zone, est matérialisée dans la planche. Les visuels sont proposés pour revue avant intégration au parcours joueur.
+Le porteur du projet a validé le corps crème avec recoloration des zones violettes, ainsi que le principe de pièces composables. La personnalisation permet de combiner un accessoire par zone (tête, visage, cou et main). Les visuels sont proposés pour revue avant intégration au parcours joueur.
 
 La base est une réinterprétation vectorielle dessinée à partir de la mascotte fournie, et non une conversion pixel à pixel. Elle conserve les plumes, la silhouette duveteuse, les grands yeux, le sourire et les contours violets.
 

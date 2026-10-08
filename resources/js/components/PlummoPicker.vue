@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import { useTranslations } from '@/composables/useTranslations';
 import { selectAccessory } from '@/lib/plummo';
@@ -8,17 +7,12 @@ const props = defineProps<{ catalog: Catalog }>();
 const color = defineModel<string>('color', { required: true });
 const accessories = defineModel<string[]>('accessories', { required: true });
 const { t } = useTranslations('plummo');
-const { t: roomText } = useTranslations('rooms');
-const notice = ref('');
 function select(id: string) {
-    const next = selectAccessory(
+    accessories.value = selectAccessory(
         accessories.value,
         id,
         props.catalog.accessories,
     );
-    notice.value =
-        next === accessories.value ? roomText('accessory_limit') : '';
-    accessories.value = next;
 }
 </script>
 <template>
@@ -56,13 +50,6 @@ function select(id: string) {
                 </div>
             </fieldset>
             <p class="text-sm text-muted-foreground">{{ t('limit') }}</p>
-            <p
-                v-if="notice"
-                role="status"
-                class="text-sm font-semibold text-primary"
-            >
-                {{ notice }}
-            </p>
             <fieldset v-for="slot in catalog.slots" :key="slot">
                 <legend class="mb-3 font-bold">{{ t(slot) }}</legend>
                 <div class="grid grid-cols-3 gap-2 sm:grid-cols-4">

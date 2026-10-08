@@ -132,7 +132,14 @@ export function useRoom(
                 true,
             );
         }
-        timer = setTimeout(() => void poll(), 2000);
+        timer = setTimeout(
+            () => void poll(),
+            !phone &&
+                game.value?.type === 'drawing' &&
+                game.value.phase === 'drawing'
+                ? 300
+                : 2000,
+        );
     }
     onMounted(() => {
         connected.value = navigator.onLine;

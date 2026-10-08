@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ContentController;
 use App\Http\Controllers\Admin\ImportController;
 use App\Http\Controllers\Admin\PackController;
 use App\Http\Controllers\Admin\TagController;
+use App\Http\Controllers\Rooms\DrawingController;
 use App\Http\Controllers\Rooms\GameController;
 use App\Http\Controllers\Rooms\PlayerController;
 use App\Http\Controllers\Rooms\RoomController;
@@ -21,6 +22,7 @@ Route::prefix('rooms/{code}')->middleware('throttle:900,1')->group(function (): 
     Route::post('screen-presence', [RoomController::class, 'screenPresence']);
     Route::post('broadcast-auth', [RoomController::class, 'broadcastAuth']);
     Route::get('games/{game}/rounds/{round}/audio', [GameController::class, 'audio'])->whereNumber(['game', 'round']);
+    Route::post('drawing/{action}', [DrawingController::class, 'action']);
     Route::post('games', [GameController::class, 'store']);
     Route::post('game-recovery', [GameController::class, 'recover']);
     Route::post('game-options', [GameController::class, 'options']);

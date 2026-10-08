@@ -22,7 +22,7 @@ Référence des premières maquettes : https://www.figma.com/design/6kioGGc1qTiF
 - Le grand écran affiche un QR code et un code de salon.
 - Un joueur peut scanner le QR code ou saisir le code ; le scan est facultatif.
 - Aucun compte n'est nécessaire pour jouer.
-- Sur son téléphone, le joueur choisit un prénom ou pseudo, la couleur de son Plummo et un ou deux accessoires, puis rejoint le salon.
+- Sur son téléphone, le joueur choisit un prénom ou pseudo, la couleur de son Plummo et des accessoires combinables, avec un choix par emplacement (tête, visage, cou et main), puis rejoint le salon.
 - Les pseudos et les apparences peuvent être identiques. Aucune vérification d'unicité n'est demandée.
 - Dans le salon, chacun peut modifier son pseudo et son apparence sans perdre ses points ou son rôle.
 - Le salon accueille au maximum huit joueurs présents. Les données d'anciens participants peuvent rester conservées.
