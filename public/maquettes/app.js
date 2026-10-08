@@ -95,7 +95,9 @@ const state = {
     menu: false,
     menuPage: 0,
     color: 0,
-    accessory: 0,
+    equipped: {},
+    wardrobe: null,
+    wardrobePage: 0,
     game: 'quiz',
     packs: [0],
     answer: 0,
@@ -155,28 +157,94 @@ const icon = (kind) => {
 let svgId = 0;
 function mascot(colorIndex = 0, accessoryId = 'flower') {
     const color = catalog.colors[colorIndex % catalog.colors.length];
-    const item = catalog.accessories.find((x) => x.id === accessoryId);
+    const ids = Array.isArray(accessoryId) ? accessoryId : [accessoryId];
+    const items = ids
+        .map((id) => catalog.accessories.find((x) => x.id === id))
+        .filter(Boolean);
     let base = parts.base;
-    if (item?.coversPlumes)
+    if (items.some((item) => item.coversPlumes))
         base = base.replace(/<g id="plummo-plumes">[\s\S]*?<\/g>/, '');
     base = base
         .replaceAll('#b99aef', color.light)
         .replaceAll('#9672dc', color.color)
         .replaceAll('#6950ac', color.dark);
     let body =
-        (parts[`${accessoryId}-back`] ?? '') +
+        items.map((item) => parts[`${item.id}-back`] ?? '').join('') +
         base +
-        (parts[accessoryId] ?? '');
+        items.map((item) => parts[item.id] ?? '').join('');
     const prefix = `m${svgId++}-`;
     body = body
         .replace(/id="([^"]+)"/g, (_, id) => `id="${prefix}${id}"`)
         .replace(/url\(#([^)]*)\)/g, (_, id) => `url(#${prefix}${id})`);
     return `<svg viewBox="0 0 512 512" aria-hidden="true">${body}</svg>`;
 }
+const slotPaths = {
+    head: '<path d="M4 29h40M10 28V15q0-10 14-10t14 10v13"/>',
+    face: '<path d="M4 16h5m8 0h14m8 0h5"/><circle cx="12" cy="20" r="9"/><circle cx="36" cy="20" r="9"/>',
+    neck: '<path d="m24 21-17-9v22l17-9 17 9V12Z"/>',
+    hand: '<path d="m17 38 17-24M30 11l6-7 7 6-6 7Z"/>',
+};
+function accessoryArt(item) {
+    const [x, y, right, bottom] = item.bounds;
+    return `<svg viewBox="${x - 12} ${y - 12} ${right - x + 24} ${bottom - y + 24}" aria-hidden="true">${parts[item.id]}</svg>`;
+}
+function slotButton(slot) {
+    const item = catalog.accessories.find(
+        (item) => item.id === state.equipped[slot],
+    );
+    return `<button class="equipment-slot ${item ? 'equipped' : ''}" data-action="wardrobe:${slot}" aria-label="${esc(t('slot' + slot))}${item ? ': ' + esc(item.label[state.locale]) : ''}" aria-haspopup="dialog"><span class="slot-art">${item ? accessoryArt(item) : `<svg viewBox="0 0 48 44" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round" aria-hidden="true">${slotPaths[slot]}</svg><svg class="slot-plus" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="var(--lime)"/><path d="M12 6v12M6 12h12" stroke="var(--ink)" stroke-width="2"/></svg>`}</span><span>${esc(t('slot' + slot))}</span></button>`;
+}
+function wardrobeView() {
+    const choices = catalog.accessories.filter(
+        (item) => item.slot === state.wardrobe,
+    );
+    const size = innerHeight <= 450 ? 2 : 4;
+    const pages = Math.ceil(choices.length / size);
+    state.wardrobePage = Math.max(0, Math.min(state.wardrobePage, pages - 1));
+    const full =
+        !state.equipped[state.wardrobe] &&
+        Object.keys(state.equipped).length >= catalog.maxAccessories;
+    return `<div class="wardrobe-backdrop" data-action="wardrobeClose"></div><section class="wardrobe-drawer" role="dialog" aria-modal="true" aria-labelledby="wardrobe-title"><div class="titlebar"><h2 id="wardrobe-title">${esc(t('slot' + state.wardrobe))}</h2>${button(t('close'), 'wardrobeClose', '', 'secondary')}</div><p class="equipment-count" role="status">${esc(t(full ? 'equipmentLimit' : 'equipmentHelp', { max: catalog.maxAccessories }))}</p><div class="wardrobe-choices">${choices
+        .slice(state.wardrobePage * size, (state.wardrobePage + 1) * size)
+        .map(
+            (item) =>
+                `<button class="wardrobe-choice" data-action="equip:${item.id}" aria-pressed="${state.equipped[item.slot] === item.id}" ${full ? 'disabled' : ''}>${accessoryArt(item)}<span>${esc(item.label[state.locale])}</span></button>`,
+        )
+        .join(
+            '',
+        )}</div>${pager(pages, 'wardrobePage')}${button(t('removeAccessory'), 'unequip', state.equipped[state.wardrobe] ? '' : 'disabled', 'secondary')}</section>`;
+}
+function closeWardrobe() {
+    const slot = state.wardrobe;
+    state.wardrobe = null;
+    render({ selector: `[data-action="wardrobe:${slot}"]` });
+}
+document.addEventListener('keydown', (event) => {
+    if (!state.wardrobe) return;
+    if (event.key === 'Escape') {
+        event.preventDefault();
+        closeWardrobe();
+    }
+    if (event.key === 'Tab') {
+        const controls = [
+            ...root.querySelectorAll('.wardrobe-drawer button:not(:disabled)'),
+        ];
+        const first = controls[0],
+            last = controls.at(-1);
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+        }
+        if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+        }
+    }
+});
 function cast() {
     const tv = state.surface === 'tv';
     const count = tv ? 8 : 1;
-    return `<div class="cast ${tv ? '' : 'solo'}" aria-label="${esc(t('legend'))}">${Array.from({ length: count }, (_, i) => `<div class="character">${state.note && i === count - 1 ? `<div class="bubble">${esc(state.note)}</div>` : ''}<span class="nickname">${esc(tv ? names[i] : state.nickname)}</span><span class="score">${tv ? 825 - i * 65 : 825}</span>${mascot(tv ? i : state.color, tv ? accessories[i] : accessories[state.accessory])}</div>`).join('')}</div>`;
+    return `<div class="cast ${tv ? '' : 'solo'}" aria-label="${esc(t('legend'))}">${Array.from({ length: count }, (_, i) => `<div class="character">${state.note && i === count - 1 ? `<div class="bubble">${esc(state.note)}</div>` : ''}<span class="nickname">${esc(tv ? names[i] : state.nickname)}</span><span class="score">${tv ? 825 - i * 65 : 825}</span>${mascot(tv ? i : state.color, tv ? accessories[i] : Object.values(state.equipped))}</div>`).join('')}</div>`;
 }
 function title(key, timer = false) {
     return `<div class="titlebar"><h1>${esc(t(key))}</h1>${timer ? '<div class="timer" aria-label="20 s">20</div>' : ''}</div>`;
@@ -248,7 +316,12 @@ function pageSize(kind) {
     return innerHeight <= 650 ? 4 : innerWidth <= 760 ? 5 : 6;
 }
 function pager(total, action = 'page') {
-    const current = action === 'menuPage' ? state.menuPage : state.page;
+    const current =
+        action === 'menuPage'
+            ? state.menuPage
+            : action === 'wardrobePage'
+              ? state.wardrobePage
+              : state.page;
     return `<div class="pager">${button(t('previous'), `${action}:-1`, current <= 0 ? 'disabled' : '', 'secondary')}<span>${esc(t('page', { n: current + 1, total }))}</span>${button(t('next'), `${action}:1`, current >= total - 1 ? 'disabled' : '', 'secondary')}</div>`;
 }
 function textField(key, max, placeholder = key, type = 'text') {
@@ -315,7 +388,7 @@ function renderScene() {
             return (
                 title('identity') +
                 formWrap(
-                    `<div class="avatar-stage">${mascot(state.color, accessories[state.accessory])}</div>${textField('name', 20)}<div class="swatches">${catalog.colors.map((c, i) => `<button class="swatch" style="background:${c.color}" data-action="color:${i}" aria-label="${esc(c.label[state.locale])}" aria-pressed="${i === state.color}"></button>`).join('')}</div><div class="pager">${button(t('previous'), 'accessory:-1', '', 'secondary')}<span>${esc(catalog.accessories.find((x) => x.id === accessories[state.accessory]).label[state.locale])}</span>${button(t('next'), 'accessory:1', '', 'secondary')}</div>${go('lobby', 'ready')}`,
+                    `<div class="wardrobe-preview">${mascot(state.color, Object.values(state.equipped))}</div>${textField('name', 20)}<div class="swatches">${catalog.colors.map((c, i) => `<button class="swatch" style="background:${c.color}" data-action="color:${i}" aria-label="${esc(c.label[state.locale])}" aria-pressed="${i === state.color}"></button>`).join('')}</div><div class="equipment-slots">${catalog.slots.map((slot) => slotButton(slot)).join('')}</div><p class="equipment-count">${esc(t('equipmentCount', { n: Object.keys(state.equipped).length, max: catalog.maxAccessories }))}</p><div class="actions">${button(t('randomize'), 'randomize', '', 'secondary')}${go('lobby', 'ready')}</div>`,
                 )
             );
         case 'lobby':
@@ -628,7 +701,7 @@ function focusSnapshot() {
     const selector = el.name
         ? `[name="${el.name}"]`
         : el.dataset.action
-          ? `[data-action="${el.dataset.action}"]`
+          ? `${state.wardrobe ? '.wardrobe-drawer ' : ''}[data-action="${el.dataset.action}"]`
           : null;
     return selector
         ? { selector, start: el.selectionStart, end: el.selectionEnd }
@@ -677,7 +750,11 @@ function render(snapshot = focusSnapshot()) {
         : state.menu
           ? menu()
           : renderScene();
-    root.innerHTML = `<nav class="lab" aria-label="${esc(t('prototype'))}"><span>${esc(t('prototype'))}</span><select name="surface" aria-label="${esc(t('screens'))}">${['tv', 'phone', 'admin'].map((s) => `<option value="${s}" ${state.surface === s ? 'selected' : ''}>${esc(t(s))}</option>`).join('')}</select><button data-action="menu">${esc(t('screens'))}</button><button data-action="stress" aria-pressed="${state.stress}">${esc(t('stress'))}</button><button data-action="locale" aria-label="${state.locale === 'fr' ? 'English' : 'Français'}">${state.locale.toUpperCase()}</button></nav><main class="world ${['drawing', 'guess', 'artistMissing'].includes(state.scene) ? 'draw-world' : ''} ${['quizReveal', 'blindReveal', 'phraseReveal', 'results'].includes(state.scene) ? 'bounce' : ''}" data-surface="${state.surface}" data-scene="${state.scene}"><header class="hud"><a class="logo" href="#${state.surface}/lobby">plummo<span aria-hidden="true">.</span></a><span class="hud-label">${esc(t(state.surface === 'admin' ? 'admin' : ['blind', 'drawing', 'write', 'vote', 'presentation'].includes(state.scene) ? (['write', 'vote', 'presentation'].includes(state.scene) ? 'phrase' : state.scene) : state.game))}</span><div class="roomcode"><span>${esc(t('room'))}</span><strong>K7PX3A</strong></div></header><section class="arena ${state.scene === 'drawing' || (state.scene === 'artistMissing' && state.surface === 'tv') ? 'draw-layout' : ''} ${state.menu ? 'scene-menu' : ''}" aria-label="${esc(t(titles[state.scene] ?? state.scene))}">${sceneContent}</section><footer class="foot">${footerContent()}${cast()}</footer></main>`;
+    root.innerHTML = `<nav class="lab" aria-label="${esc(t('prototype'))}"><span>${esc(t('prototype'))}</span><select name="surface" aria-label="${esc(t('screens'))}">${['tv', 'phone', 'admin'].map((s) => `<option value="${s}" ${state.surface === s ? 'selected' : ''}>${esc(t(s))}</option>`).join('')}</select><button data-action="menu">${esc(t('screens'))}</button><button data-action="stress" aria-pressed="${state.stress}">${esc(t('stress'))}</button><button data-action="locale" aria-label="${state.locale === 'fr' ? 'English' : 'Français'}">${state.locale.toUpperCase()}</button></nav><main class="world ${['drawing', 'guess', 'artistMissing'].includes(state.scene) ? 'draw-world' : ''} ${['quizReveal', 'blindReveal', 'phraseReveal', 'results'].includes(state.scene) ? 'bounce' : ''}" data-surface="${state.surface}" data-scene="${state.scene}"><header class="hud"><a class="logo" href="#${state.surface}/lobby">plummo<span aria-hidden="true">.</span></a><span class="hud-label">${esc(t(state.surface === 'admin' ? 'admin' : ['blind', 'drawing', 'write', 'vote', 'presentation'].includes(state.scene) ? (['write', 'vote', 'presentation'].includes(state.scene) ? 'phrase' : state.scene) : state.game))}</span><div class="roomcode"><span>${esc(t('room'))}</span><strong>K7PX3A</strong></div></header><section class="arena ${state.scene === 'drawing' || (state.scene === 'artistMissing' && state.surface === 'tv') ? 'draw-layout' : ''} ${state.menu ? 'scene-menu' : ''}" aria-label="${esc(t(titles[state.scene] ?? state.scene))}">${sceneContent}</section><footer class="foot">${footerContent()}${cast()}</footer></main>${state.wardrobe ? wardrobeView() : ''}`;
+    if (state.wardrobe) {
+        root.querySelector('.world').inert = true;
+        root.querySelector('.lab').inert = true;
+    }
     if (state.reader) fitReader();
     if (fitEditor(snapshot)) return;
     if (state.scene === 'preview')
@@ -690,6 +767,10 @@ function render(snapshot = focusSnapshot()) {
     if (document.querySelector('canvas')) initCanvas();
     history.replaceState(null, '', `#${state.surface}/${state.scene}`);
     restoreFocus(snapshot);
+    if (state.wardrobe && !document.activeElement.closest('.wardrobe-drawer'))
+        root.querySelector(
+            '.wardrobe-drawer [data-action="wardrobeClose"]',
+        ).focus();
 }
 function footerContent() {
     if (state.menu || state.reader) return '';
@@ -703,6 +784,7 @@ function navigate(scene) {
     state.scene = scene;
     state.menu = false;
     state.reader = null;
+    state.wardrobe = null;
     state.page = 0;
     state.editPage = 0;
     state.note = '';
@@ -833,10 +915,56 @@ root.addEventListener('click', (event) => {
         return navigate(list[Math.max(0, list.indexOf(state.scene) - 1)]);
     }
     if (action === 'color') state.color = Number(arg);
-    if (action === 'accessory')
-        state.accessory =
-            (state.accessory + Number(arg) + accessories.length) %
-            accessories.length;
+    if (action === 'wardrobe') {
+        state.wardrobe = arg;
+        state.wardrobePage = 0;
+        render();
+        root.querySelector(
+            '.wardrobe-drawer [data-action="wardrobeClose"]',
+        ).focus();
+        return;
+    }
+    if (action === 'wardrobeClose') return closeWardrobe();
+    if (action === 'wardrobePage') state.wardrobePage += Number(arg);
+    if (action === 'equip') {
+        const item = catalog.accessories.find(
+            (x) => x.id === arg && x.slot === state.wardrobe,
+        );
+        if (
+            item &&
+            (state.equipped[item.slot] ||
+                Object.keys(state.equipped).length < catalog.maxAccessories)
+        )
+            state.equipped[item.slot] = item.id;
+        return closeWardrobe();
+    }
+    if (action === 'unequip') {
+        delete state.equipped[state.wardrobe];
+        return closeWardrobe();
+    }
+    if (action === 'randomize') {
+        const previous = JSON.stringify([state.color, state.equipped]);
+        do {
+            state.color = Math.floor(Math.random() * catalog.colors.length);
+            state.equipped = {};
+            const slots = [...catalog.slots];
+            for (
+                let i = 0;
+                i < Math.min(catalog.maxAccessories, slots.length);
+                i++
+            ) {
+                const slot = slots.splice(
+                    Math.floor(Math.random() * slots.length),
+                    1,
+                )[0];
+                const choices = catalog.accessories.filter(
+                    (item) => item.slot === slot,
+                );
+                state.equipped[slot] =
+                    choices[Math.floor(Math.random() * choices.length)].id;
+            }
+        } while (JSON.stringify([state.color, state.equipped]) === previous);
+    }
     if (action === 'game') {
         state.game = arg;
         return navigate('packs');

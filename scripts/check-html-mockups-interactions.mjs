@@ -91,6 +91,72 @@ if (
     'readQuestion'
 )
     throw Error('Reader failed to restore trigger focus');
+await page.evaluate(() => window.mockups.setScene('phone', 'identity'));
+await page.locator('[data-action="wardrobe:head"]').click();
+await expect(page.getByRole('dialog')).toBeVisible();
+await page.locator('[data-action="equip:cap"]').click();
+await page.locator('[data-action="wardrobe:face"]').click();
+await page.locator('[data-action="equip:round-glasses"]').click();
+await page.locator('[data-action="wardrobe:neck"]').click();
+for (const choice of await page.locator('.wardrobe-choice').all())
+    await expect(choice).toBeDisabled();
+await page.keyboard.press('Escape');
+await page.locator('[data-action="wardrobe:head"]').click();
+await page.locator('[data-action="wardrobePage:1"]').click();
+await page.locator('[data-action="equip:bucket-hat"]').click();
+if (
+    JSON.stringify(await page.evaluate(() => window.mockups.state.equipped)) !==
+    JSON.stringify({ head: 'bucket-hat', face: 'round-glasses' })
+)
+    throw Error('Accessories did not combine or replace by slot');
+await page.locator('[data-action="wardrobe:face"]').click();
+await page.locator('[data-action="unequip"]').click();
+if (
+    (await page.evaluate(
+        () => Object.keys(window.mockups.state.equipped).length,
+    )) !== 1
+)
+    throw Error('Remove failed');
+for (let i = 0; i < 20; i++) {
+    const before = await page.evaluate(() =>
+        JSON.stringify([
+            window.mockups.state.color,
+            window.mockups.state.equipped,
+        ]),
+    );
+    await page.locator('[data-action="randomize"]').click();
+    const after = await page.evaluate(() =>
+        JSON.stringify([
+            window.mockups.state.color,
+            window.mockups.state.equipped,
+        ]),
+    );
+    if (before === after)
+        throw Error('Randomize repeated current configuration');
+    if (
+        !(await page.evaluate(
+            () =>
+                Object.entries(window.mockups.state.equipped).length === 2 &&
+                Object.entries(window.mockups.state.equipped).every(
+                    ([slot, id]) =>
+                        window.PLUMMO_MOCK_DATA.catalog.accessories.some(
+                            (item) => item.id === id && item.slot === slot,
+                        ),
+                ),
+        ))
+    )
+        throw Error('Randomize invalid');
+}
+await page.locator('[data-action="wardrobe:head"]').click();
+await page.keyboard.press('Escape');
+if (
+    (await page.evaluate(() => document.activeElement.dataset.action)) !==
+    'wardrobe:head'
+)
+    throw Error('Drawer focus not restored');
+console.log(
+    'PASS: wardrobe combines, replaces, removes, limits, paginates, restores focus; random configurations valid.',
+);
 console.log(
     'PASS: 8 simultaneous music choices, definitive answer, own vote blocked, integral 402/391/500-char readers, 150-char paged draft, drawing/undo, chat and admin types.',
 );
