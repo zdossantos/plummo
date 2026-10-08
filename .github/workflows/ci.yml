@@ -74,4 +74,4 @@ jobs:
                   grep -q '101 Switching Protocols' /tmp/reverb.headers
                   grep -q 'pusher:connection_established' /tmp/reverb.body
                   test "$(docker inspect --format '{{.State.Running}}' plummo-reverb-ci)" = true
-          docker logs plummo-reverb-ci
+                  docker logs plummo-reverb-ci
