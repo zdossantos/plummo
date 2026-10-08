@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
@@ -44,6 +45,8 @@ class RoomController extends Controller
             $room = $this->rooms->create();
             $request->session()->put('plummo.screen', $room->id);
         }
+
+        $room->update(['screen_seen_at' => now()]);
 
         return redirect()->route('rooms.screen', $room->code);
     }
@@ -80,6 +83,30 @@ class RoomController extends Controller
     public function state(string $code): JsonResponse
     {
         return $this->rooms->locked($code, fn (Room $room): JsonResponse => response()->json($this->rooms->state($room)));
+    }
+
+    public function screenPresence(Request $request, string $code): JsonResponse
+    {
+        return $this->rooms->locked($code, function (Room $room) use ($request): JsonResponse {
+            abort_unless($request->session()->get('plummo.screen') === $room->id, 403);
+            $room->update(['screen_seen_at' => now()]);
+
+            return response()->json($this->rooms->state($room));
+        });
+    }
+
+    public function broadcastAuth(Request $request, string $code): mixed
+    {
+        return $this->rooms->locked($code, function (Room $room) use ($request): mixed {
+            $player = $this->rooms->recognized($room, $request);
+            abort_unless($request->session()->get('plummo.screen') === $room->id || $player?->connected(), 403);
+            abort_unless($request->input('channel_name') === 'private-room.'.$room->code, 403);
+            $request->validate(['socket_id' => ['required', 'regex:/^\d+\.\d+$/']]);
+            $request->setUserResolver(fn () => $player ?? (object) ['id' => 'screen-'.$room->id]);
+            Broadcast::channel('room.'.$room->code, fn () => true);
+
+            return Broadcast::auth($request);
+        });
     }
 
     public function qr(string $code): Response

@@ -59,6 +59,7 @@ class RoomService
         $players = $room->players()->orderBy('id')->get();
         foreach ($players as $player) {
             if ($player->left_at === null && $player->disconnected_at === null && $player->last_seen_at->addSeconds(15)->lte(now())) {
+                app(GameEngine::class)->withdraw($room, $player);
                 $player->update(['disconnected_at' => $player->last_seen_at->addSeconds(15)]);
             }
         }
@@ -157,6 +158,9 @@ class RoomService
 
     public function returnPlayer(Room $room, RoomPlayer $player): RoomPlayer
     {
+        if (! $player->connected()) {
+            app(GameEngine::class)->withdraw($room, $player);
+        }
         if (! $player->occupiesPlace() && $this->occupied($room) >= 8) {
             $player->update(['left_at' => null, 'waiting' => true, 'last_seen_at' => now(), 'disconnected_at' => null]);
         } else {
@@ -190,7 +194,12 @@ class RoomService
     /** @return array<string, mixed> */
     public function state(Room $room, ?RoomPlayer $me = null): array
     {
+        $game = app(GameEngine::class)->view($room, $me);
+        $me?->refresh();
+
         return [
+            'serverTime' => app(GameEngine::class)->time(),
+            'game' => $game,
             'room' => [
                 'code' => $room->code, 'capacity' => 8, 'occupied' => $this->occupied($room), 'chiefId' => $this->chiefId($room),
                 'pointTarget' => $room->point_target, 'ranking' => $this->ranking($room),

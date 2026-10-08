@@ -1,6 +1,6 @@
 FROM php:8.4-apache AS php-base
 RUN apt-get update && apt-get install -y --no-install-recommends git unzip libzip-dev libxml2-dev curl \
-    && docker-php-ext-install pdo_mysql zip opcache xmlreader \
+    && docker-php-ext-install pdo_mysql zip opcache xmlreader pcntl \
     && pecl install redis-6.3.0 && docker-php-ext-enable redis \
     && a2enmod rewrite && rm -rf /var/lib/apt/lists/*
 COPY docker/uploads.ini /usr/local/etc/php/conf.d/plummo-uploads.ini

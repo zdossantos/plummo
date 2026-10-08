@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Rooms;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PlayerAppearanceRequest;
 use App\Models\Room;
+use App\Services\GameEngine;
 use App\Services\RoomService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -60,6 +61,7 @@ class PlayerController extends Controller
         return $this->rooms->locked($code, function (Room $room) use ($request): JsonResponse {
             $player = $this->rooms->requirePlayer($room, $request);
             $player->update(['left_at' => now(), 'waiting' => false]);
+            app(GameEngine::class)->withdraw($room, $player);
             $this->rooms->refreshPresence($room);
 
             return response()->json($this->rooms->state($room, $player));
@@ -85,6 +87,8 @@ class PlayerController extends Controller
     {
         return $this->rooms->locked($code, function (Room $room) use ($request): Response {
             $this->rooms->requireChief($room, $this->rooms->requirePlayer($room, $request));
+            $game = app(GameEngine::class)->tick($room);
+            abort_if($game !== null && $game->state['phase'] !== 'paused', 409);
             $request->validate(['confirm' => ['required', 'accepted']], ['confirm.*' => __('rooms.confirm_close')]);
             $room->delete();
 

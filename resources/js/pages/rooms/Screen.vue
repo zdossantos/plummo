@@ -3,18 +3,23 @@ import { Head, Link } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import RoomRanking from '@/components/RoomRanking.vue';
+import GamePlay from '@/components/GamePlay.vue';
 import RoomHeader from '@/components/RoomHeader.vue';
 import { useRoom } from '@/composables/useRoom';
 import { useTranslations } from '@/composables/useTranslations';
-import type { RoomState } from '@/types/rooms';
+import type { GameState, RoomState } from '@/types/rooms';
 const props = defineProps<{
     room: RoomState;
+    game: GameState | null;
+    serverTime: number;
     joinUrl: string;
     manualUrl: string;
 }>();
-const { room, closed, error } = useRoom(props.room.code, {
+const { room, game, seconds, closed, error } = useRoom(props.room.code, {
     room: props.room,
     me: null,
+    game: props.game,
+    serverTime: props.serverTime,
 });
 const { t } = useTranslations('rooms');
 const showRanking = ref(false);
@@ -60,7 +65,7 @@ const slots = computed(() =>
                 </button>
             </div>
             <section
-                v-if="!showRanking"
+                v-if="!showRanking && !game"
                 class="grid flex-1 items-center gap-10 py-10 lg:grid-cols-[1fr_420px]"
             >
                 <div>
@@ -110,6 +115,12 @@ const slots = computed(() =>
                     </p>
                 </div>
             </section>
+            <GamePlay
+                v-if="game && room && !showRanking"
+                :game="game"
+                :room="room"
+                :seconds="seconds"
+            />
             <section
                 class="rounded-3xl bg-accent/35 p-5 lg:p-7"
                 :aria-label="t('players')"
