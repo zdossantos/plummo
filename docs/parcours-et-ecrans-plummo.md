@@ -48,7 +48,7 @@ Avant la première arrivée : « En attente du premier joueur ». Ensuite, les p
 ### Téléphone : rejoindre et se présenter
 
 1. Un scan arrive directement dans le salon correspondant. L'entrée manuelle demande seulement le code, avec le bouton « Rejoindre ».
-2. Le joueur choisit son pseudo, une couleur et jusqu'à deux accessoires. L'aperçu du Plummo reste visible pendant la personnalisation. Aucun contrôle d'unicité.
+2. Le joueur choisit son pseudo, une couleur et des accessoires combinables, un par emplacement. L'aperçu du Plummo reste visible pendant la personnalisation. Aucun contrôle d'unicité.
 3. « Entrer dans le salon » confirme l'arrivée. Le joueur voit son personnage, son rôle et l'état du groupe.
 
 Proposition : réunir pseudo et personnalisation sur une même page, avec les accessoires dans un panneau secondaire, pour conserver une entrée courte. Les choix de personnalisation ne doivent pas masquer le bouton d'entrée.

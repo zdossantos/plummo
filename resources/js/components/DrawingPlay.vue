@@ -40,7 +40,10 @@ const canGuess = computed(
         !props.game.me.found &&
         ['drawing', 'artist_missing'].includes(props.game.phase),
 );
-async function send(action: string, values: Record<string, unknown>) {
+async function sendDrawingAction(
+    action: string,
+    values: Record<string, unknown>,
+) {
     return (
         (await props.send?.(action, {
             game_id: props.game.id,
@@ -51,7 +54,8 @@ async function send(action: string, values: Record<string, unknown>) {
     );
 }
 async function submit() {
-    if (await send('guess', { guess: guess.value })) guess.value = '';
+    if (await sendDrawingAction('guess', { guess: guess.value }))
+        guess.value = '';
 }
 watch(
     () => props.game.round.number,
@@ -87,7 +91,7 @@ watch(
                     data-testid="drawing-word"
                     class="h-auto whitespace-normal py-5 text-xl"
                     :disabled="busy"
-                    @click="send('choose', { choice: index })"
+                    @click="sendDrawingAction('choose', { choice: index })"
                     >{{ word }}</Button
                 >
             </div>
@@ -120,7 +124,7 @@ watch(
                 :busy="busy"
                 :color="color"
                 :width="width"
-                :send="(values) => send('stroke', values)"
+                :send="(values) => sendDrawingAction('stroke', values)"
                 @pending="pending = $event"
             />
             <div v-if="editable" class="mt-4 flex flex-wrap items-center gap-3">
@@ -150,13 +154,13 @@ watch(
                 <Button
                     variant="outline"
                     :disabled="busy || pending || !game.round.canvas.length"
-                    @click="send('undo', {})"
+                    @click="sendDrawingAction('undo', {})"
                     >{{ t('drawing_undo') }}</Button
                 >
                 <Button
                     variant="outline"
                     :disabled="busy || pending || !game.round.canvas.length"
-                    @click="send('clear', {})"
+                    @click="sendDrawingAction('clear', {})"
                     >{{ t('drawing_clear') }}</Button
                 >
             </div>
@@ -209,7 +213,7 @@ watch(
                 v-if="phone && game.me?.canSkip"
                 class="mt-5"
                 :disabled="busy || game.me.votedSkip"
-                @click="send('skip', {})"
+                @click="sendDrawingAction('skip', {})"
                 >{{
                     t(game.me.votedSkip ? 'drawing_skip_saved' : 'drawing_skip')
                 }}</Button

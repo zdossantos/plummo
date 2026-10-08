@@ -27,8 +27,11 @@ let timer: ReturnType<typeof setTimeout> | undefined;
 const pending = () =>
     local.value.some((s) => (acknowledged.get(s.id) ?? 0) < s.points.length);
 function schedule() {
-    clearTimeout(timer);
-    timer = setTimeout(() => void flush(), 250);
+    if (timer !== undefined) return;
+    timer = setTimeout(() => {
+        timer = undefined;
+        void flush();
+    }, 250);
 }
 async function flush() {
     if (stopped || sending || failed.value || !props.editable) return;
@@ -79,6 +82,7 @@ watch(
             active = null;
             current = undefined;
             clearTimeout(timer);
+            timer = undefined;
         } else if (pending()) schedule();
     },
 );
@@ -121,8 +125,10 @@ function move(event: PointerEvent) {
         return;
     const next = point(event);
     const last = current.points.at(-1)!;
-    if (Math.hypot(next[0] - last[0], next[1] - last[1]) >= 0.002)
+    if (Math.hypot(next[0] - last[0], next[1] - last[1]) >= 0.002) {
         current.points.push(next);
+        schedule();
+    }
 }
 function up(event: PointerEvent) {
     if (active !== event.pointerId) return;

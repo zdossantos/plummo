@@ -2,7 +2,7 @@
 
 Jeux entre amis et en famille : un grand écran commun et un téléphone par joueur.
 
-Le dépôt contient le socle technique, les salons sans compte, la personnalisation des Plummos et les réglages de session. Le catalogue administrateur et le quiz sont disponibles ; les autres mini-jeux suivent dans des PR distinctes.
+Le dépôt contient le socle technique, les salons sans compte, la personnalisation des Plummos et les réglages de session. Le catalogue administrateur, le quiz, le blind test et le dessin sont disponibles. Le prochain mini-jeu est le jeu de phrases.
 
 ## Installation
 
@@ -66,7 +66,7 @@ La [planche de personnalisation](public/plummo/index.html) présente la mascotte
 
 ## Salons
 
-Ouvrir `/` sur le grand écran crée un salon (une actualisation retrouve le même salon). Les téléphones entrent via le QR ou `/join` avec le code de six caractères. Chaque joueur choisit son prénom, sa couleur et jusqu’à deux accessoires. Huit places maximum ; le premier arrivé devient chef et peut transférer son rôle ou fermer le salon avec confirmation.
+Ouvrir `/` sur le grand écran crée un salon (une actualisation retrouve le même salon). Les téléphones entrent via le QR ou `/join` avec le code de six caractères. Chaque joueur choisit son prénom, sa couleur et un accessoire par emplacement (tête, visage, cou et main). Huit places maximum ; le premier arrivé devient chef et peut transférer son rôle ou fermer le salon avec confirmation.
 
 Le navigateur du téléphone conserve une identité privée dans un cookie chiffré HttpOnly : revenir avec ce même navigateur retrouve le Plummo et les points. Effacer les cookies ou utiliser un autre navigateur crée une autre identité. Un départ volontaire libère la place immédiatement ; une déconnexion détectée après quinze secondes réserve la place deux minutes. Un retour dans un salon plein attend une place disponible.
 
@@ -111,6 +111,6 @@ Le grand écran lit l’extrait préparé en boucle pendant la réponse. Si le n
 
 Le chef peut lancer le dessin à deviner pour deux à huit joueurs, de un à cinq tours et de 30 à 150 secondes par dessin (90 secondes par défaut). Chaque tour fait passer tous les joueurs connectés qui n’ont pas encore dessiné ; le dessinateur choisit un mot parmi trois propositions privées sur son téléphone et trace en direct sur le grand écran.
 
-Les autres joueurs écrivent leur proposition sur leur téléphone. La comparaison est insensible à la casse et reste volontairement exacte pour le reste ; une réponse proche reçoit un indice privé. Les bonnes réponses donnent davantage de points aux premiers joueurs, tandis que le dessinateur reçoit une part proportionnelle aux joueurs qui ont trouvé. Le tour passe immédiatement à la révélation quand tout le monde a trouvé. Les points acquis sont conservés pendant une pause, une déconnexion ou un arrêt décidé depuis le salon.
+Les autres joueurs écrivent leur proposition sur leur téléphone. La comparaison est insensible à la casse et reste volontairement exacte pour le reste ; une réponse proche reçoit un indice privé. Les bonnes réponses donnent davantage de points aux premiers joueurs, tandis que le dessinateur reçoit une part proportionnelle aux joueurs qui ont trouvé. Le tour passe immédiatement à la révélation quand tout le monde a trouvé. Les points acquis sont conservés pendant une pause ou une déconnexion. Un arrêt depuis la pause annule les points du dessin en cours et conserve ceux des dessins terminés ou passés.
 
 Le dessin est transmis par traits SVG normalisés avec révision et identifiants idempotents. Une reconnexion reprend le joueur à sa place ; un dessinateur absent gèle le tour et les joueurs connectés peuvent voter unanimement pour le passer. Le mot choisi reste privé jusqu’à la révélation.

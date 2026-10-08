@@ -33,23 +33,38 @@ it('draws from two separate phones and plays every artist before returning to th
         () => {
         const board = document.querySelector('[data-testid="drawing-board"]');
         const rect = board.getBoundingClientRect();
-        for (const [type,x,y] of [['pointerdown',.1,.1], ['pointermove',.5,.5], ['pointerup',.8,.8]]) {
+        for (const [type,x,y] of [['pointerdown',.1,.1]]) {
             board.dispatchEvent(new PointerEvent(type,{pointerId:1,bubbles:true,clientX:rect.left+x*rect.width,clientY:rect.top+y*rect.height}));
         }
         }
         JS);
         $screen->assertPresent('[data-testid="drawing-board"] polyline');
-        $second->fill('drawing-guess', mb_substr($word, 1));
+        $first->page()->evaluate(<<<'JS'
+        () => {
+            const board = document.querySelector('[data-testid="drawing-board"]');
+            const rect = board.getBoundingClientRect();
+            board.dispatchEvent(new PointerEvent('pointermove', {pointerId:1,bubbles:true,clientX:rect.left+.5*rect.width,clientY:rect.top+.5*rect.height}));
+        }
+        JS);
+        $screen->assertPresent('[data-testid="drawing-board"] polyline[points*=" "]');
+        $first->page()->evaluate(<<<'JS'
+        () => {
+            const board = document.querySelector('[data-testid="drawing-board"]');
+            const rect = board.getBoundingClientRect();
+            board.dispatchEvent(new PointerEvent('pointerup', {pointerId:1,bubbles:true,clientX:rect.left+.8*rect.width,clientY:rect.top+.8*rect.height}));
+        }
+        JS);
+        $second->fill('#drawing-guess', mb_substr($word, 1));
         $second->page()->locator('button:has-text("Guess")')->click(['noWaitAfter' => true]);
         $second->assertSee('Almost!');
-        $second->fill('drawing-guess', $word);
+        $second->fill('#drawing-guess', $word);
         $second->page()->locator('button:has-text("Guess")')->click(['noWaitAfter' => true]);
         $screen->assertSee('The word was: '.$word);
         $second->assertSee('Choose a word');
         $game->refresh();
         $word = $game->state['round']['words'][0];
         $second->page()->locator('[data-testid="drawing-word"]')->first()->click(['noWaitAfter' => true]);
-        $first->assertPresent('#drawing-guess')->fill('drawing-guess', $word);
+        $first->assertPresent('#drawing-guess')->fill('#drawing-guess', $word);
         $first->page()->locator('button:has-text("Guess")')->click(['noWaitAfter' => true]);
         $screen->assertSee('Mini-game leaderboard')->assertSee('130');
         $first->assertSee('Mini-game leaderboard');

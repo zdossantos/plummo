@@ -284,6 +284,20 @@ class DrawingGame
         $this->save($game, $state);
     }
 
+    public function cancelRound(Room $room, Game $game): void
+    {
+        $state = $game->state;
+        if (in_array($state['previous_phase'], ['reveal', 'waiting'], true)) {
+            return;
+        }
+        foreach ($state['round']['awards'] as $id => $points) {
+            $state['scores'][$id] -= $points;
+            $room->players()->whereKey($id)->decrement('score', $points);
+        }
+        $state['round']['awards'] = [];
+        $this->save($game, $state);
+    }
+
     public function skip(Room $room, RoomPlayer $player, int $gameId, int $number): void
     {
         $game = $this->current($room, $gameId, $number, ['artist_missing']);

@@ -230,6 +230,9 @@ class GameEngine
             $state['deadline'] = $this->time() + 5;
         } else {
             abort_unless($state['phase'] === 'paused', 409);
+            if ($game->type === 'drawing') {
+                app(DrawingGame::class)->cancelRound($room, $game);
+            }
             app(GameAudio::class)->retire($state['round']['payload']['audio_path'] ?? null);
             $this->save($game, ['status' => 'stopped']);
 

@@ -78,7 +78,7 @@ it('accepts only exact case-insensitive words, gives a private hint and scores o
     $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.phase', 'selecting')->assertJsonPath('game.round.artistId', $first);
 });
 
-it('shares occupied-rank points on ties and preserves acquired points on paused stop', function () {
+it('shares occupied-rank points on ties and cancels the interrupted drawing on paused stop', function () {
     $room = openRoom();
     [$artist, $one] = enterRoom($room);
     [$first, $two] = enterRoom($room, 'Alex');
@@ -88,12 +88,38 @@ it('shares occupied-rank points on ties and preserves acquired points on paused 
     $word = chooseDrawing($room, $one);
     $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => $word]))->assertOk();
     $this->withCookie('plummo_player_'.$room->code, $three)->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => $word]))->assertJsonPath('game.me.points', 83);
+    expect(RoomPlayer::findOrFail($artist)->score)->toBe(43)->and(RoomPlayer::findOrFail($first)->score)->toBe(83)->and(RoomPlayer::findOrFail($last)->score)->toBe(83);
     $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/game/stop')->assertConflict();
     $this->postJson('/rooms/'.$room->code.'/game/pause')->assertOk();
     $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => $word]))->assertConflict();
     $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/game/stop')->assertOk();
-    expect(RoomPlayer::findOrFail($artist)->score)->toBe(43)->and(RoomPlayer::findOrFail($first)->score)->toBe(83)->and(RoomPlayer::findOrFail($last)->score)->toBe(83);
+    expect(RoomPlayer::findOrFail($artist)->score)->toBe(0)->and(RoomPlayer::findOrFail($first)->score)->toBe(0)->and(RoomPlayer::findOrFail($last)->score)->toBe(0);
+    expect(Game::where('room_id', $room->id)->sole()->state['scores'])->each->toBe(0);
 });
+
+it('preserves completed drawing scores when stopping during reveal or a later drawing', function (bool $nextDrawing) {
+    $room = openRoom();
+    [$artist, $one] = enterRoom($room);
+    [$guesser, $two] = enterRoom($room, 'Alex');
+    [, $three] = enterRoom($room, 'Sam');
+    startDrawing($room, $one);
+    $word = chooseDrawing($room, $one);
+    $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => $word]))->assertOk();
+    $this->travel(90)->seconds();
+    drawingHeartbeat($room);
+    $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.phase', 'reveal');
+    if ($nextDrawing) {
+        $this->travel(3)->seconds();
+        $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.phase', 'selecting');
+        $word = chooseDrawing($room, $two);
+        $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => $word]))->assertOk();
+    }
+    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/game/pause')->assertOk();
+    $this->postJson('/rooms/'.$room->code.'/game/stop')->assertOk();
+    expect(RoomPlayer::findOrFail($artist)->score)->toBe(33)->and(RoomPlayer::findOrFail($guesser)->score)->toBe(100);
+    $scores = Game::where('room_id', $room->id)->sole()->state['scores'];
+    expect($scores[$artist])->toBe(33)->and($scores[$guesser])->toBe(100);
+})->with([false, true]);
 
 it('finishes each player rotation and then returns cumulative results at the point target', function () {
     $room = openRoom();
@@ -207,6 +233,26 @@ it('waits at a drawing boundary with one player and resumes when a second arrive
     drawingHeartbeat($room);
     $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.phase', 'selecting');
 });
+
+it('preserves completed awards while waiting for players or resuming that wait', function (bool $resume) {
+    $room = openRoom();
+    [$artist, $one] = enterRoom($room);
+    [$guesser, $two] = enterRoom($room, 'Alex');
+    [, $three] = enterRoom($room, 'Sam');
+    startDrawing($room, $one, 2);
+    $word = chooseDrawing($room, $one);
+    $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => $word]))->assertOk();
+    $this->withCookie('plummo_player_'.$room->code, $three)->postJson('/rooms/'.$room->code.'/leave')->assertJsonPath('game.phase', 'reveal');
+    $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/leave')->assertOk();
+    $this->travel(3)->seconds();
+    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.phase', 'waiting');
+    if ($resume) {
+        $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/return')->assertJsonPath('game.phase', 'resuming');
+    }
+    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/game/pause')->assertOk();
+    $this->postJson('/rooms/'.$room->code.'/game/stop')->assertOk();
+    expect(RoomPlayer::findOrFail($artist)->score)->toBe(33)->and(RoomPlayer::findOrFail($guesser)->score)->toBe(100);
+})->with([false, true]);
 
 it('recovers depleted words without erasing previously revealed history', function () {
     $room = openRoom();
