@@ -27,7 +27,7 @@ class PlayerAppearanceRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:30'],
             'color' => ['required', Rule::in($catalog->colors())],
-            'accessories' => ['present', 'array', 'list', 'max:2'],
+            'accessories' => ['present', 'array', 'list'],
             'accessories.*' => ['string', 'distinct', Rule::in(array_keys($catalog->slots()))],
         ];
     }
