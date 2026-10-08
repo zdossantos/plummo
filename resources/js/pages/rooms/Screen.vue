@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 import PlayerDock from '@/components/PlayerDock.vue';
+import RoomNotice from '@/components/RoomNotice.vue';
 import GamePlay from '@/components/GamePlay.vue';
 import ViewportShell from '@/components/ViewportShell.vue';
 import { useRoom } from '@/composables/useRoom';
@@ -27,6 +28,7 @@ const { t } = useTranslations('rooms');
 <template>
     <Head :title="t('title')" />
     <ViewportShell class="display-screen" display-only>
+        <RoomNotice :message="error" />
         <template #header
             ><span class="font-bold text-primary">{{ room?.code }}</span
             ><small>{{
@@ -39,7 +41,6 @@ const { t } = useTranslations('rooms');
             <h1 class="text-4xl">{{ t('closed') }}</h1>
         </div>
         <template v-else>
-            <p v-if="error" role="status" class="text-sm">{{ error }}</p>
             <div class="phone-scene max-w-none" data-testid="screen-content">
                 <section v-if="!game" class="screen-lobby">
                     <div>

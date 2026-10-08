@@ -11,7 +11,7 @@ import SessionSettings from '@/components/SessionSettings.vue';
 import RoomRanking from '@/components/RoomRanking.vue';
 import ViewportShell from '@/components/ViewportShell.vue';
 import GameControls from '@/components/GameControls.vue';
-import TextReader from '@/components/TextReader.vue';
+import RoomNotice from '@/components/RoomNotice.vue';
 import { useRoom } from '@/composables/useRoom';
 import { useTranslations } from '@/composables/useTranslations';
 import type { Catalog, Player } from '@/types/rooms';
@@ -98,14 +98,12 @@ watch(chief, (value) => {
 <template>
     <Head :title="t('join_title')" />
     <ViewportShell>
+        <RoomNotice :message="error" />
         <section v-if="closed" class="game-panel justify-center text-center">
             <h1>{{ t('closed') }}</h1>
             <Link href="/join">{{ t('back') }}</Link>
         </section>
         <div v-else class="phone-scene">
-            <p v-if="error" role="alert" class="text-summary">
-                {{ error }}<TextReader :text="error" />
-            </p>
             <form
                 v-if="!code"
                 class="game-panel justify-center"

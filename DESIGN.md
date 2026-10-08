@@ -230,3 +230,8 @@ La reprise dispose d’un grand compte à rebours citron au centre de la scène.
 Une commande Bulle avec icône et petit libellé reste visible dans le HUD du téléphone. Elle donne accès aux messages ou explique qu’une action de jeu doit d’abord être terminée ; les autorisations Laravel restent appliquées.
 
 Le grand écran est strictement passif : aucun contrôle, lien interactif, sélecteur de thème, lecteur de texte ou pagination. Les résultats affichent uniquement le podium des trois premiers ; les détails et le classement complet restent sur les téléphones. La lecture audio démarre automatiquement. Si le navigateur interdit l’autoplay, un statut explique le réglage à autoriser sans ajouter une commande de jeu au grand écran.
+
+
+## Clavier mobile et notifications
+
+La scène reste attachée à la zone visuelle du navigateur : sa hauteur et sa position suivent les événements resize et scroll de VisualViewport. La saisie conserve son focus et son texte pendant l’ouverture, le déplacement et la fermeture du clavier. Les erreurs de salon sont des notifications superposées roses avec icône SVG et annonce accessible, sans participer à la mise en page ni bloquer les commandes.

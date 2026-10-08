@@ -20,6 +20,57 @@ it('keeps the focused login field visible when the keyboard reduces the viewport
     $page->assertNoJavaScriptErrors();
 });
 
+it('keeps the message scene inside the visual viewport when the mobile keyboard pans it', function () {
+    $room = openRoom();
+    test()->withVite();
+    try {
+        $page = visit('/join/'.$room->code, ['viewport' => ['width' => 390, 'height' => 844]])->withLocale('en-US');
+        $page->fill('player-name', 'Camille')->click('Continue')->click('Enter the room');
+        $page->click('.message-shortcut')->fill('chat-message', 'Salut');
+        $page->page()->evaluate('() => { window.keyboardViewport = { height: 360, top: 180 }; Object.defineProperties(visualViewport, { height: { configurable: true, get: () => keyboardViewport.height }, offsetTop: { configurable: true, get: () => keyboardViewport.top } }); visualViewport.dispatchEvent(new Event("resize")); }');
+        $page->page()->evaluate('() => new Promise(resolve => setTimeout(resolve, 200))');
+        expect($page->page()->evaluate('() => document.querySelector(".viewport-shell").getBoundingClientRect().top'))->toBe(180);
+        $page->page()->evaluate('() => { keyboardViewport.top = 220; visualViewport.dispatchEvent(new Event("scroll")); }');
+        $page->page()->evaluate('() => new Promise(resolve => setTimeout(resolve, 200))');
+        expect($page->page()->evaluate('() => document.querySelector(".viewport-shell").getBoundingClientRect().top'))->toBe(220);
+        expect($page->page()->evaluate('() => document.activeElement.id'))->toBe('chat-message');
+        if (getenv('PLUMMO_UI_CAPTURE')) {
+            $page->page()->screenshot(false, 'keyboard-offset');
+        }
+        expect($page->page()->evaluate('() => Array.from(document.querySelectorAll(".viewport-shell button, .viewport-shell input, label[for=chat-message], #chat-hint")).filter(e => e.checkVisibility()).every(e => { const r = e.getBoundingClientRect(); return r.top >= visualViewport.offsetTop && r.bottom <= visualViewport.offsetTop + visualViewport.height; })'))->toBeTrue();
+        $page->page()->evaluate('() => { document.activeElement.blur(); keyboardViewport.height = 844; keyboardViewport.top = 0; visualViewport.dispatchEvent(new Event("resize")); }');
+        $page->page()->evaluate('() => new Promise(resolve => setTimeout(resolve, 200))');
+        expect($page->page()->evaluate('() => document.querySelector(".viewport-shell").getBoundingClientRect().top'))->toBe(0);
+        expect($page->page()->evaluate('() => document.querySelector("#chat-message").value'))->toBe('Salut');
+        assertViewportFits($page);
+        $page->assertNoJavaScriptErrors();
+    } finally {
+        $room->delete();
+    }
+});
+
+it('shows room errors over the message scene without moving its controls', function () {
+    $room = openRoom();
+    test()->withVite();
+    try {
+        $page = visit('/join/'.$room->code, ['viewport' => ['width' => 390, 'height' => 844]])->withLocale('en-US');
+        $page->fill('player-name', 'Camille')->click('Continue')->click('Enter the room');
+        $page->click('.message-shortcut')->fill('chat-message', 'Salut');
+        $before = $page->page()->evaluate('() => document.querySelector("#chat-message").getBoundingClientRect().top');
+        $page->page()->evaluate('() => { const originalFetch = window.fetch; window.fetch = (url, options) => String(url).endsWith("/chat") ? Promise.resolve(new Response(JSON.stringify({ errors: { message: ["Message temporarily unavailable"] } }), { status: 422, headers: { "Content-Type": "application/json" } })) : originalFetch(url, options); }');
+        $page->click('Send message')->assertSee('Message temporarily unavailable');
+        expect($page->page()->evaluate('() => document.querySelector("#chat-message").getBoundingClientRect().top'))->toBe($before);
+        $page->assertPresent('.room-notice[role="alert"]');
+        if (getenv('PLUMMO_UI_CAPTURE')) {
+            $page->page()->screenshot(false, 'message-error-toast');
+        }
+        assertViewportFits($page);
+        $page->assertNoJavaScriptErrors();
+    } finally {
+        $room->delete();
+    }
+});
+
 it('shows game preparation together without steps or scroll', function (int $width, int $height) {
     $room = openRoom();
     test()->withVite();

@@ -3,25 +3,29 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import RoomHeader from '@/components/RoomHeader.vue';
 defineProps<{ displayOnly?: boolean }>();
 const height = ref('100dvh');
+const top = ref('0px');
 const compact = ref(false);
 function resize() {
     compact.value = (window.visualViewport?.height ?? window.innerHeight) < 420;
     height.value = `${window.visualViewport?.height ?? window.innerHeight}px`;
+    top.value = `${window.visualViewport?.offsetTop ?? 0}px`;
 }
 onMounted(() => {
     resize();
     window.visualViewport?.addEventListener('resize', resize);
+    window.visualViewport?.addEventListener('scroll', resize);
     window.addEventListener('resize', resize);
 });
 onUnmounted(() => {
     window.visualViewport?.removeEventListener('resize', resize);
+    window.visualViewport?.removeEventListener('scroll', resize);
     window.removeEventListener('resize', resize);
 });
 </script>
 <template>
     <main
         class="viewport-shell"
-        :style="{ height }"
+        :style="{ height, top }"
         :data-compact="compact || undefined"
     >
         <svg

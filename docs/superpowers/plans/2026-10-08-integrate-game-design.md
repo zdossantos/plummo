@@ -85,3 +85,12 @@ Le grand écran ne contient aucune commande, aucun lien interactif ni pagination
 Validation navigateur : huit scénarios admin, messages et jeux ont réussi lors du contrôle général ; les douze scénarios restants ont réussi après adaptation des tests au grand écran passif (194 assertions). Les matrices FR/EN ont passé 99 et 92 contrôles sur téléphone, hauteur réduite, paysage et PC ; le grand écran passif a passé 44 contrôles supplémentaires. Les assertions vérifient la palette, les trois hauteurs du podium, l’absence de clignotement des boutons et l’absence de commandes sur le grand écran. Types, ESLint (avertissement PlummoAvatar existant), Prettier et Pint passent. Builds Vite et Docker réussis. compose.yaml reste exclu.
 
 Décor télé final : 90 contrôles supplémentaires réussis en français sur 1440 × 900 et 390 × 844, avec vérification du fond transparent et des motifs SVG. Capture télé inspectée ; sources CSS, shell et Screen identiques dans Docker et le workspace, runtime HTTP 200.
+
+
+## Clavier Safari et erreurs superposées
+
+Le défaut clavier est reproduit avec une zone visuelle de 360 px décalée de 180 puis 220 px : la scène restait à zéro, tronquant son contenu. Le shell est désormais fixé au viewport de mise en page et suit offsetTop sur resize et scroll. La fermeture rétablit la position initiale et préserve la saisie. Référence de l’API : https://developer.mozilla.org/en-US/docs/Web/API/VisualViewport.
+
+L’erreur inline déplaçait le champ de 471 à 488 px dans le test. RoomNotice la remplace par une notification absolue avec icône SVG, role alert et aria-atomic, partagée par téléphone et grand écran. Aucun contrôle supplémentaire n’est ajouté au grand écran.
+
+Validation : 11 tests de viewport WebKit réussis, 144 assertions ; les deux parcours messages Chromium passent et le test clavier Chromium corrigé passe (10 assertions). Deux captures finales WebKit inspectées (clavier décalé simulé et toast) ; contrôle ciblé 2 tests / 17 assertions. Matrice de géométrie : 99 contrôles réussis sur 320 × 400 et 1440 × 900. Types, ESLint (avertissement existant), Prettier, Pint et builds Vite/Docker passent. Les tests simulent les métriques du clavier ; ils ne constituent pas un essai sur un iPhone physique. Le moteur WebKit correspondant au Playwright verrouillé a été installé sans modifier les locks. compose.yaml reste exclu.
