@@ -28,7 +28,7 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         $phone->click('button[aria-label="Controls"]')->click('Session')->fill('session-target', '50')->click('Save target')->assertSee('Target: 50 points');
         $phone->click('button[aria-label="Play"]')->assertSee('Mini-game');
         $phone->select('game-type', 'blind_test');
-        $phone->click('Continue')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('Continue')->assertSee('8 unseen clips')->fill('game-rounds', '5');
+        $phone->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")')->assertSee('8 unseen clips')->fill('game-rounds', '5');
         // Simulate an autoplay restriction, then use native playback after consent.
         $screen->page()->evaluate('() => { window.nativePlay = HTMLMediaElement.prototype.play; HTMLMediaElement.prototype.play = function () { return Promise.reject(new DOMException("Autoplay blocked", "NotAllowedError")); }; }');
         $phone->page()->locator('button:has-text("Start blind test")')->click(['noWaitAfter' => true]);

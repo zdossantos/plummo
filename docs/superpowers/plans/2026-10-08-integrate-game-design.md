@@ -62,3 +62,13 @@ Les champs partagent un fond papier lisible, des dimensions de 44 px (32 px en h
 Validation finale : 158 tests Laravel/Pest, 1 682 assertions, 126,89 s ; frontend : 8 tests, 34 assertions. Types, ESLint (avertissement PlummoAvatar préexistant), Prettier, Pint, PHPStan et builds passent. Matrices de géométrie : 143 contrôles joueurs FR sur quatre formats et 144 contrôles administration FR/EN sur six formats, sans débordement ; contraste des champs et relief des boutons contrôlés. Le défaut du champ actif a été reproduit par un test en échec, puis corrigé et vérifié dans la suite finale. Docker reconstruit, champs et bouton de connexion mesurés à 44 px et réduction de hauteur vérifiée sur le runtime.
 
 Aucun changement au catalogue ni aux assets des Plummos. compose.yaml reste une modification utilisateur exclue du commit.
+
+## Préparation regroupée et scène mobile
+
+La préparation réunit les quatre contrôles dans une grille commune : deux colonnes sur téléphone, quatre sur PC. Les packs se choisissent dans le Drawer Shadcn Vue. Le formulaire transmet les mêmes réglages Laravel et conserve les contraintes de lancement. Les libellés sur deux lignes ne décalent plus les champs ; le type et le nombre de packs restent lisibles. Si le lancement est impossible, le message d’attente remplace l’estimation.
+
+Les champs et sélecteurs ont une base pleine, une face crème et la police Fredoka commune aux boutons. Le chevron occupe une commande violette ; les cases à cocher reprennent les mêmes contours et une coche jaune. Sur mobile, le grand panneau arrondi disparaît au profit d’un décor commun avec points lumineux, sol en diagonale et bandeaux de titre.
+
+Le nouveau test a d’abord échoué sur les quatre formats car les réglages étaient masqués par les étapes. Les contrôles de géométrie vérifient maintenant l’alignement des champs, les régions titre/réglages/lancement et les débordements internes. Le salon en attente de joueurs a également reproduit un débordement en hauteur réduite, corrigé par l’affichage du message utile à la place de l’estimation.
+
+Validation des retouches : 13 tests navigateur réussis, 253 assertions, 77,24 s. Les matrices FR/EN comptent 358 contrôles après la refonte des champs sur quatre formats, 186 contrôles après le décor mobile et 42 contrôles supplémentaires de préparation/attente en 320 × 400. Captures des petits écrans, du téléphone et du PC inspectées visuellement. Types, ESLint (avertissement existant PlummoAvatar), Prettier, Pint, Vite et Docker passent. Les sources finales du formulaire, du CSS et des traductions françaises ont les mêmes empreintes dans Docker et dans le workspace ; le runtime répond HTTP 200.

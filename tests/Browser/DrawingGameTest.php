@@ -19,7 +19,7 @@ it('draws from two separate phones and plays every artist before returning to th
         $first = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Camille')->click('Continue')->click('Enter the room')->assertSee('Prepare a quiz');
         $second = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Alex')->click('Continue')->click('Enter the room')->assertSee('Alex');
         $first->select('game-type', 'drawing')->assertSee('Prepare a drawing game');
-        $first->click('Continue')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('Continue')->assertSee('2 drawings');
+        $first->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")')->assertSee('2 drawings');
         $first->page()->locator('button:has-text("Start drawing")')->click(['noWaitAfter' => true]);
         $first->assertSee('Choose a word');
         $second->assertSee('Camille is choosing a word');

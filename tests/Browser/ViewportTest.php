@@ -20,6 +20,25 @@ it('keeps the focused login field visible when the keyboard reduces the viewport
     $page->assertNoJavaScriptErrors();
 });
 
+it('shows game preparation together without steps or scroll', function (int $width, int $height) {
+    $room = openRoom();
+    test()->withVite();
+    try {
+        $page = visit('/join/'.$room->code, ['viewport' => compact('width', 'height')])->withLocale('en-US');
+        $page->fill('player-name', 'Camille')->click('Continue')->click('Enter the room')->assertSee('Prepare a quiz');
+        foreach (['game-type', 'game-rounds', 'game-duration'] as $id) {
+            expect($page->page()->evaluate('() => document.getElementById("'.$id.'").checkVisibility()'))->toBeTrue();
+        }
+        $page->assertDontSee('Continue')->assertSee('Start quiz');
+        assertViewportFits($page);
+        $page->click('[data-choose-packs]')->assertPresent('[data-slot="drawer-content"][data-state="open"]');
+        assertViewportFits($page);
+        $page->assertNoJavaScriptErrors();
+    } finally {
+        $room->delete();
+    }
+})->with([[320, 400], [390, 844], [844, 390], [1440, 900]]);
+
 it('keeps the wardrobe and genuine accessory drawers usable without scroll on phone and desktop', function (int $width, int $height, string $locale) {
     app()->terminating(function () {
         app('cookie')->flushQueuedCookies();

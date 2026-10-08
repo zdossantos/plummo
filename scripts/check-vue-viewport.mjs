@@ -23,6 +23,26 @@ async function fits(page, label) {
     const failures = await page.evaluate(() => {
         const visible = (e) => e.checkVisibility() && !e.closest('[inert]');
         const issues = [];
+        const setup = document.querySelector('.setup-board');
+        if (setup && visible(setup)) {
+            for (const pair of [
+                ['#game-type', '[data-choose-packs]'],
+                ['#game-rounds', '#game-duration'],
+            ]) {
+                const fields = pair
+                    .map((selector) => setup.querySelector(selector))
+                    .filter(Boolean);
+                if (fields.length !== 2) continue;
+                const [a, b] = fields.map((field) => field.getBoundingClientRect());
+                if (Math.abs(a.top - b.top) > 1 || Math.abs(a.height - b.height) > 1)
+                    issues.push('misaligned setup fields');
+            }
+            const title = setup.querySelector('h2').getBoundingClientRect();
+            const main = setup.querySelector('.setup-main').getBoundingClientRect();
+            const launch = setup.querySelector('.setup-launch').getBoundingClientRect();
+            if (main.top < title.bottom || main.bottom > launch.top)
+                issues.push('overlapping setup regions');
+        }
         for (const e of document.querySelectorAll(
             'input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select,textarea',
         )) {
@@ -69,7 +89,7 @@ async function fits(page, label) {
                 );
         }
         for (const e of document.querySelectorAll(
-            '.game-panel,.paged-items,.deck-stage,.reader-text,.game-drawer,textarea',
+            '.game-panel,.setup-main,.setup-details,.paged-items,.deck-stage,.reader-text,.game-drawer,textarea',
         )) {
             if (!visible(e)) continue;
             if (
@@ -269,6 +289,7 @@ try {
             await page.route('**/rooms/' + code + '/presence', (r) =>
                 r.fulfill({ json: snapshot }),
             );
+            let setupPlayers = 8;
             await page.route('**/rooms/' + code + '/game-options', (r) =>
                 r.fulfill({
                     json: {
@@ -276,22 +297,44 @@ try {
                             id: i + 1,
                             name: 'Long pack name '.repeat(6),
                         })),
-                        connectedPlayers: 8,
+                        connectedPlayers: setupPlayers,
                         distinctSongs: 8,
                         availability: { total: 100, unseen: 100 },
                     },
                 }),
             );
             await page.waitForTimeout(2100);
-            await fits(page, 'setup-type');
-            await page
-                .getByRole('button', { name: t.continue, exact: true })
-                .click();
-            await fits(page, 'setup-packs');
-            await page
-                .getByRole('button', { name: t.continue, exact: true })
-                .click();
-            await fits(page, 'setup-settings');
+            await page.locator('#game-type').selectOption('blind_test');
+            for (const type of ['quiz', 'blind_test', 'drawing', 'phrase']) {
+                await page.locator('#game-type').selectOption(type);
+                await fits(page, 'setup-' + type);
+                assert.equal(await page.locator('#game-rounds').isVisible(), true);
+                assert.equal(await page.locator('#game-duration').isVisible(), true);
+                assert.equal(await page.locator('.setup-board .page-controls').count(), 0);
+                await page.locator('[data-choose-packs]').click();
+                await fits(page, 'setup-pack-drawer-' + type);
+                await page.locator('.setup-pack-drawer input[type=checkbox]').first().check();
+                await page.keyboard.press('Escape');
+                await fits(page, 'setup-selected-' + type);
+                if (process.env.PLUMMO_UI_SETUP_ONLY) {
+                    await page.screenshot({
+                        path: `/tmp/plummo-setup-${locale}-${type}-${width}-${height}.png`,
+                    });
+                }
+            }
+            await page.screenshot({ path: `/tmp/plummo-setup-${locale}-${width}.png` });
+            if (process.env.PLUMMO_UI_SETUP_ONLY) {
+                setupPlayers = 1;
+                for (const type of ['drawing', 'phrase']) {
+                    await page.locator('#game-type').selectOption(type);
+                    await page.locator('.setup-details [role=status]').waitFor();
+                    await fits(page, 'setup-awaiting-players-' + type);
+                }
+                assert.equal(errors.length, 0, errors.join('\n'));
+                console.log('PASS setup', locale, width, height);
+                await context.close();
+                continue;
+            }
             await page
                 .getByRole('button', { name: t.controls, exact: true })
                 .click();

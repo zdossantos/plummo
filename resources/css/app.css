@@ -790,22 +790,6 @@
     min-height: 0 !important;
 }
 
-.setup-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-}
-.setup-actions > .page-controls {
-    flex: 1;
-    min-width: 0;
-    margin: 0;
-}
-.setup-actions > button {
-    flex: 1;
-    min-width: 0;
-}
-
 .viewport-shell[data-compact] > .room-header {
     display: none;
 }
@@ -952,6 +936,7 @@
 .game-drawer {
     --control-height: 44px;
     --control-padding: 10px 12px;
+    --field-depth: 4px;
 }
 .viewport-shell button,
 .game-drawer button {
@@ -960,6 +945,7 @@
     border-radius: 14px;
     box-shadow: 0 var(--button-depth) 0 var(--edge);
     margin-bottom: var(--button-depth);
+    font-family: Fredoka, sans-serif;
     font-weight: 700;
     transition:
         transform 100ms ease-out,
@@ -1015,6 +1001,68 @@
     padding: var(--control-padding);
     border: 2px solid var(--edge);
     border-radius: 14px;
+    box-shadow:
+        0 var(--field-depth) 0 var(--edge),
+        inset 0 2px 0 #fff;
+    transition:
+        outline-color 120ms ease-out,
+        box-shadow 120ms ease-out;
+}
+.viewport-shell input:not([type='checkbox']):not([type='radio']),
+.viewport-shell select,
+.game-drawer input:not([type='checkbox']):not([type='radio']),
+.game-drawer select {
+    font-family: Fredoka, sans-serif;
+    font-weight: 500;
+}
+.viewport-shell select,
+.game-drawer select {
+    appearance: none;
+    padding-right: 42px;
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 6 5 5 5-5' fill='none' stroke='%2321182f' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"),
+        linear-gradient(
+            to left,
+            var(--purple) 32px,
+            var(--edge) 32px,
+            var(--edge) 34px,
+            transparent 34px
+        );
+    background-position:
+        right 9px center,
+        center;
+    background-size:
+        14px 14px,
+        100% 100%;
+    background-repeat: no-repeat;
+}
+.viewport-shell :is(input, select, textarea):focus-visible,
+.game-drawer :is(input, select, textarea):focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 3px;
+}
+.viewport-shell :is(input, select, textarea):disabled,
+.game-drawer :is(input, select, textarea):disabled {
+    opacity: 0.6;
+}
+.viewport-shell input[type='checkbox'],
+.game-drawer input[type='checkbox'] {
+    appearance: none;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--edge);
+    border-radius: 5px;
+    background: var(--paper);
+    box-shadow: 0 2px 0 var(--edge);
+}
+.viewport-shell input[type='checkbox']:checked,
+.game-drawer input[type='checkbox']:checked {
+    background-color: var(--primary);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 8 3 3 7-7' fill='none' stroke='%2321182f' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-position: center;
+    background-size: 14px;
+    background-repeat: no-repeat;
 }
 .viewport-shell input::placeholder,
 .viewport-shell textarea::placeholder,
@@ -1110,6 +1158,7 @@
     .game-drawer {
         --control-height: 32px;
         --control-padding: 4px 10px;
+        --field-depth: 2px;
     }
     .viewport-shell button,
     .game-drawer button {
@@ -1212,5 +1261,169 @@
     }
     .phone-status > .text-summary {
         font-size: 14px;
+    }
+}
+
+.setup-board > h2 {
+    flex-shrink: 0;
+    line-height: 1.2;
+}
+.setup-main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: safe center;
+    gap: 20px;
+    width: 100%;
+    max-width: 920px;
+    align-self: center;
+}
+.setup-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 12px;
+}
+.setup-type,
+.setup-pack-choice,
+.setup-field {
+    display: grid;
+    grid-template-rows: minmax(40px, auto) var(--control-height);
+    align-content: end;
+    min-width: 0;
+    gap: 8px;
+}
+.setup-fields span {
+    align-self: end;
+    font-weight: 700;
+    line-height: 20px;
+}
+.setup-fields input,
+.setup-fields select,
+.setup-fields button {
+    width: 100%;
+    min-width: 0;
+    height: var(--control-height);
+    margin: 0;
+}
+.setup-fields button {
+    white-space: nowrap;
+}
+.setup-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.setup-launch {
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 920px;
+    align-self: center;
+}
+@media (min-width: 768px) {
+    .setup-fields {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+@media (max-height: 650px) {
+    .setup-main {
+        gap: 12px;
+    }
+    .setup-fields {
+        gap: 12px;
+    }
+    .setup-details {
+        gap: 4px;
+    }
+    .setup-details p,
+    .setup-details label {
+        font-size: 12px;
+        line-height: 16px;
+    }
+    .setup-fields span {
+        font-size: 14px;
+        line-height: 18px;
+    }
+    .setup-type,
+    .setup-pack-choice,
+    .setup-field {
+        grid-template-rows: minmax(36px, auto) var(--control-height);
+        gap: 6px;
+    }
+    .setup-pack-choice button {
+        font-size: 14px;
+    }
+}
+.viewport-shell[data-compact] .setup-main {
+    gap: 8px;
+}
+.viewport-shell[data-compact] .setup-board > h2 {
+    font-size: 20px;
+}
+.viewport-shell[data-compact] .setup-fields {
+    gap: 8px;
+}
+.viewport-shell[data-compact] .setup-type,
+.viewport-shell[data-compact] .setup-pack-choice,
+.viewport-shell[data-compact] .setup-field {
+    grid-template-rows: minmax(30px, auto) var(--control-height);
+    gap: 4px;
+}
+.viewport-shell[data-compact] .setup-fields span {
+    font-size: 12px;
+    line-height: 15px;
+}
+
+@media (max-width: 600px) {
+    .viewport-shell::before {
+        background:
+            radial-gradient(
+                circle at 12% 22%,
+                #efe68199 0 2px,
+                transparent 3px
+            ),
+            radial-gradient(
+                circle at 88% 38%,
+                #b7e1c380 0 2px,
+                transparent 3px
+            ),
+            radial-gradient(
+                circle at 76% 12%,
+                #aa83ec99 0 3px,
+                transparent 4px
+            ),
+            radial-gradient(circle at 8% 78%, #aa83ec80 0 3px, transparent 4px),
+            linear-gradient(
+                155deg,
+                transparent 65%,
+                #aa83ec14 65% 78%,
+                transparent 78%
+            ),
+            radial-gradient(ellipse at 100% 0, #61497880, transparent 55%),
+            linear-gradient(180deg, #302143, #251731);
+    }
+    .viewport-shell::after {
+        height: 96px;
+        background: linear-gradient(180deg, #61497866, var(--edge));
+        clip-path: polygon(0 65%, 100% 10%, 100% 100%, 0 100%);
+    }
+    .viewport-shell .game-panel {
+        background: transparent;
+        border-radius: 0;
+    }
+    .viewport-shell .game-panel > h2 {
+        position: relative;
+        isolation: isolate;
+        align-self: flex-start;
+        max-width: 100%;
+    }
+    .viewport-shell .game-panel > h2::before {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        inset: -4px -14px -4px -8px;
+        background: #614978b3;
+        clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+        pointer-events: none;
     }
 }
