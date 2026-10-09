@@ -74,3 +74,119 @@ export function randomAppearance(
         }),
     };
 }
+
+export interface PlummoRig {
+    version: number;
+    sourceHash: string;
+    defs: string;
+    attributes: string;
+    parts: Record<string, { svg: string; pivot: number[]; parent: string }>;
+}
+
+/** Repository-owned fragments only. Rest order matches the original SVG. */
+export function composeAnimatedPlummo(
+    colorId: string,
+    selected: string[],
+    catalog: Catalog,
+    parts: Record<string, string>,
+    rig: PlummoRig,
+    prefix: string,
+    foreground: boolean,
+): string {
+    const chosen = catalog.accessories.filter((a) => selected.includes(a.id));
+    const body = (file?: string) =>
+        file
+            ? (parts[file] ?? '')
+                  .replace(/<svg[^>]*>/, '')
+                  .replace(/<\/svg>\s*$/, '')
+                  .replace(/<title>.*?<\/title>/gs, '')
+            : '';
+    const group = (name: string, svg: string, pivot = [256, 320]) =>
+        `<g data-plummo-part="${name}" style="transform-origin:${pivot[0]}px ${pivot[1]}px">${svg}</g>`;
+    const piece = (name: string) =>
+        group(name, rig.parts[name].svg, rig.parts[name].pivot);
+    const hand = chosen.find((a) => a.slot === 'hand');
+    const arm = (side: string) =>
+        group(
+            `arm-${side}`,
+            [
+                side === 'right' && foreground
+                    ? group('object-back', body(hand?.back))
+                    : '',
+                `<g fill="url(#plummo-tone)">${piece(`hand-${side}`)}${foreground ? piece(`hand-${side}-reflection`) : ''}</g>`,
+                side === 'right' && foreground
+                    ? group('object-front', body(hand?.front))
+                    : '',
+            ].join(''),
+            rig.parts[`hand-${side}`].pivot,
+        );
+    const accessory = (slot: string, svg: string) =>
+        group(`accessory-${slot}`, svg);
+    const behind = chosen
+        .map((a) =>
+            foreground && a.slot === 'hand'
+                ? ''
+                : accessory(a.slot, body(a.back)),
+        )
+        .join('');
+    const front = chosen
+        .map((a) =>
+            foreground && a.slot === 'hand'
+                ? ''
+                : accessory(a.slot, body(a.front)),
+        )
+        .join('');
+    const feet = `<g fill="url(#plummo-tone)">${piece('foot-left')}${piece('foot-right')}</g>`;
+    const plumes = chosen.some((a) => a.coversPlumes)
+        ? ''
+        : Object.keys(rig.parts)
+              .filter((n) => n.startsWith('plume-'))
+              .map(piece)
+              .join('');
+    const eye = (side: string) =>
+        group(
+            `eye-${side}`,
+            ['eye-white', 'iris', 'highlight']
+                .map((name) => piece(`${name}-${side}`))
+                .join(''),
+            rig.parts[`iris-${side}`].pivot,
+        );
+    const mouth = group(
+        'mouth',
+        piece('mouth-opening') +
+            group(
+                'tongue',
+                rig.parts.tongue.svg + piece('tongue-reflection'),
+                rig.parts.tongue.pivot,
+            ),
+        rig.parts['mouth-opening'].pivot,
+    );
+    const face = group(
+        'face',
+        piece('brow-left') +
+            piece('brow-right') +
+            eye('left') +
+            eye('right') +
+            piece('cheek-left') +
+            piece('cheek-right') +
+            mouth,
+    );
+    // Moving arms are painted last; their objects and reflections share the pivot.
+    const pose = group(
+        'pose',
+        behind +
+            `<g${rig.attributes}>${feet}${plumes}${foreground ? '' : arm('left') + arm('right') + piece('hands-reflection')}${piece('body')}${piece('shadow')}${face}</g>` +
+            front +
+            (foreground
+                ? `<g${rig.attributes}>${arm('left')}${arm('right')}</g>`
+                : ''),
+    );
+    const color =
+        catalog.colors.find((c) => c.id === colorId) ?? catalog.colors[0];
+    return (rig.defs + pose)
+        .replaceAll('#b99aef', color.light)
+        .replaceAll('#9672dc', color.color)
+        .replaceAll('#6950ac', color.dark)
+        .replace(/id="([^"]+)"/g, `id="${prefix}-$1"`)
+        .replace(/url\(#([^)]+)\)/g, `url(#${prefix}-$1)`);
+}

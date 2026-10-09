@@ -36,3 +36,34 @@ test('random appearance selects a valid color and one item from every available 
     }
     expect(randomAppearance({ colors: [], accessories: [] }, () => 0)).toEqual({ color: 'violet', accessories: [] });
 });
+
+// Exercise the real vector kit, including every two-layer hand object.
+import * as composer from '../../resources/js/lib/plummo';
+import realCatalog from '../../public/plummo/catalog.json';
+import { createHash } from 'node:crypto';
+import { readFileSync, existsSync } from 'node:fs';
+const realParts = Object.fromEntries(['base.svg', ...realCatalog.accessories.flatMap(a => [a.front, ...(a.back ? [a.back] : [])])].map(file => [file, readFileSync(`public/plummo/${file}`, 'utf8')]));
+
+test('articulated composition exposes independent features and keeps objects attached to the right hand', () => {
+    expect(composer.composeAnimatedPlummo).toBeFunction();
+    expect(existsSync('public/plummo/rig.json')).toBe(true);
+    const rig = JSON.parse(readFileSync('public/plummo/rig.json', 'utf8'));
+    expect(rig.sourceHash).toBe(createHash('sha256').update(realParts['base.svg']).digest('hex'));
+    const svg = composer.composeAnimatedPlummo('violet', [], realCatalog, realParts, rig, 'rig', false);
+    for (const name of ['body', 'shadow', 'foot-left', 'foot-right', 'arm-left', 'arm-right', 'plume-large', 'plume-pink', 'plume-side', 'brow-left', 'brow-right', 'eye-left', 'eye-right', 'iris-left', 'iris-right', 'highlight-left', 'highlight-right', 'cheek-left', 'cheek-right', 'mouth', 'tongue']) expect(svg).toContain(`data-plummo-part="${name}"`);
+    for (const item of realCatalog.accessories.filter(a => a.slot === 'hand')) {
+        const animated = composer.composeAnimatedPlummo('violet', [item.id], realCatalog, realParts, rig, 'rig', true);
+        const arm = animated.slice(animated.indexOf('data-plummo-part="arm-right"'));
+        expect(arm.indexOf('data-plummo-part="object-back"')).toBeLessThan(arm.indexOf('data-plummo-part="hand-right"'));
+        expect(arm.indexOf('data-plummo-part="hand-right"')).toBeLessThan(arm.indexOf('data-plummo-part="object-front"'));
+        expect(animated.indexOf('data-plummo-part="arm-right"')).toBeGreaterThan(animated.indexOf('data-plummo-part="face"'));
+    }
+    const cap = realCatalog.accessories.find(a => a.coversPlumes)!;
+    expect(composer.composeAnimatedPlummo('violet', [cap.id], realCatalog, realParts, rig, 'rig', false)).not.toContain('data-plummo-part="plume-large"');
+    for (const color of realCatalog.colors) {
+        const rendered = composer.composeAnimatedPlummo(color.id, [], realCatalog, realParts, rig, color.id, false);
+        expect(rendered).toContain(color.color);
+        expect(rendered).toContain(`url(#${color.id}-plummo-tone)`);
+        expect(rendered).not.toContain('url(#plummo-tone)');
+    }
+});
