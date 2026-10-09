@@ -65,7 +65,7 @@ jobs:
         run: |
           test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
           test "$(git rev-parse "$RELEASE_TAG^{commit}")" = "$RELEASE_SHA"
-          test "v$(jq -r '."."' .release-please-manifest.json)" = "$RELEASE_TAG"
+          test "plummo-v$(jq -r '."."' .release-please-manifest.json)" = "$RELEASE_TAG"
       - name: Set image name
         id: image
         run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
