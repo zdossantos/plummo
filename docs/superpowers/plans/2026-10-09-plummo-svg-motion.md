@@ -1,6 +1,6 @@
 # Découpage complet des Plummos et microanimations
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** animer indépendamment toutes les parties visibles des Plummos, avec des gestes naturels et une apparence au repos conservée.
 
@@ -33,13 +33,13 @@
 
 **Interfaces:** conserver `composePlummo(colorId, selected, catalog, parts, prefix): string` pour les usages statiques. Ajouter `composeAnimatedPlummo(colorId, selected, catalog, parts, rig, prefix, foreground): string`, où `rig` contient les fragments SVG nommés, leurs parents et pivots ; `foreground` choisit l’ordre des bras au repos ou en geste. Les fragments proviennent de fichiers du dépôt, jamais d’une saisie utilisateur.
 
-- [ ] Écrire les tests : toutes les parties de la spec sont adressables ; la recoloration et les chapeaux fonctionnent ; les huit objets de main appartiennent au bras droit avec leurs deux segments ; aucune référence ne croise deux instances.
-- [ ] Exécuter `bun test tests/Frontend/plummo.test.ts` et vérifier l’échec pertinent sur les groupes ou l’assemblage encore absents.
-- [ ] Nommer les éléments SVG et les groupes parents sans changer les tracés. Séparer les deux pieds, les trois plumes, les reflets, les deux membres, chaque sourcil, œil, iris, reflet d’œil, joue, bouche et langue. Conserver l’ordre original entre surfaces qui se recouvrent.
-- [ ] Générer les fragments et pivots depuis le XML avec `php scripts/build-plummo-rig.php` : pas d’extraction de groupes imbriqués par une expression régulière. Les parents coordonnent les détails ; l’ombrage et les reflets suivent leurs surfaces. Le bras et la main restent ensemble lorsque le tracé actuel dessine un membre continu.
-- [ ] Implémenter le compositeur animé, avec ordre de repos identique à l’actuel et ordre de geste au premier plan. Conserver l’unicité des identifiants et leurs références ; réutiliser la sélection par zone et la suppression des plumes sous les chapeaux.
-- [ ] Vérifier les tests et les images de repos pour six couleurs et les 28 accessoires. Comparer ancien compositeur statique et nouveau compositeur au repos, y compris une combinaison complète ; vérifier aussi huit instances simultanées.
-- [ ] Commit `feat: split Plummo SVG into independently animated parts`.
+- [x] Écrire les tests : toutes les parties de la spec sont adressables ; la recoloration et les chapeaux fonctionnent ; les huit objets de main appartiennent au bras droit avec leurs deux segments ; aucune référence ne croise deux instances.
+- [x] Exécuter `bun test tests/Frontend/plummo.test.ts` et vérifier l’échec pertinent sur les groupes ou l’assemblage encore absents.
+- [x] Nommer les éléments SVG et les groupes parents sans changer les tracés. Séparer les deux pieds, les trois plumes, les reflets, les deux membres, chaque sourcil, œil, iris, reflet d’œil, joue, bouche et langue. Conserver l’ordre original entre surfaces qui se recouvrent.
+- [x] Générer les fragments et pivots depuis le XML avec `php scripts/build-plummo-rig.php` : pas d’extraction de groupes imbriqués par une expression régulière. Les parents coordonnent les détails ; l’ombrage et les reflets suivent leurs surfaces. Le bras et la main restent ensemble lorsque le tracé actuel dessine un membre continu.
+- [x] Implémenter le compositeur animé, avec ordre de repos identique à l’actuel et ordre de geste au premier plan. Conserver l’unicité des identifiants et leurs références ; réutiliser la sélection par zone et la suppression des plumes sous les chapeaux.
+- [x] Vérifier les tests et les images de repos pour six couleurs et les 28 accessoires. Comparer ancien compositeur statique et nouveau compositeur au repos, y compris une combinaison complète ; vérifier aussi huit instances simultanées.
+- [x] Commit `feat: split Plummo SVG into independently animated parts`.
 
 ## Tâche 2 — Gestes coordonnés et déclencheurs
 
@@ -47,13 +47,13 @@
 
 **Interfaces:** `PlummoMotion = 'idle' | 'answer' | 'points' | 'resume' | 'podium'` ; `PlummoAvatar` reçoit `motion?: PlummoMotion` et `motionKey?: string`. Une clé représente un événement confirmé, pas la date d’une relecture. `usePlummoMotion` conserve les clés consommées pendant sa vie, annule ses minuteries à la destruction et rend les bras au repos à la fin du geste. L’absence de `motion` laisse l’avatar statique.
 
-- [ ] Écrire les tests de déduplication : une même réponse confirmée ou révélation relue ne rejoue pas le geste ; un nouvel événement le joue ; une ancienne révélation après reconnexion n’est pas célébrée ; un changement de manche annule le geste précédent.
-- [ ] Exécuter `bun test tests/Frontend/plummo-motion.test.ts` et constater l’échec sur la gestion des événements absente.
-- [ ] Implémenter les états et gestes : respiration du corps avec clignement des yeux en attente ; signe du bras après réponse enregistrée ; geste des bras au gain de points ; signe à la reprise ; victoire au podium. Réutiliser `roundCelebration` pour les gains, sans modifier leurs règles ni leur affichage.
-- [ ] Employer des courbes progressives, petites amplitudes et légers décalages entre parties liées. Les sourcils et la bouche peuvent accompagner les gestes ; les pieds soutiennent le mouvement, les plumes amortissent le retour. Ne pas animer tous les éléments en permanence.
-- [ ] Relier les gestes aux projections serveur existantes : réponse de quiz/blind test, dessin trouvé, phrase envoyée ou vote confirmé. Ne jamais déduire une réussite privée sur le grand écran avant sa révélation. Garder les listes et l’atelier statiques.
-- [ ] Ajouter la règle de réduction des mouvements, arrêter toutes les minuteries et conserver les indications textuelles. Vérifier que les événements ne dépendent pas de la fin d’une animation pour continuer le jeu.
-- [ ] Vérifier les tests unitaires et navigateur, puis commit `feat: animate Plummo gestures from confirmed game events`.
+- [x] Écrire les tests de déduplication : une même réponse confirmée ou révélation relue ne rejoue pas le geste ; un nouvel événement le joue ; une ancienne révélation après reconnexion n’est pas célébrée ; un changement de manche annule le geste précédent.
+- [x] Exécuter `bun test tests/Frontend/plummo-motion.test.ts` et constater l’échec sur la gestion des événements absente.
+- [x] Implémenter les états et gestes : respiration du corps avec clignement des yeux en attente ; signe du bras après réponse enregistrée ; geste des bras au gain de points ; signe à la reprise ; victoire au podium. Réutiliser `roundCelebration` pour les gains, sans modifier leurs règles ni leur affichage.
+- [x] Employer des courbes progressives, petites amplitudes et légers décalages entre parties liées. Les sourcils et la bouche peuvent accompagner les gestes ; les pieds soutiennent le mouvement, les plumes amortissent le retour. Ne pas animer tous les éléments en permanence.
+- [x] Relier les gestes aux projections serveur existantes : réponse de quiz/blind test, dessin trouvé, phrase envoyée ou vote confirmé. Ne jamais déduire une réussite privée sur le grand écran avant sa révélation. Garder les listes et l’atelier statiques.
+- [x] Ajouter la règle de réduction des mouvements, arrêter toutes les minuteries et conserver les indications textuelles. Vérifier que les événements ne dépendent pas de la fin d’une animation pour continuer le jeu.
+- [x] Vérifier les tests unitaires et navigateur, puis commit `feat: animate Plummo gestures from confirmed game events`.
 
 ## Tâche 3 — Revue visuelle et livraison
 
@@ -61,12 +61,16 @@
 
 **Interfaces:** scènes existantes de téléphone, grand écran, reprise et podium ; aucune nouvelle commande utilisateur.
 
-- [ ] Capturer repos et gestes : bras avec chacun des huit objets, visage expressif, pieds et plumes ; vérifier les recouvrements et l’absence de déformation ou de discontinuité visuelle.
-- [ ] Tester sur téléphone 390 × 844 et grand écran 1366 × 768, avec huit Plummos et bulles ; vérifier que les gestes ne masquent aucune commande et n’ajoutent pas de scroll. Vérifier `prefers-reduced-motion` dans Chromium et WebKit.
-- [ ] Exécuter `composer ci:check`, la suite d’interface avec `vendor/bin/pest tests/Browser/PlummoMotionTest.php --browser safari`, et la matrice de viewport du dépôt. Consigner uniquement les sorties fraîches et distinguer clavier simulé et matériel réel.
-- [ ] Mettre à jour le kit et le backlog selon ce qui est effectivement livré, puis commit `docs: record Plummo motion validation`.
+- [x] Capturer repos et gestes : bras avec chacun des huit objets, visage expressif, pieds et plumes ; vérifier les recouvrements et l’absence de déformation ou de discontinuité visuelle.
+- [x] Tester sur téléphone 390 × 844 et grand écran 1366 × 768, avec huit Plummos et bulles ; vérifier que les gestes ne masquent aucune commande et n’ajoutent pas de scroll. Vérifier `prefers-reduced-motion` dans Chromium et WebKit.
+- [x] Exécuter `composer ci:check`, la suite d’interface avec `vendor/bin/pest tests/Browser/PlummoMotionTest.php --browser safari`, et la matrice de viewport du dépôt. Consigner uniquement les sorties fraîches et distinguer clavier simulé et matériel réel.
+- [x] Mettre à jour le kit et le backlog selon ce qui est effectivement livré, puis commit `docs: record Plummo motion validation`.
 - [ ] Pousser la branche, ouvrir une PR et reconstruire Docker pour la revue locale. Ne pas fusionner avant les contrôles et la revue du rendu final.
 
 ## État
 
-Conception approuvée le 9 octobre avec la précision « toutes les parties » et mouvements naturels. Plan préparé pour revue ; aucune implémentation de ce découpage n’a encore été engagée.
+Conception approuvée le 9 octobre avec la précision « toutes les parties » et mouvements naturels. Découpage et gestes implémentés. Revue indépendante effectuée ; corrections de l’espace mobile, de la reconnexion et des attaches validées. Les derniers contrôles de géométrie ont aussi corrigé la réservation du lecteur de réponses courtes et le brouillon de phrases sur petit téléphone. Le SVG original reste inchangé et sert de référence aux comparaisons pixel par pixel.
+
+### Ajustements de mise en œuvre
+
+`base.svg` reste immuable : les fragments sont extraits dans `rig.json` depuis le DOM XML. Le reflet commun des mains reste entier au repos pour garder l’anticrénelage original ; les gestes utilisent ses deux sous-tracés existants. Les reflets des plumes et les accessoires du visage utilisent des transformations liées plutôt qu’un déplacement de leurs calques, car leur imbrication modifierait les recouvrements du dessin original. Les bras et les mains restent un seul membre lorsque leur tracé continu ne comporte pas de séparation anatomique.

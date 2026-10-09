@@ -34,3 +34,17 @@ Les essais automatisés couvrent les navigateurs ; un essai sur les appareils ut
 5. Envoyer des messages une fois l’action terminée, vérifier leur expiration et le retour aux commandes à la nouvelle manche. Vérifier la lisibilité de huit joueurs et le son du blind test avec les réglages d’accessibilité habituels.
 
 Aucun hébergement de production n’est configuré. La validation des appareils locaux et le déploiement dépendent du matériel et de la cible retenus.
+
+## Articulation des Plummos — 9 octobre 2026
+
+Le kit conserve le SVG original et expose corps, ombrage, pieds, bras/mains, plumes, sourcils, yeux, iris, reflets, joues, bouche et langue. Les gestes d’attente, réponse, points, reprise et podium utilisent les événements confirmés du serveur. Les objets tenus passent devant le visage avec leur main ; les masques et lunettes suivent le visage. Une reconnexion consomme le premier état frais silencieusement.
+
+`bun scripts/check-plummo-rig.ts` : Chromium et WebKit valident chacun 180 comparaisons de repos strictement identiques (six couleurs, chaque accessoire et une combinaison complète). Huit objets simultanés gardent leurs références locales. Les transformations indépendantes vérifient le couplage des reflets de plumes et des accessoires du visage ; la réduction des mouvements laisse zéro animation active. Les captures des gestes ont été examinées visuellement.
+
+Le test [PlummoMotionTest](../tests/Browser/PlummoMotionTest.php) couvre téléphone 390 × 844 et écran 1366 × 768 : réponse jouée une seule fois, retour au repos, rechargement silencieux, réduction des mouvements et absence de scroll. Le pied de scène mobile réserve 48 px et s’efface entièrement en mode compact. Les claviers restent simulés : aucun essai matériel iPhone ou TV n’est revendiqué.
+
+La revue indépendante a identifié l’espace mobile, la reconnexion montée et les attaches de reflets/accessoires ; ces trois points ont été corrigés puis relus sans défaut important restant.
+
+Sorties du 9 octobre : `composer ci:check` passe avec 165 tests PHP/navigateur et 1 784 assertions, ainsi que 13 tests frontend et 133 assertions. Le parcours dédié Safari passe avec 21 assertions. La matrice a également révélé une réservation d’espace persistante du lecteur après passage d’une réponse longue à une courte ; la correction retire cette réservation avant la nouvelle mesure. Le cas 320 × 568 anglais passe avec 45 contrôles de géométrie et d’interaction.
+
+Les cinq tailles 320 × 568, 390 × 844, 844 × 390, 1366 × 768 et 1920 × 1080 passent en anglais. Après ajustement des marges et du statut du brouillon sur petit écran, les cinq tailles françaises passent également : 229 contrôles de géométrie et d’interaction. La version Docker est reconstruite et `/up` répond HTTP 200 sur le réseau local.
