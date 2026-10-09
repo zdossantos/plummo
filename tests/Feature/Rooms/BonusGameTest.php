@@ -2,7 +2,9 @@
 
 use App\Models\Game;
 use App\Models\RoomPlayer;
+use App\Services\GameBonuses;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Storage;
 
 uses(DatabaseTransactions::class);
 
@@ -243,4 +245,149 @@ it('can decline a pending object or move it into the place freed by a launch', f
     $state['bonuses']['pending'][$id] = ['id' => 'fourth', 'kind' => 'squatter'];
     $game->update(['state' => $state]);
     $this->postJson('/rooms/'.$room->code.'/bonuses', [...$values, 'item_id' => 'first'])->assertOk()->assertJsonPath('game.bonuses.pending', null)->assertJsonPath('game.bonuses.inventory.0.id', 'second')->assertJsonPath('game.bonuses.inventory.1.id', 'fourth');
+})->group('bonuses');
+
+it('launches every compatible object with the expected targets and lifetime', function (string $type, string $kind, ?int $duration) {
+    $this->freezeTime();
+    if ($type === 'blind_test') {
+        Storage::fake('local');
+        Storage::disk('local')->put('audio/test.wav', 'prepared audio');
+    }
+    $room = openRoom();
+    $members = [enterRoom($room, 'Un'), enterRoom($room, 'Deux'), enterRoom($room, 'Trois')];
+    $pack = match ($type) {
+        'quiz' => quizPack(), 'blind_test' => blindPack(), 'phrase' => phrasePack(), 'drawing' => drawingPack(),
+    };
+    $this->withCookie('plummo_player_'.$room->code, $members[0][1])->postJson('/rooms/'.$room->code.'/games', ['type' => $type, 'packs' => [$pack], 'rounds' => in_array($type, ['quiz', 'blind_test'], true) ? 5 : 1, 'duration' => 60, 'bonuses' => true])->assertCreated();
+    $game = Game::where('room_id', $room->id)->sole();
+    $allowed = app(GameBonuses::class)->kinds($type);
+    foreach ($game->state['bonuses']['inventory'] as $items) {
+        expect($items[0]['kind'])->toBeIn($allowed);
+    }
+    if ($type === 'drawing') {
+        $this->postJson('/rooms/'.$room->code.'/drawing/choose', ['game_id' => $game->id, 'round' => 1, 'choice' => 0])->assertOk();
+    }
+    giveTestBonus($game, $members[0][0], $kind);
+    $this->postJson('/rooms/'.$room->code.'/bonuses', ['game_id' => $game->id, 'round' => 1, 'item_id' => 'test-object'])->assertOk();
+    $effects = $game->fresh()->state['bonuses']['effects'];
+    expect(array_column($effects, 'target'))->toBe($type === 'drawing' ? [0] : [$members[1][0], $members[2][0]]);
+    foreach ($effects as $effect) {
+        expect($effect['kind'])->toBe($kind);
+        expect($effect['expiresAt'])->toBe($duration === null ? null : $effect['startedAt'] + $duration);
+    }
+    $view = $this->getJson('/rooms/'.$room->code.'/state')->assertOk();
+    expect($view->json('game.bonuses.inventory'))->toBe([]);
+    expect($view->json('game.bonuses.effects'))->toHaveCount($type === 'drawing' ? 1 : 0);
+})->with([
+    ['quiz', 'bolt', 3], ['quiz', 'dice', 6], ['quiz', 'squatter', 4],
+    ['blind_test', 'bolt', 3], ['blind_test', 'dice', 6], ['blind_test', 'squatter', 4], ['blind_test', 'artist', 4],
+    ['phrase', 'accent', null], ['phrase', 'sneeze', null], ['drawing', 'stamp', 4], ['drawing', 'paint', 4],
+])->group('bonuses');
+
+it('rejects an incompatible or stolen object without changing the pocket or effects', function (string $item) {
+    [$room, $members, $game] = bonusQuiz();
+    giveTestBonus($game, $members[0][0], 'artist', 'incompatible');
+    giveTestBonus($game, $members[1][0], 'bolt', 'stolen');
+    $before = $game->fresh()->state['bonuses'];
+    $this->postJson('/rooms/'.$room->code.'/bonuses', ['game_id' => $game->id, 'round' => 1, 'item_id' => $item])->assertConflict();
+    expect($game->fresh()->state['bonuses']['inventory'])->toBe($before['inventory']);
+    expect($game->fresh()->state['bonuses']['effects'])->toBe([]);
+    expect($game->fresh()->state['bonuses']['used'])->toBe([]);
+    expect($game->fresh()->state['bonuses']['launches'] ?? [])->toBe([]);
+})->with(['incompatible', 'stolen'])->group('bonuses');
+
+it('does not consume an object when there are no eligible opponents', function () {
+    [$room, $members, $game] = bonusQuiz();
+    $state = $game->state;
+    $state['excluded'] = [$members[1][0]];
+    $game->update(['state' => $state]);
+    $item = $state['bonuses']['inventory'][$members[0][0]][0];
+    $this->postJson('/rooms/'.$room->code.'/bonuses', ['game_id' => $game->id, 'round' => 1, 'item_id' => $item['id']])->assertConflict();
+    expect($game->fresh()->state['bonuses']['inventory'][$members[0][0]])->toBe([$item]);
+})->group('bonuses');
+
+it('does not let a waiting newcomer or excluded player launch an object', function (bool $newcomer) {
+    [$room, $members, $game] = bonusQuiz(true, 3);
+    if ($newcomer) {
+        [$id, $token] = enterRoom($room, 'Attente');
+    } else {
+        [$id, $token] = $members[1];
+        $state = $game->state;
+        $state['excluded'] = [$id];
+        $game->update(['state' => $state]);
+    }
+    giveTestBonus($game, $id, 'bolt');
+    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/bonuses', ['game_id' => $game->id, 'round' => 1, 'item_id' => 'test-object'])->assertForbidden();
+    expect($game->fresh()->state['bonuses']['inventory'][$id])->toHaveCount(1);
+})->with([true, false])->group('bonuses');
+
+it('preserves a pending offer across lost rounds and clears it when finished', function () {
+    $this->freezeTime();
+    [$room, $members, $game] = bonusQuiz();
+    $state = $game->state;
+    $state['bonuses']['inventory'][$members[1][0]] = [['id' => 'one', 'kind' => 'bolt'], ['id' => 'two', 'kind' => 'dice']];
+    $offer = ['id' => 'waiting', 'kind' => 'squatter'];
+    $state['bonuses']['pending'][$members[1][0]] = $offer;
+    $game->update(['state' => $state]);
+    foreach (range(1, 5) as $round) {
+        $this->withCookie('plummo_player_'.$room->code, $members[0][1])->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk();
+        $this->withCookie('plummo_player_'.$room->code, $members[1][1])->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 1))->assertOk();
+        $this->travel(3)->seconds();
+        $this->postJson('/rooms/'.$room->code.'/screen-presence')->assertOk();
+        $this->postJson('/rooms/'.$room->code.'/presence')->assertOk();
+        expect($game->fresh()->state['bonuses']['pending'][$members[1][0]] ?? null)->toBe($round === 5 ? null : $offer);
+    }
+})->group('bonuses');
+
+it('rejects a replacement from a past round without losing the pending offer', function () {
+    [$room, $members, $game] = bonusQuiz();
+    $state = $game->state;
+    $state['bonuses']['pending'][$members[0][0]] = ['id' => 'third', 'kind' => 'dice'];
+    $game->update(['state' => $state]);
+    $this->postJson('/rooms/'.$room->code.'/bonuses/replace', ['game_id' => $game->id, 'round' => 2, 'item_id' => 'third', 'replace_id' => null])->assertConflict();
+    expect($game->fresh()->state['bonuses']['pending'][$members[0][0]]['id'])->toBe('third');
+})->group('bonuses');
+
+it('rejects malformed launch requests without consuming the owned object', function (array $invalid) {
+    [$room, $members, $game] = bonusQuiz();
+    $item = $game->state['bonuses']['inventory'][$members[0][0]][0];
+    $values = ['game_id' => $game->id, 'round' => 1, 'item_id' => $item['id']];
+    $this->postJson('/rooms/'.$room->code.'/bonuses', [...$values, ...$invalid])->assertUnprocessable();
+    expect($game->fresh()->state['bonuses']['inventory'][$members[0][0]])->toBe([$item]);
+    expect($game->fresh()->state['bonuses']['effects'])->toBe([]);
+})->with([
+    [['game_id' => 0]], [['game_id' => []]], [['round' => 0]], [['round' => 'oops']], [['item_id' => null]], [['item_id' => []]], [['item_id' => str_repeat('x', 37)]],
+])->group('bonuses');
+
+it('rejects launching during reveal or resuming without consuming the object', function (string $phase) {
+    $this->freezeTime();
+    [$room, $members, $game] = bonusQuiz();
+    $item = $game->state['bonuses']['inventory'][$members[0][0]][0];
+    if ($phase === 'reveal') {
+        $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk();
+        $this->withCookie('plummo_player_'.$room->code, $members[1][1])->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertJsonPath('game.phase', 'reveal');
+    } else {
+        $this->postJson('/rooms/'.$room->code.'/game/pause')->assertOk();
+        $this->postJson('/rooms/'.$room->code.'/game/resume')->assertJsonPath('game.phase', 'resuming');
+    }
+    $this->withCookie('plummo_player_'.$room->code, $members[0][1])->postJson('/rooms/'.$room->code.'/bonuses', ['game_id' => $game->id, 'round' => 1, 'item_id' => $item['id']])->assertConflict();
+    expect($game->fresh()->state['bonuses']['inventory'][$members[0][0]])->toBe([$item]);
+})->with(['reveal', 'resuming'])->group('bonuses');
+
+it('combines phrase pranks after validation without modifying saved drafts', function () {
+    $room = openRoom();
+    $members = [enterRoom($room, 'Un'), enterRoom($room, 'Deux'), enterRoom($room, 'Trois')];
+    $this->withCookie('plummo_player_'.$room->code, $members[0][1])->postJson('/rooms/'.$room->code.'/games', ['type' => 'phrase', 'packs' => [phrasePack()], 'rounds' => 1, 'duration' => 60, 'bonuses' => true])->assertCreated();
+    $game = Game::where('room_id', $room->id)->sole();
+    giveTestBonus($game, $members[0][0], 'accent', 'accent');
+    giveTestBonus($game, $members[1][0], 'sneeze', 'sneeze');
+    $values = ['game_id' => $game->id, 'round' => 1];
+    $this->postJson('/rooms/'.$room->code.'/bonuses', [...$values, 'item_id' => 'accent'])->assertOk();
+    $this->withCookie('plummo_player_'.$room->code, $members[1][1])->postJson('/rooms/'.$room->code.'/bonuses', [...$values, 'item_id' => 'sneeze'])->assertOk();
+    foreach ($members as [$id, $token]) {
+        $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/phrases/submit', [...$values, 'suffix' => 'Rire avec Robert'])->assertOk()->assertJsonPath('game.me.draft', 'Rire avec Robert');
+    }
+    $entry = collect($game->fresh()->state['round']['entries'])->firstWhere('author', $members[2][0]);
+    expect($entry['text'])->toEndWith('Wiwe avec ATCHOUM ! Wobewt');
+    $this->getJson('/rooms/'.$room->code.'/state')->assertJsonMissingPath('game.round.entries.0.author')->assertJsonMissingPath('game.round.drafts');
 })->group('bonuses');

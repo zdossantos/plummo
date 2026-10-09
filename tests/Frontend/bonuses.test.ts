@@ -41,3 +41,35 @@ test('each prank has its own short, restrained sound signature', async () => {
         }
     }
 });
+
+test('dice preserves all answer IDs through every shuffle for four and eight choices', () => {
+    for (const count of [4, 8]) {
+        const choices = Array.from({ length: count }, (_, index) => `answer-${index}`);
+        for (const time of [100, 101.999, 102, 103.999, 104, 105.999, 106]) {
+            const displayed = bonusChoices(choices, [dice], time);
+            expect(displayed.map(item => item.index).sort((a, b) => a - b)).toEqual(choices.map((_, index) => index));
+            for (const item of displayed) expect(item.choice).toBe(choices[item.index]!);
+            expect(bonusChoices(choices, [dice], time)).toEqual(displayed);
+        }
+        expect(bonusChoices(choices, [dice], 102)).not.toEqual(bonusChoices(choices, [dice], 104));
+    }
+});
+
+test('events arriving in batches play once and reconnection suppresses only the resumed batch', () => {
+    const tracker = new BonusReceiptTracker<{ id: string; at: number }>();
+    const events = [{ id: 'a', at: 100 }, { id: 'b', at: 100.5 }];
+    expect(tracker.observe(1, events, 101, true)).toEqual(events);
+    expect(tracker.observe(1, [...events, { id: 'c', at: 102 }], 102, true)).toEqual([{ id: 'c', at: 102 }]);
+    tracker.observe(1, [], 103, false);
+    expect(tracker.observe(1, [{ id: 'd', at: 104 }], 104, true)).toEqual([]);
+    expect(tracker.observe(1, [{ id: 'd', at: 104 }, { id: 'e', at: 105 }], 105, true)).toEqual([{ id: 'e', at: 105 }]);
+    expect(tracker.observe(2, [{ id: 'a', at: 106 }], 106, true)).toEqual([{ id: 'a', at: 106 }]);
+});
+
+test('phrase effects persist while writing but never leak into voting or results', () => {
+    const effect: BonusEffect = { ...dice, kind: 'accent', expiresAt: null };
+    expect(activeBonusEffects([effect], 10000, 'writing')).toEqual([effect]);
+    for (const phase of ['paused', 'resuming', 'voting', 'results', 'reveal', 'selecting']) {
+        expect(activeBonusEffects([effect], 101, phase)).toEqual([]);
+    }
+});

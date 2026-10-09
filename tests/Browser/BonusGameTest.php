@@ -6,7 +6,9 @@ use App\Models\Game;
 use App\Models\Pack;
 use App\Models\Room;
 use App\Models\Tag;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Pest\Browser\Execution;
 
 it('launches a collective bonus in one click while phone and screen stay inside their viewport', function () {
     app()->terminating(function () {
@@ -123,6 +125,125 @@ it('changes a held drawing stroke at paint activation and expiry without losing 
         $screen->assertPresent('polyline:nth-of-type(3)[stroke="#35236b"]');
         expect($game->fresh()->state['round']['canvas'])->toHaveCount(3);
         $first->assertNoJavaScriptErrors();
+    } finally {
+        $room->delete();
+        Content::whereIn('id', $ids)->delete();
+        $pack->delete();
+        $tag->delete();
+    }
+});
+
+it('keeps collective overlays usable and accepts only one of two simultaneous launches', function (string $kind) {
+    app()->terminating(function () {
+        app('cookie')->flushQueuedCookies();
+        app('session.store')->flush();
+    });
+    $tag = Tag::create(['name' => 'Bonus '.Str::uuid()]);
+    $pack = Pack::create(['name' => 'Bonus quiz']);
+    $pack->tags()->sync([$tag->id]);
+    foreach (range(1, 5) as $number) {
+        $content = Content::create(['type' => ContentType::Quiz, 'published' => true, 'payload' => ['question' => 'Question '.$number, 'choices' => ['A', 'B', 'C', 'D'], 'correct' => 0]]);
+        $content->tags()->sync([$tag->id]);
+    }
+    $tag = $pack->tags()->sole();
+    $ids = $tag->contents()->pluck('contents.id');
+    $screen = visit('/', ['viewport' => ['width' => 1920, 'height' => 1080]])->withLocale('en-US')->assertSee('Everyone plays.');
+    $room = Room::latest('id')->firstOrFail();
+    try {
+        $first = visit('/join/'.$room->code, ['viewport' => ['width' => 390, 'height' => 664]])->withLocale('en-US')->fill('player-name', 'Camille')->click('Continue')->click('Enter the room');
+        $second = visit('/join/'.$room->code, ['viewport' => ['width' => 390, 'height' => 664]])->withLocale('en-US')->fill('player-name', 'Alex')->click('Continue')->click('Enter the room');
+        $first->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")');
+        $first->assertSee('Prank bonuses')->click('label:has-text("Prank bonuses")');
+        $first->fill('game-rounds', '5')->fill('game-duration', '60');
+        $first->page()->locator('button:has-text("Start quiz")')->click(['noWaitAfter' => true]);
+        $first->assertSee('Quiz · Question 1 / 5');
+        expect(Game::where('room_id', $room->id)->sole()->settings['bonuses'])->toBeTrue();
+        $first->assertPresent('.bonus-object');
+        $second->assertPresent('.bonus-object');
+
+        $game = Game::where('room_id', $room->id)->sole();
+        $player = $room->players()->where('name', 'Camille')->sole();
+        $state = $game->state;
+        $state['bonuses']['inventory'][$player->id] = [['id' => 'parallel-one', 'kind' => $kind], ['id' => 'parallel-two', 'kind' => $kind]];
+        $game->update(['state' => $state]);
+        $first->refresh()->assertPresent('.bonus-object');
+        $statuses = $first->page()->evaluate('async ({ code, gameId }) => Promise.all(["parallel-one", "parallel-two"].map(async itemId => { const response = await fetch(`/rooms/${code}/bonuses`, { method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json", "X-CSRF-TOKEN": document.querySelector("meta[name=csrf-token]").content }, body: JSON.stringify({ game_id: gameId, round: 1, item_id: itemId }) }); return response.status; }))', ['code' => $room->code, 'gameId' => $game->id]);
+        sort($statuses);
+        expect($statuses)->toBe([200, 409]);
+        $bonus = $game->fresh()->state['bonuses'];
+        expect($bonus['inventory'][$player->id])->toHaveCount(1);
+        expect($bonus['launches'])->toHaveCount(1);
+        expect($bonus['used'])->toBe([$player->id]);
+        $selector = match ($kind) {
+            'bolt' => '.bonus-blackout', 'squatter' => '.bonus-squatter', default => '.game-choices'
+        };
+        $second->assertPresent($selector);
+        $first->assertMissing('.bonus-blackout')->assertMissing('.bonus-squatter');
+        $second->page()->evaluate('() => new Promise(resolve => setTimeout(resolve, 300))');
+        if ($kind !== 'dice') {
+            expect($second->page()->evaluate('(selector) => getComputedStyle(document.querySelector(selector)).pointerEvents', $selector))->toBe('none');
+        }
+        $correct = $game->fresh()->state['round']['payload']['correct'];
+        $second->page()->locator('.game-choices button')->filter(['hasText' => ['A', 'B', 'C', 'D'][$correct]])->first()->click(['noWaitAfter' => true]);
+        $second->assertNoJavaScriptErrors();
+        expect($game->fresh()->state['round']['answers'][$room->players()->where('name', 'Alex')->sole()->id]['choice'])->toBe($correct);
+        $screen->assertMissing('.bonus-pocket')->assertNoJavaScriptErrors();
+    } finally {
+        $room->delete();
+        Content::whereIn('id', $ids)->delete();
+        $pack->delete();
+        $tag->delete();
+    }
+})->with(['bolt', 'dice', 'squatter']);
+
+it('temporarily hides artists on opponents phones and restores all eight answers', function () {
+    app()->terminating(function () {
+        app('cookie')->flushQueuedCookies();
+        app('session.store')->flush();
+    });
+    Storage::fake('local');
+    Storage::disk('local')->put('audio/test.wav', 'prepared audio');
+    $pack = Pack::findOrFail(blindPack());
+    $tag = $pack->tags()->sole();
+    $ids = $tag->contents()->pluck('contents.id');
+    $screen = visit('/', ['viewport' => ['width' => 1920, 'height' => 1080]])->withLocale('en-US')->assertSee('Everyone plays.');
+    $room = Room::latest('id')->firstOrFail();
+    try {
+        $first = visit('/join/'.$room->code, ['viewport' => ['width' => 390, 'height' => 664]])->withLocale('en-US')->fill('player-name', 'Camille')->click('Continue')->click('Enter the room');
+        $second = visit('/join/'.$room->code, ['viewport' => ['width' => 390, 'height' => 664]])->withLocale('en-US')->fill('player-name', 'Alex')->click('Continue')->click('Enter the room');
+        $first->click('[data-choose-game]')->click('[data-game-option="blind_test"]');
+        $first->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")');
+        $first->click('label:has-text("Prank bonuses")')->fill('game-rounds', '5')->fill('game-duration', '60');
+        $first->page()->locator('button:has-text("Start blind test")')->click(['noWaitAfter' => true]);
+        $first->assertSee('Blind test · Clip 1 / 5');
+        $second->assertPresent('.game-choices .text-summary');
+        $game = Game::where('room_id', $room->id)->sole();
+        $player = $room->players()->where('name', 'Camille')->sole();
+        $state = $game->state;
+        $state['bonuses']['inventory'][$player->id] = [['id' => 'hide-artists', 'kind' => 'artist']];
+        $game->update(['state' => $state]);
+        $first->refresh()->assertPresent('.bonus-object')->click('.bonus-object');
+        Execution::instance()->waitForExpectation(function () use ($second) {
+            $answers = $second->page()->evaluate('() => [...document.querySelectorAll(".game-choices .text-summary")].map(node => node.textContent)');
+            expect($answers)->toHaveCount(8);
+            foreach ($answers as $answer) {
+                expect($answer)->not->toContain(' — ');
+            }
+        });
+        $ownAnswers = $first->page()->evaluate('() => [...document.querySelectorAll(".game-choices .text-summary")].map(node => node.textContent)');
+        foreach ($ownAnswers as $answer) {
+            expect($answer)->toContain(' — ');
+        }
+        expect($second->page()->evaluate('() => document.documentElement.scrollHeight <= innerHeight && document.documentElement.scrollWidth <= innerWidth'))->toBeTrue();
+        Execution::instance()->waitForExpectation(function () use ($second) {
+            $restored = $second->page()->evaluate('() => [...document.querySelectorAll(".game-choices .text-summary")].map(node => node.textContent)');
+            expect($restored)->toHaveCount(8);
+            foreach ($restored as $answer) {
+                expect($answer)->toContain(' — ');
+            }
+        });
+        $second->assertNoJavaScriptErrors();
+        $screen->assertMissing('.bonus-pocket')->assertMissing('.page-controls');
     } finally {
         $room->delete();
         Content::whereIn('id', $ids)->delete();
