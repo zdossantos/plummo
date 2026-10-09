@@ -12,13 +12,19 @@ WORKDIR /var/www/html
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 FROM php-base AS dependencies
 COPY . .
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+RUN mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs \
+    && composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 FROM dependencies AS assets
 COPY --from=oven/bun:1.3.14 /usr/local/bin/bun /usr/local/bin/bun
 RUN bun install --frozen-lockfile && bun run build
 FROM php-base AS runtime
 COPY --from=dependencies --chown=www-data:www-data /var/www/html /var/www/html
 COPY --from=assets --chown=www-data:www-data /var/www/html/public/build /var/www/html/public/build
-RUN chmod -R ug+rwX storage bootstrap/cache
+COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/plummo-entrypoint
+RUN mkdir -p storage/app/private storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R ug+rwX storage bootstrap/cache
+ENTRYPOINT ["plummo-entrypoint"]
+CMD ["web"]
 HEALTHCHECK --interval=30s --timeout=5s CMD curl --fail http://localhost/up || exit 1
 EXPOSE 80

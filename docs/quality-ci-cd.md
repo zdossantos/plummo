@@ -16,8 +16,19 @@ Release Please utilise `GITHUB_TOKEN`, sans secret supplémentaire. Le réglage 
 
 Les PR créées avec ce jeton ne déclenchent pas les workflows `pull_request`. Le workflow de release lance donc explicitement `CI` et `PR title` sur la branche de chaque PR créée ou actualisée. Le contrôle du titre vérifie également que le commit contrôlé correspond à cette PR ouverte vers `main`.
 
-## Production à configurer
+## Production Coolify
 
-Une fusion de fonctionnalité ne déploie pas l’application. La publication GitHub d’une version ne déploie pas non plus le site à ce stade.
+Une fusion de fonctionnalité ne déploie pas l’application. Après fusion volontaire
+de la PR de release, le workflow construit le commit exact pour `linux/amd64`,
+publie `ghcr.io/zdossantos/plummo`, teste l’image par digest et attache
+`container-image.json` à la release. Tag, version et SHA doivent correspondre.
 
-Après le choix de l’hébergement et de l’architecture du serveur, compléter le flux prévu par le socle : build du commit exact de release, publication GHCR, test de l’image par digest, conservation de sa référence et déploiement Coolify. Les migrations resteront explicites et l’Auto Deploy indépendant de Coolify devra être désactivé. Aucun secret de production ne doit être versionné.
+La livraison Coolify est activée uniquement lorsque `COOLIFY_APPLICATION_UUID`
+est renseigné. Elle met à jour le digest et le commit du Compose avant de demander
+le déploiement ; un échec arrête la séquence sans retry automatique. Le jeton
+reste dans les secrets GitHub, les secrets runtime dans Coolify.
+
+Les [instructions de production](operations.md) décrivent les quatre services,
+MySQL et Redis dédiés à Plummo, les domaines HTTPS, les variables et les vérifications.
+Les migrations restent explicites et l’Auto Deploy indépendant de Coolify est
+désactivé. La préparation versionnée ne signifie pas que le site est déployé.

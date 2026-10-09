@@ -53,7 +53,10 @@ jobs:
         timeout-minutes: 15
         steps:
             - uses: actions/checkout@v7
+            - run: python3 .github/scripts/test-deploy-release.py
+            - run: bash -n .github/scripts/deploy-release.sh .github/scripts/smoke-image.sh && sh -n docker/entrypoint.sh
             - run: docker build --target runtime -t plummo:ci .
+            - run: bash .github/scripts/smoke-image.sh plummo:ci
             - run: |
                   docker run -d --name plummo-ci -p 8080:80 -e APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA= -e APP_ENV=testing -e SESSION_DRIVER=array -e CACHE_STORE=array plummo:ci
                   for attempt in $(seq 1 30); do
@@ -65,7 +68,7 @@ jobs:
                   docker exec plummo-ci test -f public/build/manifest.json
             - name: Reverb WebSocket handshake
               run: |
-                  docker run -d --name plummo-reverb-ci -p 8081:8080 -e APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA= -e APP_ENV=testing -e CACHE_STORE=array -e REVERB_APP_ID=ci -e REVERB_APP_KEY=ci-public-key -e REVERB_APP_SECRET=ci-only-secret -e REVERB_ALLOWED_ORIGINS=localhost --entrypoint php plummo:ci artisan reverb:start --host=0.0.0.0 --port=8080
+                  docker run -d --name plummo-reverb-ci -p 8081:8080 -e APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA= -e APP_ENV=testing -e CACHE_STORE=array -e REVERB_APP_ID=ci -e REVERB_APP_KEY=ci-public-key -e REVERB_APP_SECRET=ci-only-secret -e REVERB_ALLOWED_ORIGINS=localhost --user www-data plummo:ci reverb
                   for attempt in $(seq 1 15); do
                     curl --silent --max-time 1 --dump-header /tmp/reverb.headers -H 'Connection: Upgrade' -H 'Upgrade: websocket' -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' -H 'Sec-WebSocket-Version: 13' -H 'Origin: http://localhost' 'http://localhost:8081/app/ci-public-key?protocol=7&client=js&version=8.6.0&flash=false' > /tmp/reverb.body || true
                     if grep -q '101 Switching Protocols' /tmp/reverb.headers && grep -q 'pusher:connection_established' /tmp/reverb.body; then break; fi

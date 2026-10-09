@@ -12,3 +12,9 @@ bootstrap/cache/*.php
 test-results
 playwright-report
 docs
+
+storage/app/*
+!storage/app/.gitignore
+storage/framework/*
+!storage/framework/.gitignore
+database/*.sqlite*

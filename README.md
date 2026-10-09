@@ -59,7 +59,7 @@ Aucun compte n’est créé par les seeders.
 - [Contribuer](CONTRIBUTING.md)
 - [Validation V1 et essai sur appareils](docs/validation-v1.md)
 
-Aucun hébergement de production n’est configuré. Les sources publiques ne constituent pas une autorisation de réutilisation des créations graphiques.
+Le [déploiement Coolify](docs/operations.md) est préparé pour `plummo.zdossantos.fr`, avec MySQL et Redis dédiés. Sa mise en service et ses vérifications restent à effectuer. Les sources publiques ne constituent pas une autorisation de réutilisation des créations graphiques.
 
 ## Kit vectoriel Plummo
 
