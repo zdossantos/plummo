@@ -87,3 +87,40 @@ test('keeps audio volume valid when the first animation timestamp precedes the f
         globalThis.cancelAnimationFrame = oldCancel;
     }
 });
+
+test('starts one continuous decoded loop and stops it when disposed', async () => {
+    const originalContext = globalThis.AudioContext;
+    const originalFetch = globalThis.fetch;
+    let starts = 0;
+    let stops = 0;
+    let loads = 0;
+    const source = { buffer: null, loop: false, connect() {}, start() { starts++; }, stop() { stops++; }, disconnect() {} };
+    class FakeContext {
+        currentTime = 0;
+        state = 'running';
+        destination = {};
+        createGain() { return { gain: { value: 0, setTargetAtTime() {} }, connect() {} }; }
+        createBufferSource() { return source; }
+        async decodeAudioData() { return { duration: 147.692 }; }
+        async resume() {}
+        async close() { this.state = 'closed'; }
+    }
+    globalThis.AudioContext = FakeContext as unknown as typeof AudioContext;
+    globalThis.fetch = (async () => { loads++; return new Response(new ArrayBuffer(8)); }) as typeof fetch;
+    try {
+        const { Soundscape } = await import('../../resources/js/lib/soundscape');
+        const sound = new Soundscape();
+        await Promise.all([sound.start(), sound.start()]);
+        expect(loads).toBe(1);
+        expect(starts).toBe(1);
+        expect(source.loop).toBe(true);
+        sound.setVolume(0, false);
+        await sound.start();
+        expect(starts).toBe(1);
+        sound.close();
+        expect(stops).toBe(1);
+    } finally {
+        globalThis.AudioContext = originalContext;
+        globalThis.fetch = originalFetch;
+    }
+});
