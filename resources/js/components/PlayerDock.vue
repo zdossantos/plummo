@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onUnmounted, ref, watch } from 'vue';
-import PlummoAvatar from '@/components/PlummoAvatar.vue';
+import GamePlummoAvatar from '@/components/GamePlummoAvatar.vue';
 import { roundCelebration } from '@/lib/celebration';
 import { useTranslations } from '@/composables/useTranslations';
 import type { GameState, RoomState } from '@/types/rooms';
@@ -12,10 +12,25 @@ const props = defineProps<{
 const { t } = useTranslations('rooms');
 const gains = ref<Record<number, number>>({});
 let lastCelebrated = '';
+let observedGame = false;
 let timer: ReturnType<typeof setTimeout> | undefined;
 watch(
     () => props.game,
     (game) => {
+        if (!game) {
+            observedGame = false;
+            gains.value = {};
+            clearTimeout(timer);
+            return;
+        }
+        if (!observedGame) {
+            observedGame = true;
+            lastCelebrated =
+                game.phase === 'reveal'
+                    ? `${game.id}:${game.round.number}`
+                    : '';
+            return;
+        }
         const celebration = roundCelebration(game, lastCelebrated);
         if (!celebration) return;
         lastCelebrated = celebration.key;
@@ -58,12 +73,8 @@ onUnmounted(() => clearTimeout(timer));
             <p v-if="player.status === 'disconnected'" class="text-[10px]">
                 {{ t('disconnected') }}
             </p>
-            <div class="relative" :class="{ 'plummo-hop': gains[player.id] }">
-                <PlummoAvatar
-                    :color="player.color"
-                    :accessories="player.accessories"
-                    :label="player.name"
-                />
+            <div class="relative">
+                <GamePlummoAvatar :game="game" :player="player" />
                 <p
                     v-if="gains[player.id]"
                     class="points-rise absolute -top-2 left-1/2 z-10 -translate-x-1/2 rounded-full bg-primary px-2 py-1 text-sm font-black whitespace-nowrap text-primary-foreground"
@@ -79,9 +90,6 @@ onUnmounted(() => clearTimeout(timer));
 .chat-bubble {
     animation: bubble-in 0.18s ease-out;
 }
-.plummo-hop {
-    animation: plummo-hop 0.6s ease-out 2;
-}
 .points-rise {
     animation: points-rise 2.4s ease-out;
 }
@@ -93,15 +101,6 @@ onUnmounted(() => clearTimeout(timer));
     to {
         opacity: 1;
         transform: translateY(0);
-    }
-}
-@keyframes plummo-hop {
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-    45% {
-        transform: translateY(-12px);
     }
 }
 @keyframes points-rise {
@@ -120,7 +119,6 @@ onUnmounted(() => clearTimeout(timer));
 }
 @media (prefers-reduced-motion: reduce) {
     .chat-bubble,
-    .plummo-hop,
     .points-rise {
         animation: none;
     }

@@ -1,0 +1,178 @@
+/* Pivots are SVG user coordinates, shared by each surface and its reflection. */
+[data-plummo-part] {
+    transform-box: view-box;
+}
+[data-plummo-motion='idle'] [data-plummo-part='pose'] {
+    animation: plummo-breathe 4.8s ease-in-out infinite;
+}
+[data-plummo-motion='idle']
+    :is([data-plummo-part='eye-left'], [data-plummo-part='eye-right']) {
+    animation: plummo-blink 6.7s ease-in-out infinite;
+    animation-delay: var(--plummo-idle-delay, 0s);
+}
+:is(
+        [data-plummo-motion='answer'],
+        [data-plummo-motion='resume'],
+        [data-plummo-motion='points'],
+        [data-plummo-motion='podium']
+    )
+    [data-plummo-part='pose'] {
+    animation: plummo-bounce 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+:is(
+        [data-plummo-motion='answer'],
+        [data-plummo-motion='resume'],
+        [data-plummo-motion='points'],
+        [data-plummo-motion='podium']
+    )
+    [data-plummo-part='arm-right'] {
+    animation: plummo-wave 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+:is([data-plummo-motion='points'], [data-plummo-motion='podium'])
+    [data-plummo-part='arm-left'] {
+    animation: plummo-cheer 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+:is(
+        [data-plummo-motion='answer'],
+        [data-plummo-motion='resume'],
+        [data-plummo-motion='points'],
+        [data-plummo-motion='podium']
+    )
+    :is(
+        [data-plummo-part='plume-large'],
+        [data-plummo-part='plume-large-reflection'],
+        [data-plummo-part='plume-side'],
+        [data-plummo-part='plume-side-reflection']
+    ) {
+    animation: plummo-follow 1.6s ease-in-out;
+}
+:is([data-plummo-motion='points'], [data-plummo-motion='podium'])
+    [data-plummo-part='plume-pink'] {
+    animation: plummo-follow 1.6s ease-in-out reverse;
+}
+:is([data-plummo-motion='points'], [data-plummo-motion='podium'])
+    :is([data-plummo-part^='brow-'], [data-plummo-part='mouth']) {
+    animation: plummo-smile 1.6s ease-in-out;
+}
+:is([data-plummo-motion='points'], [data-plummo-motion='podium'])
+    [data-plummo-part^='foot-'] {
+    animation: plummo-step 1.6s ease-in-out;
+}
+@keyframes plummo-breathe {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+}
+@keyframes plummo-blink {
+    0%,
+    42%,
+    46%,
+    100% {
+        transform: scaleY(1);
+    }
+    44% {
+        transform: scaleY(0.08);
+    }
+}
+@keyframes plummo-bounce {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    12% {
+        transform: translateY(3px);
+    }
+    32% {
+        transform: translateY(-8px);
+    }
+    58% {
+        transform: translateY(-4px);
+    }
+    78% {
+        transform: translateY(1px);
+    }
+}
+@keyframes plummo-wave {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+    12% {
+        transform: rotate(5deg);
+    }
+    34% {
+        transform: rotate(-34deg);
+    }
+    52% {
+        transform: rotate(-24deg);
+    }
+    68% {
+        transform: rotate(-32deg);
+    }
+    85% {
+        transform: rotate(-8deg);
+    }
+}
+@keyframes plummo-cheer {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+    15% {
+        transform: rotate(-4deg);
+    }
+    38%,
+    60% {
+        transform: rotate(25deg);
+    }
+    82% {
+        transform: rotate(8deg);
+    }
+}
+@keyframes plummo-follow {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+    24% {
+        transform: rotate(-3deg);
+    }
+    48% {
+        transform: rotate(4deg);
+    }
+    74% {
+        transform: rotate(-2deg);
+    }
+}
+@keyframes plummo-smile {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    35%,
+    65% {
+        transform: translateY(-2px);
+    }
+}
+@keyframes plummo-step {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+    36% {
+        transform: rotate(-3deg);
+    }
+    64% {
+        transform: rotate(2deg);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    [data-plummo-motion] [data-plummo-part] {
+        animation: none !important;
+        transform: none !important;
+    }
+}

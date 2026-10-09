@@ -146,7 +146,10 @@ const ranking = computed(() => {
                     })
                 }}
             </p>
-            <GameWinners :winners="ranking.slice(0, 3)" />
+            <GameWinners
+                :winners="ranking.slice(0, 3)"
+                :motion-key="`${game.id}:results`"
+            />
             <p v-if="game.targetReached" class="text-sm">
                 {{ t('session_results') }}
             </p>

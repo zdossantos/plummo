@@ -2,7 +2,7 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { computed, onMounted, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
-import PlummoAvatar from '@/components/PlummoAvatar.vue';
+import GamePlummoAvatar from '@/components/GamePlummoAvatar.vue';
 import PlummoPicker from '@/components/PlummoPicker.vue';
 import ChatComposer from '@/components/ChatComposer.vue';
 import GamePlay from '@/components/GamePlay.vue';
@@ -306,9 +306,9 @@ watch(chief, (value) => {
                                         : t('phone_hint')
                                 }}
                             </p>
-                            <PlummoAvatar
-                                :color="me.color"
-                                :accessories="me.accessories"
+                            <GamePlummoAvatar
+                                :game="game"
+                                :player="me"
                                 class="phone-plummo"
                             />
                         </div>
@@ -411,5 +411,21 @@ watch(chief, (value) => {
                 </template>
             </template>
         </div>
+        <template
+            v-if="
+                me &&
+                game &&
+                !editing &&
+                view === 'play' &&
+                game.phase !== 'results'
+            "
+            #footer
+        >
+            <GamePlummoAvatar
+                :game="game"
+                :player="me"
+                class="phone-game-plummo"
+            />
+        </template>
     </ViewportShell>
 </template>

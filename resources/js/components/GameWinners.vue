@@ -2,7 +2,7 @@
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import { useTranslations } from '@/composables/useTranslations';
 import type { Player } from '@/types/rooms';
-defineProps<{ winners: (Player & { rank?: number })[] }>();
+defineProps<{ winners: (Player & { rank?: number })[]; motionKey?: string }>();
 const { t } = useTranslations('rooms');
 </script>
 <template>
@@ -20,6 +20,8 @@ const { t } = useTranslations('rooms');
                 :color="player.color"
                 :accessories="player.accessories"
                 :label="player.name"
+                :motion="motionKey ? 'podium' : undefined"
+                :motion-key="motionKey"
             />
             <span v-else class="podium-empty" aria-hidden="true" />
             <div class="podium-step">

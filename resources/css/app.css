@@ -1,3 +1,4 @@
+@import './plummo-motion.css';
 @import 'tailwindcss';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../views';
@@ -1825,4 +1826,13 @@
     .resume-count {
         animation: none;
     }
+}
+
+.phone-game-plummo {
+    width: 48px;
+    height: 48px;
+    margin-left: auto;
+}
+[data-compact] .phone-game-plummo {
+    display: none;
 }
