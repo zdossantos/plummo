@@ -194,4 +194,10 @@ return [
     'phrase_votes' => '{count} votes · {points} points',
     'phrase_vote_saved' => 'Vote enregistré !',
     'phrase_invalid_vote' => 'Choisis une phrase de ce tour.',
+    'drawing_guesses' => 'Vos propositions',
+    'drawing_guesses_empty' => 'À vous de deviner !',
+    'sound_on' => 'Activer le son',
+    'sound_off' => 'Couper le son',
+    'sound_volume' => 'Volume',
+    'drawing_found' => 'Trouvé !',
 ];

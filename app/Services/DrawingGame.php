@@ -6,6 +6,7 @@ use App\Enums\ContentType;
 use App\Models\Game;
 use App\Models\Room;
 use App\Models\RoomPlayer;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class DrawingGame
@@ -233,17 +234,24 @@ class DrawingGame
         $state = $game->state;
         abort_unless($state['round']['word'] !== null && $this->eligible($player, $state), 403);
         abort_if(isset($state['round']['answers'][$player->id]), 409);
-        $word = mb_strtolower($state['round']['word']);
-        $guess = mb_strtolower($guess);
+        $submitted = $guess;
+        $word = $this->normalize($state['round']['word']);
+        $guess = $this->normalize($guess);
         $state['round']['near'][$player->id] = $guess !== $word && $this->distance($guess, $word) <= (mb_strlen($word) > 7 ? 2 : 1);
         if ($word === $guess) {
             $state['round']['answers'][$player->id] = ['at' => $this->time()];
         }
+        $state['round']['guesses'] = array_slice([...($state['round']['guesses'] ?? []), ['playerId' => $player->id, 'text' => $submitted, 'found' => $word === $guess]], -12);
         $this->save($game, $state);
         if ($word === $guess) {
             $this->award($room, $game);
         }
         $this->tick($room, $game);
+    }
+
+    private function normalize(string $value): string
+    {
+        return preg_replace('/[^\p{L}\p{N}]/u', '', Str::lower(Str::ascii($value)));
     }
 
     private function distance(string $a, string $b): int
@@ -357,7 +365,7 @@ class DrawingGame
         $artist = $me?->id === $round['artist'];
 
         return ['id' => $game->id, 'type' => 'drawing', 'phase' => $state['phase'], 'deadline' => $state['deadline'], 'settings' => $game->settings, 'scores' => $state['scores'], 'exhausted' => $state['exhausted'] ?? false, 'targetReached' => $game->status === 'finished' && $room->point_target !== null && (int) $room->players()->max('score') >= $room->point_target,
-            'round' => ['number' => $state['number'], 'total' => $game->settings['rounds'], 'tour' => $state['tour'], 'artistId' => $round['artist'], 'word' => $revealed ? $round['word'] : null, 'canvas' => $round['canvas'], 'revision' => $round['revision'], 'awards' => $round['awards']],
+            'round' => ['number' => $state['number'], 'total' => $game->settings['rounds'], 'tour' => $state['tour'], 'artistId' => $round['artist'], 'word' => $revealed ? $round['word'] : null, 'guesses' => array_map(fn ($guess) => [...$guess, 'text' => $guess['found'] && ! $revealed ? null : $guess['text']], $round['guesses'] ?? []), 'canvas' => $round['canvas'], 'revision' => $round['revision'], 'awards' => $round['awards']],
             'me' => $me === null ? null : ['eligible' => $this->eligible($me, $state), 'found' => isset($round['answers'][$me->id]), 'canGuess' => $round['word'] !== null && $this->eligible($me, $state) && ! isset($round['answers'][$me->id]) && in_array($state['phase'], ['drawing', 'artist_missing'], true), 'near' => $round['near'][$me->id] ?? false, 'points' => $round['awards'][$me->id] ?? 0, 'words' => $artist && ($state['phase'] === 'selecting' || ($state['phase'] === 'resuming' && $state['previous_phase'] === 'selecting')) ? $round['words'] : [], 'word' => $artist ? $round['word'] : null, 'canDraw' => $artist && $me->connected() && $state['phase'] === 'drawing', 'canSkip' => $me->connected() && ! $artist && $state['phase'] === 'artist_missing', 'votedSkip' => in_array($me->id, $round['votes'], true)]];
     }
 }

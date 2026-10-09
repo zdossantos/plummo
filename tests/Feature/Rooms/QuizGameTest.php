@@ -26,11 +26,11 @@ it('accepts one definitive answer per round and commits rapidity points once whe
     [$first, $one] = enterRoom($room);
     [$second, $two] = enterRoom($room, 'Autre');
     $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
-    $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk()->assertJsonPath('game.me.answered', true);
+    $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk()->assertJsonPath('game.me.answered', true)->assertJsonPath('game.round.answers', []);
     $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 1))->assertConflict();
     expect(RoomPlayer::findOrFail($first)->score)->toBe(0);
     $this->travel(1)->seconds();
-    $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk()->assertJsonPath('game.phase', 'reveal');
+    $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk()->assertJsonPath('game.phase', 'reveal')->assertJsonPath('game.round.answers.'.$first, 0)->assertJsonPath('game.round.answers.'.$second, 0);
     expect(RoomPlayer::findOrFail($first)->score)->toBe(100)->and(RoomPlayer::findOrFail($second)->score)->toBe(30);
     $this->getJson('/rooms/'.$room->code.'/state')->assertOk();
     expect(RoomPlayer::findOrFail($first)->score)->toBe(100);

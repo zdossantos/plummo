@@ -57,6 +57,7 @@ it('draws from two separate phones and plays every artist before returning to th
         $second->fill('#drawing-guess', mb_substr($word, 1));
         $second->page()->locator('button:has-text("Guess")')->click(['noWaitAfter' => true]);
         $second->assertSee('Almost!');
+        $screen->assertSee('Your guesses')->assertSee(mb_substr($word, 1));
         $second->fill('#drawing-guess', $word);
         $second->page()->locator('button:has-text("Guess")')->click(['noWaitAfter' => true]);
         $screen->assertSee('The word was: '.$word);

@@ -21,6 +21,7 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
     $tag = $pack->tags()->sole();
     $ids = $tag->contents()->pluck('contents.id');
     $screen = visit('/')->withLocale('en-US')->assertSee('Everyone plays.');
+    $screen->click('button[aria-label="Enable sound"]')->assertPresent('.sound-controls button[aria-pressed="true"]');
     $room = Room::latest('id')->firstOrFail();
     try {
         $phone = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')
@@ -33,7 +34,7 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         $screen->page()->evaluate('() => { window.nativePlay = HTMLMediaElement.prototype.play; HTMLMediaElement.prototype.play = function () { return Promise.reject(new DOMException("Autoplay blocked", "NotAllowedError")); }; }');
         $phone->page()->locator('button:has-text("Start blind test")')->click(['noWaitAfter' => true]);
         $phone->assertSee('Blind test · Clip 1 / 5');
-        $screen->assertSee('Blind test · Clip 1 / 5')->assertSee('Your browser blocks automatic sound.')->assertMissing('button');
+        $screen->assertSee('Blind test · Clip 1 / 5')->assertSee('Your browser blocks automatic sound.')->assertMissing('.game-play button');
         $screen->page()->evaluate('() => { HTMLMediaElement.prototype.play = window.nativePlay; }');
         // Permit playback for this test browser; gameplay never needs a screen action.
         $screen->page()->evaluate('() => { document.querySelector("audio").muted = true; }');
@@ -54,7 +55,7 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         $position = $screen->page()->evaluate('document.querySelector("audio").currentTime');
         expect($screen->page()->evaluate('document.querySelector("audio").paused'))->toBeTrue();
         $screen->page()->evaluate('() => { window.pausedAudio = document.querySelector("audio"); }');
-        $screen->assertMissing('button')->assertMissing('.page-controls');
+        $screen->assertMissing('.game-play button')->assertMissing('.page-controls');
         expect($screen->page()->evaluate('document.querySelector("audio") === window.pausedAudio'))->toBeTrue();
         $phone->page()->locator('button:has-text("Resume")')->click(['noWaitAfter' => true]);
         $phone->assertSee('Resuming in…');

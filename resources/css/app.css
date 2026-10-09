@@ -1893,3 +1893,103 @@
 [data-compact] .viewport-footer:has(.phone-game-plummo) {
     display: none;
 }
+
+.choice-plummos {
+    position: absolute;
+    bottom: 0.35rem;
+    left: 0.75rem;
+    right: 0.75rem;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 2;
+}
+.choice-plummos > * {
+    width: clamp(26px, 4vw, 58px);
+    margin-inline: -3px;
+    flex: 0 1 58px;
+    min-width: 0;
+}
+.game-choice:has(.choice-plummos) .choice-face {
+    padding-bottom: clamp(36px, 5vw, 65px);
+}
+.drawing-stage {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    gap: clamp(12px, 2vw, 30px);
+}
+.drawing-stage.with-guesses > .drawing-board {
+    flex: 3;
+    min-width: 0;
+}
+.drawing-guesses {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4px, 1vh, 12px);
+    overflow: hidden;
+}
+.drawing-guesses h2 {
+    color: var(--color-primary);
+    font-size: clamp(12px, 1.8vw, 26px);
+}
+.drawing-guesses-empty {
+    opacity: 0.7;
+    font-size: clamp(12px, 1.5vw, 20px);
+}
+.drawing-guess {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    min-height: 0;
+    border-left: 3px solid #aa83e8;
+    padding: 4px 8px;
+    background: linear-gradient(90deg, #aa83e820, transparent);
+}
+.drawing-guess.found {
+    border-color: #b4e1c1;
+    color: #b4e1c1;
+}
+.drawing-guess > :first-child {
+    width: clamp(24px, 3.5vw, 48px);
+    flex: none;
+}
+.drawing-guess > div {
+    min-width: 0;
+}
+.drawing-guess small,
+.drawing-guess strong {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.drawing-guess small {
+    font-size: clamp(10px, 1vw, 16px);
+    opacity: 0.7;
+}
+.drawing-guess strong {
+    font-size: clamp(12px, 1.5vw, 22px);
+}
+.sound-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.sound-controls button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #f1e680;
+}
+.sound-controls svg {
+    width: 20px;
+    height: 20px;
+}
+.sound-controls input {
+    width: 70px;
+    accent-color: #f1e680;
+}

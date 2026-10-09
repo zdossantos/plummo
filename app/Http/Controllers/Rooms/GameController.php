@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pack;
 use App\Models\Room;
 use App\Services\BlindChoices;
+use App\Services\ContentCatalog;
 use App\Services\GameEngine;
 use App\Services\RoomContentCatalog;
 use App\Services\RoomService;
@@ -39,7 +40,12 @@ class GameController extends Controller
             $type = ContentType::from($packs['type'] ?? 'quiz');
             $packs = $packs['packs'] ?? [];
 
-            return response()->json(['connectedPlayers' => $room->players()->get()->filter(fn ($player) => $player->connected())->count(), 'packs' => Pack::orderBy('name')->get(['id', 'name']), 'distinctSongs' => $type === ContentType::BlindTest ? app(BlindChoices::class)->count() : null, 'availability' => $packs === [] ? null : app(RoomContentCatalog::class)->availability($room, $type, $packs)]);
+            $connected = $room->players()->get()->filter(fn ($player) => $player->connected())->count();
+            $available = Pack::orderBy('name')->get(['id', 'name'])->filter(fn ($pack) => app(ContentCatalog::class)->query($type, [$pack->id])->exists())->values();
+
+            return response()->json(['games' => array_values(array_filter(['quiz', 'blind_test', 'drawing', 'phrase'], fn ($game) => $connected >= match ($game) {
+                'drawing' => 2, 'phrase' => 3, default => 1
+            })), 'connectedPlayers' => $connected, 'packs' => $available, 'distinctSongs' => $type === ContentType::BlindTest ? app(BlindChoices::class)->count() : null, 'availability' => $packs === [] ? null : app(RoomContentCatalog::class)->availability($room, $type, $packs)]);
         });
     }
 

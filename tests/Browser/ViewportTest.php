@@ -84,8 +84,7 @@ it('shows game preparation together without steps or scroll', function (int $wid
         assertViewportFits($page);
         $page->click('[data-choose-game]')->assertPresent('[data-slot="drawer-content"][data-state="open"]');
         assertViewportFits($page);
-        $page->assertPresent('[data-game-option="quiz"][aria-pressed="true"]')->click('[data-game-option="phrase"]')->assertSee('Prepare sentences');
-        $page->click('[data-choose-game]')->click('[data-game-option="quiz"]')->assertSee('Prepare a quiz');
+        $page->assertPresent('[data-game-option="quiz"][aria-pressed="true"]')->assertMissing('[data-game-option="phrase"]')->assertMissing('[data-game-option="drawing"]')->click('[data-game-option="quiz"]')->assertSee('Prepare a quiz');
         $page->click('[data-choose-packs]')->assertPresent('[data-slot="drawer-content"][data-state="open"]');
         assertViewportFits($page);
         $page->assertNoJavaScriptErrors();

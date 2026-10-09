@@ -194,4 +194,10 @@ return [
     'phrase_votes' => '{count} votes · {points} points',
     'phrase_vote_saved' => 'Vote saved!',
     'phrase_invalid_vote' => 'Choose a sentence from this round.',
+    'drawing_guesses' => 'Your guesses',
+    'drawing_guesses_empty' => 'Take a guess!',
+    'sound_on' => 'Enable sound',
+    'sound_off' => 'Mute sound',
+    'sound_volume' => 'Volume',
+    'drawing_found' => 'Found it!',
 ];

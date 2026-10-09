@@ -17,6 +17,7 @@ const props = defineProps<{
     code: string;
     busy: boolean;
     recover?: boolean;
+    playerCount?: number;
     initialPacks?: number[];
     initialType?: 'quiz' | 'blind_test' | 'drawing' | 'phrase';
 }>();
@@ -66,7 +67,17 @@ const duration = computed({
         settings.value[gameType.value].duration = value;
     },
 });
-const connectedPlayers = ref(0);
+const fetchedPlayers = ref(0);
+const connectedPlayers = computed(
+    () => props.playerCount ?? fetchedPlayers.value,
+);
+const playableGames = computed(() =>
+    games.filter(
+        (game) =>
+            connectedPlayers.value >=
+            (game.type === 'drawing' ? 2 : game.type === 'phrase' ? 3 : 1),
+    ),
+);
 const labels = computed(() =>
     gameType.value === 'phrase'
         ? {
@@ -161,7 +172,14 @@ async function load() {
         const data = await response.json();
         if (controller !== current) return;
         packs.value = data.packs;
-        connectedPlayers.value = data.connectedPlayers;
+        fetchedPlayers.value = data.connectedPlayers;
+        const retained = selected.value.filter((id) =>
+            packs.value.some((pack) => pack.id === id),
+        );
+        if (retained.length !== selected.value.length) {
+            selected.value = retained;
+            return;
+        }
         distinctSongs.value = data.distinctSongs;
         availability.value = data.availability;
     } catch {
@@ -170,7 +188,22 @@ async function load() {
         if (controller === current) loading.value = false;
     }
 }
-watch([selected, gameType], () => void load());
+watch(selected, () => void load());
+watch(gameType, () => {
+    selected.value = [];
+    void load();
+});
+watch(
+    () => props.playerCount,
+    () => {
+        if (
+            !props.recover &&
+            !playableGames.value.some((game) => game.type === gameType.value)
+        )
+            gameType.value = 'quiz';
+        void load();
+    },
+);
 onMounted(() => void load());
 onUnmounted(() => controller?.abort());
 </script>
@@ -337,7 +370,7 @@ onUnmounted(() => controller?.abort());
                 }}</DrawerDescription>
                 <div class="setup-game-grid">
                     <Button
-                        v-for="game in games"
+                        v-for="game in playableGames"
                         :key="game.type"
                         type="button"
                         variant="outline"
