@@ -39,9 +39,9 @@ Les couvre-chefs fermés déclarent `coversPlumes: true` dans le catalogue. À l
 
 `base.svg` reste la référence de repos. `php scripts/build-plummo-rig.php` produit `rig.json` depuis son XML : pieds, membres, plumes et reflets, corps et ombrage, sourcils, blancs des yeux, iris, reflets, joues, bouche et langue. Chaque pièce indique son parent et son pivot dans le cadre 512 × 512. Un bras et sa main partagent le tracé continu existant.
 
-Le compositeur animé conserve l'ordre d'origine au repos. Pendant un geste, les bras passent devant le visage ; les deux segments d'un objet entourent la main dans le même groupe et partagent sa transformation. Les reflets suivent leur surface. Le reflet original commun des mains est conservé au repos pour éviter les écarts d'anticrénelage dus à sa séparation.
+Le compositeur animé conserve l'ordre d'origine au repos. Pendant un geste, les bras passent devant le visage ; les deux segments d'un objet entourent la main dans le même groupe et partagent sa transformation. L’ombrage, le visage et les accessoires suivent le corps ; chaque reflet d’œil suit son iris et chaque iris suit son œil. Les reflets suivent leur surface. Les plumes superposées gardent leur ordre de peinture : deux angles CSS indépendants lient chaque plume à son reflet. Une transformation partagée lie également les lunettes et masques au visage, y compris leurs calques arrière. Le reflet original commun des mains est conservé au repos pour éviter les écarts d'anticrénelage dus à sa séparation.
 
-Les événements serveur déclenchent les gestes une fois : réponse confirmée, gain révélé, reprise et podium. Les aperçus et listes restent statiques. La préférence de réduction des mouvements arrête animations et minuteries de geste. Aucun événement du jeu ne dépend de la fin d'une animation.
+Le premier état reçu après une coupure réseau est consommé silencieusement, même si les composants restent montés. Les événements serveur déclenchent les gestes une fois : réponse confirmée, gain révélé, reprise et podium. Les aperçus et listes restent statiques. La préférence de réduction des mouvements arrête animations et minuteries de geste. Aucun événement du jeu ne dépend de la fin d'une animation.
 
 Vérification du dessin dans Chromium et WebKit :
 

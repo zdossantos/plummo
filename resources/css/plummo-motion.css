@@ -32,19 +32,43 @@
     [data-plummo-part='arm-left'] {
     animation: plummo-cheer 1.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
+/* A shared angle preserves overlapping plume paint order without detaching reflections. */
+@property --plummo-plume-large-angle {
+    syntax: '<angle>';
+    inherits: true;
+    initial-value: 0deg;
+}
+[data-plummo-part='plume-large'],
+[data-plummo-link='plume-large'] {
+    transform: rotate(var(--plummo-plume-large-angle));
+}
 :is(
         [data-plummo-motion='answer'],
         [data-plummo-motion='resume'],
         [data-plummo-motion='points'],
         [data-plummo-motion='podium']
     )
-    :is(
-        [data-plummo-part='plume-large'],
-        [data-plummo-part='plume-large-reflection'],
-        [data-plummo-part='plume-side'],
-        [data-plummo-part='plume-side-reflection']
-    ) {
-    animation: plummo-follow 1.6s ease-in-out;
+    [data-plummo-part='body'] {
+    animation: plummo-plumes 1.6s ease-in-out;
+}
+@keyframes plummo-plumes {
+    0%,
+    100% {
+        --plummo-plume-large-angle: 0deg;
+        --plummo-plume-side-angle: 0deg;
+    }
+    24% {
+        --plummo-plume-large-angle: -3deg;
+        --plummo-plume-side-angle: -3deg;
+    }
+    48% {
+        --plummo-plume-large-angle: 4deg;
+        --plummo-plume-side-angle: 4deg;
+    }
+    74% {
+        --plummo-plume-large-angle: -2deg;
+        --plummo-plume-side-angle: -2deg;
+    }
 }
 :is([data-plummo-motion='points'], [data-plummo-motion='podium'])
     [data-plummo-part='plume-pink'] {
@@ -175,4 +199,25 @@
         animation: none !important;
         transform: none !important;
     }
+}
+
+@property --plummo-plume-side-angle {
+    syntax: '<angle>';
+    inherits: true;
+    initial-value: 0deg;
+}
+[data-plummo-part='plume-side'],
+[data-plummo-link='plume-side'] {
+    transform: rotate(var(--plummo-plume-side-angle));
+}
+
+/* The face and its worn layers share a transform across their paint layers. */
+@property --plummo-face-transform {
+    syntax: '<transform-list>';
+    inherits: true;
+    initial-value: translate(0px, 0px);
+}
+[data-plummo-part='face'],
+[data-plummo-link='face'] {
+    transform: var(--plummo-face-transform);
 }

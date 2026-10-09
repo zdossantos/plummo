@@ -1833,6 +1833,9 @@
     height: 48px;
     margin-left: auto;
 }
-[data-compact] .phone-game-plummo {
+.viewport-footer:has(.phone-game-plummo) {
+    height: 48px;
+}
+[data-compact] .viewport-footer:has(.phone-game-plummo) {
     display: none;
 }

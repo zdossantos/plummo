@@ -5,12 +5,50 @@ export type PlummoMotion = 'idle' | 'answer' | 'points' | 'resume' | 'podium';
 export type PlummoEvent = { motion: PlummoMotion; key: string };
 export const gestureDuration = 1600;
 
+/** Wait for a fresh successful snapshot after a mounted network interruption. */
+export class PlummoSnapshotBaseline {
+    private pending = true;
+    private stale: GameState | null = null;
+    observe(
+        game: GameState | null,
+        connected = true,
+    ): 'waiting' | 'baseline' | 'live' {
+        if (!connected || !game) {
+            this.pending = true;
+            this.stale = game;
+            return 'waiting';
+        }
+        if (this.pending && game === this.stale) return 'waiting';
+        if (this.pending) {
+            this.pending = false;
+            return 'baseline';
+        }
+        return 'live';
+    }
+}
+
 /** Consume semantic server events, including the baseline on reconnect. */
 export class PlummoEvents {
     private initialized = false;
+    private baseline = new PlummoSnapshotBaseline();
     private context = '';
     private seen = new Set<string>();
-    observe(game: GameState | null, playerId: number): PlummoEvent | null {
+    observe(
+        game: GameState | null,
+        playerId: number,
+        connected = true,
+    ): PlummoEvent | null {
+        const state = this.baseline.observe(game, connected);
+        if (state === 'waiting') {
+            const active = this.initialized;
+            this.initialized = false;
+            this.seen.clear();
+            return active ? { motion: 'idle', key: 'offline' } : null;
+        }
+        if (state === 'baseline') {
+            this.initialized = false;
+            this.seen.clear();
+        }
         if (!game) {
             const hadGame = this.context !== '';
             this.context = '';

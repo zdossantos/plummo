@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onUnmounted, ref, watch } from 'vue';
 import GamePlummoAvatar from '@/components/GamePlummoAvatar.vue';
+import { PlummoSnapshotBaseline } from '@/lib/plummo-motion';
 import { roundCelebration } from '@/lib/celebration';
 import { useTranslations } from '@/composables/useTranslations';
 import type { GameState, RoomState } from '@/types/rooms';
@@ -8,23 +9,23 @@ const props = defineProps<{
     room: RoomState;
     game: GameState | null;
     serverNow: number;
+    connected: boolean;
 }>();
 const { t } = useTranslations('rooms');
 const gains = ref<Record<number, number>>({});
 let lastCelebrated = '';
-let observedGame = false;
+const baseline = new PlummoSnapshotBaseline();
 let timer: ReturnType<typeof setTimeout> | undefined;
 watch(
-    () => props.game,
-    (game) => {
-        if (!game) {
-            observedGame = false;
+    [() => props.game, () => props.connected],
+    ([game, connected]) => {
+        const state = baseline.observe(game, connected);
+        if (state === 'waiting' || !game) {
             gains.value = {};
             clearTimeout(timer);
             return;
         }
-        if (!observedGame) {
-            observedGame = true;
+        if (state === 'baseline') {
             lastCelebrated =
                 game.phase === 'reveal'
                     ? `${game.id}:${game.round.number}`
@@ -74,7 +75,11 @@ onUnmounted(() => clearTimeout(timer));
                 {{ t('disconnected') }}
             </p>
             <div class="relative">
-                <GamePlummoAvatar :game="game" :player="player" />
+                <GamePlummoAvatar
+                    :game="game"
+                    :player="player"
+                    :connected="connected"
+                />
                 <p
                     v-if="gains[player.id]"
                     class="points-rise absolute -top-2 left-1/2 z-10 -translate-x-1/2 rounded-full bg-primary px-2 py-1 text-sm font-black whitespace-nowrap text-primary-foreground"

@@ -121,7 +121,10 @@ export function composeAnimatedPlummo(
             rig.parts[`hand-${side}`].pivot,
         );
     const accessory = (slot: string, svg: string) =>
-        group(`accessory-${slot}`, svg);
+        group(`accessory-${slot}`, svg).replace(
+            ' style=',
+            slot === 'face' ? ' data-plummo-link="face" style=' : ' style=',
+        );
     const behind = chosen
         .map((a) =>
             foreground && a.slot === 'hand'
@@ -140,15 +143,25 @@ export function composeAnimatedPlummo(
     const plumes = chosen.some((a) => a.coversPlumes)
         ? ''
         : Object.keys(rig.parts)
-              .filter((n) => n.startsWith('plume-'))
-              .map(piece)
+              .filter((name) => name.startsWith('plume-'))
+              .map((name) =>
+                  name.endsWith('-reflection')
+                      ? piece(name).replace(
+                            ' style=',
+                            ` data-plummo-link="${rig.parts[name].parent}" style=`,
+                        )
+                      : piece(name),
+              )
               .join('');
     const eye = (side: string) =>
         group(
             `eye-${side}`,
-            ['eye-white', 'iris', 'highlight']
-                .map((name) => piece(`${name}-${side}`))
-                .join(''),
+            piece(`eye-white-${side}`) +
+                group(
+                    `iris-${side}`,
+                    rig.parts[`iris-${side}`].svg + piece(`highlight-${side}`),
+                    rig.parts[`iris-${side}`].pivot,
+                ),
             rig.parts[`iris-${side}`].pivot,
         );
     const mouth = group(
@@ -174,12 +187,16 @@ export function composeAnimatedPlummo(
     // Moving arms are painted last; their objects and reflections share the pivot.
     const pose = group(
         'pose',
-        behind +
-            `<g${rig.attributes}>${feet}${plumes}${foreground ? '' : arm('left') + arm('right') + piece('hands-reflection')}${piece('body')}${piece('shadow')}${face}</g>` +
-            front +
-            (foreground
-                ? `<g${rig.attributes}>${arm('left')}${arm('right')}</g>`
-                : ''),
+        group(
+            'body',
+            behind +
+                `<g${rig.attributes}>${feet}${plumes}${foreground ? '' : arm('left') + arm('right') + piece('hands-reflection')}${rig.parts.body.svg}${piece('shadow')}${face}</g>` +
+                front +
+                (foreground
+                    ? `<g${rig.attributes}>${arm('left')}${arm('right')}</g>`
+                    : ''),
+            rig.parts.body.pivot,
+        ),
     );
     const color =
         catalog.colors.find((c) => c.id === colorId) ?? catalog.colors[0];

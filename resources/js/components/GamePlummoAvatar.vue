@@ -2,10 +2,15 @@
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import { useGamePlummoMotion } from '@/composables/usePlummoMotion';
 import type { GameState, Player } from '@/types/rooms';
-const props = defineProps<{ game: GameState | null; player: Player }>();
+const props = defineProps<{
+    game: GameState | null;
+    player: Player;
+    connected: boolean;
+}>();
 const event = useGamePlummoMotion(
     () => props.game,
     () => props.player.id,
+    () => props.connected,
 );
 </script>
 <template>

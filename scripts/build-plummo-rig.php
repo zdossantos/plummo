@@ -16,7 +16,7 @@ foreach ($elements($children[0]) as $i => $node) {
     $add('foot-'.['left', 'right'][$i], $node, [[197, 453], [305, 460]][$i], 'pose');
 }
 foreach ($elements($children[1]) as $i => $node) {
-    $add(['plume-large', 'plume-pink', 'plume-side', 'plume-large-reflection', 'plume-side-reflection'][$i], $node, [244, 165], 'pose');
+    $add(['plume-large', 'plume-pink', 'plume-side', 'plume-large-reflection', 'plume-side-reflection'][$i], $node, [244, 165], $i === 3 ? 'plume-large' : ($i === 4 ? 'plume-side' : 'body'));
 }
 $hands = $elements($children[2]);
 foreach (['left', 'right'] as $i => $side) {
@@ -27,12 +27,12 @@ foreach (['left', 'right'] as $i => $side) {
 }
 $add('hands-reflection', $hands[2], [256, 320], 'pose');
 $add('body', $children[3], [256, 420], 'pose');
-$add('shadow', $children[4], [256, 420], 'pose');
+$add('shadow', $children[4], [256, 420], 'body');
 $names = ['brow-left', 'brow-right', 'eye-white-left', 'eye-white-right', 'iris-left', 'iris-right', 'highlight-left', 'highlight-right', 'cheek-left', 'cheek-right', 'mouth-opening', 'tongue', 'tongue-reflection'];
 foreach ($elements($children[5]) as $i => $node) {
     $name = $names[$i];
     $pivot = str_ends_with($name, 'left') ? [195, 263] : (str_ends_with($name, 'right') ? [314, 273] : [250, 313]);
-    $parent = preg_match('/^(eye-white|iris|highlight)-(left|right)$/', $name, $match) ? 'eye-'.$match[2] : (in_array($name, ['mouth-opening', 'tongue', 'tongue-reflection']) ? 'mouth' : 'face');
+    $parent = preg_match('/^(eye-white|iris|highlight)-(left|right)$/', $name, $match) ? ($match[1] === 'highlight' ? 'iris-' : 'eye-').$match[2] : ($name === 'tongue-reflection' ? 'tongue' : (in_array($name, ['mouth-opening', 'tongue']) ? 'mouth' : 'face'));
     $add($name, $node, $pivot, $parent);
 }
 $attributes = '';

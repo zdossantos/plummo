@@ -26,7 +26,7 @@
                 244,
                 165
             ],
-            "parent": "pose"
+            "parent": "body"
         },
         "plume-pink": {
             "svg": "<path fill=\"url(#plummo-pink)\" d=\"M241 164 C221 144 186 136 187 102 C188 75 212 62 230 78 C245 93 239 124 241 164Z\"/>",
@@ -34,7 +34,7 @@
                 244,
                 165
             ],
-            "parent": "pose"
+            "parent": "body"
         },
         "plume-side": {
             "svg": "<path fill=\"url(#plummo-tone)\" d=\"M248 169 C259 115 294 98 324 112 C361 132 351 157 319 158 Q285 158 248 169Z\"/>",
@@ -42,7 +42,7 @@
                 244,
                 165
             ],
-            "parent": "pose"
+            "parent": "body"
         },
         "plume-large-reflection": {
             "svg": "<path d=\"M243 150 C244 106 267 57 305 40\" stroke=\"#d4b9fc\" stroke-width=\"9\" opacity=\".45\" fill=\"none\"/>",
@@ -50,7 +50,7 @@
                 244,
                 165
             ],
-            "parent": "pose"
+            "parent": "plume-large"
         },
         "plume-side-reflection": {
             "svg": "<path d=\"M250 156 C272 130 300 119 319 124\" stroke=\"#d4b9fc\" stroke-width=\"7\" opacity=\".45\" fill=\"none\"/>",
@@ -58,7 +58,7 @@
                 244,
                 165
             ],
-            "parent": "pose"
+            "parent": "plume-side"
         },
         "hand-left-reflection": {
             "svg": "<path xmlns=\"http://www.w3.org/2000/svg\" d=\"M55 305 Q75 333 107 327\" stroke=\"#d3b6ff\" stroke-width=\"6\" opacity=\".4\" fill=\"none\"/>",
@@ -114,7 +114,7 @@
                 256,
                 420
             ],
-            "parent": "pose"
+            "parent": "body"
         },
         "brow-left": {
             "svg": "<path d=\"M182 211 C189 192 207 186 213 198 Q195 200 182 211Z\" fill=\"#392468\" stroke=\"none\"/>",
@@ -170,7 +170,7 @@
                 195,
                 263
             ],
-            "parent": "eye-left"
+            "parent": "iris-left"
         },
         "highlight-right": {
             "svg": "<ellipse cx=\"306\" cy=\"259\" rx=\"7\" ry=\"8\" fill=\"#fff\" stroke=\"none\"/>",
@@ -178,7 +178,7 @@
                 314,
                 273
             ],
-            "parent": "eye-right"
+            "parent": "iris-right"
         },
         "cheek-left": {
             "svg": "<ellipse cx=\"161\" cy=\"300\" rx=\"20\" ry=\"14\" transform=\"rotate(12 161 300)\" fill=\"#ffb9b4\" stroke=\"none\"/>",
@@ -218,7 +218,7 @@
                 250,
                 313
             ],
-            "parent": "mouth"
+            "parent": "tongue"
         }
     }
 }

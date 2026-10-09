@@ -6,13 +6,14 @@ import type { GameState } from '@/types/rooms';
 export function useGamePlummoMotion(
     game: () => GameState | null,
     player: () => number,
+    connected: () => boolean,
 ) {
     const events = new PlummoEvents();
     const event = ref<PlummoEvent>({ motion: 'idle', key: '' });
     watch(
-        [game, player],
-        ([snapshot, id]) => {
-            const next = events.observe(snapshot, id);
+        [game, player, connected],
+        ([snapshot, id, online]) => {
+            const next = events.observe(snapshot, id, online);
             if (next) event.value = next;
         },
         { immediate: true },

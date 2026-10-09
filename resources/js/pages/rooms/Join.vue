@@ -307,6 +307,7 @@ watch(chief, (value) => {
                                 }}
                             </p>
                             <GamePlummoAvatar
+                                :connected="connected"
                                 :game="game"
                                 :player="me"
                                 class="phone-plummo"
@@ -422,6 +423,7 @@ watch(chief, (value) => {
             #footer
         >
             <GamePlummoAvatar
+                :connected="connected"
                 :game="game"
                 :player="me"
                 class="phone-game-plummo"
