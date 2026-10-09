@@ -76,6 +76,7 @@ const { t } = useTranslations('rooms');
         <template #footer
             ><PlayerDock
                 v-if="room && !closed"
+                :connected="connected"
                 :room="room"
                 :game="game"
                 :server-now="serverNow"

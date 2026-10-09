@@ -44,6 +44,8 @@ onMounted(() => {
 watch(
     () => props.text,
     async () => {
+        // Remove the reader's reserved space before measuring new content.
+        truncated.value = false;
         await nextTick();
         measure();
     },

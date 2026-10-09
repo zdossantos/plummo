@@ -82,6 +82,10 @@ it('shows game preparation together without steps or scroll', function (int $wid
         }
         $page->assertDontSee('Continue')->assertSee('Start quiz');
         assertViewportFits($page);
+        $page->click('[data-choose-game]')->assertPresent('[data-slot="drawer-content"][data-state="open"]');
+        assertViewportFits($page);
+        $page->assertPresent('[data-game-option="quiz"][aria-pressed="true"]')->click('[data-game-option="phrase"]')->assertSee('Prepare sentences');
+        $page->click('[data-choose-game]')->click('[data-game-option="quiz"]')->assertSee('Prepare a quiz');
         $page->click('[data-choose-packs]')->assertPresent('[data-slot="drawer-content"][data-state="open"]');
         assertViewportFits($page);
         $page->assertNoJavaScriptErrors();

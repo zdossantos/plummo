@@ -1,0 +1,388 @@
+/* Pivots are SVG user coordinates, shared by each surface and its reflection. */
+[data-plummo-part] {
+    transform-box: view-box;
+}
+[data-plummo-motion='idle'] [data-plummo-part='pose'] {
+    animation: plummo-breathe 3.4s ease-in-out infinite;
+    animation-delay: var(--plummo-idle-delay, 0s);
+    transform-origin: 256px 445px !important;
+}
+[data-plummo-motion='idle']
+    :is([data-plummo-part='eye-left'], [data-plummo-part='eye-right']) {
+    animation: plummo-blink 6.7s ease-in-out infinite;
+    animation-delay: var(--plummo-idle-delay, 0s);
+}
+:is(
+        [data-plummo-motion='answer'],
+        [data-plummo-motion='resume'],
+        [data-plummo-motion='points'],
+        [data-plummo-motion='podium']
+    )
+    [data-plummo-part='pose'] {
+    animation: plummo-bounce 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: 256px 445px !important;
+}
+[data-plummo-motion='podium'] [data-plummo-part='pose'] {
+    animation-name: plummo-victory-jump;
+}
+[data-plummo-motion='points'] [data-plummo-part='pose'] {
+    animation-name: plummo-points-hop;
+}
+:is(
+        [data-plummo-motion='answer'],
+        [data-plummo-motion='resume'],
+        [data-plummo-motion='points'],
+        [data-plummo-motion='podium']
+    )
+    [data-plummo-part='arm-right'] {
+    animation: plummo-wave 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+:is([data-plummo-motion='points'], [data-plummo-motion='podium'])
+    [data-plummo-part='arm-left'] {
+    animation: plummo-cheer 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* A shared angle preserves overlapping plume paint order without detaching reflections. */
+@property --plummo-plume-large-angle {
+    syntax: '<angle>';
+    inherits: true;
+    initial-value: 0deg;
+}
+[data-plummo-part='plume-large'],
+[data-plummo-link='plume-large'] {
+    transform: rotate(var(--plummo-plume-large-angle));
+}
+:is(
+        [data-plummo-motion='answer'],
+        [data-plummo-motion='resume'],
+        [data-plummo-motion='points'],
+        [data-plummo-motion='podium']
+    )
+    [data-plummo-part='body'] {
+    animation: plummo-plumes 1.6s ease-in-out;
+}
+@keyframes plummo-plumes {
+    0%,
+    100% {
+        --plummo-plume-large-angle: 0deg;
+        --plummo-plume-side-angle: 0deg;
+    }
+    24% {
+        --plummo-plume-large-angle: -7deg;
+        --plummo-plume-side-angle: -5deg;
+    }
+    48% {
+        --plummo-plume-large-angle: 9deg;
+        --plummo-plume-side-angle: 6deg;
+    }
+    74% {
+        --plummo-plume-large-angle: -4deg;
+        --plummo-plume-side-angle: -3deg;
+    }
+}
+:is([data-plummo-motion='points'], [data-plummo-motion='podium'])
+    [data-plummo-part='plume-pink'] {
+    animation: plummo-follow 1.6s ease-in-out reverse;
+}
+:is([data-plummo-motion='points'], [data-plummo-motion='podium'])
+    :is([data-plummo-part^='brow-'], [data-plummo-part='mouth']) {
+    animation: plummo-smile 1.6s ease-in-out;
+}
+:is([data-plummo-motion='points'], [data-plummo-motion='podium'])
+    [data-plummo-part^='foot-'] {
+    animation: plummo-step 1.6s ease-in-out;
+}
+@keyframes plummo-breathe {
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-2px) scale(1.025, 1.045);
+    }
+}
+@keyframes plummo-blink {
+    0%,
+    42%,
+    46%,
+    100% {
+        transform: scaleY(1);
+    }
+    44% {
+        transform: scaleY(0.08);
+    }
+}
+@keyframes plummo-bounce {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    12% {
+        transform: translateY(4px) scale(1.025, 0.96);
+    }
+    32% {
+        transform: translateY(-14px) scale(0.985, 1.025);
+    }
+    58% {
+        transform: translateY(-6px) rotate(-2deg);
+    }
+    78% {
+        transform: translateY(2px) scale(1.015, 0.98);
+    }
+}
+@keyframes plummo-points-hop {
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+    14% {
+        transform: translateY(5px) scale(1.06, 0.92);
+    }
+    36% {
+        transform: translateY(-30px) scale(0.96, 1.05) rotate(-3deg);
+    }
+    58% {
+        transform: translateY(0) scale(1.045, 0.94);
+    }
+    76% {
+        transform: translateY(-12px) scale(0.985, 1.02) rotate(2deg);
+    }
+    90% {
+        transform: translateY(0) scale(1.02, 0.98);
+    }
+}
+@keyframes plummo-victory-jump {
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+    14% {
+        transform: translateY(7px) scale(1.09, 0.87);
+    }
+    36% {
+        transform: translateY(-64px) scale(0.94, 1.07) rotate(-5deg);
+    }
+    46% {
+        transform: translateY(-60px) scale(1) rotate(4deg);
+    }
+    64% {
+        transform: translateY(3px) scale(1.08, 0.89);
+    }
+    80% {
+        transform: translateY(-20px) scale(0.97, 1.04) rotate(-2deg);
+    }
+    92% {
+        transform: translateY(2px) scale(1.025, 0.97);
+    }
+}
+@keyframes plummo-wave {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+    12% {
+        transform: rotate(9deg);
+    }
+    34% {
+        transform: rotate(-52deg);
+    }
+    52% {
+        transform: rotate(-30deg);
+    }
+    68% {
+        transform: rotate(-48deg);
+    }
+    85% {
+        transform: rotate(-12deg);
+    }
+}
+@keyframes plummo-cheer {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+    15% {
+        transform: rotate(-8deg);
+    }
+    38%,
+    60% {
+        transform: rotate(43deg);
+    }
+    82% {
+        transform: rotate(12deg);
+    }
+}
+@keyframes plummo-follow {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+    24% {
+        transform: rotate(-6deg);
+    }
+    48% {
+        transform: rotate(8deg);
+    }
+    74% {
+        transform: rotate(-4deg);
+    }
+}
+@keyframes plummo-smile {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    35%,
+    65% {
+        transform: translateY(-4px);
+    }
+}
+@keyframes plummo-step {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+    36% {
+        transform: rotate(-8deg);
+    }
+    64% {
+        transform: rotate(5deg);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    [data-plummo-motion] [data-plummo-part] {
+        animation: none !important;
+        transform: none !important;
+    }
+}
+
+@property --plummo-plume-side-angle {
+    syntax: '<angle>';
+    inherits: true;
+    initial-value: 0deg;
+}
+[data-plummo-part='plume-side'],
+[data-plummo-link='plume-side'] {
+    transform: rotate(var(--plummo-plume-side-angle));
+}
+
+/* The face and its worn layers share a transform across their paint layers. */
+@property --plummo-face-transform {
+    syntax: '<transform-list>';
+    inherits: true;
+    initial-value: translate(0px, 0px);
+}
+[data-plummo-part='face'],
+[data-plummo-link='face'] {
+    transform: var(--plummo-face-transform);
+}
+
+/* Short spontaneous gestures keep waiting characters playful. */
+:is(
+        [data-plummo-motion='wiggle'],
+        [data-plummo-motion='stretch'],
+        [data-plummo-motion='hello'],
+        [data-plummo-motion='boing']
+    )
+    [data-plummo-part='pose'] {
+    animation: plummo-wiggle 1.6s ease-in-out;
+    transform-origin: 256px 445px !important;
+}
+[data-plummo-motion='stretch'] [data-plummo-part='pose'] {
+    animation-name: plummo-stretch;
+}
+[data-plummo-motion='hello'] [data-plummo-part='pose'] {
+    animation-name: plummo-peek;
+}
+[data-plummo-motion='boing'] [data-plummo-part='pose'] {
+    animation-name: plummo-boing;
+}
+[data-plummo-motion='hello'] [data-plummo-part='arm-right'] {
+    animation: plummo-wave 1.6s ease-in-out;
+}
+[data-plummo-motion='stretch'] [data-plummo-part='arm-right'] {
+    animation: plummo-stretch-arm 1.6s ease-in-out;
+}
+[data-plummo-motion='stretch'] [data-plummo-part='arm-left'] {
+    animation: plummo-cheer 1.6s ease-in-out;
+}
+:is([data-plummo-motion='wiggle'], [data-plummo-motion='boing'])
+    [data-plummo-part='body'] {
+    animation: plummo-plumes 1.6s ease-in-out;
+}
+[data-plummo-motion='wiggle'] [data-plummo-part^='foot-'] {
+    animation: plummo-step 1.6s ease-in-out;
+}
+@keyframes plummo-wiggle {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+    20%,
+    60% {
+        transform: rotate(-7deg) translateX(-4px);
+    }
+    40%,
+    80% {
+        transform: rotate(7deg) translateX(4px);
+    }
+}
+@keyframes plummo-stretch {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    18% {
+        transform: scale(1.05, 0.94);
+    }
+    42%,
+    65% {
+        transform: scale(0.94, 1.1) translateY(-5px);
+    }
+    82% {
+        transform: scale(1.03, 0.97);
+    }
+}
+@keyframes plummo-stretch-arm {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+    42%,
+    65% {
+        transform: rotate(-55deg);
+    }
+}
+@keyframes plummo-peek {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+    30%,
+    65% {
+        transform: rotate(-7deg) translateY(-5px);
+    }
+    82% {
+        transform: rotate(2deg);
+    }
+}
+@keyframes plummo-boing {
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+    18% {
+        transform: translateY(6px) scale(1.12, 0.85);
+    }
+    38% {
+        transform: translateY(-24px) scale(0.91, 1.09);
+    }
+    56% {
+        transform: translateY(2px) scale(1.06, 0.92);
+    }
+    73% {
+        transform: translateY(-9px) scale(0.98, 1.03);
+    }
+    88% {
+        transform: translateY(0) scale(1.02, 0.98);
+    }
+}

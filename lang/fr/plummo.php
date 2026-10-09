@@ -1,6 +1,21 @@
 <?php
 
 return [
+    'motion_lab' => [
+        'title' => 'La scène des Plummos',
+        'note' => 'Aperçu temporaire · touche un Plummo pour changer sa tenue',
+        'shuffle' => 'Nouvelles tenues',
+        'idle' => 'Attente',
+        'answer' => 'Réponse',
+        'points' => 'Points',
+        'resume' => 'Reprise',
+        'podium' => 'Victoire',
+        'wiggle' => 'Déhanché',
+        'stretch' => 'Étirement',
+        'hello' => 'Salut',
+        'boing' => 'Rebond',
+        'reduced' => 'Les animations sont désactivées par le réglage de réduction des mouvements de ton appareil.',
+    ],
     'title' => 'L’atelier des Plummos',
     'intro' => 'Une petite boule de plumes. Beaucoup de personnalité.',
     'preview' => 'Ton Plummo',

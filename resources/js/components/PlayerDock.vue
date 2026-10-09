@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onUnmounted, ref, watch } from 'vue';
-import PlummoAvatar from '@/components/PlummoAvatar.vue';
+import GamePlummoAvatar from '@/components/GamePlummoAvatar.vue';
+import { PlummoSnapshotBaseline } from '@/lib/plummo-motion';
 import { roundCelebration } from '@/lib/celebration';
 import { useTranslations } from '@/composables/useTranslations';
 import type { GameState, RoomState } from '@/types/rooms';
@@ -8,14 +9,29 @@ const props = defineProps<{
     room: RoomState;
     game: GameState | null;
     serverNow: number;
+    connected: boolean;
 }>();
 const { t } = useTranslations('rooms');
 const gains = ref<Record<number, number>>({});
 let lastCelebrated = '';
+const baseline = new PlummoSnapshotBaseline();
 let timer: ReturnType<typeof setTimeout> | undefined;
 watch(
-    () => props.game,
-    (game) => {
+    [() => props.game, () => props.connected],
+    ([game, connected]) => {
+        const state = baseline.observe(game, connected);
+        if (state === 'waiting' || !game) {
+            gains.value = {};
+            clearTimeout(timer);
+            return;
+        }
+        if (state === 'baseline') {
+            lastCelebrated =
+                game.phase === 'reveal'
+                    ? `${game.id}:${game.round.number}`
+                    : '';
+            return;
+        }
         const celebration = roundCelebration(game, lastCelebrated);
         if (!celebration) return;
         lastCelebrated = celebration.key;
@@ -58,11 +74,11 @@ onUnmounted(() => clearTimeout(timer));
             <p v-if="player.status === 'disconnected'" class="text-[10px]">
                 {{ t('disconnected') }}
             </p>
-            <div class="relative" :class="{ 'plummo-hop': gains[player.id] }">
-                <PlummoAvatar
-                    :color="player.color"
-                    :accessories="player.accessories"
-                    :label="player.name"
+            <div class="relative">
+                <GamePlummoAvatar
+                    :game="game"
+                    :player="player"
+                    :connected="connected"
                 />
                 <p
                     v-if="gains[player.id]"
@@ -79,9 +95,6 @@ onUnmounted(() => clearTimeout(timer));
 .chat-bubble {
     animation: bubble-in 0.18s ease-out;
 }
-.plummo-hop {
-    animation: plummo-hop 0.6s ease-out 2;
-}
 .points-rise {
     animation: points-rise 2.4s ease-out;
 }
@@ -93,15 +106,6 @@ onUnmounted(() => clearTimeout(timer));
     to {
         opacity: 1;
         transform: translateY(0);
-    }
-}
-@keyframes plummo-hop {
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-    45% {
-        transform: translateY(-12px);
     }
 }
 @keyframes points-rise {
@@ -120,7 +124,6 @@ onUnmounted(() => clearTimeout(timer));
 }
 @media (prefers-reduced-motion: reduce) {
     .chat-bubble,
-    .plummo-hop,
     .points-rise {
         animation: none;
     }

@@ -19,7 +19,7 @@ it('writes privately on three phones, presents anonymously, votes and returns to
         $first = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Camille')->click('Continue')->click('Enter the room')->assertSee('Prepare a quiz');
         $second = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Alex')->click('Continue')->click('Enter the room')->assertSee('Alex');
         $third = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Sam')->click('Continue')->click('Enter the room')->assertSee('Sam');
-        $first->select('game-type', 'phrase')->assertSee('Prepare sentences')->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")')->assertSee('5 unseen prompts');
+        $first->click('[data-choose-game]')->click('[data-game-option="phrase"]')->assertSee('Prepare sentences')->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")')->assertSee('5 unseen prompts');
         $first->page()->locator('button:has-text("Start sentences")')->click(['noWaitAfter' => true]);
         $first->assertSee('Your secret ending');
         $second->assertSee('Your secret ending');
