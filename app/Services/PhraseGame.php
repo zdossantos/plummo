@@ -129,7 +129,7 @@ class PhraseGame
             $entries = [];
             foreach ($state['round']['drafts'] as $author => $suffix) {
                 if (trim($suffix) !== '') {
-                    $entries[] = ['id' => (string) Str::uuid(), 'author' => (int) $author, 'text' => $state['round']['prompt'].' '.$suffix];
+                    $entries[] = ['id' => (string) Str::uuid(), 'author' => (int) $author, 'text' => $state['round']['prompt'].' '.app(GameBonuses::class)->phrase($game, (int) $author, $suffix)];
                 }
             }
             shuffle($entries);

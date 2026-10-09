@@ -329,10 +329,10 @@ class DrawingGame
             abort_unless($index <= count($canvas) && $index >= count($canvas) - 1, 409);
             if ($index === count($canvas)) {
                 abort_unless($values['offset'] === 0, 409);
-                $canvas[] = ['id' => $values['id'], 'color' => $values['color'], 'width' => $values['width'], 'points' => []];
+                $canvas[] = ['id' => $values['id'], 'color' => app(GameBonuses::class)->paint($game, $values['color']), 'input_color' => $values['color'], 'width' => $values['width'], 'points' => []];
             }
             $stroke = $canvas[$index];
-            abort_unless($stroke['color'] === $values['color'] && $stroke['width'] === $values['width'], 409);
+            abort_unless(($stroke['input_color'] ?? $stroke['color']) === $values['color'] && $stroke['width'] === $values['width'], 409);
             $offset = $values['offset'];
             if ($offset < count($stroke['points'])) {
                 abort_unless(array_slice($stroke['points'], $offset, count($values['points'])) == $values['points'], 409);

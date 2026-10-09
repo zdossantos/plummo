@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ContentController;
 use App\Http\Controllers\Admin\ImportController;
 use App\Http\Controllers\Admin\PackController;
 use App\Http\Controllers\Admin\TagController;
+use App\Http\Controllers\Rooms\BonusController;
 use App\Http\Controllers\Rooms\ChatController;
 use App\Http\Controllers\Rooms\DrawingController;
 use App\Http\Controllers\Rooms\GameController;
@@ -38,6 +39,8 @@ Route::prefix('rooms/{code}')->middleware('throttle:900,1')->group(function (): 
     Route::post('games', [GameController::class, 'store']);
     Route::post('game-recovery', [GameController::class, 'recover']);
     Route::post('game-options', [GameController::class, 'options']);
+    Route::post('bonuses', [BonusController::class, 'store']);
+    Route::post('bonuses/replace', [BonusController::class, 'replace']);
     Route::post('answer', [GameController::class, 'answer']);
     Route::post('game/{action}', [GameController::class, 'control']);
     Route::get('qr', [RoomController::class, 'qr'])->name('rooms.qr');

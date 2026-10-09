@@ -1890,7 +1890,8 @@
 .viewport-footer:has(.phone-game-plummo) {
     height: 48px;
 }
-[data-compact] .viewport-footer:has(.phone-game-plummo) {
+[data-compact]
+    .viewport-footer:has(.phone-game-plummo):not(:has(.bonus-pocket)) {
     display: none;
 }
 
@@ -1919,7 +1920,7 @@
     display: flex;
     gap: clamp(12px, 2vw, 30px);
 }
-.drawing-stage.with-guesses > .drawing-board {
+.drawing-stage.with-guesses > .bonus-canvas {
     flex: 3;
     min-width: 0;
 }
@@ -1992,4 +1993,367 @@
 .sound-controls input {
     width: 70px;
     accent-color: #f1e680;
+}
+
+/* Bonus objects stay close to the controller Plummo, outside the play area. */
+.phone-bonus-footer {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    width: 100%;
+    position: relative;
+    gap: 12px;
+}
+.phone-bonus-footer .phone-game-plummo {
+    margin-left: auto;
+}
+.bonus-pocket {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0 6px;
+    position: relative;
+}
+.bonus-slot {
+    position: relative;
+    width: 76px;
+}
+.bonus-object {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    width: 76px;
+    height: 66px;
+    padding: 5px;
+    border: 2px solid #1c102b;
+    border-radius: 18px;
+    background: #f3e779;
+    color: #241630;
+    box-shadow: 0 6px 0 #1c102b;
+    cursor: pointer;
+    transition: transform 0.12s;
+}
+.bonus-slot:nth-child(2) .bonus-object {
+    background: #c4a0f3;
+}
+.bonus-object svg {
+    width: 27px;
+    height: 27px;
+    stroke-width: 2.5;
+}
+.bonus-object small {
+    font-size: 10px;
+    line-height: 1;
+    font-weight: 900;
+}
+.bonus-object:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #1c102b;
+}
+.bonus-object:disabled {
+    opacity: 0.48;
+    cursor: default;
+}
+.bonus-info {
+    position: absolute;
+    top: -20px;
+    right: -4px;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    padding: 4px;
+    border: 2px solid #1c102b;
+    border-radius: 50%;
+    background: #fff7e3;
+    color: #241630;
+    z-index: 2;
+}
+.bonus-info svg {
+    width: 15px;
+    height: 15px;
+}
+.bonus-tooltip {
+    position: absolute;
+    bottom: 90px;
+    left: 0;
+    width: min(250px, 75vw);
+    padding: 12px;
+    color: #241630;
+    background: #fff7e3;
+    border: 2px solid #1c102b;
+    border-radius: 16px;
+    box-shadow: 0 5px 0 #1c102b;
+    font-size: 13px;
+    z-index: 40;
+}
+.bonus-empty {
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 66px;
+    border: 2px dashed #bba0df80;
+    border-radius: 18px;
+    color: #bba0df80;
+    font-size: 25px;
+}
+.bonus-reception {
+    position: absolute;
+    left: 50%;
+    top: 25%;
+    width: 42px;
+    height: 42px;
+    padding: 8px;
+    border: 2px solid #1c102b;
+    border-radius: 12px;
+    color: #241630;
+    background: #f3e779;
+    animation: bonus-receive-tv 2.3s ease both;
+    pointer-events: none;
+}
+.bonus-reception svg {
+    width: 100%;
+    height: 100%;
+}
+.bonus-reception-phone {
+    z-index: 30;
+    top: -58px;
+    left: 0;
+    width: auto;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 900;
+    animation: bonus-receive-phone 2.3s ease both;
+}
+.bonus-reception-phone svg {
+    width: 24px;
+}
+.bonus-blackout {
+    position: fixed;
+    inset: 0;
+    background: #090313e6;
+    z-index: 35;
+    pointer-events: none;
+    display: grid;
+    place-items: center;
+    animation: bonus-lights 0.2s ease-out;
+}
+.bonus-blackout svg {
+    color: #f3e779;
+    width: 54px;
+    opacity: 0.25;
+}
+.game-play {
+    position: relative;
+}
+.bonus-squatter {
+    position: absolute;
+    top: 42%;
+    left: 25%;
+    width: clamp(80px, 28vw, 130px);
+    z-index: 25;
+    pointer-events: none;
+    animation: bonus-walk 4s ease-in-out both;
+}
+.bonus-warning {
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    top: 52px;
+    padding: 7px 12px;
+    background: #f3e779;
+    color: #241630;
+    border: 2px solid #1c102b;
+    border-radius: 14px;
+    font-size: 11px;
+    font-weight: 800;
+    pointer-events: none;
+    z-index: 2;
+}
+.bonus-canvas {
+    position: relative;
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex: 1;
+}
+.bonus-stamp {
+    position: absolute;
+    left: 42%;
+    top: 25%;
+    width: clamp(70px, 20%, 150px);
+    color: #f05a78;
+    opacity: 0.8;
+    pointer-events: none;
+    transform: rotate(-15deg);
+    animation: bonus-stamp-in 0.25s ease-out;
+}
+@keyframes bonus-receive-tv {
+    0% {
+        opacity: 0;
+        transform: translate(100px, -80px) rotate(30deg);
+    }
+    20%,
+    65% {
+        opacity: 1;
+        transform: translate(25px, -30px) rotate(-10deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-10px, 20px) scale(0.5);
+    }
+}
+@keyframes bonus-receive-phone {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    15%,
+    65% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(65px) scale(0.3);
+        transform-origin: left bottom;
+    }
+}
+@keyframes bonus-walk {
+    0% {
+        transform: translate(-50%, -10%) rotate(-12deg);
+    }
+    25% {
+        transform: translate(90%, 10%) rotate(12deg);
+    }
+    50% {
+        transform: translate(-20%, 70%) rotate(-12deg);
+    }
+    75% {
+        transform: translate(80%, 30%) rotate(12deg);
+    }
+    100% {
+        transform: translate(-20%, -10%) rotate(-12deg);
+    }
+}
+@keyframes bonus-stamp-in {
+    from {
+        transform: scale(2) rotate(-15deg);
+        opacity: 0;
+    }
+}
+@keyframes bonus-lights {
+    from {
+        opacity: 0;
+    }
+}
+@media (max-height: 700px) {
+    .bonus-object,
+    .bonus-empty {
+        height: 52px;
+    }
+    .bonus-pocket {
+        padding-top: 12px;
+    }
+    .bonus-object svg {
+        height: 22px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .bonus-reception,
+    .bonus-squatter,
+    .bonus-stamp,
+    .bonus-blackout {
+        animation: none;
+    }
+    .bonus-object {
+        transition: none;
+    }
+}
+
+[data-compact] .viewport-footer:has(.bonus-pocket) {
+    height: 48px;
+}
+[data-compact] .phone-bonus-footer .phone-game-plummo {
+    display: none;
+}
+[data-compact] .bonus-object,
+[data-compact] .bonus-empty {
+    width: 52px;
+    height: 38px;
+}
+[data-compact] .bonus-object small {
+    display: none;
+}
+[data-compact] .bonus-object svg {
+    width: 22px;
+    height: 22px;
+}
+
+.bonus-pending {
+    align-self: end;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    padding: 5px;
+    border: 2px dashed #f3e779;
+    border-radius: 16px;
+    color: #f3e779;
+    background: #38234e;
+    box-shadow: 0 5px 0 #1c102b;
+}
+.bonus-pending svg {
+    width: 26px;
+    height: 26px;
+}
+.bonus-pending small {
+    font-size: 11px;
+    font-weight: 800;
+}
+.bonus-replace-drawer {
+    gap: 14px;
+}
+.bonus-replace-options {
+    display: grid;
+    gap: 12px;
+}
+.bonus-replace-options button {
+    min-height: 56px;
+    white-space: normal;
+}
+.bonus-replace-options svg {
+    flex-shrink: 0;
+}
+[data-compact] .bonus-pending {
+    width: 52px;
+    height: 38px;
+}
+[data-compact] .bonus-pending small {
+    display: none;
+}
+
+@media (max-height: 480px) {
+    .bonus-replace-drawer {
+        padding: 12px;
+        gap: 8px;
+    }
+    .bonus-replace-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+    .bonus-replace-drawer [data-slot='button'] {
+        min-height: 40px;
+        height: auto;
+        padding: 6px 10px;
+    }
+    .bonus-replace-drawer [data-slot='drawer-title'] {
+        font-size: 22px;
+    }
 }

@@ -1,3 +1,28 @@
+export type BonusKind =
+    | 'bolt'
+    | 'dice'
+    | 'squatter'
+    | 'artist'
+    | 'accent'
+    | 'sneeze'
+    | 'stamp'
+    | 'paint';
+export type BonusItem = { id: string; kind: BonusKind };
+export type BonusEffect = BonusItem & {
+    actorId: number;
+    startedAt: number;
+    expiresAt: number | null;
+};
+export type BonusReceipt = BonusItem & { recipientId: number; at: number };
+export type BonusState = {
+    enabled: boolean;
+    inventory: BonusItem[];
+    canUse: boolean;
+    effects: BonusEffect[];
+    receipts: BonusReceipt[];
+    pending?: BonusItem | null;
+    launches?: (BonusItem & { at: number; actorId: number })[];
+};
 export type Player = {
     id: number;
     name: string;
@@ -17,12 +42,14 @@ export type RoomState = {
     ranking: (Player & { rank: number })[];
 };
 export type ChoiceGame = {
+    bonuses?: BonusState;
     id: number;
     settings: {
         packs: number[];
         rounds: number;
         duration: number;
         allow_repeats?: boolean;
+        bonuses?: boolean;
     };
     exhausted: boolean;
     targetReached: boolean;

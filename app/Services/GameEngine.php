@@ -46,6 +46,9 @@ class GameEngine
     /** @param array<string, mixed> $changes */
     public function save(Game $game, array $changes): void
     {
+        if (isset($changes['state']) || isset($changes['status'])) {
+            $changes['state'] = app(GameBonuses::class)->transition($game, $changes['state'] ?? $game->state, $changes['status'] ?? $game->status ?? 'active');
+        }
         $game->update($changes);
         if (config('broadcasting.default') !== 'null') {
             event(new RoomChanged(Room::findOrFail($game->room_id)->code));
@@ -271,15 +274,15 @@ class GameEngine
             return null;
         }
         if ($game->type === 'drawing') {
-            return app(DrawingGame::class)->view($room, $game, $me);
+            return [...app(DrawingGame::class)->view($room, $game, $me), 'bonuses' => app(GameBonuses::class)->view($game, $me, $screen)];
         }
         $state = $game->state;
         if ($game->type === 'phrase') {
-            return app(PhraseGame::class)->view($room, $game, $me);
+            return [...app(PhraseGame::class)->view($room, $game, $me), 'bonuses' => app(GameBonuses::class)->view($game, $me, $screen)];
         }
         $round = $state['round'];
         $revealed = $state['phase'] === 'reveal' || $state['phase'] === 'results' || ($state['previous_phase'] === 'reveal' && in_array($state['phase'], ['paused', 'resuming'], true));
 
-        return ['id' => $game->id, 'settings' => $game->settings, 'exhausted' => $state['exhausted'] ?? false, 'targetReached' => $game->status === 'finished' && $room->point_target !== null && (int) $room->players()->max('score') >= $room->point_target, 'type' => $game->type, 'phase' => $state['phase'], 'deadline' => $state['deadline'], 'scores' => $state['scores'], 'round' => ['number' => $state['number'], 'total' => $game->settings['rounds'], 'question' => $game->type === 'blind_test' ? __('rooms.blind_listen') : $round['payload']['question'], 'audio' => $screen && $game->type === 'blind_test' && $game->status === 'active' ? '/rooms/'.$room->code.'/games/'.$game->id.'/rounds/'.$state['number'].'/audio' : null, 'answers' => $revealed ? array_map(fn ($answer) => $answer['choice'], $round['answers']) : [], 'choices' => $round['payload']['choices'], 'correct' => $revealed ? $round['payload']['correct'] : null, 'awards' => $revealed ? $round['awards'] : []], 'me' => $me === null ? null : ['eligible' => $this->eligible($me, $state), 'answered' => isset($round['answers'][$me->id]), 'choice' => $round['answers'][$me->id]['choice'] ?? null, 'points' => $revealed ? ($round['awards'][$me->id] ?? 0) : null]];
+        return ['bonuses' => app(GameBonuses::class)->view($game, $me, $screen), 'id' => $game->id, 'settings' => $game->settings, 'exhausted' => $state['exhausted'] ?? false, 'targetReached' => $game->status === 'finished' && $room->point_target !== null && (int) $room->players()->max('score') >= $room->point_target, 'type' => $game->type, 'phase' => $state['phase'], 'deadline' => $state['deadline'], 'scores' => $state['scores'], 'round' => ['number' => $state['number'], 'total' => $game->settings['rounds'], 'question' => $game->type === 'blind_test' ? __('rooms.blind_listen') : $round['payload']['question'], 'audio' => $screen && $game->type === 'blind_test' && $game->status === 'active' ? '/rooms/'.$room->code.'/games/'.$game->id.'/rounds/'.$state['number'].'/audio' : null, 'answers' => $revealed ? array_map(fn ($answer) => $answer['choice'], $round['answers']) : [], 'choices' => $round['payload']['choices'], 'correct' => $revealed ? $round['payload']['correct'] : null, 'awards' => $revealed ? $round['awards'] : []], 'me' => $me === null ? null : ['eligible' => $this->eligible($me, $state), 'answered' => isset($round['answers'][$me->id]), 'choice' => $round['answers'][$me->id]['choice'] ?? null, 'points' => $revealed ? ($round['awards'][$me->id] ?? 0) : null]];
     }
 }

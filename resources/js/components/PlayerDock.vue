@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onUnmounted, ref, watch } from 'vue';
+import BonusReception from '@/components/BonusReception.vue';
 import GamePlummoAvatar from '@/components/GamePlummoAvatar.vue';
 import { PlummoSnapshotBaseline } from '@/lib/plummo-motion';
 import { roundCelebration } from '@/lib/celebration';
@@ -75,7 +76,14 @@ onUnmounted(() => clearTimeout(timer));
                 {{ t('disconnected') }}
             </p>
             <div class="relative">
+                <BonusReception
+                    :game="game"
+                    :recipient-id="player.id"
+                    :server-now="serverNow"
+                    :connected="connected"
+                />
                 <GamePlummoAvatar
+                    class="relative z-10"
                     :game="game"
                     :player="player"
                     :connected="connected"

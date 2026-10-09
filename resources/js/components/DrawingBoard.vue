@@ -81,6 +81,25 @@ watch(
     },
     { deep: true },
 );
+// Split a held stroke at a paint change so the prank starts and ends on time.
+// Existing segments keep their wire colour for acknowledged chunk retries.
+watch(
+    () => props.color,
+    (color) => {
+        if (active === null || !current || current.color === color) return;
+        if (local.value.length >= 100) return;
+        const last = current.points.at(-1);
+        if (!last) return;
+        local.value.push({
+            id: local.value.length + 1,
+            color: color ?? '#35236b',
+            width: current.width,
+            points: [[...last]],
+        });
+        current = local.value.at(-1);
+        schedule();
+    },
+);
 watch(
     () => props.editable,
     (editable) => {

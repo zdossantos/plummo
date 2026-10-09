@@ -122,6 +122,7 @@ const required = computed(() =>
 );
 const distinctSongs = ref<number | null>(null);
 const repeats = ref(false);
+const bonuses = ref(false);
 const loading = ref(true);
 const error = ref('');
 let controller: AbortController | undefined;
@@ -217,6 +218,9 @@ onUnmounted(() => controller?.abort());
                 rounds,
                 duration,
                 allow_repeats: repeats,
+                ...(!recover
+                    ? { bonuses: bonuses && connectedPlayers > 1 }
+                    : {}),
             })
         "
     >
@@ -319,6 +323,13 @@ onUnmounted(() => controller?.abort());
                 <label class="flex gap-3 text-sm"
                     ><input v-model="repeats" type="checkbox" />{{
                         t('allow_repeats')
+                    }}</label
+                >
+                <label
+                    v-if="!recover && connectedPlayers > 1"
+                    class="flex gap-3 text-sm"
+                    ><input v-model="bonuses" type="checkbox" />{{
+                        t('bonus_enable')
                     }}</label
                 >
                 <p v-if="availability" class="text-sm">
