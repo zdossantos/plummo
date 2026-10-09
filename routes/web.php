@@ -11,9 +11,17 @@ use App\Http\Controllers\Rooms\PhraseController;
 use App\Http\Controllers\Rooms\PlayerController;
 use App\Http\Controllers\Rooms\RoomController;
 use App\Http\Controllers\Rooms\SessionController;
+use App\Services\PlummoCatalog;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
+
+// Temporary preview, available only in local and test environments.
+Route::get('/dev/plummo-animations', function (PlummoCatalog $catalog) {
+    abort_unless(app()->environment(['local', 'testing']), 404);
+
+    return Inertia::render('dev/PlummoAnimations', ['catalog' => $catalog->data()]);
+})->name('dev.plummo-animations');
 
 Route::get('/', [RoomController::class, 'open'])->name('home')->middleware('throttle:30,1');
 Route::get('/join', [RoomController::class, 'joinPage'])->name('join');

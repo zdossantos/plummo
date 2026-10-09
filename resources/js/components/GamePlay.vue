@@ -205,11 +205,16 @@ const ranking = computed(() => {
                     :key="index"
                     class="game-choice"
                     :class="{
-                        correct: game.round.correct === index,
+                        correct: revealed && game.round.correct === index,
                         wrong:
-                            game.round.correct !== null &&
+                            phone &&
+                            revealed &&
                             game.me?.choice === index &&
                             game.round.correct !== index,
+                        muted:
+                            revealed &&
+                            game.round.correct !== index &&
+                            (!phone || game.me?.choice !== index),
                         chosen: game.me?.choice === index,
                     }"
                 >

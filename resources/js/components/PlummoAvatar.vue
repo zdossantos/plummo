@@ -4,7 +4,7 @@ import catalog from '../../../public/plummo/catalog.json';
 import rig from '../../../public/plummo/rig.json';
 import { usePlummoMotion } from '@/composables/usePlummoMotion';
 import type { PlummoMotion } from '@/lib/plummo-motion';
-import { composePlummo, composeAnimatedPlummo } from '@/lib/plummo';
+import { composeAnimatedPlummo } from '@/lib/plummo';
 const props = withDefaults(
     defineProps<{
         color?: string;
@@ -30,29 +30,27 @@ const parts = Object.fromEntries(
         content as string,
     ]),
 );
-const { active, foreground } = usePlummoMotion(
+const { active } = usePlummoMotion(
     () => props.motion,
     () => props.motionKey,
 );
 const svg = computed(() =>
-    props.motion
-        ? composeAnimatedPlummo(
-              props.color,
-              props.accessories,
-              catalog,
-              parts,
-              rig,
-              id,
-              foreground.value,
-          )
-        : composePlummo(props.color, props.accessories, catalog, parts, id),
+    composeAnimatedPlummo(
+        props.color,
+        props.accessories,
+        catalog,
+        parts,
+        rig,
+        id,
+        true,
+    ),
 );
 </script>
 <template>
     <!-- Only repository-owned SVG layers are composed; user input never becomes markup. -->
     <!-- eslint-disable vue/no-v-html -- Only trusted repository SVG fragments are composed. -->
     <svg
-        class="pointer-events-none"
+        class="pointer-events-none overflow-visible"
         :data-plummo-motion="active"
         :style="{ '--plummo-idle-delay': `${idleDelay}s` }"
         :data-plummo-key="motionKey"

@@ -524,7 +524,10 @@
     --choice-color: #50bd86;
 }
 .game-choice.wrong {
-    --choice-color: #f086a1;
+    --choice-color: #f07474;
+}
+.game-choice.muted {
+    opacity: 0.25;
 }
 .game-choice.chosen > .choice-face {
     outline: 3px solid var(--paper);
@@ -1034,6 +1037,18 @@
 .game-drawer [data-slot='button'][data-variant='ghost'] {
     background: var(--pink);
 }
+.game-drawer .drawer-close[data-size='icon'] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--purple);
+    color: var(--ink);
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    padding: 0;
+    flex-shrink: 0;
+}
 .viewport-shell
     input:not([type='checkbox']):not([type='radio']):not([type='range']):not(
         [type='file']
@@ -1364,6 +1379,35 @@
 .setup-fields button {
     white-space: nowrap;
 }
+.setup-game-grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: center;
+    gap: 16px 12px;
+}
+.setup-game-grid [data-slot='button'] {
+    position: relative;
+    flex-direction: column;
+    height: auto;
+    min-height: 80px;
+    padding: 12px;
+}
+.setup-game-grid [aria-pressed='true'] {
+    background: var(--mint);
+}
+.setup-game-grid svg {
+    width: 24px;
+    height: 24px;
+}
+.setup-game-grid .setup-game-check {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 16px;
+    height: 16px;
+}
 .setup-details {
     display: flex;
     flex-direction: column;
@@ -1635,7 +1679,7 @@
     gap: 0;
     min-height: 0;
     flex: 0 1 auto;
-    padding: 8px 0 6px;
+    padding: 12px 0 6px;
 }
 .podium-place {
     display: flex;
@@ -1753,7 +1797,7 @@
 }
 @media (max-height: 420px) {
     .podium {
-        padding-top: 0;
+        padding-top: 8px;
     }
     .podium-place > svg,
     .podium-empty {

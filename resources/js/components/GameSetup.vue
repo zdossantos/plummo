@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch, onUnmounted } from 'vue';
+import { Brain, Music, Pencil, MessageSquare, Check } from '@lucide/vue';
 import PagedList from '@/components/PagedList.vue';
 import TextReader from '@/components/TextReader.vue';
 import { useMediaQuery } from '@vueuse/core';
@@ -22,6 +23,16 @@ const props = defineProps<{
 const emit = defineEmits<{ start: [settings: object] }>();
 const { t } = useTranslations('rooms');
 const choosingPacks = ref(false);
+const choosingGame = ref(false);
+const games = [
+    { type: 'quiz', label: 'quiz_name', icon: Brain },
+    { type: 'blind_test', label: 'blind_name', icon: Music },
+    { type: 'drawing', label: 'drawing_short', icon: Pencil },
+    { type: 'phrase', label: 'phrase_short', icon: MessageSquare },
+] as const;
+const gameLabel = computed(() =>
+    t(games.find((game) => game.type === gameType.value)!.label),
+);
 const desktop = useMediaQuery('(min-width: 768px)');
 const ui = useTranslations('interface');
 const packSummary = computed(() =>
@@ -183,20 +194,18 @@ onUnmounted(() => controller?.abort());
             <div class="setup-fields">
                 <label class="setup-type" for="game-type">
                     <span class="font-bold">{{ t('game_type') }}</span>
-                    <select
+                    <Button
                         id="game-type"
-                        v-model="gameType"
+                        type="button"
+                        variant="outline"
+                        data-choose-game
+                        aria-haspopup="dialog"
+                        :aria-expanded="choosingGame"
                         :disabled="recover"
+                        @click="choosingGame = true"
                     >
-                        <option value="quiz">{{ t('quiz_name') }}</option>
-                        <option value="blind_test">
-                            {{ t('blind_name') }}
-                        </option>
-                        <option value="drawing">
-                            {{ t('drawing_short') }}
-                        </option>
-                        <option value="phrase">{{ t('phrase_short') }}</option>
-                    </select>
+                        {{ gameLabel }}
+                    </Button>
                 </label>
                 <div class="setup-pack-choice">
                     <span class="font-bold">{{ t('packs_label') }}</span>
@@ -314,6 +323,47 @@ onUnmounted(() => controller?.abort());
             :disabled="busy || loading || !valid"
             >{{ t(recover ? 'recover_game' : labels.start) }}</Button
         >
+        <Drawer
+            v-model:open="choosingGame"
+            :swipe-direction="desktop ? 'right' : 'down'"
+        >
+            <DrawerContent
+                v-if="choosingGame"
+                class="game-drawer setup-game-drawer"
+            >
+                <DrawerTitle>{{ t('game_type') }}</DrawerTitle>
+                <DrawerDescription>{{
+                    t('game_choice_hint')
+                }}</DrawerDescription>
+                <div class="setup-game-grid">
+                    <Button
+                        v-for="game in games"
+                        :key="game.type"
+                        type="button"
+                        variant="outline"
+                        :data-game-option="game.type"
+                        :aria-pressed="gameType === game.type"
+                        @click="
+                            gameType = game.type;
+                            choosingGame = false;
+                        "
+                    >
+                        <component :is="game.icon" aria-hidden="true" />
+                        {{ t(game.label) }}
+                        <Check
+                            v-if="gameType === game.type"
+                            class="setup-game-check"
+                            aria-hidden="true"
+                        />
+                    </Button>
+                </div>
+                <DrawerClose as-child
+                    ><Button type="button">{{
+                        ui.t('close')
+                    }}</Button></DrawerClose
+                >
+            </DrawerContent>
+        </Drawer>
         <Drawer
             v-model:open="choosingPacks"
             :swipe-direction="desktop ? 'right' : 'down'"

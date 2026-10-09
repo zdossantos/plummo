@@ -69,8 +69,16 @@
 
 ## État
 
-Conception approuvée le 9 octobre avec la précision « toutes les parties » et mouvements naturels. Découpage et gestes implémentés. Revue indépendante effectuée ; corrections de l’espace mobile, de la reconnexion et des attaches validées. Les derniers contrôles de géométrie ont aussi corrigé la réservation du lecteur de réponses courtes et le brouillon de phrases sur petit téléphone. Le SVG original reste inchangé et sert de référence aux comparaisons pixel par pixel. Branche publiée dans la [PR #26](https://github.com/zdossantos/plummo/pull/26), sans fusion. Docker reconstruit et disponible sur le réseau local.
+Conception approuvée le 9 octobre avec la précision « toutes les parties » et mouvements naturels. Découpage et gestes implémentés. Revue indépendante effectuée ; corrections de l’espace mobile, de la reconnexion et des attaches validées. Les derniers contrôles de géométrie ont aussi corrigé la réservation du lecteur de réponses courtes et le brouillon de phrases sur petit téléphone. Le SVG original reste inchangé et sert de référence aux comparaisons pixel par pixel. Branche publiée dans la [PR #26](https://github.com/zdossantos/plummo/pull/26). Docker reconstruit et disponible sur le réseau local.
 
 ### Ajustements de mise en œuvre
 
 `base.svg` reste immuable : les fragments sont extraits dans `rig.json` depuis le DOM XML. Le reflet commun des mains reste entier au repos pour garder l’anticrénelage original ; les gestes utilisent ses deux sous-tracés existants. Les reflets des plumes et les accessoires du visage utilisent des transformations liées plutôt qu’un déplacement de leurs calques, car leur imbrication modifierait les recouvrements du dessin original. Les bras et les mains restent un seul membre lorsque leur tracé continu ne comporte pas de séparation anatomique.
+
+### Ajustements validés lors des essais locaux
+
+Le repos respire et les gestes sont plus marqués, avec saut de victoire et quatre animations spontanées réparties entre les personnages en attente. Les mains et objets restent au premier plan même dans les aperçus statiques ; le saut du podium conserve ses débords visibles. Une interface temporaire `/dev/plummo-animations`, limitée aux environnements local et testing, permet de tester chaque geste et des tenues aléatoires.
+
+Le choix du jeu utilise le même drawer shadcn Vue que les packs, sans chevron. La fermeture des accessoires est un bouton carré de 44 px avec une icône SVG. À la révélation du quiz et du blind test, la bonne réponse est verte, la mauvaise réponse choisie sur téléphone est rouge et les autres mauvaises réponses passent à 25 % d’opacité sur téléphone et grand écran. Les choix conservent leur opacité avant la révélation serveur. Ces états, les gestes, le podium et les drawers ont été vérifiés dans Chromium et WebKit.
+
+Vérification finale avant publication : analyse, lint, format, types et build passent ; 13 tests frontend avec 133 assertions, puis 165 tests PHP/navigateur avec 1 808 assertions sur `plummo_testing` réinitialisée explicitement après les essais visuels. La construction de l’image Docker runtime passe également. Revue indépendante du diff final sans défaut bloquant.

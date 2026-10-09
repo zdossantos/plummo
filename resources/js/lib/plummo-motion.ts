@@ -1,7 +1,16 @@
 import { roundCelebration } from '@/lib/celebration';
 import type { GameState } from '@/types/rooms';
 
-export type PlummoMotion = 'idle' | 'answer' | 'points' | 'resume' | 'podium';
+export type PlummoMotion =
+    | 'idle'
+    | 'answer'
+    | 'points'
+    | 'resume'
+    | 'podium'
+    | 'wiggle'
+    | 'stretch'
+    | 'hello'
+    | 'boing';
 export type PlummoEvent = { motion: PlummoMotion; key: string };
 export const gestureDuration = 1600;
 

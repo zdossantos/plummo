@@ -1,6 +1,21 @@
 <?php
 
 return [
+    'motion_lab' => [
+        'title' => 'The Plummo stage',
+        'note' => 'Temporary preview · tap a Plummo to change its outfit',
+        'shuffle' => 'New outfits',
+        'idle' => 'Idle',
+        'answer' => 'Answer',
+        'points' => 'Points',
+        'resume' => 'Resume',
+        'podium' => 'Victory',
+        'wiggle' => 'Wiggle',
+        'stretch' => 'Stretch',
+        'hello' => 'Wave',
+        'boing' => 'Bounce',
+        'reduced' => 'Animations are disabled by your device’s reduced motion setting.',
+    ],
     'title' => 'The Plummo workshop',
     'intro' => 'A little ball of feathers. A lot of personality.',
     'preview' => 'Your Plummo',

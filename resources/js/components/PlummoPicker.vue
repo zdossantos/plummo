@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useMediaQuery } from '@vueuse/core';
+import { X } from '@lucide/vue';
+import { Button } from '@/components/ui/button';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import PageControls from '@/components/PageControls.vue';
 import {
@@ -98,13 +100,18 @@ function worn(slot: string) {
                         <div class="flex items-center justify-between gap-3">
                             <DrawerTitle>{{ t(slot) }}</DrawerTitle
                             ><DrawerClose as-child
-                                ><button
+                                ><Button
                                     type="button"
+                                    variant="secondary"
+                                    size="icon"
+                                    class="drawer-close"
                                     :aria-label="ui.t('close')"
                                 >
-                                    ✕
-                                </button></DrawerClose
-                            >
+                                    <X
+                                        class="size-6"
+                                        aria-hidden="true"
+                                    /> </Button
+                            ></DrawerClose>
                         </div>
                         <DrawerDescription>{{ t('limit') }}</DrawerDescription>
                         <div class="drawer-accessories">

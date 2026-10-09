@@ -125,6 +125,7 @@ return [
     'recover_packs' => 'Contents exhausted: change packs or allow repeats',
     'recover_game' => 'Resume with these packs',
     'game_type' => 'Mini-game',
+    'game_choice_hint' => 'Choose the game for the next round.',
     'quiz_name' => 'Quiz',
     'blind_name' => 'Blind test',
     'launch_blind' => 'Prepare a blind test',
