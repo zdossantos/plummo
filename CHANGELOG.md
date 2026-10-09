@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/zdossantos/plummo/compare/plummo-v0.3.0...plummo-v0.4.0) (2026-10-09)
+
+
+### Features
+
+* enrich game atmosphere and contextual choices ([#29](https://github.com/zdossantos/plummo/issues/29)) ([4c86859](https://github.com/zdossantos/plummo/commit/4c86859fc28167207a4ad64215ae9910851b4678))
+* integrate approved continuous ambiance loop ([#31](https://github.com/zdossantos/plummo/issues/31)) ([ffbc713](https://github.com/zdossantos/plummo/commit/ffbc7132077d492e8a561f3c01b6d0f445179c3e))
+
 ## [0.3.0](https://github.com/zdossantos/plummo/compare/plummo-v0.2.0...plummo-v0.3.0) (2026-10-09)
 
 
