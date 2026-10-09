@@ -35,6 +35,7 @@ export type ChoiceGame = {
         total: number;
         question: string;
         audio: string | null;
+        answers?: Record<number, number>;
         choices: string[];
         correct: number | null;
         awards: Record<number, number>;
@@ -70,6 +71,7 @@ export type DrawingGameState = Omit<
         number: number;
         total: number;
         tour: number;
+        guesses?: { playerId: number; text: string | null; found: boolean }[];
         artistId: number;
         word: string | null;
         canvas: Stroke[];

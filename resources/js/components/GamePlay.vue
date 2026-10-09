@@ -33,6 +33,13 @@ const revealed = computed(
         'correct' in props.game.round &&
         props.game.round.correct !== null,
 );
+function responders(index: number) {
+    if (!revealed.value || !('answers' in props.game.round)) return [];
+    const answers = props.game.round.answers;
+    return props.room.players.filter(
+        (player) => answers?.[player.id] === index,
+    );
+}
 const ranking = computed(() => {
     let rank = 0;
     let last: number | null = null;
@@ -99,8 +106,9 @@ const ranking = computed(() => {
         <AudioClip
             v-if="!phone && game.type === 'blind_test' && game.round.audio"
             :src="game.round.audio"
+            :revealing="game.phase === 'reveal'"
             :playing="
-                game.phase === 'answer' && seconds > 0 && connected !== false
+                ['answer', 'reveal'].includes(game.phase) && connected !== false
             "
         />
         <PhrasePlay
@@ -243,6 +251,18 @@ const ranking = computed(() => {
                         }}</span
                         ><span class="text-summary">{{ choice }}</span>
                     </p>
+                    <div
+                        v-if="revealed && responders(index).length"
+                        class="choice-plummos"
+                    >
+                        <PlummoAvatar
+                            v-for="player in responders(index)"
+                            :key="player.id"
+                            :color="player.color"
+                            :accessories="player.accessories"
+                            :label="player.name"
+                        />
+                    </div>
                     <TextReader
                         v-if="phone"
                         :text="choice"

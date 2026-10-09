@@ -246,6 +246,11 @@ watch(chief, (value) => {
                             :recover="game?.exhausted"
                             :initial-packs="game?.settings.packs"
                             :initial-type="game?.type"
+                            :player-count="
+                                room?.players.filter(
+                                    (player) => player.status === 'connected',
+                                ).length
+                            "
                             @start="
                                 request(
                                     game?.exhausted ? 'game-recovery' : 'games',

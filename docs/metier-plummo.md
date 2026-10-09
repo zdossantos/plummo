@@ -154,7 +154,7 @@ Un joueur qui part volontairement ou se déconnecte avant son passage est retir�
 - Le chrono de dessin démarre après le choix.
 - Le joueur dessine sur son téléphone et le dessin apparaît en direct sur le grand écran.
 - Les autres écrivent leurs propositions sur leur téléphone et peuvent faire plusieurs tentatives.
-- Seules les différences de majuscules et minuscules sont tolérées pour valider une réponse. L'orthographe et les accents doivent être exacts.
+- Les différences de casse, d’accents, d’espaces, de tirets et de ponctuation sont ignorées pour valider une réponse ; une faute de lettre reste incorrecte.
 - Une proposition proche par son écriture peut déclencher un retour privé « Presque ! Vérifie l'orthographe. », sans accorder de points.
 - Les joueurs qui trouvent gagnent des points selon leur ordre d'arrivée.
 - Le dessinateur gagne des points selon la proportion des joueurs ayant trouvé. Si tous trouvent, il reçoit le maximum prévu pour ce dessin.
@@ -236,7 +236,7 @@ Le jeu doit s'enchaîner rapidement, sans attendre inutilement la fin des chrono
 
 Les Plummos des joueurs restent visibles en bas à droite du grand écran. Après une question ou un extrait, la bonne réponse apparaît brièvement et les Plummos ayant répondu correctement font une petite animation avec les points gagnés. Ces animations n'exigent aucune action du chef et ne bloquent pas l'enchaînement.
 
-Pour le quiz et le blind test, le grand écran n'affiche pas le détail des choix de chacun. Le téléphone montre le choix et le résultat du joueur concerné. La révélation des auteurs est conservée pour le jeu de phrases, où elle participe à l'intérêt du jeu.
+Pour le quiz et le blind test, les choix restent privés pendant la réponse. À la révélation, le grand écran et les téléphones affichent les Plummos sur les propositions choisies. La révélation des auteurs est conservée pour le jeu de phrases, où elle participe à l'intérêt du jeu.
 
 ### Bulles de chat
 
@@ -289,3 +289,9 @@ Les questions métier ouvertes lors de la première synthèse ont été traitée
 - La disposition et la lisibilité du grand écran sur télé et ordinateur, à préciser lors des maquettes. Les commandes de partie sur le téléphone du chef sont validées.
 
 La prochaine étape consiste à relire ce cadrage consolidé, puis concevoir les parcours et les maquettes et vérifier les barèmes en jouant. Aucune implémentation ni décision de stack n'est engagée par ce document.
+
+### Ambiance et propositions (octobre 2026)
+
+Le grand écran diffuse une musique originale en boucle et de petits sons discrets des Plummos, après activation du son par le navigateur. Le volume commun et la coupure du son sont accessibles dans son en-tête. Pendant les extraits du blind test et leur révélation, l’ambiance reste audible à volume réduit ; les extraits démarrent progressivement et leur fondu de fin commence après l’annonce des résultats. Les téléphones ne diffusent pas ces sons pour éviter les échos.
+
+Les propositions récentes du dessin apparaissent sur le grand écran. Une bonne réponse est remplacée par « Trouvé ! » avant la révélation pour préserver le secret. La comparaison ignore accents, casse, espaces et ponctuation, sans accepter une véritable faute de lettre comme bonne réponse. Le formulaire propose seulement les jeux compatibles avec le nombre de joueurs connectés et les packs contenant du contenu publié pour le mode choisi.

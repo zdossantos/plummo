@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import DrawingBoard from '@/components/DrawingBoard.vue';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from '@/composables/useTranslations';
@@ -114,16 +115,53 @@ watch(
             >
                 {{ t('drawing_secret', { word: game.me.word }) }}
             </p>
-            <DrawingBoard
-                :key="`${game.id}-${game.round.number}-${game.round.revision}`"
-                :strokes="game.round.canvas"
-                :editable="editable"
-                :busy="busy"
-                :color="color"
-                :width="width"
-                :send="(values) => sendDrawingAction('stroke', values)"
-                @pending="pending = $event"
-            />
+            <div class="drawing-stage" :class="{ 'with-guesses': !phone }">
+                <DrawingBoard
+                    :key="`${game.id}-${game.round.number}-${game.round.revision}`"
+                    :strokes="game.round.canvas"
+                    :editable="editable"
+                    :busy="busy"
+                    :color="color"
+                    :width="width"
+                    :send="(values) => sendDrawingAction('stroke', values)"
+                    @pending="pending = $event"
+                />
+                <aside v-if="!phone" class="drawing-guesses" aria-live="polite">
+                    <h2>{{ t('drawing_guesses') }}</h2>
+                    <p
+                        v-if="!game.round.guesses?.length"
+                        class="drawing-guesses-empty"
+                    >
+                        {{ t('drawing_guesses_empty') }}
+                    </p>
+                    <div
+                        v-for="(item, index) in game.round.guesses?.slice(-6)"
+                        :key="`${game.round.number}-${index}-${item.text}`"
+                        class="drawing-guess"
+                        :class="{ found: item.found }"
+                    >
+                        <PlummoAvatar
+                            :color="
+                                room.players.find((p) => p.id === item.playerId)
+                                    ?.color
+                            "
+                            :accessories="
+                                room.players.find((p) => p.id === item.playerId)
+                                    ?.accessories
+                            "
+                        />
+                        <div>
+                            <small>{{
+                                room.players.find((p) => p.id === item.playerId)
+                                    ?.name
+                            }}</small
+                            ><strong>{{
+                                item.found ? t('drawing_found') : item.text
+                            }}</strong>
+                        </div>
+                    </div>
+                </aside>
+            </div>
             <div v-if="editable" class="drawing-tools">
                 <button
                     v-for="(value, index) in palette"

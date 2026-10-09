@@ -58,7 +58,7 @@ it('requires two players and validates drawing settings, private words and histo
     expect(Game::where('room_id', $room->id)->sole()->state['deadline'])->toBe(app(GameEngine::class)->time() + 90);
 });
 
-it('accepts only exact case-insensitive words, gives a private hint and scores once', function () {
+it('normalizes accents and separators, gives a private hint and scores once', function () {
     $room = openRoom();
     [$artist, $one] = enterRoom($room);
     [$first, $two] = enterRoom($room, 'Alex');
@@ -66,10 +66,10 @@ it('accepts only exact case-insensitive words, gives a private hint and scores o
     startDrawing($room, $one);
     $word = chooseDrawing($room, $one);
     $this->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => $word]))->assertForbidden();
-    $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => ' '.$word]))->assertOk()->assertJsonPath('game.me.found', false);
-    $this->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => str_replace('É', 'E', $word)]))->assertOk()->assertJsonPath('game.me.near', true)->assertJsonPath('game.me.found', false);
+    $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => 'zzzzzz']))->assertOk()->assertJsonPath('game.me.found', false);
+    $this->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => mb_substr($word, 0, -1)]))->assertOk()->assertJsonPath('game.me.near', true)->assertJsonPath('game.me.found', false);
     $this->getJson('/rooms/'.$room->code.'/state')->assertJsonMissingPath('game.me.near')->assertJsonPath('game.round.word', null);
-    $this->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => mb_strtoupper($word)]))->assertOk()->assertJsonPath('game.me.points', 100);
+    $this->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => ' '.str_replace('É', 'e-', mb_strtoupper($word)).' !']))->assertOk()->assertJsonPath('game.me.points', 100);
     $this->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => $word]))->assertConflict();
     $this->travel(1)->seconds();
     $this->withCookie('plummo_player_'.$room->code, $three)->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => $word]))->assertJsonPath('game.phase', 'reveal')->assertJsonPath('game.round.word', $word);
@@ -368,4 +368,15 @@ it('renders completed large drawings without sorting their full JSON payload', f
     $state['phase'] = 'results';
     $game->update(['state' => $state, 'status' => 'finished']);
     $this->postJson('/rooms/'.$room->code.'/presence')->assertOk()->assertJsonPath('game.phase', 'results');
+});
+
+it('shows recent guesses without leaking a successful word before revelation', function () {
+    $room = openRoom();
+    [, $one] = enterRoom($room);
+    [$guesser, $two] = enterRoom($room, 'Alex');
+    enterRoom($room, 'Sam');
+    startDrawing($room, $one);
+    $word = chooseDrawing($room, $one);
+    $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => 'girafe']))->assertOk()->assertJsonPath('game.round.guesses.0.text', 'girafe');
+    $this->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => $word]))->assertOk()->assertJsonPath('game.round.guesses.1.playerId', $guesser)->assertJsonPath('game.round.guesses.1.found', true)->assertJsonPath('game.round.guesses.1.text', null)->assertJsonPath('game.round.word', null);
 });

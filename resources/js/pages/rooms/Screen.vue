@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { provide, ref } from 'vue';
+import ScreenSound from '@/components/ScreenSound.vue';
+import { soundSettings } from '@/lib/soundscape';
 import { Head } from '@inertiajs/vue3';
 import PlayerDock from '@/components/PlayerDock.vue';
 import RoomNotice from '@/components/RoomNotice.vue';
@@ -23,6 +26,9 @@ const { room, game, seconds, serverNow, closed, error, connected } = useRoom(
         serverTime: props.serverTime,
     },
 );
+const soundEnabled = ref(false);
+const soundVolume = ref(0.6);
+provide(soundSettings, { enabled: soundEnabled, volume: soundVolume });
 const { t } = useTranslations('rooms');
 </script>
 <template>
@@ -35,8 +41,14 @@ const { t } = useTranslations('rooms');
                 room?.pointTarget === null
                     ? t('nonstop')
                     : t('point_target', { count: room?.pointTarget ?? 0 })
-            }}</small></template
-        >
+            }}</small
+            ><ScreenSound
+                v-model:enabled="soundEnabled"
+                v-model:volume="soundVolume"
+                :room="room"
+                :game="game"
+                :closed="closed"
+        /></template>
         <div v-if="closed" class="game-panel justify-center text-center">
             <h1 class="text-4xl">{{ t('closed') }}</h1>
         </div>
