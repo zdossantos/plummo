@@ -26,7 +26,7 @@ export function fadeAudio(
     const initial = element.volume;
     let frame = 0;
     function tick(now: number) {
-        const progress = Math.min(1, (now - start) / duration);
+        const progress = Math.max(0, Math.min(1, (now - start) / duration));
         element.volume = initial + (target - initial) * progress;
         if (progress < 1) frame = requestAnimationFrame(tick);
         else done?.();

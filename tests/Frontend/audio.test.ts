@@ -59,3 +59,31 @@ test('fades smoothly and cancels an obsolete transition before it can overwrite 
         globalThis.cancelAnimationFrame = oldCancel;
     }
 });
+
+test('keeps audio volume valid when the first animation timestamp precedes the fade start', async () => {
+    const { fadeAudio } = await import('../../resources/js/lib/audio');
+    const oldRequest = globalThis.requestAnimationFrame;
+    const oldCancel = globalThis.cancelAnimationFrame;
+    let callback: FrameRequestCallback | undefined;
+    globalThis.requestAnimationFrame = (fn) => { callback = fn; return 1; };
+    globalThis.cancelAnimationFrame = () => {};
+    try {
+        let volume = 0;
+        const element = {
+            get volume() { return volume; },
+            set volume(value: number) {
+                if (value < 0 || value > 1) throw new RangeError('Invalid media volume');
+                volume = value;
+            },
+        };
+        const before = performance.now() - 16;
+        fadeAudio(element, 0.6, 1000);
+        callback?.(before);
+        expect(volume).toBe(0);
+        callback?.(performance.now() + 1001);
+        expect(volume).toBe(0.6);
+    } finally {
+        globalThis.requestAnimationFrame = oldRequest;
+        globalThis.cancelAnimationFrame = oldCancel;
+    }
+});
