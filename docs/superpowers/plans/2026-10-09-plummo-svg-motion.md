@@ -65,11 +65,11 @@
 - [x] Tester sur téléphone 390 × 844 et grand écran 1366 × 768, avec huit Plummos et bulles ; vérifier que les gestes ne masquent aucune commande et n’ajoutent pas de scroll. Vérifier `prefers-reduced-motion` dans Chromium et WebKit.
 - [x] Exécuter `composer ci:check`, la suite d’interface avec `vendor/bin/pest tests/Browser/PlummoMotionTest.php --browser safari`, et la matrice de viewport du dépôt. Consigner uniquement les sorties fraîches et distinguer clavier simulé et matériel réel.
 - [x] Mettre à jour le kit et le backlog selon ce qui est effectivement livré, puis commit `docs: record Plummo motion validation`.
-- [ ] Pousser la branche, ouvrir une PR et reconstruire Docker pour la revue locale. Ne pas fusionner avant les contrôles et la revue du rendu final.
+- [x] Pousser la branche, ouvrir une PR et reconstruire Docker pour la revue locale. Ne pas fusionner avant les contrôles et la revue du rendu final.
 
 ## État
 
-Conception approuvée le 9 octobre avec la précision « toutes les parties » et mouvements naturels. Découpage et gestes implémentés. Revue indépendante effectuée ; corrections de l’espace mobile, de la reconnexion et des attaches validées. Les derniers contrôles de géométrie ont aussi corrigé la réservation du lecteur de réponses courtes et le brouillon de phrases sur petit téléphone. Le SVG original reste inchangé et sert de référence aux comparaisons pixel par pixel.
+Conception approuvée le 9 octobre avec la précision « toutes les parties » et mouvements naturels. Découpage et gestes implémentés. Revue indépendante effectuée ; corrections de l’espace mobile, de la reconnexion et des attaches validées. Les derniers contrôles de géométrie ont aussi corrigé la réservation du lecteur de réponses courtes et le brouillon de phrases sur petit téléphone. Le SVG original reste inchangé et sert de référence aux comparaisons pixel par pixel. Branche publiée dans la [PR #26](https://github.com/zdossantos/plummo/pull/26), sans fusion. Docker reconstruit et disponible sur le réseau local.
 
 ### Ajustements de mise en œuvre
 
