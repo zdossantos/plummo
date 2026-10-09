@@ -1,0 +1,122 @@
+# MySQL and Redis are dedicated Coolify resources, independent of DLP Friends.
+x-app: &app
+  image: ${APP_IMAGE:?Set a published GHCR image digest}
+  restart: unless-stopped
+  volumes:
+    - app-storage:/var/www/html/storage/app
+  environment: &environment
+    APP_NAME: Plummo
+    APP_ENV: production
+    APP_KEY: ${APP_KEY:?Set the production application key}
+    APP_DEBUG: 'false'
+    APP_URL: https://plummo.zdossantos.fr
+    APP_LOCALE: fr
+    APP_FALLBACK_LOCALE: en
+    APP_MAINTENANCE_DRIVER: file
+    # Only expose web through Coolify's trusted reverse proxy, never host ports.
+    TRUSTED_PROXIES: '*'
+    LOG_CHANNEL: stderr
+    LOG_LEVEL: warning
+    DB_CONNECTION: mysql
+    DB_HOST: ${DB_HOST:?Set the dedicated Plummo MySQL internal hostname}
+    DB_PORT: 3306
+    DB_DATABASE: plummo
+    DB_USERNAME: ${DB_USERNAME:-mysql}
+    DB_PASSWORD: ${DB_PASSWORD:?Required}
+    REDIS_CLIENT: phpredis
+    REDIS_HOST: ${REDIS_HOST:?Set the dedicated Plummo Redis internal hostname}
+    REDIS_PORT: 6379
+    REDIS_USERNAME: ${REDIS_USERNAME:-default}
+    REDIS_PASSWORD: ${REDIS_PASSWORD:?Required}
+    REDIS_PREFIX: plummo-database-
+    REDIS_QUEUE: plummo
+    REDIS_DB: 0
+    REDIS_CACHE_DB: 1
+    CACHE_STORE: redis
+    CACHE_PREFIX: plummo-cache-
+    QUEUE_CONNECTION: redis
+    SESSION_DRIVER: redis
+    SESSION_COOKIE: plummo_session
+    SESSION_ENCRYPT: 'true'
+    SESSION_SECURE_COOKIE: 'true'
+    SESSION_SAME_SITE: lax
+    SESSION_LIFETIME: 120
+    FILESYSTEM_DISK: local
+    BROADCAST_CONNECTION: reverb
+    REVERB_APP_ID: plummo
+    REVERB_APP_KEY: ${REVERB_APP_KEY:?Set the public Reverb application key}
+    REVERB_APP_SECRET: ${REVERB_APP_SECRET:?Set the private Reverb secret}
+    REVERB_HOST: reverb
+    REVERB_PORT: 8080
+    REVERB_SCHEME: http
+    REVERB_PUBLIC_HOST: ${REVERB_PUBLIC_HOST:-ws.plummo.zdossantos.fr}
+    REVERB_PUBLIC_PORT: 443
+    REVERB_PUBLIC_SCHEME: https
+    REVERB_ALLOWED_ORIGINS: plummo.zdossantos.fr
+    MAIL_MAILER: log
+
+services:
+  web:
+    <<: *app
+    command: web
+    expose: ['80']
+    healthcheck:
+      test: ['CMD', 'curl', '--fail', '--silent', 'http://127.0.0.1/up']
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+  worker:
+    <<: *app
+    command: worker
+    user: www-data
+    healthcheck:
+      test: ['CMD', 'php', '-r', 'exit(str_contains(file_get_contents("/proc/1/cmdline"), "queue:work") ? 0 : 1);']
+      interval: 15s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 384M
+  scheduler:
+    <<: *app
+    command: scheduler
+    user: www-data
+    healthcheck:
+      test: ['CMD', 'php', '-r', 'exit(str_contains(file_get_contents("/proc/1/cmdline"), "schedule:work") ? 0 : 1);']
+      interval: 15s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 192M
+  reverb:
+    <<: *app
+    command: reverb
+    user: www-data
+    expose: ['8080']
+    healthcheck:
+      test: ['CMD', 'php', '-r', '$$socket = @fsockopen("127.0.0.1", 8080); exit($$socket ? 0 : 1);']
+      interval: 10s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+volumes:
+  app-storage:
