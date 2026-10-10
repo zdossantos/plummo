@@ -67,6 +67,8 @@ La [planche de personnalisation](public/plummo/index.html) présente la mascotte
 
 ## Salons
 
+Le grand écran conserve le QR de connexion en haut à droite pendant le jeu, les pauses et les résultats. Dans le salon, le QR, le code et l’adresse de saisie sont agrandis pour être lisibles à distance ; les formats de faible hauteur utilisent une invitation plus compacte. L’affichage reste sans scroll ni pagination, et les arrivées pendant une manche suivent les règles d’attente existantes.
+
 Ouvrir `/` sur le grand écran crée un salon (une actualisation retrouve le même salon). Les téléphones entrent via le QR ou `/join` avec le code de six caractères. Chaque joueur choisit son prénom, sa couleur et un accessoire par emplacement (tête, visage, cou et main). Huit places maximum ; le premier arrivé devient chef et peut transférer son rôle ou fermer le salon avec confirmation.
 
 Le navigateur du téléphone conserve une identité privée dans un cookie chiffré HttpOnly : revenir avec ce même navigateur retrouve le Plummo et les points. Effacer les cookies ou utiliser un autre navigateur crée une autre identité. Un départ volontaire libère la place immédiatement ; une déconnexion détectée après quinze secondes réserve la place deux minutes. Un retour dans un salon plein attend une place disponible.

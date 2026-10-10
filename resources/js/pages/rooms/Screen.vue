@@ -42,10 +42,20 @@ const { t } = useTranslations('rooms');
 </script>
 <template>
     <Head :title="t('title')" />
-    <ViewportShell class="display-screen" display-only>
+    <ViewportShell
+        class="display-screen"
+        :data-lobby="!game || undefined"
+        display-only
+    >
         <RoomNotice :message="error" />
         <template #header
-            ><span class="font-bold text-primary">{{ room?.code }}</span
+            ><span class="screen-session"
+                ><span class="font-bold text-primary">{{ room?.code }}</span
+                ><img
+                    v-if="room && !closed"
+                    data-testid="screen-header-qr"
+                    :src="`/rooms/${room.code}/qr`"
+                    :alt="t('qr_alt')" /></span
             ><small>{{
                 room?.pointTarget === null
                     ? t('nonstop')
@@ -59,7 +69,20 @@ const { t } = useTranslations('rooms');
                 :closed="closed"
                 :server-now="serverNow"
                 :connected="connected"
-        /></template>
+            />
+            <aside
+                v-if="room && !closed && !game"
+                class="screen-join"
+                data-testid="screen-join"
+            >
+                <img :src="`/rooms/${room.code}/qr`" :alt="t('qr_alt')" />
+                <div v-if="!game" class="screen-join-address">
+                    <p class="screen-code">{{ room.code }}</p>
+                    <p class="screen-manual-label">{{ t('manual') }}</p>
+                    <p class="screen-manual-url">{{ manualUrl }}</p>
+                </div>
+            </aside>
+        </template>
         <div v-if="closed" class="game-panel justify-center text-center">
             <h1 class="text-4xl">{{ t('closed') }}</h1>
         </div>
@@ -74,17 +97,6 @@ const { t } = useTranslations('rooms');
                         <p class="my-4 text-lg text-muted-foreground">
                             {{ t('invite') }}
                         </p>
-                        <p class="screen-code">{{ room?.code }}</p>
-                        <p class="mt-3 text-sm">
-                            {{ t('manual') }}
-                            <span>{{ manualUrl }}</span>
-                        </p>
-                    </div>
-                    <div class="flex flex-col items-center gap-3">
-                        <img
-                            :src="`/rooms/${room?.code}/qr`"
-                            :alt="t('qr_alt')"
-                        /><span class="text-sm font-bold">{{ t('join') }}</span>
                     </div>
                 </section>
                 <GamePlay
