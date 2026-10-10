@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.6.0](https://github.com/zdossantos/plummo/compare/plummo-v0.5.0...plummo-v0.6.0) (2026-10-10)
+
+
+### Features
+
+* **screen:** keep joining QR visible throughout games ([#62](https://github.com/zdossantos/plummo/issues/62)) ([d1faf8c](https://github.com/zdossantos/plummo/commit/d1faf8c270d0ed5ce941e9b61916705f955529c5))
+
+
+### Bug Fixes
+
+* improve session defaults and drawing interactions ([#59](https://github.com/zdossantos/plummo/issues/59)) ([c3b6333](https://github.com/zdossantos/plummo/commit/c3b633391e613c4d7aeecfe9e68b78dbfcacfb57))
+* restore phrase cards and prepare blind test audio ([#61](https://github.com/zdossantos/plummo/issues/61)) ([be8ec54](https://github.com/zdossantos/plummo/commit/be8ec546308d9effc3cd0001eaa1b01b3307184c))
+
 ## [0.5.0](https://github.com/zdossantos/plummo/compare/plummo-v0.4.0...plummo-v0.5.0) (2026-10-10)
 
 
