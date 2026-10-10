@@ -48,6 +48,8 @@ const { t } = useTranslations('rooms');
                 :room="room"
                 :game="game"
                 :closed="closed"
+                :server-now="serverNow"
+                :connected="connected"
         /></template>
         <div v-if="closed" class="game-panel justify-center text-center">
             <h1 class="text-4xl">{{ t('closed') }}</h1>
@@ -81,6 +83,7 @@ const { t } = useTranslations('rooms');
                     :game="game"
                     :room="room"
                     :seconds="seconds"
+                    :server-now="serverNow"
                     :connected="connected"
                 />
             </div>

@@ -295,3 +295,23 @@ La prochaine étape consiste à relire ce cadrage consolidé, puis concevoir les
 Le grand écran diffuse une musique originale en boucle et de petits sons discrets des Plummos, après activation du son par le navigateur. Le volume commun et la coupure du son sont accessibles dans son en-tête. Pendant les extraits du blind test et leur révélation, l’ambiance reste audible à volume réduit ; les extraits démarrent progressivement et leur fondu de fin commence après l’annonce des résultats. Les téléphones ne diffusent pas ces sons pour éviter les échos.
 
 Les propositions récentes du dessin apparaissent sur le grand écran. Une bonne réponse est remplacée par « Trouvé ! » avant la révélation pour préserver le secret. La comparaison ignore accents, casse, espaces et ponctuation, sans accepter une véritable faute de lettre comme bonne réponse. Le formulaire propose seulement les jeux compatibles avec le nombre de joueurs connectés et les packs contenant du contenu publié pour le mode choisi.
+
+## Bonus farceurs optionnels
+
+Le chef peut activer les bonus pour chaque mini-jeu, uniquement avec plusieurs participants. L’option reste désactivée par défaut. Chaque joueur reçoit un objet compatible au départ et possède deux emplacements. Entre les manches, les joueurs strictement derrière le meilleur score du mini-jeu reçoivent un objet, avec un choix de remplacement si leur poche est pleine. Aucune attribution après la dernière manche ; les objets disparaissent à la fin du mini-jeu.
+
+Un appui déclenche immédiatement le bonus sur tous les adversaires participants, sans sélection de cible ni confirmation. Le bouton d’information explique l’effet sans le consommer. Un lancement par joueur et par manche ; pause, reprise, révélation et résultats interdisent les lancements. Les effets distincts coexistent ; un même effet ne prolonge pas sa durée. La pause conserve le temps restant et la manche suivante efface les effets.
+
+- Quiz et blind test : éclair (écran sombre, 3 s), dé (trois déplacements des réponses, 6 s), Plummo squatteur (4 s). Le blind test propose aussi artiste incognito (artistes masqués, 4 s).
+- Phrases : accent Plummo (r/R devient w/W) et éternuement (« ATCHOUM ! »). Seules les contributions publiées sont transformées, y compris celles déjà validées pendant l’écriture. Le brouillon et le prompt restent intacts ; accent puis éternuement dans un ordre fixe. Aucun auteur n’est révélé lors du vote.
+- Dessin : tampon temporaire (4 s, traits conservés) et pot renversé (couleur imposée, 4 s). La toile est commune ; le crayon revient à la couleur choisie après l’effet. Un trait maintenu est segmenté au changement de couleur pour conserver les échanges et les retries des traits existants.
+
+La réception est signalée par une icône glissant derrière le Plummo sur le grand écran et par un toast sur le téléphone. Les événements sont dédupliqués et une reconnexion ne rejoue pas les anciennes réceptions. La poche reste utilisable avec le clavier ouvert. Les animations ne capturent pas les appuis et respectent les mouvements réduits ; le grand écran reste passif.
+
+Chaque malus accepté diffuse un événement sonore public distinct, conservé huit secondes. Le grand écran joue une courte signature propre à l’objet via son système audio existant (activation, volume, atténuation blind test). Les snapshots répétés et les reconnexions ne rejouent pas les sons ; les lancements refusés restent silencieux.
+
+### Extension à un nouveau mini-jeu
+
+Tout nouveau mini-jeu doit intégrer les bonus/malus existants compatibles avec ses interactions : catalogue, attribution, lancement collectif, effets, pause/reprise, réception et sons. Réutiliser le système commun, expliquer les incompatibilités et tester les règles du nouveau mode.
+
+La poche conserve deux objets utilisables. Lorsque l’attribution suivante arrive dans une poche pleine, un troisième objet reste en attente, privé au joueur. Il peut remplacer un des deux objets ou refuser le nouveau. Un seul objet attend : tant que le choix reste ouvert, il n’est pas écrasé par les attributions suivantes. Il disparaît à la fin du mini-jeu. Si un lancement libère une place, le nouveau rejoint la poche.

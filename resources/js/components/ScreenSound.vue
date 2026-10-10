@@ -2,14 +2,17 @@
 import { computed, onUnmounted, ref, watch } from 'vue';
 import { Volume2, VolumeX } from '@lucide/vue';
 import { Soundscape } from '@/lib/soundscape';
+import { BonusReceiptTracker } from '@/lib/bonuses';
 import { useTranslations } from '@/composables/useTranslations';
-import type { GameState, RoomState } from '@/types/rooms';
+import type { BonusItem, GameState, RoomState } from '@/types/rooms';
 const props = defineProps<{
     game: GameState | null;
     room: RoomState | null;
     enabled: boolean;
     volume: number;
     closed: boolean;
+    serverNow: number;
+    connected: boolean;
 }>();
 const emit = defineEmits<{
     'update:enabled': [value: boolean];
@@ -18,6 +21,7 @@ const emit = defineEmits<{
 const { t } = useTranslations('rooms');
 const started = ref(false);
 let sound: Soundscape | undefined;
+const launches = new BonusReceiptTracker<BonusItem & { at: number }>();
 let idle: ReturnType<typeof setTimeout> | undefined;
 const blind = computed(
     () =>
@@ -82,6 +86,21 @@ watch(
     (_, previous) => {
         if (previous && props.enabled) sound?.chirp();
     },
+);
+watch(
+    () => [props.game?.bonuses?.launches, props.connected] as const,
+    ([events]) => {
+        if (!props.game) return;
+        const fresh = launches.observe(
+            props.game.id,
+            events ?? [],
+            props.serverNow,
+            props.connected,
+        );
+        if (props.enabled && !props.closed)
+            for (const event of fresh) sound?.prank(event.kind);
+    },
+    { immediate: true },
 );
 onUnmounted(() => {
     clearTimeout(idle);

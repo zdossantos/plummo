@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BonusEffects from '@/components/BonusEffects.vue';
+import { activeBonusEffects } from '@/lib/bonuses';
 import { computed, ref, watch } from 'vue';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import DrawingBoard from '@/components/DrawingBoard.vue';
@@ -8,12 +10,25 @@ import type { DrawingGameState, DrawingSender, RoomState } from '@/types/rooms';
 const props = defineProps<{
     game: DrawingGameState;
     room: RoomState;
+    serverNow?: number;
     phone?: boolean;
     busy?: boolean;
     connected?: boolean;
     send?: DrawingSender;
 }>();
 const { t } = useTranslations('rooms');
+const effects = computed(() =>
+    activeBonusEffects(
+        props.game.bonuses?.effects ?? [],
+        props.serverNow ?? Date.now() / 1000,
+        props.game.phase,
+    ),
+);
+const effectiveColor = computed(() =>
+    effects.value.some((effect) => effect.kind === 'paint')
+        ? '#f05a78'
+        : color.value,
+);
 const guess = ref('');
 const color = ref('#35236b');
 const width = ref(4);
@@ -116,16 +131,19 @@ watch(
                 {{ t('drawing_secret', { word: game.me.word }) }}
             </p>
             <div class="drawing-stage" :class="{ 'with-guesses': !phone }">
-                <DrawingBoard
-                    :key="`${game.id}-${game.round.number}-${game.round.revision}`"
-                    :strokes="game.round.canvas"
-                    :editable="editable"
-                    :busy="busy"
-                    :color="color"
-                    :width="width"
-                    :send="(values) => sendDrawingAction('stroke', values)"
-                    @pending="pending = $event"
-                />
+                <div class="bonus-canvas">
+                    <DrawingBoard
+                        :key="`${game.id}-${game.round.number}-${game.round.revision}`"
+                        :strokes="game.round.canvas"
+                        :editable="editable"
+                        :busy="busy"
+                        :color="effectiveColor"
+                        :width="width"
+                        :send="(values) => sendDrawingAction('stroke', values)"
+                        @pending="pending = $event"
+                    />
+                    <BonusEffects :effects="effects" :room="room" canvas />
+                </div>
                 <aside v-if="!phone" class="drawing-guesses" aria-live="polite">
                     <h2>{{ t('drawing_guesses') }}</h2>
                     <p

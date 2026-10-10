@@ -1,4 +1,24 @@
 import type { InjectionKey, Ref } from 'vue';
+import type { BonusKind } from '@/types/rooms';
+
+export function bonusSoundNotes(kind: BonusKind) {
+    const pitches: Record<BonusKind, number[]> = {
+        bolt: [160, 95, 220],
+        dice: [520, 360, 640, 440],
+        squatter: [280, 420, 350],
+        artist: [700, 480, 300],
+        accent: [380, 500, 620],
+        sneeze: [210, 850, 130],
+        stamp: [120, 180],
+        paint: [330, 390, 470, 560],
+    };
+    return pitches[kind].map((frequency, index) => ({
+        frequency,
+        at: index * 0.09,
+        duration: 0.16,
+        gain: 0.25,
+    }));
+}
 
 export const soundSettings: InjectionKey<{
     enabled: Ref<boolean>;
@@ -94,6 +114,19 @@ export class Soundscape {
         const pitch = 420 + (seed % 7) * 37;
         this.note(pitch, now, 0.16, 0.25, this.voices, 'triangle');
         this.note(pitch * 1.3, now + 0.12, 0.2, 0.2, this.voices, 'triangle');
+    }
+    prank(kind: BonusKind) {
+        if (this.context.state !== 'running') return;
+        const now = this.context.currentTime;
+        for (const note of bonusSoundNotes(kind))
+            this.note(
+                note.frequency,
+                now + note.at,
+                note.duration,
+                note.gain,
+                this.voices,
+                'triangle',
+            );
     }
     close() {
         this.closed = true;

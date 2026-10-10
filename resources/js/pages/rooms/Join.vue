@@ -2,6 +2,8 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { computed, onMounted, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
+import BonusPocket from '@/components/BonusPocket.vue';
+import BonusReception from '@/components/BonusReception.vue';
 import GamePlummoAvatar from '@/components/GamePlummoAvatar.vue';
 import PlummoPicker from '@/components/PlummoPicker.vue';
 import ChatComposer from '@/components/ChatComposer.vue';
@@ -53,6 +55,15 @@ const profile = computed(() => ({
     color: color.value,
     accessories: accessories.value,
 }));
+function replaceBonus(itemId: string, replaceId: string | null) {
+    if (!game.value) return;
+    void request('bonuses/replace', 'POST', {
+        game_id: game.value.id,
+        round: game.value.round.number,
+        item_id: itemId,
+        replace_id: replaceId,
+    });
+}
 async function submit() {
     if (
         await request(
@@ -264,6 +275,7 @@ watch(chief, (value) => {
                             :game="game"
                             :room="room"
                             :seconds="seconds"
+                            :server-now="serverNow"
                             :chief="chief"
                             :busy="busy"
                             phone
@@ -427,12 +439,35 @@ watch(chief, (value) => {
             "
             #footer
         >
-            <GamePlummoAvatar
-                :connected="connected"
-                :game="game"
-                :player="me"
-                class="phone-game-plummo"
-            />
+            <div class="phone-bonus-footer">
+                <BonusPocket
+                    v-if="game.bonuses"
+                    :bonuses="game.bonuses"
+                    :busy="busy"
+                    :connected="connected"
+                    @replace="replaceBonus"
+                    @launch="
+                        request('bonuses', 'POST', {
+                            game_id: game.id,
+                            round: game.round.number,
+                            item_id: $event,
+                        })
+                    "
+                />
+                <BonusReception
+                    :game="game"
+                    :recipient-id="me.id"
+                    :server-now="serverNow"
+                    :connected="connected"
+                    phone
+                />
+                <GamePlummoAvatar
+                    :connected="connected"
+                    :game="game"
+                    :player="me"
+                    class="phone-game-plummo"
+                />
+            </div>
         </template>
     </ViewportShell>
 </template>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BonusEffects from '@/components/BonusEffects.vue';
+import { activeBonusEffects, bonusChoices } from '@/lib/bonuses';
 import PagedList from '@/components/PagedList.vue';
 import TextReader from '@/components/TextReader.vue';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
@@ -15,6 +17,7 @@ const props = defineProps<{
     game: GameState;
     room: RoomState;
     seconds: number;
+    serverNow?: number;
     phone?: boolean;
     chief?: boolean;
     busy?: boolean;
@@ -27,6 +30,29 @@ const emit = defineEmits<{
     control: [action: string];
 }>();
 const { t } = useTranslations('rooms');
+const effects = computed(() =>
+    props.phone
+        ? activeBonusEffects(
+              props.game.bonuses?.effects ?? [],
+              props.serverNow ?? Date.now() / 1000,
+              props.game.phase,
+          )
+        : [],
+);
+const choices = computed(() =>
+    'choices' in props.game.round
+        ? bonusChoices(
+              props.game.round.choices,
+              effects.value,
+              props.serverNow ?? Date.now() / 1000,
+          )
+        : [],
+);
+function choiceText(choice: string) {
+    return effects.value.some((effect) => effect.kind === 'artist')
+        ? choice.split(' — ')[0]!
+        : choice;
+}
 const revealed = computed(
     () =>
         ['quiz', 'blind_test'].includes(props.game.type) &&
@@ -63,6 +89,7 @@ const ranking = computed(() => {
         }"
         data-testid="game-play"
     >
+        <BonusEffects v-if="phone" :effects="effects" :room="room" />
         <div
             class="flex items-center justify-between gap-5 font-bold text-primary"
         >
@@ -195,6 +222,7 @@ const ranking = computed(() => {
             :phone="phone"
             :busy="busy"
             :connected="connected"
+            :server-now="serverNow"
             :send="sendDrawing"
         />
         <template v-else-if="game.type !== 'phrase'">
@@ -209,7 +237,7 @@ const ranking = computed(() => {
             </p>
             <div class="game-choices">
                 <div
-                    v-for="(choice, index) in game.round.choices"
+                    v-for="{ choice, index } in choices"
                     :key="index"
                     class="game-choice"
                     :class="{
@@ -242,14 +270,18 @@ const ranking = computed(() => {
                         <span class="choice-letter">{{
                             String.fromCharCode(65 + index)
                         }}</span
-                        ><span class="text-summary">{{ choice }}</span>
+                        ><span class="text-summary">{{
+                            choiceText(choice)
+                        }}</span>
                     </button>
                     <p v-else class="choice-face font-bold">
                         <AnswerTexture :variant="index % 4" />
                         <span class="choice-letter">{{
                             String.fromCharCode(65 + index)
                         }}</span
-                        ><span class="text-summary">{{ choice }}</span>
+                        ><span class="text-summary">{{
+                            choiceText(choice)
+                        }}</span>
                     </p>
                     <div
                         v-if="revealed && responders(index).length"
@@ -265,7 +297,7 @@ const ranking = computed(() => {
                     </div>
                     <TextReader
                         v-if="phone"
-                        :text="choice"
+                        :text="choiceText(choice)"
                         :label="String.fromCharCode(65 + index)"
                     />
                 </div>

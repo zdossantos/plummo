@@ -12,3 +12,4 @@ Lire PRODUCT.md et docs/metier-plummo.md avant de développer le métier. Le soc
 - Aucun secret versionné ; variables VITE_* publiques.
 - Branches chore/feature/fix/docs, Conventional Commits, PR et Squash & Merge ; pas de push direct sur main.
 - Commandes de validation dans README.md. Ne pas annoncer une vérification sans sortie récente.
+- À chaque nouveau mini-jeu, intégrer les bonus/malus existants qui ont un effet cohérent dans ce mode, avec leurs règles serveur, effets Vue, sons et tests. Documenter les incompatibilités ; ne pas laisser ce raccordement implicite.
