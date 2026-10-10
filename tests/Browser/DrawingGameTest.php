@@ -27,7 +27,7 @@ it('draws from two separate phones and plays every artist before returning to th
         $word = $game->state['round']['words'][0];
         $first->page()->locator('[data-testid="drawing-word"]')->first()->click(['noWaitAfter' => true]);
         $first->assertSee('Your word: '.$word);
-        $second->assertDontSee($word);
+        $second->assertDontSee($word)->assertMissing('[data-testid="drawing-board"]');
         $screen->assertDontSee($word);
         $first->page()->evaluate(<<<'JS'
         () => {
@@ -65,7 +65,8 @@ it('draws from two separate phones and plays every artist before returning to th
         $game->refresh();
         $word = $game->state['round']['words'][0];
         $second->page()->locator('[data-testid="drawing-word"]')->first()->click(['noWaitAfter' => true]);
-        $first->assertPresent('#drawing-guess')->fill('#drawing-guess', $word);
+        $second->assertPresent('[data-testid="drawing-board"]');
+        $first->assertMissing('[data-testid="drawing-board"]')->assertPresent('#drawing-guess')->fill('#drawing-guess', $word);
         $first->page()->locator('button:has-text("Guess")')->click(['noWaitAfter' => true]);
         $screen->assertSee('Mini-game leaderboard');
         $first->assertSee('Mini-game leaderboard');

@@ -315,3 +315,7 @@ Chaque malus accepté diffuse un événement sonore public distinct, conservé h
 Tout nouveau mini-jeu doit intégrer les bonus/malus existants compatibles avec ses interactions : catalogue, attribution, lancement collectif, effets, pause/reprise, réception et sons. Réutiliser le système commun, expliquer les incompatibilités et tester les règles du nouveau mode.
 
 La poche conserve deux objets utilisables. Lorsque l’attribution suivante arrive dans une poche pleine, un troisième objet reste en attente, privé au joueur. Il peut remplacer un des deux objets ou refuser le nouveau. Un seul objet attend : tant que le choix reste ouvert, il n’est pas écrasé par les attributions suivantes. Il disparaît à la fin du mini-jeu. Si un lancement libère une place, le nouveau rejoint la poche.
+
+### Affichage de la toile de dessin
+
+La toile apparaît uniquement sur le grand écran et sur le téléphone du dessinateur courant, y compris pendant une pause ou une révélation. Les autres téléphones conservent leur saisie et les informations utiles sans copie du dessin. Les projections serveur ne leur transmettent pas les traits ; le changement de dessinateur et la reconnexion réévaluent ce droit.
