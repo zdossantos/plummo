@@ -253,6 +253,7 @@ watch(chief, (value) => {
                             "
                             :key="game?.id ?? 0"
                             :code="code"
+                            :audio-ready="room?.audioReady"
                             :busy="busy"
                             :recover="game?.exhausted"
                             :initial-packs="game?.settings.packs"

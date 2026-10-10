@@ -42,11 +42,16 @@ it('writes privately on three phones, presents anonymously, votes and returns to
         $first->assertSee('Vote for your favourite sentence');
         $second->assertSee('Vote for your favourite sentence');
         $third->assertSee('Vote for your favourite sentence');
+        $screen->assertSee('Vote for your favourite sentence');
+        foreach ([$first, $second, $third, $screen] as $page) {
+            expect($page->page()->evaluate('() => { const entries = Array.from(document.querySelectorAll("[data-testid^=phrase-entry-]")); return entries.length === 3 && entries.every(e => { const s = getComputedStyle(e); return s.backgroundColor !== "rgba(0, 0, 0, 0)" && s.opacity === "1"; }); }'))->toBeTrue();
+        }
         $entries = collect(Game::where('room_id', $room->id)->sole()->state['round']['entries'])->keyBy('author');
         $players = $room->players()->orderBy('id')->get();
         $first->assertDisabled('[data-testid="phrase-entry-'.$entries[$players[0]->id]['id'].'"]');
         $first->page()->locator('[data-testid="phrase-entry-'.$entries[$players[1]->id]['id'].'"]')->click(['noWaitAfter' => true]);
         $first->assertSee('Vote saved!');
+        expect($first->page()->evaluate('() => Array.from(document.querySelectorAll("[data-testid^=phrase-entry-]")).every(e => getComputedStyle(e).opacity === "1" && getComputedStyle(e).backgroundColor !== "rgba(0, 0, 0, 0)")'))->toBeTrue();
         $second->page()->locator('[data-testid="phrase-entry-'.$entries[$players[0]->id]['id'].'"]')->click(['noWaitAfter' => true]);
         $second->assertSee('Vote saved!');
         $third->page()->locator('[data-testid="phrase-entry-'.$entries[$players[0]->id]['id'].'"]')->click(['noWaitAfter' => true]);

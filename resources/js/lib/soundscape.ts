@@ -23,6 +23,8 @@ export function bonusSoundNotes(kind: BonusKind) {
 export const soundSettings: InjectionKey<{
     enabled: Ref<boolean>;
     volume: Ref<number>;
+    media: Ref<HTMLAudioElement | undefined>;
+    blocked: Ref<boolean>;
 }> = Symbol('plummo-sound');
 export function ambianceVolume(volume: number, blind: boolean): number {
     return volume * (blind ? 0.06 : 0.3);

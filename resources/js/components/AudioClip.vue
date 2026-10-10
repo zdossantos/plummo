@@ -37,8 +37,8 @@ function transition(stop = false) {
     );
 }
 const { t } = useTranslations('rooms');
-const audio = ref<HTMLAudioElement>();
-const blocked = ref(false);
+const audio = sound?.media ?? ref<HTMLAudioElement>();
+const blocked = sound?.blocked ?? ref(false);
 const failed = ref(false);
 let generation = 0;
 async function play() {
@@ -63,15 +63,20 @@ watch(
         generation++;
         scheduleRelease();
         cancelFade?.();
+        if (audio.value && audio.value.getAttribute('src') !== props.src)
+            audio.value.src = props.src;
         if (props.playing) {
-            if (audio.value) audio.value.volume = 0;
+            if (audio.value) {
+                audio.value.loop = true;
+                audio.value.volume = 0;
+            }
             void play();
         } else {
             audio.value?.pause();
             if (audio.value) audio.value.volume = 0;
         }
     },
-    { flush: 'post' },
+    { flush: 'post', immediate: true },
 );
 watch(
     () => props.revealing,
@@ -84,9 +89,17 @@ watch(
     () => [sound?.enabled.value, sound?.volume.value],
     () => transition(!props.playing),
 );
-onMounted(() => window.addEventListener('plummo-audio-unlocked', play));
+function mediaError() {
+    failed.value = true;
+    blocked.value = true;
+}
+onMounted(() => {
+    audio.value?.addEventListener('error', mediaError);
+    window.addEventListener('plummo-audio-unlocked', play);
+});
 onUnmounted(() => {
     clearTimeout(release);
+    audio.value?.removeEventListener('error', mediaError);
     cancelFade?.();
     window.removeEventListener('plummo-audio-unlocked', play);
     generation++;
@@ -95,14 +108,12 @@ onUnmounted(() => {
 </script>
 <template>
     <audio
+        v-if="!sound"
         ref="audio"
         :src="src"
         loop
         preload="auto"
-        @error="
-            failed = true;
-            blocked = true;
-        "
+        @error="mediaError"
     />
     <div v-if="blocked && playing" class="mt-5">
         <p v-if="failed" role="alert">{{ t('audio_error') }}</p>

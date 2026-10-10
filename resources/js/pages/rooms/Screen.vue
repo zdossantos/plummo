@@ -17,6 +17,16 @@ const props = defineProps<{
     joinUrl: string;
     manualUrl: string;
 }>();
+const soundEnabled = ref(false);
+const soundVolume = ref(0.6);
+const media = ref<HTMLAudioElement>();
+const audioBlocked = ref(false);
+provide(soundSettings, {
+    enabled: soundEnabled,
+    volume: soundVolume,
+    media,
+    blocked: audioBlocked,
+});
 const { room, game, seconds, serverNow, closed, error, connected } = useRoom(
     props.room.code,
     {
@@ -25,10 +35,9 @@ const { room, game, seconds, serverNow, closed, error, connected } = useRoom(
         game: props.game,
         serverTime: props.serverTime,
     },
+    false,
+    () => soundEnabled.value && !audioBlocked.value && soundVolume.value > 0,
 );
-const soundEnabled = ref(false);
-const soundVolume = ref(0.6);
-provide(soundSettings, { enabled: soundEnabled, volume: soundVolume });
 const { t } = useTranslations('rooms');
 </script>
 <template>

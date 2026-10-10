@@ -209,6 +209,7 @@ it('temporarily hides artists on opponents phones and restores all eight answers
     $screen = visit('/', ['viewport' => ['width' => 1920, 'height' => 1080]])->withLocale('en-US')->assertSee('Everyone plays.');
     $room = Room::latest('id')->firstOrFail();
     try {
+        $screen->click('.sound-controls button')->assertAttribute('.sound-controls button', 'aria-pressed', 'true');
         $first = visit('/join/'.$room->code, ['viewport' => ['width' => 390, 'height' => 664]])->withLocale('en-US')->fill('player-name', 'Camille')->click('Continue')->click('Enter the room');
         $second = visit('/join/'.$room->code, ['viewport' => ['width' => 390, 'height' => 664]])->withLocale('en-US')->fill('player-name', 'Alex')->click('Continue')->click('Enter the room');
         $first->click('[data-choose-game]')->click('[data-game-option="blind_test"]');

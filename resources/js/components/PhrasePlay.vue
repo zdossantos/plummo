@@ -188,6 +188,7 @@ const author = (id?: number) =>
                     <button
                         v-if="phone && game.phase === 'voting'"
                         type="button"
+                        class="choice-face"
                         :data-testid="'phrase-entry-' + entry.id"
                         :disabled="
                             busy ||
@@ -203,38 +204,39 @@ const author = (id?: number) =>
                             t('phrase_own')
                         }}</small>
                     </button>
-                    <p
+                    <div
                         v-else
                         :data-testid="'phrase-entry-' + entry.id"
-                        class="text-summary"
+                        class="choice-face"
                     >
-                        {{ entry.text }}
-                    </p>
-                    <TextReader v-if="phone" :text="entry.text" />
-                    <div
-                        v-if="entry.author !== undefined"
-                        class="flex items-center gap-1"
-                    >
-                        <PlummoAvatar
-                            v-if="author(entry.author)"
-                            :color="author(entry.author)!.color"
-                            :accessories="author(entry.author)!.accessories"
-                            class="w-6 shrink-0"
-                        />
-                        <div class="min-w-0 text-[10px]">
-                            <p class="text-summary">
-                                {{ author(entry.author)?.name }}
-                            </p>
-                            <p>
-                                {{
-                                    t('phrase_votes', {
-                                        count: entry.votes ?? 0,
-                                        points: entry.points ?? 0,
-                                    })
-                                }}
-                            </p>
+                        <span class="text-summary">{{ entry.text }}</span>
+
+                        <div
+                            v-if="entry.author !== undefined"
+                            class="flex items-center gap-1"
+                        >
+                            <PlummoAvatar
+                                v-if="author(entry.author)"
+                                :color="author(entry.author)!.color"
+                                :accessories="author(entry.author)!.accessories"
+                                class="w-6 shrink-0"
+                            />
+                            <div class="min-w-0 text-[10px]">
+                                <p class="text-summary">
+                                    {{ author(entry.author)?.name }}
+                                </p>
+                                <p>
+                                    {{
+                                        t('phrase_votes', {
+                                            count: entry.votes ?? 0,
+                                            points: entry.points ?? 0,
+                                        })
+                                    }}
+                                </p>
+                            </div>
                         </div>
                     </div>
+                    <TextReader v-if="phone" :text="entry.text" />
                 </article>
             </div>
             <p

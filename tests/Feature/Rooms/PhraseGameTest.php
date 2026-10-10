@@ -228,3 +228,33 @@ it('ends voting when all players with an available choice have voted', function 
     phrasePost($room, $players[2][1], 'vote', ['choice' => $entry['id']])->assertJsonPath('game.phase', 'reveal');
     expect(RoomPlayer::findOrFail($players[0][0])->score)->toBe(130);
 });
+
+it('projects distinct or tied three-player awards without changing earlier session points', function (array $votes, array $awards) {
+    [$room, $players] = phraseSetup(2);
+    foreach ($players as $index => [$id]) {
+        RoomPlayer::findOrFail($id)->update(['score' => [200, 80, 10][$index]]);
+    }
+    $entries = phraseVoting($room, $players);
+    foreach ($votes as $voter => $recipient) {
+        phrasePost($room, $players[$voter][1], 'vote', ['choice' => $entries[$players[$recipient][0]]])->assertOk();
+    }
+    if (count($votes) < 3) {
+        phraseAdvance($room, 30);
+    }
+    // Screen refreshes and phone presence must never award a round twice.
+    foreach ($players as $index => [$id, $token]) {
+        $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/presence')
+            ->assertJsonPath('game.me.points', $awards[$index]);
+        $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.round.awards.'.$id, $awards[$index]);
+        expect(RoomPlayer::findOrFail($id)->score)->toBe([200, 80, 10][$index] + $awards[$index]);
+    }
+    phraseAdvance($room, 3);
+    foreach ($players as $index => [$id]) {
+        expect(RoomPlayer::findOrFail($id)->score)->toBe([200, 80, 10][$index] + $awards[$index]);
+    }
+})->with([
+    'unequal votes' => [[1, 0, 0], [130, 65, 0]],
+    'cyclic votes legitimately tie' => [[1, 2, 0], [65, 65, 65]],
+    'two abstentions' => [[1 => 0], [65, 0, 0]],
+    'everyone abstains' => [[], [0, 0, 0]],
+]);
