@@ -554,8 +554,8 @@
 }
 .display-screen .room-header {
     position: relative;
-    padding-right: calc(var(--screen-join-width) + 24px);
-    min-height: var(--screen-qr-size);
+    padding-right: 0;
+    min-height: 44px;
 }
 .screen-join {
     position: absolute;
@@ -578,7 +578,7 @@
     box-shadow: 0 6px 0 var(--edge);
 }
 .display-screen[data-lobby] {
-    --screen-qr-size: clamp(160px, 36dvh, 440px);
+    --screen-qr-size: clamp(160px, min(46.5dvh, calc(78dvh - 310px)), 560px);
     --screen-join-width: clamp(220px, 38vw, 560px);
 }
 .display-screen[data-lobby] .phone-scene {
@@ -2444,5 +2444,25 @@
     }
     .display-screen .room-header > small {
         font-size: 11px;
+    }
+}
+
+.screen-session {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+.screen-session img {
+    width: clamp(44px, 7dvh, 72px);
+    height: clamp(44px, 7dvh, 72px);
+    padding: 4px;
+    border: 2px solid var(--edge);
+    border-radius: 10px;
+    background: white;
+    box-shadow: 0 4px 0 var(--edge);
+}
+@media (min-height: 501px) and (max-height: 800px) {
+    .display-screen[data-lobby] {
+        --screen-qr-size: clamp(160px, 36dvh, 440px);
     }
 }

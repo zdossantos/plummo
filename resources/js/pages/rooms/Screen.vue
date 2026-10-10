@@ -49,7 +49,13 @@ const { t } = useTranslations('rooms');
     >
         <RoomNotice :message="error" />
         <template #header
-            ><span class="font-bold text-primary">{{ room?.code }}</span
+            ><span class="screen-session"
+                ><span class="font-bold text-primary">{{ room?.code }}</span
+                ><img
+                    v-if="room && !closed"
+                    data-testid="screen-header-qr"
+                    :src="`/rooms/${room.code}/qr`"
+                    :alt="t('qr_alt')" /></span
             ><small>{{
                 room?.pointTarget === null
                     ? t('nonstop')
@@ -65,7 +71,7 @@ const { t } = useTranslations('rooms');
                 :connected="connected"
             />
             <aside
-                v-if="room && !closed"
+                v-if="room && !closed && !game"
                 class="screen-join"
                 data-testid="screen-join"
             >
