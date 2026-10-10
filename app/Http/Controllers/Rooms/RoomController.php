@@ -89,6 +89,8 @@ class RoomController extends Controller
     {
         return $this->rooms->locked($code, function (Room $room) use ($request): JsonResponse {
             abort_unless($request->session()->get('plummo.screen') === $room->id, 403);
+            $request->validate(['audio_ready' => ['sometimes', 'boolean']]);
+            $this->rooms->reportAudio($room, $request->boolean('audio_ready'));
             $room->update(['screen_seen_at' => now()]);
 
             return response()->json($this->rooms->state($room, screen: true));

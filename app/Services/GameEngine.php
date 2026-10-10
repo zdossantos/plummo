@@ -37,6 +37,9 @@ class GameEngine
         if ($settings['type'] === 'blind_test' && app(BlindChoices::class)->count() < 8) {
             throw ValidationException::withMessages(['packs' => __('rooms.blind_catalogue_small')]);
         }
+        if ($settings['type'] === 'blind_test' && ! app(RoomService::class)->audioReady($room)) {
+            throw ValidationException::withMessages(['audio' => __('rooms.blind_audio_prepare')]);
+        }
         $game = Game::create(['room_id' => $room->id, 'type' => $settings['type'], 'settings' => $settings, 'state' => ['scores' => [], 'number' => 0]]);
         $this->nextRound($room, $game);
 

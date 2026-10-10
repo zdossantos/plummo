@@ -33,6 +33,7 @@ export type Player = {
     status: 'connected' | 'disconnected' | 'waiting' | 'left';
 };
 export type RoomState = {
+    audioReady?: boolean;
     code: string;
     capacity: number;
     occupied: number;

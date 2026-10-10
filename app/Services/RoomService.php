@@ -7,6 +7,7 @@ use App\Models\RoomPlayer;
 use Closure;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -14,6 +15,16 @@ use Illuminate\Validation\ValidationException;
 
 class RoomService
 {
+    public function reportAudio(Room $room, bool $ready): void
+    {
+        Cache::put('rooms:'.$room->code.':audio-ready', $ready, now()->addSeconds(8));
+    }
+
+    public function audioReady(Room $room): bool
+    {
+        return Cache::get('rooms:'.$room->code.':audio-ready', false) === true;
+    }
+
     public function create(): Room
     {
         for ($attempt = 0; $attempt < 10; $attempt++) {
@@ -203,7 +214,7 @@ class RoomService
             'game' => $game,
             'room' => [
                 'code' => $room->code, 'capacity' => 8, 'occupied' => $this->occupied($room), 'chiefId' => $this->chiefId($room),
-                'pointTarget' => $room->point_target, 'ranking' => $this->ranking($room),
+                'audioReady' => $this->audioReady($room), 'pointTarget' => $room->point_target, 'ranking' => $this->ranking($room),
                 'players' => $room->players()->orderBy('id')->get()->filter(fn (RoomPlayer $player): bool => $player->occupiesPlace())->map(fn (RoomPlayer $player): array => $player->publicData())->values()->all(),
             ],
             'me' => $me?->publicData(),

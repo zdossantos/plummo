@@ -10,6 +10,7 @@ export function useRoom(
     code: string | null,
     initial?: Snapshot,
     phone = false,
+    audioReady?: () => boolean,
 ) {
     const room = ref<RoomState | null>(initial?.room ?? null);
     const game = ref<GameState | null>(initial?.game ?? null);
@@ -55,6 +56,8 @@ export function useRoom(
         background = false,
     ): Promise<boolean> {
         if (!code || busy.value || closed.value || stopped) return false;
+        if (action === 'screen-presence')
+            body = { audio_ready: audioReady?.() ?? false };
         const ticket = requests.begin(background);
         if (!ticket) return false;
         busy.value = requests.busy;

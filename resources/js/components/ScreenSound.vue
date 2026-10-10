@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from 'vue';
+import { computed, inject, onUnmounted, ref, watch } from 'vue';
 import { Volume2, VolumeX } from '@lucide/vue';
-import { Soundscape } from '@/lib/soundscape';
+import { playAudio } from '@/lib/audio';
+import { Soundscape, soundSettings } from '@/lib/soundscape';
 import { BonusReceiptTracker } from '@/lib/bonuses';
 import { useTranslations } from '@/composables/useTranslations';
 import type { BonusItem, GameState, RoomState } from '@/types/rooms';
@@ -20,6 +21,9 @@ const emit = defineEmits<{
 }>();
 const { t } = useTranslations('rooms');
 const started = ref(false);
+const settings = inject(soundSettings);
+const media = settings?.media ?? ref<HTMLAudioElement>();
+const blocked = settings?.blocked ?? ref(false);
 let sound: Soundscape | undefined;
 const launches = new BonusReceiptTracker<BonusItem & { at: number }>();
 let idle: ReturnType<typeof setTimeout> | undefined;
@@ -35,14 +39,32 @@ function updateVolume() {
     );
 }
 async function toggle() {
+    if (props.enabled && !blocked.value) {
+        emit('update:enabled', false);
+        return;
+    }
     try {
+        // Both playback APIs must be invoked inside the click, before any await.
+        // Keep this media element for every excerpt: WebKit permission is per element.
+        const element = media.value;
+        if (!element) return;
+        if (!blind.value) {
+            element.src = '/audio/plummo-ambiance.mp3';
+            element.loop = false;
+        }
+        element.volume = props.volume;
+        const playback = playAudio(element);
         sound ??= new Soundscape();
-        await sound.start();
+        const ambiance = sound.start();
+        await Promise.all([playback, ambiance]);
+        if (!blind.value) element.pause();
         started.value = true;
-        emit('update:enabled', !props.enabled);
+        blocked.value = false;
+        emit('update:enabled', true);
         window.dispatchEvent(new Event('plummo-audio-unlocked'));
     } catch {
-        started.value = false;
+        if (!blind.value) media.value?.pause();
+        blocked.value = true;
     }
 }
 function scheduleIdle() {
@@ -104,20 +126,33 @@ watch(
 );
 onUnmounted(() => {
     clearTimeout(idle);
+    media.value?.pause();
     sound?.close();
 });
 </script>
 <template>
+    <audio ref="media" src="/audio/plummo-ambiance.mp3" preload="auto" />
     <div v-if="!closed" class="sound-controls">
         <button
             type="button"
-            :aria-label="t(enabled ? 'sound_off' : 'sound_on')"
+            :aria-label="
+                t(blocked ? 'audio_retry' : enabled ? 'sound_off' : 'sound_on')
+            "
             :aria-pressed="enabled"
+            :title="enabled ? t('audio_ready_hint') : undefined"
             @click="toggle"
         >
             <Volume2 v-if="enabled" /><VolumeX v-else />
-            <span v-if="!started">{{ t('sound_on') }}</span>
+            <span v-if="blocked || !started">{{
+                t(blocked ? 'audio_retry' : 'sound_on')
+            }}</span>
         </button>
+        <span
+            v-if="started && enabled && !game"
+            class="sr-only"
+            role="status"
+            >{{ t('audio_ready_hint') }}</span
+        >
         <input
             v-if="started"
             type="range"

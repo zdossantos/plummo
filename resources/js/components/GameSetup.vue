@@ -18,6 +18,7 @@ const props = defineProps<{
     busy: boolean;
     recover?: boolean;
     playerCount?: number;
+    audioReady?: boolean;
     initialPacks?: number[];
     initialType?: 'quiz' | 'blind_test' | 'drawing' | 'phrase';
 }>();
@@ -142,7 +143,10 @@ const valid = computed(
         (gameType.value !== 'phrase' ||
             props.recover ||
             connectedPlayers.value >= 3) &&
-        count.value >= required.value,
+        count.value >= required.value &&
+        (gameType.value !== 'blind_test' ||
+            props.recover ||
+            props.audioReady === true),
 );
 async function load() {
     controller?.abort();
@@ -360,6 +364,12 @@ onUnmounted(() => controller?.abort());
                 </p>
             </div>
         </div>
+        <p
+            v-if="gameType === 'blind_test' && !recover && !audioReady"
+            role="status"
+        >
+            {{ t('blind_audio_prepare') }}
+        </p>
         <p v-if="error" role="alert">{{ error }}</p>
         <Button
             type="submit"

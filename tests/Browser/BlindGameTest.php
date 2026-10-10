@@ -5,6 +5,7 @@ use App\Models\Game;
 use App\Models\Pack;
 use App\Models\Room;
 use Illuminate\Support\Facades\Storage;
+use Pest\Browser\Execution;
 use Pest\Browser\Playwright\Playwright;
 
 it('plays looping audio on the screen and pauses it while phones select eight choices', function () {
@@ -21,7 +22,18 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
     $tag = $pack->tags()->sole();
     $ids = $tag->contents()->pluck('contents.id');
     $screen = visit('/')->withLocale('en-US')->assertSee('Everyone plays.');
-    $screen->click('button[aria-label="Enable sound"]')->assertPresent('.sound-controls button[aria-pressed="true"]');
+    // Model WebKit's per-element permission, granted only during the actual click.
+    $screen->page()->evaluate('() => {
+        window.nativePlay = HTMLMediaElement.prototype.play;
+        const unlocked = new WeakSet();
+        let gesture = false;
+        document.addEventListener("click", event => { gesture = event.isTrusted; setTimeout(() => gesture = false, 0); }, true);
+        HTMLMediaElement.prototype.play = function () {
+            if (gesture) unlocked.add(this);
+            if (!unlocked.has(this)) return Promise.reject(new DOMException("Autoplay blocked", "NotAllowedError"));
+            return window.nativePlay.call(this);
+        };
+    }');
     $room = Room::latest('id')->firstOrFail();
     try {
         $phone = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')
@@ -30,14 +42,14 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         $phone->click('button[aria-label="Play"]')->assertSee('Mini-game');
         $phone->click('[data-choose-game]')->click('[data-game-option="blind_test"]');
         $phone->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")')->assertSee('8 unseen clips')->fill('game-rounds', '5');
-        // Simulate an autoplay restriction: the passive screen shows a status, never a command.
-        $screen->page()->evaluate('() => { window.nativePlay = HTMLMediaElement.prototype.play; HTMLMediaElement.prototype.play = function () { return Promise.reject(new DOMException("Autoplay blocked", "NotAllowedError")); }; }');
+        $phone->assertDisabled('button:has-text("Start blind test")')->assertSee('Press Enable sound on the big screen');
+        $screen->click('button[aria-label="Enable sound"]')->assertPresent('.sound-controls button[aria-pressed="true"]');
+        expect($screen->page()->evaluate('() => { window.unlockedAudio = document.querySelector("audio"); return !!window.unlockedAudio; }'))->toBeTrue();
+        $phone->assertEnabled('button:has-text("Start blind test")');
         $phone->page()->locator('button:has-text("Start blind test")')->click(['noWaitAfter' => true]);
         $phone->assertSee('Blind test · Clip 1 / 5');
-        $screen->assertSee('Blind test · Clip 1 / 5')->assertSee('Your browser blocks automatic sound.')->assertMissing('.game-play button');
-        $screen->page()->evaluate('() => { HTMLMediaElement.prototype.play = window.nativePlay; }');
-        // Permit playback for this test browser; gameplay never needs a screen action.
-        $screen->page()->evaluate('() => { document.querySelector("audio").muted = true; }');
+        $screen->assertSee('Blind test · Clip 1 / 5')->assertDontSee('Your browser blocks automatic sound.')->assertMissing('.game-play button');
+        expect($screen->page()->evaluate('() => document.querySelector("audio") === window.unlockedAudio && !window.unlockedAudio.paused && !window.unlockedAudio.muted'))->toBeTrue();
         $phone->page()->locator('button:has-text("Pause")')->click(['noWaitAfter' => true]);
         $phone->assertSee('Game paused');
         $screen->assertSee('Game paused');
@@ -78,6 +90,10 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         Storage::disk('local')->assertMissing($game->state['round']['payload']['audio_path']);
         $phone->page()->locator('button:has-text("Back to lobby")')->click(['noWaitAfter' => true]);
         $screen->assertSee('Everyone plays.')->assertSee('65 Points')->assertNoJavaScriptErrors();
+        $screen->click('button[aria-label="Mute sound"]')->assertPresent('.sound-controls button[aria-pressed="false"]')->click('button[aria-label="Enable sound"]')->assertPresent('.sound-controls button[aria-pressed="true"]');
+        Execution::instance()->waitForExpectation(function () use ($screen) {
+            expect($screen->page()->evaluate('() => document.querySelector("audio") === window.unlockedAudio && new URL(window.unlockedAudio.src).pathname === "/audio/plummo-ambiance.mp3" && !window.unlockedAudio.loop && window.unlockedAudio.paused'))->toBeTrue();
+        });
         $phone->assertNoJavaScriptErrors();
     } finally {
         $room->delete();

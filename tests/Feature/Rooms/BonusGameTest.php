@@ -254,6 +254,9 @@ it('launches every compatible object with the expected targets and lifetime', fu
         Storage::disk('local')->put('audio/test.wav', 'prepared audio');
     }
     $room = openRoom();
+    if ($type === 'blind_test') {
+        $this->postJson('/rooms/'.$room->code.'/screen-presence', ['audio_ready' => true])->assertOk();
+    }
     $members = [enterRoom($room, 'Un'), enterRoom($room, 'Deux'), enterRoom($room, 'Trois')];
     $pack = match ($type) {
         'quiz' => quizPack(), 'blind_test' => blindPack(), 'phrase' => phrasePack(), 'drawing' => drawingPack(),
