@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/zdossantos/plummo/compare/plummo-v0.4.0...plummo-v0.5.0) (2026-10-10)
+
+
+### Features
+
+* add collective bonuses to mini-games ([#32](https://github.com/zdossantos/plummo/issues/32)) ([d189c9f](https://github.com/zdossantos/plummo/commit/d189c9fa82c28ebf0793fbbe5e050e9f6664d462))
+
 ## [0.4.0](https://github.com/zdossantos/plummo/compare/plummo-v0.3.0...plummo-v0.4.0) (2026-10-09)
 
 
