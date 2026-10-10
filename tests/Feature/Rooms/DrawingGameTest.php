@@ -4,6 +4,7 @@ use App\Models\Content;
 use App\Models\Game;
 use App\Models\Room;
 use App\Models\RoomPlayer;
+use App\Services\DrawingGame;
 use App\Services\GameEngine;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
@@ -307,7 +308,7 @@ it('authorizes drawing commands only for the current artist and keeps words priv
     chooseDrawing($room, $one);
     $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/drawing/stroke', drawingStroke($room))->assertForbidden();
     $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/drawing/stroke', drawingStroke($room))->assertOk()->assertJsonCount(1, 'game.round.canvas');
-    $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.round.word', null)->assertJsonPath('game.me.words', [])->assertJsonPath('game.me.word', null)->assertJsonCount(1, 'game.round.canvas');
+    $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.round.word', null)->assertJsonPath('game.me.words', [])->assertJsonPath('game.me.word', null)->assertJsonCount(0, 'game.round.canvas');
     $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/drawing/stroke', drawingStroke($room, ['round' => 99]))->assertConflict();
     $this->postJson('/rooms/'.$room->code.'/game/pause')->assertOk();
     $this->postJson('/rooms/'.$room->code.'/drawing/clear', drawingAction($room, ['revision' => 0]))->assertConflict();
@@ -379,4 +380,42 @@ it('shows recent guesses without leaking a successful word before revelation', f
     $word = chooseDrawing($room, $one);
     $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => 'girafe']))->assertOk()->assertJsonPath('game.round.guesses.0.text', 'girafe');
     $this->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => $word]))->assertOk()->assertJsonPath('game.round.guesses.1.playerId', $guesser)->assertJsonPath('game.round.guesses.1.found', true)->assertJsonPath('game.round.guesses.1.text', null)->assertJsonPath('game.round.word', null);
+});
+
+it('keeps the canvas exclusive to the screen and current artist through every phase', function (string $phase) {
+    $room = openRoom();
+    [$artist, $one] = enterRoom($room);
+    [$guesser] = enterRoom($room, 'Alex');
+    $game = startDrawing($room, $one);
+    chooseDrawing($room, $one);
+    $this->postJson('/rooms/'.$room->code.'/drawing/stroke', drawingStroke($room))->assertOk();
+    $game->refresh();
+    $state = $game->state;
+    $state['phase'] = $phase;
+    $state['previous_phase'] = 'drawing';
+    $game->state = $state;
+    $drawing = app(DrawingGame::class);
+    expect($drawing->view($room, $game, null)['round']['canvas'])->toHaveCount(1)
+        ->and($drawing->view($room, $game, RoomPlayer::findOrFail($artist))['round']['canvas'])->toHaveCount(1)
+        ->and($drawing->view($room, $game, RoomPlayer::findOrFail($guesser))['round']['canvas'])->toBe([]);
+    $state['round']['artist'] = $guesser;
+    $game->state = $state;
+    expect($drawing->view($room, $game, RoomPlayer::findOrFail($artist))['round']['canvas'])->toBe([])
+        ->and($drawing->view($room, $game, RoomPlayer::findOrFail($guesser))['round']['canvas'])->toHaveCount(1);
+})->with(['drawing', 'paused', 'resuming', 'artist_missing', 'reveal', 'results']);
+
+it('restores the artist canvas after reconnecting without exposing it to guessers', function () {
+    $room = openRoom();
+    [, $one] = enterRoom($room);
+    [, $two] = enterRoom($room, 'Alex');
+    startDrawing($room, $one);
+    chooseDrawing($room, $one);
+    $this->postJson('/rooms/'.$room->code.'/drawing/stroke', drawingStroke($room))->assertOk();
+    $this->postJson('/rooms/'.$room->code.'/leave')->assertOk();
+    $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/presence')->assertJsonCount(0, 'game.round.canvas');
+    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/return')->assertJsonPath('game.phase', 'resuming')->assertJsonCount(1, 'game.round.canvas');
+    $this->travel(5)->seconds();
+    drawingHeartbeat($room);
+    $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.phase', 'drawing')->assertJsonCount(1, 'game.round.canvas');
+    $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/presence')->assertJsonCount(0, 'game.round.canvas');
 });

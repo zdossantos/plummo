@@ -27,7 +27,23 @@ it('draws from two separate phones and plays every artist before returning to th
         $word = $game->state['round']['words'][0];
         $first->page()->locator('[data-testid="drawing-word"]')->first()->click(['noWaitAfter' => true]);
         $first->assertSee('Your word: '.$word);
-        $second->assertDontSee($word);
+        $second->assertDontSee($word)->assertMissing('[data-testid="drawing-board"]');
+        expect($first->page()->evaluate('() => getComputedStyle(document.documentElement).touchAction'))->toBe('pan-x pan-y');
+        expect($first->page()->evaluate('() => getComputedStyle(document.querySelector(".drawing-board")).userSelect'))->toBe('none');
+        expect($first->page()->evaluate('() => getComputedStyle(document.querySelector(".drawing-tools")).userSelect'))->toBe('none');
+        $second->assertPresent('#drawing-guess');
+        expect($second->page()->evaluate('() => getComputedStyle(document.querySelector("#drawing-guess")).userSelect'))->not->toBe('none');
+        expect($first->page()->evaluate(<<<'JS'
+        () => {
+            const zoom = new WheelEvent('wheel', {ctrlKey:true, cancelable:true});
+            document.dispatchEvent(zoom);
+            const shortcut = new KeyboardEvent('keydown', {key:'+', ctrlKey:true, cancelable:true});
+            document.dispatchEvent(shortcut);
+            const normal = new KeyboardEvent('keydown', {key:'a', cancelable:true});
+            document.dispatchEvent(normal);
+            return zoom.defaultPrevented && shortcut.defaultPrevented && !normal.defaultPrevented;
+        }
+        JS))->toBeTrue();
         $screen->assertDontSee($word);
         $first->page()->evaluate(<<<'JS'
         () => {
@@ -65,7 +81,8 @@ it('draws from two separate phones and plays every artist before returning to th
         $game->refresh();
         $word = $game->state['round']['words'][0];
         $second->page()->locator('[data-testid="drawing-word"]')->first()->click(['noWaitAfter' => true]);
-        $first->assertPresent('#drawing-guess')->fill('#drawing-guess', $word);
+        $second->assertPresent('[data-testid="drawing-board"]');
+        $first->assertMissing('[data-testid="drawing-board"]')->assertPresent('#drawing-guess')->fill('#drawing-guess', $word);
         $first->page()->locator('button:has-text("Guess")')->click(['noWaitAfter' => true]);
         $screen->assertSee('Mini-game leaderboard');
         $first->assertSee('Mini-game leaderboard');

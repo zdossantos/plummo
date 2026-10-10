@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\RoomPlayer;
+use App\Services\RoomService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 uses(DatabaseTransactions::class);
@@ -56,8 +57,13 @@ it('publishes shared ranking positions and retains departed players with duplica
     RoomPlayer::whereIn('id', [$one, $two])->update(['score' => 100]);
     RoomPlayer::findOrFail($two)->update(['left_at' => now()]);
     $this->getJson('/rooms/'.$room->code.'/state')->assertOk()
-        ->assertJsonPath('room.pointTarget', 1000)
+        ->assertJsonPath('room.pointTarget', null)
         ->assertJsonPath('room.ranking.0.rank', 1)->assertJsonPath('room.ranking.1.rank', 1)
         ->assertJsonPath('room.ranking.2.rank', 3)->assertJsonPath('room.ranking.2.id', $three)
         ->assertJsonCount(2, 'room.players')->assertJsonCount(3, 'room.ranking');
+});
+
+it('creates new sessions without a score limit', function () {
+    $room = app(RoomService::class)->create();
+    expect($room->fresh()->point_target)->toBeNull();
 });

@@ -51,6 +51,9 @@
         margin: 0;
         overflow: hidden;
     }
+    html {
+        touch-action: pan-x pan-y;
+    }
     body {
         @apply bg-background text-foreground;
         font-family: 'Trebuchet MS', system-ui, sans-serif;
@@ -66,7 +69,7 @@
     input,
     select,
     textarea {
-        touch-action: manipulation;
+        touch-action: pan-x pan-y;
     }
     button {
         cursor: pointer;
@@ -779,6 +782,12 @@
     .phrase-scene > form > button {
         margin-top: 0;
     }
+}
+.drawing-board,
+.drawing-tools {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
 }
 .drawing-board {
     flex: 1;

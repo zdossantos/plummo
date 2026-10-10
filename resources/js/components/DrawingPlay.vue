@@ -130,7 +130,11 @@ watch(
             >
                 {{ t('drawing_secret', { word: game.me.word }) }}
             </p>
-            <div class="drawing-stage" :class="{ 'with-guesses': !phone }">
+            <div
+                v-if="!phone || !!game.me?.word"
+                class="drawing-stage"
+                :class="{ 'with-guesses': !phone }"
+            >
                 <div class="bonus-canvas">
                     <DrawingBoard
                         :key="`${game.id}-${game.round.number}-${game.round.revision}`"

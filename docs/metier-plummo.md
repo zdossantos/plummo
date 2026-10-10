@@ -90,7 +90,7 @@ Les barèmes restent ceux validés. Les essais de jeu devront vérifier les diff
 
 Dès la première version, une session peut être libre ou comporter un objectif de points fixé au départ.
 
-L'objectif proposé par défaut est de 1 000 points. Avant le lancement de la session, le chef peut saisir un autre nombre entier ou choisir le mode sans limite.
+Les nouveaux salons sont sans limite par défaut. Le chef peut choisir explicitement un objectif de points. Les objectifs des salons existants sont conservés.
 
 Si le seuil est atteint, seule la manche en cours se termine avant la célébration du ou des gagnants globaux. Les manches restantes du mini-jeu ne sont pas jouées. L'objectif n'est pas augmenté pour absorber un dépassement : un seuil de 1 000 points reste fixé à 1 000 même si le meilleur score termine la manche à 1 180. Le groupe revient au salon avec ses scores conservés. Le chef peut :
 
@@ -315,3 +315,9 @@ Chaque malus accepté diffuse un événement sonore public distinct, conservé h
 Tout nouveau mini-jeu doit intégrer les bonus/malus existants compatibles avec ses interactions : catalogue, attribution, lancement collectif, effets, pause/reprise, réception et sons. Réutiliser le système commun, expliquer les incompatibilités et tester les règles du nouveau mode.
 
 La poche conserve deux objets utilisables. Lorsque l’attribution suivante arrive dans une poche pleine, un troisième objet reste en attente, privé au joueur. Il peut remplacer un des deux objets ou refuser le nouveau. Un seul objet attend : tant que le choix reste ouvert, il n’est pas écrasé par les attributions suivantes. Il disparaît à la fin du mini-jeu. Si un lancement libère une place, le nouveau rejoint la poche.
+
+### Affichage de la toile de dessin
+
+La toile apparaît uniquement sur le grand écran et sur le téléphone du dessinateur courant, y compris pendant une pause ou une révélation. Les autres téléphones conservent leur saisie et les informations utiles sans copie du dessin. Les projections serveur ne leur transmettent pas les traits ; le changement de dessinateur et la reconnexion réévaluent ce droit.
+
+Les gestes de dessin ne sélectionnent pas le texte du plateau ou de ses outils. Le zoom par double tap, pincement, molette avec Ctrl/Cmd et raccourcis clavier est bloqué dans l’application. Les champs de texte conservent leur sélection. Les réglages de zoom imposés par le navigateur ou le système restent hors du contrôle de l’application.
