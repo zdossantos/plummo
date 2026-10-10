@@ -23,7 +23,7 @@ class RoomService
                 $code .= $alphabet[random_int(0, strlen($alphabet) - 1)];
             }
             try {
-                return Room::create(['code' => $code, 'empty_since' => now()]);
+                return Room::create(['code' => $code, 'empty_since' => now(), 'point_target' => null]);
             } catch (UniqueConstraintViolationException) {
                 // Retry a collision; the unique index arbitrates concurrent creations.
             }
