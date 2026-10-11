@@ -77,7 +77,8 @@ it('shows a long phrase during presentation and voting using the available space
             $page->assertPresent('.text-reader-trigger');
             expect($page->page()->evaluate('() => Array.from(document.querySelectorAll(".choice-face > .text-summary")).every(e => getComputedStyle(e).webkitLineClamp === "none")'))->toBeTrue();
         } else {
-            expect($page->page()->evaluate('() => Array.from(document.querySelectorAll(".choice-face > .text-summary")).every(e => e.scrollHeight <= e.clientHeight + 1)'))->toBeTrue();
+            $metrics = $page->page()->evaluate('() => Array.from(document.querySelectorAll(".choice-face > .text-summary")).map(e => ({height: e.clientHeight, content: e.scrollHeight, width: e.clientWidth, font: getComputedStyle(e).font, card: e.parentElement.clientHeight, scene: document.querySelector(".phrase-scene").clientHeight}))');
+            expect(array_filter($metrics, fn ($item) => $item['content'] > $item['height'] + 1))->toBeEmpty(json_encode($metrics));
             $page->assertMissing('.text-reader-trigger');
         }
         expect($page->page()->evaluate('() => document.documentElement.scrollHeight <= innerHeight'))->toBeTrue();
