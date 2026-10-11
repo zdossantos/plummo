@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.7.0](https://github.com/zdossantos/plummo/compare/plummo-v0.6.0...plummo-v0.7.0) (2026-10-11)
+
+
+### Features
+
+* add fill and eraser drawing tools ([#66](https://github.com/zdossantos/plummo/issues/66)) ([b7eee9c](https://github.com/zdossantos/plummo/commit/b7eee9cc6d1223cf798dffca1f630d280cce7540))
+* animate collective bonus launches on the display ([#67](https://github.com/zdossantos/plummo/issues/67)) ([6accd88](https://github.com/zdossantos/plummo/commit/6accd8890039ca62787c68143ae7a075ecf4f84a))
+* celebrate point gains on player phones ([#65](https://github.com/zdossantos/plummo/issues/65)) ([fa4bbd3](https://github.com/zdossantos/plummo/commit/fa4bbd372f358dfbecf5e878b2ed3a5de945653b))
+
+
+### Bug Fixes
+
+* improve question and answer readability ([#63](https://github.com/zdossantos/plummo/issues/63)) ([5fdb597](https://github.com/zdossantos/plummo/commit/5fdb597935efc14b33573d67b2839f34a10b2c27))
+
 ## [0.6.0](https://github.com/zdossantos/plummo/compare/plummo-v0.5.0...plummo-v0.6.0) (2026-10-10)
 
 
