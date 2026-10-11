@@ -2489,7 +2489,7 @@
     -webkit-line-clamp: 3;
 }
 .display-screen .game-choice > .choice-face {
-    font-size: clamp(16px, 1.65vw, 28px);
+    font-size: clamp(16px, min(1.65vw, 2.5dvh), 28px);
 }
 @media (max-height: 500px) {
     .display-screen .game-question h1,
