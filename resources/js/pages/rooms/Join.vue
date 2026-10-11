@@ -152,6 +152,14 @@ watch(chief, (value) => {
                 <Button type="submit" size="lg" :disabled="manual.processing">{{
                     t('join')
                 }}</Button>
+                <Button
+                    as="a"
+                    variant="secondary"
+                    size="lg"
+                    href="/host"
+                    data-testid="host-room"
+                    >{{ t('host_room') }}</Button
+                >
             </form>
             <p v-else-if="returning" role="status">{{ t('loading') }}</p>
             <form

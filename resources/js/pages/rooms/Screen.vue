@@ -4,6 +4,7 @@ import ScreenSound from '@/components/ScreenSound.vue';
 import BonusLaunch from '@/components/BonusLaunch.vue';
 import { soundSettings } from '@/lib/soundscape';
 import { Head } from '@inertiajs/vue3';
+import { Button } from '@/components/ui/button';
 import PlayerDock from '@/components/PlayerDock.vue';
 import RoomNotice from '@/components/RoomNotice.vue';
 import GamePlay from '@/components/GamePlay.vue';
@@ -105,6 +106,13 @@ const { t } = useTranslations('rooms');
                         <p class="my-4 text-lg text-muted-foreground">
                             {{ t('invite') }}
                         </p>
+                        <Button
+                            as="a"
+                            size="lg"
+                            href="/join"
+                            data-testid="join-room"
+                            >{{ t('join_room') }}</Button
+                        >
                     </div>
                 </section>
                 <GamePlay

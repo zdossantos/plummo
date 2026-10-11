@@ -49,6 +49,8 @@ return [
     'invalid_content_count' => 'Invalid content count.',
     'contents_exhausted' => 'Not enough unseen content. Change packs or allow repeats.',
     'title' => 'The room',
+    'host_room' => 'Host a room',
+    'join_room' => 'Join a room',
     'join_title' => 'Join the gang.',
     'screen_title' => 'Everyone plays.',
     'screen_intro' => 'One shared screen. Your phones. The whole gang.',

@@ -24,7 +24,8 @@ Route::get('/dev/plummo-animations', function (PlummoCatalog $catalog) {
     return Inertia::render('dev/PlummoAnimations', ['catalog' => $catalog->data()]);
 })->name('dev.plummo-animations');
 
-Route::get('/', [RoomController::class, 'open'])->name('home')->middleware('throttle:30,1');
+Route::get('/', fn () => Inertia::render('rooms/Home'))->name('home');
+Route::get('/host', [RoomController::class, 'open'])->name('host')->middleware('throttle:30,1');
 Route::get('/join', [RoomController::class, 'joinPage'])->name('join');
 Route::post('/join', [RoomController::class, 'find'])->middleware('throttle:30,1');
 Route::get('/join/{code}', [RoomController::class, 'joinPage'])->name('rooms.join');
