@@ -12,6 +12,7 @@ return [
     'bonus_empty' => 'Empty slot',
     'bonus_info' => 'What does {name} do?',
     'bonus_launch' => 'Launch {name}',
+    'bonus_launched' => '{name} launched!',
     'bonus_received' => '{name} received!',
     'bonus_phrase_warning' => 'A prank awaits your sentence after submission…',
     'bonus_bolt' => 'Lightning',

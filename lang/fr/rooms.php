@@ -12,6 +12,7 @@ return [
     'bonus_empty' => 'Emplacement libre',
     'bonus_info' => 'À quoi sert {name} ?',
     'bonus_launch' => 'Lancer {name}',
+    'bonus_launched' => '{name} lancé !',
     'bonus_received' => '{name} reçu !',
     'bonus_phrase_warning' => 'Une farce attend ta phrase après validation…',
     'bonus_bolt' => 'Éclair',

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Pest\Browser\Execution;
 
-it('launches a collective bonus in one click while phone and screen stay inside their viewport', function () {
+it('launches a collective bonus in one click while phone and screen stay inside their viewport', function (bool $reduced) {
     app()->terminating(function () {
         app('cookie')->flushQueuedCookies();
         app('session.store')->flush();
@@ -24,7 +24,7 @@ it('launches a collective bonus in one click while phone and screen stay inside 
     }
     $tag = $pack->tags()->sole();
     $ids = $tag->contents()->pluck('contents.id');
-    $screen = visit('/', ['viewport' => ['width' => 1920, 'height' => 1080]])->withLocale('en-US')->assertSee('Everyone plays.');
+    $screen = visit('/', ['reducedMotion' => $reduced ? 'reduce' : 'no-preference', 'viewport' => ['width' => $reduced ? 1280 : 1920, 'height' => $reduced ? 720 : 1080]])->withLocale('en-US')->assertSee('Everyone plays.');
     $room = Room::latest('id')->firstOrFail();
     try {
         $first = visit('/join/'.$room->code, ['viewport' => ['width' => 390, 'height' => 664]])->withLocale('en-US')->fill('player-name', 'Camille')->click('Continue')->click('Enter the room');
@@ -47,14 +47,25 @@ it('launches a collective bonus in one click while phone and screen stay inside 
         $first->assertVisible('.bonus-object');
         expect($first->page()->evaluate('() => { const r = document.querySelector(".bonus-object").getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight; }'))->toBeTrue();
         $first->page()->setViewportSize(390, 664);
+        $screen->assertSee('Quiz · Question 1 / 5');
         $screen->page()->evaluate('() => { window.bonusNotes = 0; const original = AudioContext.prototype.createOscillator; AudioContext.prototype.createOscillator = function(...args) { window.bonusNotes++; return original.apply(this, args); }; }');
         $screen->click('.sound-controls button')->assertAttribute('.sound-controls button', 'aria-pressed', 'true');
+        $screen->page()->evaluate('() => { window.launchIds = new Set(); new MutationObserver(() => document.querySelectorAll("[data-testid=bonus-launch]").forEach(item => window.launchIds.add(item.dataset.launchId))).observe(document.body, {subtree:true,childList:true}); }');
         $first->click('.bonus-object')->assertMissing('.bonus-object');
+        $screen->assertVisible('[data-testid="bonus-launch"]')->assertSee('Camille');
+        expect($screen->page()->evaluate('() => getComputedStyle(document.querySelector(".bonus-launch-layer")).pointerEvents'))->toBe('none');
+        if ($reduced) {
+            expect($screen->page()->evaluate('() => [".bonus-launch", ".bonus-launch-projectile"].every(selector => getComputedStyle(document.querySelector(selector)).animationName === "none")'))->toBeTrue();
+        }
+        $screen->screenshot(filename: 'bonus-launch-'.($reduced ? 'reduced' : 'animated'));
+
         $screen->page()->evaluate('() => new Promise(resolve => { const until = Date.now() + 4000; const check = () => window.bonusNotes > 0 || Date.now() >= until ? resolve() : setTimeout(check, 50); check(); })');
         $notes = $screen->page()->evaluate('() => window.bonusNotes');
         expect($notes)->toBeGreaterThanOrEqual(2)->toBeLessThanOrEqual(4);
         $screen->page()->evaluate('() => new Promise(resolve => setTimeout(resolve, 1200))');
         expect($screen->page()->evaluate('() => window.bonusNotes'))->toBe($notes);
+        expect($screen->page()->evaluate('() => window.launchIds.size'))->toBe(1);
+        $screen->refresh()->assertMissing('[data-testid="bonus-launch"]');
         $second->assertPresent('.game-choices button');
         $screen->assertMissing('.bonus-pocket')->assertMissing('.page-deck');
         $first->screenshot(filename: 'bonus-phone');
@@ -82,7 +93,7 @@ it('launches a collective bonus in one click while phone and screen stay inside 
         $pack->delete();
         $tag->delete();
     }
-});
+})->with([false, true]);
 
 it('changes a held drawing stroke at paint activation and expiry without losing previous segments', function () {
     app()->terminating(function () {
