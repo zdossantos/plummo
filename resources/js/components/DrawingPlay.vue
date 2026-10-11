@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Check, Paintbrush, PaintBucket, Eraser } from '@lucide/vue';
 import BonusEffects from '@/components/BonusEffects.vue';
 import { activeBonusEffects } from '@/lib/bonuses';
 import { computed, ref, watch } from 'vue';
@@ -32,6 +33,12 @@ const effectiveColor = computed(() =>
 const guess = ref('');
 const color = ref('#35236b');
 const width = ref(4);
+const tool = ref<'brush' | 'fill' | 'erase'>('brush');
+const tools = [
+    { value: 'brush', icon: Paintbrush },
+    { value: 'fill', icon: PaintBucket },
+    { value: 'erase', icon: Eraser },
+] as const;
 const pending = ref(false);
 const palette = [
     '#35236b',
@@ -72,6 +79,7 @@ watch(
     () => {
         guess.value = '';
         pending.value = false;
+        tool.value = 'brush';
     },
 );
 </script>
@@ -143,6 +151,7 @@ watch(
                         :busy="busy"
                         :color="effectiveColor"
                         :width="width"
+                        :tool="tool"
                         :send="(values) => sendDrawingAction('stroke', values)"
                         @pending="pending = $event"
                     />
@@ -185,21 +194,40 @@ watch(
                 </aside>
             </div>
             <div v-if="editable" class="drawing-tools">
-                <button
-                    v-for="(value, index) in palette"
-                    :key="value"
-                    type="button"
-                    :aria-label="t('drawing_color', { number: index + 1 })"
-                    :aria-pressed="color === value"
-                    :style="{ backgroundColor: value }"
-                    class="size-7 rounded-full border-2"
-                    :class="
-                        color === value
-                            ? 'ring-2 ring-primary ring-offset-2'
-                            : ''
-                    "
-                    @click="color = value"
-                />
+                <div
+                    class="drawing-tool-picker"
+                    :aria-label="t('drawing_tools')"
+                >
+                    <button
+                        v-for="item in tools"
+                        :key="item.value"
+                        type="button"
+                        :data-drawing-tool="item.value"
+                        :aria-pressed="tool === item.value"
+                        :aria-label="t('drawing_tool_' + item.value)"
+                        @click="tool = item.value"
+                    >
+                        <component :is="item.icon" aria-hidden="true" />
+                        <span>{{ t('drawing_tool_' + item.value) }}</span>
+                    </button>
+                </div>
+                <div class="drawing-palette">
+                    <button
+                        v-for="(value, index) in palette"
+                        :key="value"
+                        type="button"
+                        :aria-label="t('drawing_color', { number: index + 1 })"
+                        :aria-pressed="color === value"
+                        :data-drawing-color="value"
+                        :style="{
+                            backgroundColor: value,
+                            color: value === '#35236b' ? '#fff9e6' : '#20132e',
+                        }"
+                        @click="color = value"
+                    >
+                        <Check v-if="color === value" aria-hidden="true" />
+                    </button>
+                </div>
                 <label class="flex items-center gap-2"
                     >{{ t('drawing_width')
                     }}<input

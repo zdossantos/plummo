@@ -325,14 +325,27 @@ class DrawingGame
         abort_unless($values['revision'] === $state['round']['revision'], 409);
         $canvas = $state['round']['canvas'];
         if ($action === 'stroke') {
+            $tool = $values['tool'] ?? 'brush';
+            $spans = $values['spans'] ?? [];
+            if ($tool === 'fill') {
+                abort_unless($values['offset'] === 0, 409);
+                $previous = [-1, 0, 0];
+                foreach ($spans as $span) {
+                    if ($span[2] <= $span[1] || $span[0] < $previous[0] || ($span[0] === $previous[0] && $span[1] < $previous[2])) {
+                        throw ValidationException::withMessages(['spans' => __('rooms.drawing_limit')]);
+                    }
+                    $previous = $span;
+                }
+            }
             $index = $values['id'] - 1;
             abort_unless($index <= count($canvas) && $index >= count($canvas) - 1, 409);
             if ($index === count($canvas)) {
                 abort_unless($values['offset'] === 0, 409);
-                $canvas[] = ['id' => $values['id'], 'color' => app(GameBonuses::class)->paint($game, $values['color']), 'input_color' => $values['color'], 'width' => $values['width'], 'points' => []];
+                $canvas[] = ['id' => $values['id'], 'tool' => $tool, 'spans' => $spans, 'color' => $tool === 'erase' ? '#ffffff' : app(GameBonuses::class)->paint($game, $values['color']), 'input_color' => $values['color'], 'width' => $values['width'], 'points' => []];
             }
             $stroke = $canvas[$index];
             abort_unless(($stroke['input_color'] ?? $stroke['color']) === $values['color'] && $stroke['width'] === $values['width'], 409);
+            abort_unless(($stroke['tool'] ?? 'brush') === $tool && ($stroke['spans'] ?? []) == $spans, 409);
             $offset = $values['offset'];
             if ($offset < count($stroke['points'])) {
                 abort_unless(array_slice($stroke['points'], $offset, count($values['points'])) == $values['points'], 409);
@@ -342,6 +355,9 @@ class DrawingGame
             abort_unless($offset === count($stroke['points']), 409);
             if (array_sum(array_map(fn ($stroke) => count($stroke['points']), $canvas)) + count($values['points']) > 10000) {
                 throw ValidationException::withMessages(['points' => __('rooms.drawing_limit')]);
+            }
+            if (array_sum(array_map(fn ($stroke) => count($stroke['spans'] ?? []), $canvas)) > 20000) {
+                throw ValidationException::withMessages(['spans' => __('rooms.drawing_limit')]);
             }
             $canvas[$index]['points'] = [...$stroke['points'], ...$values['points']];
         } else {

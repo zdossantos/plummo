@@ -2609,3 +2609,95 @@
         animation: none;
     }
 }
+.drawing-tools {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+}
+.drawing-tools > label,
+.drawing-tools > button {
+    grid-column: span 2;
+    min-width: 0;
+}
+.drawing-tool-picker,
+.drawing-palette {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 8px;
+}
+.drawing-tool-picker {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.drawing-palette {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+.drawing-tool-picker button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 4px;
+    height: 38px;
+    font-size: 11px;
+}
+.drawing-tool-picker button[aria-pressed='true'] {
+    background: var(--primary);
+    outline: 2px solid var(--paper);
+    outline-offset: 2px;
+}
+.drawing-tool-picker svg {
+    width: 18px;
+    height: 18px;
+    flex: none;
+}
+.drawing-tools .drawing-palette button {
+    display: grid;
+    place-items: center;
+    height: 30px;
+    padding: 0;
+    border: 2px solid var(--edge);
+    border-radius: 12px;
+    box-shadow: 0 3px 0 var(--edge);
+}
+.drawing-palette button[aria-pressed='true'] {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+.drawing-palette svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 3;
+}
+.viewport-shell[data-compact] .drawing-tool-picker button {
+    height: 30px;
+}
+.viewport-shell[data-compact] .drawing-tools .drawing-palette button {
+    height: 26px;
+}
+@media (max-width: 640px) and (max-height: 650px) {
+    .drawing-tools {
+        gap: 6px;
+    }
+    .viewport-shell .drawing-tools > button {
+        height: 36px;
+        min-height: 36px;
+        padding: 4px 6px;
+        font-size: 11px;
+        line-height: 12px;
+        white-space: normal;
+    }
+    .drawing-tools > label {
+        font-size: 10px;
+        gap: 4px;
+    }
+    .drawing-tools input[type='range'] {
+        width: 50px;
+        min-width: 0;
+    }
+    .drawing-tool-picker button {
+        height: 30px;
+    }
+    .drawing-tools .drawing-palette button {
+        height: 26px;
+    }
+}

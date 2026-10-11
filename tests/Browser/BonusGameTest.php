@@ -120,9 +120,9 @@ it('changes a held drawing stroke at paint activation and expiry without losing 
         $first->page()->evaluate('() => { const board = document.querySelector("[data-testid=drawing-board]"); const r = board.getBoundingClientRect(); board.dispatchEvent(new PointerEvent("pointermove", {pointerId:1,bubbles:true,clientX:r.left+.5*r.width,clientY:r.top+.5*r.height})); }');
         $screen->assertPresent('polyline[stroke="#f05a78"]');
         // Poll until the effect expires, while the same pointer remains held.
-        $first->assertPresent('polyline:nth-of-type(3)[stroke="#35236b"]');
+        $first->assertPresent('[data-tool="brush"]:nth-child(3) polyline[stroke="#35236b"]');
         $first->page()->evaluate('() => { const board = document.querySelector("[data-testid=drawing-board]"); const r = board.getBoundingClientRect(); board.dispatchEvent(new PointerEvent("pointerup", {pointerId:1,bubbles:true,clientX:r.left+.8*r.width,clientY:r.top+.8*r.height})); }');
-        $screen->assertPresent('polyline:nth-of-type(3)[stroke="#35236b"]');
+        $screen->assertPresent('[data-tool="brush"]:nth-child(3) polyline[stroke="#35236b"]');
         expect($game->fresh()->state['round']['canvas'])->toHaveCount(3);
         $first->assertNoJavaScriptErrors();
     } finally {

@@ -70,6 +70,41 @@ it('draws from two separate phones and plays every artist before returning to th
             board.dispatchEvent(new PointerEvent('pointerup', {pointerId:1,bubbles:true,clientX:rect.left+.8*rect.width,clientY:rect.top+.8*rect.height}));
         }
         JS);
+        $first->click('[data-drawing-color="#ffffff"]')->assertAttribute('[data-drawing-color="#ffffff"]', 'aria-pressed', 'true');
+        $first->assertPresent('[data-drawing-color="#ffffff"] svg');
+        $first->click('[data-drawing-color="#35236b"]');
+        $draw = function ($page, array $points): void {
+            $page->page()->evaluate(<<<'JS'
+            (points) => {
+                const board = document.querySelector('[data-testid="drawing-board"]');
+                const rect = board.getBoundingClientRect();
+                const dispatch = (type, [x,y]) => board.dispatchEvent(new PointerEvent(type, {pointerId:2,bubbles:true,clientX:rect.left+x*rect.width,clientY:rect.top+y*rect.height}));
+                dispatch('pointerdown', points[0]);
+                for (const point of points.slice(1)) dispatch('pointermove', point);
+                dispatch('pointerup', points.at(-1));
+            }
+            JS, $points);
+        };
+        $draw($first, [[.2, .2], [.8, .2], [.8, .8], [.2, .8], [.2, .2]]);
+        $screen->assertPresent('[data-tool="brush"]:nth-child(2) polyline');
+        $first->click('[data-drawing-color="#f05a78"]')->click('[data-drawing-tool="fill"]')->assertAttribute('[data-drawing-tool="fill"]', 'aria-pressed', 'true');
+        $draw($first, [[.4, .5]]);
+        $screen->assertPresent('[data-tool="fill"] path[fill="#f05a78"]');
+        expect($screen->page()->evaluate('() => { const box = document.querySelector("[data-tool=fill] path").getBBox(); return box.x >= 200 && box.y >= 120 && box.x + box.width <= 800 && box.y + box.height <= 480; }'))->toBeTrue();
+        $first->click('[data-drawing-tool="erase"]')->assertAttribute('[data-drawing-tool="erase"]', 'aria-pressed', 'true');
+        $draw($first, [[.3, .5], [.7, .5]]);
+        $screen->assertPresent('[data-tool="erase"] polyline[stroke="#ffffff"][stroke-width="12"]');
+        $first->refresh()->assertPresent('[data-tool="fill"] path')->assertPresent('[data-tool="erase"] polyline');
+        $first->click('button:has-text("Undo")');
+        $screen->assertMissing('[data-tool="erase"]')->assertPresent('[data-tool="fill"] path');
+        $first->page()->setViewportSize(320, 568);
+        $first->page()->evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
+        expect($first->page()->evaluate('() => document.documentElement.scrollHeight <= innerHeight && document.documentElement.scrollWidth <= innerWidth'))->toBeTrue();
+        expect($first->page()->evaluate('() => { const rect = document.querySelector("[data-testid=drawing-board]").getBoundingClientRect(); return rect.height >= 120 && rect.top >= 0 && rect.bottom <= innerHeight; }'))->toBeTrue();
+        $first->screenshot(filename: 'drawing-tools-phone');
+        $screen->screenshot(filename: 'drawing-tools-screen');
+        $first->click('button:has-text("Clear")');
+        $screen->assertMissing('[data-testid="drawing-board"] g');
         $second->fill('#drawing-guess', mb_substr($word, 1));
         $second->page()->locator('button:has-text("Guess")')->click(['noWaitAfter' => true]);
         $second->assertSee('Almost!');

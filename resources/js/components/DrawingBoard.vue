@@ -9,12 +9,15 @@ const canvasWidth = computed(() =>
 import { Button } from '@/components/ui/button';
 import { useTranslations } from '@/composables/useTranslations';
 import type { Stroke } from '@/types/rooms';
+import { drawingFill } from '@/lib/drawing-raster';
+import { fillPath } from '@/lib/drawing-fill';
 const props = defineProps<{
     strokes: Stroke[];
     editable?: boolean;
     busy?: boolean;
     color?: string;
     width?: number;
+    tool?: 'brush' | 'fill' | 'erase';
     send?: (values: Record<string, unknown>) => Promise<boolean>;
 }>();
 const emit = defineEmits<{ pending: [value: boolean] }>();
@@ -22,6 +25,7 @@ const { t } = useTranslations('rooms');
 const copy = () => props.strokes.map((s) => ({ ...s, points: [...s.points] }));
 const local = ref<Stroke[]>(copy());
 const failed = ref(false);
+const limited = ref(false);
 let active: number | null = null;
 let current: Stroke | undefined;
 let acknowledged = new Map<number, number>(
@@ -61,6 +65,8 @@ async function flush() {
         points,
         color: stroke.color,
         width: stroke.width,
+        ...(stroke.tool ? { tool: stroke.tool } : {}),
+        ...(stroke.tool === 'fill' ? { spans: stroke.spans } : {}),
     });
     sending = false;
     if (stopped) return;
@@ -86,7 +92,13 @@ watch(
 watch(
     () => props.color,
     (color) => {
-        if (active === null || !current || current.color === color) return;
+        if (
+            active === null ||
+            !current ||
+            current.tool === 'erase' ||
+            current.color === color
+        )
+            return;
         if (local.value.length >= 100) return;
         const last = current.points.at(-1);
         if (!last) return;
@@ -94,10 +106,20 @@ watch(
             id: local.value.length + 1,
             color: color ?? '#35236b',
             width: current.width,
+            tool: current.tool,
             points: [[...last]],
         });
         current = local.value.at(-1);
         schedule();
+    },
+);
+watch(
+    () => props.tool,
+    () => {
+        active = null;
+        current = undefined;
+        emit('pending', pending());
+        if (pending()) schedule();
     },
 );
 watch(
@@ -127,17 +149,34 @@ function down(event: PointerEvent) {
         local.value.reduce((sum, s) => sum + s.points.length, 0) >= 10000
     )
         return;
-    active = event.pointerId;
+    const tool = props.tool ?? 'brush';
+    const seed = point(event);
+    const color = tool === 'erase' ? '#ffffff' : (props.color ?? '#35236b');
+    const spans = tool === 'fill' ? drawingFill(local.value, seed, color) : [];
+    if (tool === 'fill' && !spans.length) return;
+    if (
+        spans.length > 10000 ||
+        local.value.reduce((sum, s) => sum + (s.spans?.length ?? 0), 0) +
+            spans.length >
+            20000
+    ) {
+        limited.value = true;
+        return;
+    }
+    limited.value = false;
+    active = tool === 'fill' ? null : event.pointerId;
     current = {
         id: local.value.length + 1,
-        color: props.color ?? '#35236b',
-        width: props.width ?? 4,
-        points: [point(event)],
+        tool,
+        ...(tool === 'fill' ? { spans } : {}),
+        color,
+        width: (props.width ?? 4) * (tool === 'erase' ? 3 : 1),
+        points: [seed],
     };
     local.value.push(current);
-    current = local.value.at(-1);
+    current = tool === 'fill' ? undefined : local.value.at(-1);
     // Synthetic pointer events in browser tests have no active native pointer.
-    if (event.isTrusted)
+    if (event.isTrusted && active !== null)
         (event.currentTarget as SVGSVGElement).setPointerCapture(
             event.pointerId,
         );
@@ -185,28 +224,38 @@ onUnmounted(() => {
                 @pointerup="up"
                 @pointercancel="up"
             >
-                <polyline
+                <g
                     v-for="stroke in local"
                     :key="stroke.id"
-                    :points="
-                        stroke.points
-                            .map(([x, y]) => `${x * 1000},${y * 600}`)
-                            .join(' ')
-                    "
-                    :stroke="stroke.color"
-                    :stroke-width="stroke.width"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    fill="none"
-                />
-                <circle
-                    v-for="stroke in local.filter((s) => s.points.length === 1)"
-                    :key="`dot-${stroke.id}`"
-                    :cx="stroke.points[0][0] * 1000"
-                    :cy="stroke.points[0][1] * 600"
-                    :r="stroke.width / 2"
-                    :fill="stroke.color"
-                />
+                    :data-tool="stroke.tool ?? 'brush'"
+                >
+                    <path
+                        v-if="stroke.tool === 'fill'"
+                        :d="fillPath(stroke.spans ?? [])"
+                        :fill="stroke.color"
+                    />
+                    <template v-else>
+                        <polyline
+                            :points="
+                                stroke.points
+                                    .map(([x, y]) => `${x * 1000},${y * 600}`)
+                                    .join(' ')
+                            "
+                            :stroke="stroke.color"
+                            :stroke-width="stroke.width"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            fill="none"
+                        />
+                        <circle
+                            v-if="stroke.points.length === 1"
+                            :cx="stroke.points[0][0] * 1000"
+                            :cy="stroke.points[0][1] * 600"
+                            :r="stroke.width / 2"
+                            :fill="stroke.color"
+                        />
+                    </template>
+                </g>
             </svg>
         </div>
         <p v-if="failed" class="mt-3" role="alert">
@@ -224,7 +273,8 @@ onUnmounted(() => {
         <p
             v-if="
                 editable &&
-                (local.length >= 100 ||
+                (limited ||
+                    local.length >= 100 ||
                     local.reduce((sum, s) => sum + s.points.length, 0) >= 10000)
             "
             class="mt-3"

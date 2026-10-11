@@ -235,4 +235,8 @@ return [
     'sound_off' => 'Couper le son',
     'sound_volume' => 'Volume',
     'drawing_found' => 'Trouvé !',
+    'drawing_tools' => 'Outils de dessin',
+    'drawing_tool_brush' => 'Pinceau',
+    'drawing_tool_fill' => 'Seau',
+    'drawing_tool_erase' => 'Gomme',
 ];
