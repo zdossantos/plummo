@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { provide, ref } from 'vue';
 import ScreenSound from '@/components/ScreenSound.vue';
+import BonusLaunch from '@/components/BonusLaunch.vue';
 import { soundSettings } from '@/lib/soundscape';
 import { Head } from '@inertiajs/vue3';
 import PlayerDock from '@/components/PlayerDock.vue';
@@ -48,6 +49,13 @@ const { t } = useTranslations('rooms');
         display-only
     >
         <RoomNotice :message="error" />
+        <BonusLaunch
+            :game="game"
+            :room="room"
+            :server-now="serverNow"
+            :connected="connected"
+            :closed="closed"
+        />
         <template #header
             ><span class="screen-session"
                 ><span class="font-bold text-primary">{{ room?.code }}</span
