@@ -72,6 +72,7 @@ it('shows a long phrase during presentation and voting using the available space
         $state['phase'] = 'voting';
         app(GameEngine::class)->save($game, ['state' => $state]);
         $page->refresh()->assertSee('Vote for your favourite sentence');
+        $page->page()->evaluate('() => document.fonts.ready');
         if ($phone) {
             $page->assertPresent('.text-reader-trigger');
             expect($page->page()->evaluate('() => Array.from(document.querySelectorAll(".choice-face > .text-summary")).every(e => getComputedStyle(e).webkitLineClamp === "none")'))->toBeTrue();
