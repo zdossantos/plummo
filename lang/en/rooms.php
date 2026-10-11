@@ -74,6 +74,8 @@ return [
     'return' => 'Return to the room',
     'welcome_back' => 'Welcome back!',
     'score' => 'Points',
+    'points_earned' => 'Nice work!',
+    'points_gain' => '+{count} points',
     'waiting_chief' => 'The leader is preparing what’s next on their phone.',
     'chief_hint' => 'You are the room leader. You can pass the role to another player.',
     'games_soon' => 'Mini-games are coming in the next step.',

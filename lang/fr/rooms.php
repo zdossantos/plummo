@@ -74,6 +74,8 @@ return [
     'return' => 'Revenir dans le salon',
     'welcome_back' => 'Bon retour !',
     'score' => 'Points',
+    'points_earned' => 'Bien joué !',
+    'points_gain' => '+{count} points',
     'waiting_chief' => 'Le chef prépare la suite sur son téléphone.',
     'chief_hint' => 'Tu es chef de partie. Tu peux transmettre ton rôle à un autre joueur.',
     'games_soon' => 'Les mini-jeux arrivent dans la prochaine étape.',

@@ -14,6 +14,7 @@ import RoomRanking from '@/components/RoomRanking.vue';
 import ViewportShell from '@/components/ViewportShell.vue';
 import GameControls from '@/components/GameControls.vue';
 import RoomNotice from '@/components/RoomNotice.vue';
+import PhonePointsFeedback from '@/components/PhonePointsFeedback.vue';
 import { useRoom } from '@/composables/useRoom';
 import { useTranslations } from '@/composables/useTranslations';
 import type { Catalog, Player } from '@/types/rooms';
@@ -110,6 +111,11 @@ watch(chief, (value) => {
     <Head :title="t('join_title')" />
     <ViewportShell>
         <RoomNotice :message="error" />
+        <PhonePointsFeedback
+            v-if="me && !closed && !editing"
+            :game="game"
+            :connected="connected"
+        />
         <section v-if="closed" class="game-panel justify-center text-center">
             <h1>{{ t('closed') }}</h1>
             <Link href="/join">{{ t('back') }}</Link>

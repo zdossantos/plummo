@@ -36,8 +36,11 @@ it('plays a quiz with a shared screen and two separate phones then returns to th
         $second->page()->locator('.game-choices button:has-text("BB")')->click(['noWaitAfter' => true]);
         $second->assertSee('0 points for this question');
         $first->assertSee('100 points for this question');
+        $first->assertVisible('[data-testid="phone-points-gain"]')->assertSee('+100 points');
+        $second->assertMissing('[data-testid="phone-points-gain"]');
         $screen->assertSee('Mini-game leaderboard')->assertSee('Well done, Camille!')->assertSee('Session target reached')->assertVisible('[data-testid="screen-header-qr"]');
         $first->assertSee('Mini-game leaderboard')->assertPresent('.podium')->assertMissing('.page-deck');
+        $first->refresh()->assertSee('Mini-game leaderboard')->assertMissing('[data-testid="phone-points-gain"]');
         $first->page()->locator('button:has-text("Back to lobby")')->click(['noWaitAfter' => true]);
         $first->click('button[aria-label="Controls"]')->click('Session')->assertSee('The session')->assertDontSee('Prepare a quiz');
         $screen->assertSee('Everyone plays.')->assertSee('Camille')->assertSee('100 Points');
