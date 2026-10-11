@@ -151,7 +151,7 @@
     box-shadow: 0 3px 0 var(--edge);
     animation: token-arrive 0.3s ease-out;
 }
-.bonus-effect-token svg {
+.bonus-effect-token .bonus-icon {
     width: 17px;
     height: 17px;
     flex: none;
@@ -191,7 +191,7 @@
     pointer-events: none;
     color: var(--primary);
 }
-.bonus-strike-sign svg {
+.bonus-strike-sign .bonus-icon {
     width: 28px;
     height: 28px;
     animation: carry-away 1s infinite alternate;
@@ -407,7 +407,7 @@
         height: 36px;
         border-radius: 12px;
     }
-    body .bonus-launch-projectile svg {
+    body .bonus-launch-projectile .bonus-icon {
         width: 24px;
         height: 24px;
     }
@@ -426,7 +426,7 @@
     .bonus-bubble-pop,
     .bonus-effect-token,
     .bonus-carried-away,
-    .bonus-strike-sign svg,
+    .bonus-strike-sign .bonus-icon,
     .bonus-launch .bonus-launch-projectile {
         animation: none;
     }

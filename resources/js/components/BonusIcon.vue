@@ -1,85 +1,13 @@
 <script setup lang="ts">
-import {
-    Zap,
-    Dices,
-    Ghost,
-    EyeOff,
-    MessageCircle,
-    Wind,
-    Stamp,
-    PaintBucket,
-    Shield,
-    SoapDispenserDroplet,
-    Undo2,
-    Gift,
-    WashingMachine,
-    LockKeyhole,
-    Package,
-    Bubbles,
-    Camera,
-    Vibrate,
-    Footprints,
-    Hourglass,
-    Snowflake,
-    PlugZap,
-    Watch,
-    AlarmClock,
-    TimerReset,
-    ClockArrowUp,
-    ClockFading,
-    Languages,
-    Megaphone,
-    Disc3,
-    FastForward,
-    MicVocal,
-    Cookie,
-    ArrowDownUp,
-    PanelsTopLeft,
-    Paintbrush,
-    FlipHorizontal2,
-    Spline,
-} from '@lucide/vue';
 import type { BonusKind } from '@/types/rooms';
 defineProps<{ kind: BonusKind }>();
-const icons = {
-    bolt: Zap,
-    dice: Dices,
-    squatter: Ghost,
-    artist: EyeOff,
-    accent: MessageCircle,
-    sneeze: Wind,
-    stamp: Stamp,
-    paint: PaintBucket,
-    shield: Shield,
-    soap: SoapDispenserDroplet,
-    boomerang: Undo2,
-    pinata: Gift,
-    washer: WashingMachine,
-    lock: LockKeyhole,
-    mystery: Package,
-    bubbles: Bubbles,
-    photobomb: Camera,
-    jelly: Vibrate,
-    strike: Footprints,
-    leak: Hourglass,
-    freeze: Snowflake,
-    extension: PlugZap,
-    watch: Watch,
-    overtime: ClockArrowUp,
-    last_breath: TimerReset,
-    alarm: AlarmClock,
-    borrow: ClockFading,
-    translator: Languages,
-    advert: Megaphone,
-    scratch: Disc3,
-    speed: FastForward,
-    singer: MicVocal,
-    missing_word: Cookie,
-    alphabet: ArrowDownUp,
-    curtain: PanelsTopLeft,
-    giant: Paintbrush,
-    mirror: FlipHorizontal2,
-    clumsy: Spline,
-};
 </script>
-<template><component :is="icons[kind]" aria-hidden="true" /></template>
+<template>
+    <img
+        :src="`/bonuses/${kind}.svg`"
+        class="bonus-icon"
+        alt=""
+        aria-hidden="true"
+        draggable="false"
+    />
+</template>

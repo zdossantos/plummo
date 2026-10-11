@@ -255,3 +255,19 @@ it('keeps freeze badges aligned and preserves effects while waiting for an absen
     expect($resumed['bonuses']['clock']['frozenUntil'])->toBe((float) now()->format('U.u') + 6);
     expect(collect($resumed['bonuses']['effects'])->firstWhere('kind', 'freeze')['expiresAt'])->toBe($resumed['bonuses']['clock']['frozenUntil']);
 })->group('bonuses');
+
+it('ignores departed and excluded scores when granting catchup objects and keeps weights private', function () {
+    [$room, $members, $game] = bonusQuiz(true, 3);
+    $state = $game->state;
+    $state['scores'] = [$members[0][0] => 100, $members[1][0] => 100, $members[2][0] => 1000, 999999 => 2000];
+    $state['excluded'] = [$members[2][0]];
+    $state['bonuses']['inventory'] = [];
+    $state['bonuses']['pending'] = [];
+    $game->update(['state' => $state]);
+    $next = app(GameBonuses::class)->transition($game, [...$state, 'number' => 2], 'active');
+    foreach ([$members[0][0], $members[1][0]] as $id) {
+        expect($next['bonuses']['inventory'][$id])->toHaveCount(1);
+        expect(array_keys($next['bonuses']['inventory'][$id][0]))->toBe(['id', 'kind']);
+    }
+    expect($next['bonuses']['inventory'])->not->toHaveKeys([$members[2][0], 999999]);
+});

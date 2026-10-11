@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'bonus_category_helpful' => 'Boost',
+    'bonus_category_prank' => 'Prank',
     'bonus_new' => 'New',
     'bonus_replace_title' => 'A new object!',
     'bonus_replace_hint' => '{name} arrived. Which object would you like to replace?',

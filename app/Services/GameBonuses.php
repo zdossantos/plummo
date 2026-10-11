@@ -30,12 +30,13 @@ class GameBonuses
             $bonus['used'] = [];
             $bonus['effects'] = [];
             $bonus['defenses'] = [];
-            $best = max([0, ...array_values($state['scores'] ?? [])]);
-            foreach ($state['round']['participants'] as $id) {
+            $scores = $this->participantScores($state);
+            $best = max([0, ...array_values($scores)]);
+            foreach (array_keys($scores) as $id) {
                 $bonus['inventory'][$id] ??= [];
-                $this->give($bonus, $id, $game->type);
+                $this->give($bonus, $id, $game->type, $scores);
                 if (($state['scores'][$id] ?? 0) < $best) {
-                    $this->give($bonus, $id, $game->type);
+                    $this->give($bonus, $id, $game->type, $scores);
                 }
             }
         }
@@ -75,20 +76,34 @@ class GameBonuses
         return $state;
     }
 
-    /** @param array<string, mixed> $bonus */
-    private function give(array &$bonus, int $id, string $type): void
+    /** @param array<string, mixed> $bonus
+     * @param  array<int, int>  $scores
+     */
+    private function give(array &$bonus, int $id, string $type, array $scores): void
     {
         if (isset($bonus['pending'][$id])) {
             return;
         }
-        $kinds = $this->kinds($type);
-        $item = ['id' => (string) Str::uuid(), 'kind' => $kinds[random_int(0, count($kinds) - 1)]];
+        $item = ['id' => (string) Str::uuid(), 'kind' => app(BonusDistribution::class)->choose($type, $id, $scores)];
         if (count($bonus['inventory'][$id]) < 2) {
             $bonus['inventory'][$id][] = $item;
         } else {
             $bonus['pending'][$id] = $item;
         }
         $bonus['receipts'][] = [...$item, 'recipientId' => $id, 'at' => app(GameEngine::class)->time()];
+    }
+
+    /** @param array<string, mixed> $state
+     * @return array<int, int>
+     */
+    private function participantScores(array $state): array
+    {
+        $scores = [];
+        foreach (array_diff($state['round']['participants'], $state['excluded'] ?? []) as $id) {
+            $scores[$id] = (int) ($state['scores'][$id] ?? 0);
+        }
+
+        return $scores;
     }
 
     public function use(Room $room, RoomPlayer $player, int $gameId, int $round, string $itemId): void
@@ -130,7 +145,7 @@ class GameBonuses
             $bonus['effects'] = array_values(array_filter($bonus['effects'], fn ($effect) => $effect['target'] !== $player->id || $catalog->defense($effect['kind'])));
         } elseif ($kind === 'pinata') {
             foreach ([$player->id, ...$targets] as $id) {
-                $this->give($bonus, $id, $game->type);
+                $this->give($bonus, $id, $game->type, $this->participantScores($state));
             }
         } elseif ($catalog->defense($kind)) {
             $this->effect($bonus, $kind, $player->id, $player->id, $duration);
@@ -154,8 +169,7 @@ class GameBonuses
                 }
                 if ($kind === 'washer') {
                     foreach ($bonus['inventory'][$recipient] ?? [] as $index => $item) {
-                        $kinds = array_values(array_diff($this->kinds($game->type), [$item['kind']]));
-                        $new = ['id' => (string) Str::uuid(), 'kind' => $kinds[random_int(0, count($kinds) - 1)]];
+                        $new = ['id' => (string) Str::uuid(), 'kind' => app(BonusDistribution::class)->choose($game->type, $recipient, $this->participantScores($state), $item['kind'])];
                         $bonus['inventory'][$recipient][$index] = $new;
                         $bonus['receipts'][] = [...$new, 'recipientId' => $recipient, 'at' => $now];
                     }
