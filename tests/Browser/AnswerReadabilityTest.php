@@ -11,7 +11,7 @@ it('uses the available answer height for long text and keeps the TV question pro
         app('session.store')->flush();
     });
     test()->withVite();
-    $screen = visit('/', ['viewport' => compact('width', 'height')])->withLocale('en-US')->assertSee('Everyone plays.');
+    $screen = visit('/host', ['viewport' => compact('width', 'height')])->withLocale('en-US')->assertSee('Everyone plays.');
     $room = Room::latest('id')->firstOrFail();
     $pack = Pack::findOrFail(quizPack());
     $tag = $pack->tags()->sole();
@@ -49,7 +49,7 @@ it('shows a long phrase during presentation and voting using the available space
         app('session.store')->flush();
     });
     test()->withVite();
-    $screen = visit('/', ['viewport' => compact('width', 'height')])->withLocale('en-US')->assertSee('Everyone plays.');
+    $screen = visit('/host', ['viewport' => compact('width', 'height')])->withLocale('en-US')->assertSee('Everyone plays.');
     $room = Room::latest('id')->firstOrFail();
     $pack = Pack::findOrFail(phrasePack());
     $tag = $pack->tags()->sole();
