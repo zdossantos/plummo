@@ -30,6 +30,9 @@ class GameEngine
         if ($settings['type'] === 'phrase') {
             return app(PhraseGame::class)->start($room, $settings);
         }
+        if ($settings['type'] === 'mini_games') {
+            return app(MiniGames::class)->start($room, $settings);
+        }
         $counts = app(RoomContentCatalog::class)->availability($room, ContentType::from($settings['type'] ?? 'quiz'), $settings['packs']);
         if (($settings['allow_repeats'] ?? false) ? $counts['total'] < 1 : $counts['unseen'] < $settings['rounds']) {
             throw ValidationException::withMessages(['packs' => __('rooms.contents_exhausted')]);
@@ -135,6 +138,9 @@ class GameEngine
         if ($game->type === 'phrase') {
             return app(PhraseGame::class)->tick($room, $game);
         }
+        if ($game->type === 'mini_games') {
+            return app(MiniGames::class)->tick($room, $game);
+        }
         if ($state['phase'] === 'answer') {
             $waiting = $room->players()->get()->filter(fn (RoomPlayer $player) => $this->eligible($player, $state) && ! isset($state['round']['answers'][$player->id]));
             if ($state['deadline'] <= $this->time() || $waiting->isEmpty()) {
@@ -193,6 +199,11 @@ class GameEngine
     {
         $current = $this->active($room);
         abort_unless($current !== null && $current->id === $gameId && $current->state['number'] === $roundNumber, 409);
+        if ($current->type === 'mini_games') {
+            app(MiniGames::class)->answer($room, $player, $gameId, $roundNumber, $choice);
+
+            return;
+        }
         $game = $this->tick($room);
         abort_unless($game !== null && $game->id === $gameId && $game->state['number'] === $roundNumber && $game->state['phase'] === 'answer', 409);
         abort_unless(in_array($game->type, ['quiz', 'blind_test'], true), 409);
@@ -284,6 +295,9 @@ class GameEngine
         $state = $game->state;
         if ($game->type === 'phrase') {
             return [...app(PhraseGame::class)->view($room, $game, $me), 'bonuses' => app(GameBonuses::class)->view($game, $me, $screen)];
+        }
+        if ($game->type === 'mini_games') {
+            return [...app(MiniGames::class)->view($room, $game, $me, $screen), 'bonuses' => app(GameBonuses::class)->view($game, $me, $screen)];
         }
         $round = $state['round'];
         $revealed = $state['phase'] === 'reveal' || $state['phase'] === 'results' || ($state['previous_phase'] === 'reveal' && in_array($state['phase'], ['paused', 'resuming'], true));

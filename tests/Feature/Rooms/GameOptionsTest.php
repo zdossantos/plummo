@@ -11,7 +11,7 @@ it('offers only packs matching the game and games matching connected player coun
     $quiz = quizPack();
     $drawing = drawingPack();
     phrasePack();
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/game-options', ['type' => 'quiz'])->assertOk()->assertJsonCount(1, 'packs')->assertJsonPath('packs.0.id', $quiz)->assertJsonPath('games', ['quiz', 'blind_test']);
+    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/game-options', ['type' => 'quiz'])->assertOk()->assertJsonCount(1, 'packs')->assertJsonPath('packs.0.id', $quiz)->assertJsonPath('games', ['quiz', 'blind_test', 'mini_games']);
     enterRoom($room, 'Alex');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/game-options', ['type' => 'drawing'])->assertOk()->assertJsonCount(1, 'packs')->assertJsonPath('packs.0.id', $drawing)->assertJsonPath('games', ['quiz', 'blind_test', 'drawing']);
+    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/game-options', ['type' => 'drawing'])->assertOk()->assertJsonCount(1, 'packs')->assertJsonPath('packs.0.id', $drawing)->assertJsonPath('games', ['quiz', 'blind_test', 'drawing', 'mini_games']);
 });

@@ -40,7 +40,7 @@ class GameBonuses
                 }
             }
         }
-        if ($status === 'active' && $state['phase'] === app(BonusCatalog::class)->phase($game->type) && (($state['number'] ?? 0) > ($old['number'] ?? 0) || ($old['phase'] ?? '') === 'selecting')) {
+        if ($status === 'active' && $state['phase'] === app(BonusCatalog::class)->phase($game->type) && (($state['number'] ?? 0) > ($old['number'] ?? 0) || (($old['phase'] ?? '') === 'selecting' || ($game->type === 'mini_games' && in_array($old['phase'] ?? '', ['observing', 'writing'], true))))) {
             $state = app(BonusClock::class)->start($game, $state, $bonus);
         }
         $now = app(GameEngine::class)->time();

@@ -42,6 +42,7 @@ Route::prefix('rooms/{code}')->middleware('throttle:900,1')->group(function (): 
     Route::post('game-options', [GameController::class, 'options']);
     Route::post('bonuses', [BonusController::class, 'store']);
     Route::post('bonuses/replace', [BonusController::class, 'replace']);
+    Route::post('mini-write', [GameController::class, 'miniWrite']);
     Route::post('answer', [GameController::class, 'answer']);
     Route::post('game/{action}', [GameController::class, 'control']);
     Route::get('qr', [RoomController::class, 'qr'])->name('rooms.qr');

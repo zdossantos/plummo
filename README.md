@@ -137,3 +137,7 @@ Sur téléphone, chaque nouveau gain validé par le serveur apparaît pendant 2,
 Le dessinateur dispose d’un pinceau, d’un seau qui remplit la zone contiguë touchée et d’une gomme locale trois fois plus large que le pinceau. La coche de la palette indique la couleur sélectionnée. Les opérations gardent leur ordre sur téléphone et TV ; annuler retire la dernière opération, remplissage compris. Les remplissages sont bornés à une grille de 500×300, à 10 000 segments par zone et 20 000 segments par dessin. Le malus peinture colore le pinceau et le seau, tandis que la gomme continue d’effacer.
 
 Chaque lancement de bonus/malus affiche brièvement sur la TV le Plummo de son auteur et l’objet lancé. Le retour visuel ne bloque pas les commandes et utilise les signatures sonores existantes, selon les réglages audio. Les événements déjà affichés ou restaurés après reconnexion/rechargement ne sont pas rejoués ; les mouvements réduits gardent une annonce statique.
+
+## Mini jeux
+
+Le chef choisit « Mini jeux » puis les épreuves dans le drawer qui remplace les packs. Toutes les épreuves compatibles sont cochées par défaut : mémoire, cache-cache, comptage et gobelets dès un joueur ; Qui a écrit ça ? dès trois joueurs. Aucun import n'est nécessaire. Les scènes sont générées sur le serveur et affichées sur la TV, avec des commandes de réponse sur téléphone. Le mode utilise les scores, les pauses, les résultats et les bonus compatibles existants. Voir les [règles métier](docs/metier-plummo.md).

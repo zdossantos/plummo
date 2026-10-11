@@ -40,6 +40,10 @@ class RoomChat
             };
         }
 
+        if ($game['type'] === 'mini_games' && $game['phase'] === 'writing') {
+            return $me['submitted'];
+        }
+
         return $me['answered'];
     }
 

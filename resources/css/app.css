@@ -2897,3 +2897,294 @@
         height: 54px;
     }
 }
+
+/* Mini games share the world itself: no extra panel around the stage. */
+.mini-trial-list {
+    display: grid;
+    gap: 8px;
+    min-height: 0;
+}
+.mini-trial-list label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 8px 12px;
+    border: 2px solid var(--edge);
+    border-radius: 14px;
+    background: var(--paper);
+    color: var(--ink);
+    font-weight: 700;
+}
+.mini-trial-list label:has(input:checked) {
+    background: var(--mint);
+}
+.mini-trial-list svg {
+    width: 20px;
+    height: 20px;
+    flex: none;
+}
+.mini-play {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.mini-question {
+    flex: none;
+    font-size: clamp(24px, 3.2vw, 54px);
+    line-height: 1.15;
+    text-align: center;
+    text-wrap: balance;
+}
+.mini-stage {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    container-type: size;
+}
+.mini-cast {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: center;
+    gap: 12px;
+}
+.mini-cast-member {
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+.mini-cast-member svg {
+    width: min(90%, 62cqh);
+    max-height: 78%;
+}
+.mini-number {
+    display: grid;
+    place-items: center;
+    width: clamp(28px, 5cqh, 58px);
+    height: clamp(28px, 5cqh, 58px);
+    background: var(--paper);
+    border: 3px solid var(--edge);
+    border-radius: 50%;
+    color: var(--ink);
+    font:
+        600 clamp(16px, 3cqh, 32px) / 1 Fredoka,
+        sans-serif;
+    box-shadow: 0 4px 0 var(--edge);
+}
+.mini-crowd {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+}
+.mini-crowd .mini-cast-member svg {
+    width: min(75%, 22cqh);
+    max-height: 76%;
+}
+.mini-found .mini-number {
+    background: var(--mint);
+    outline: 5px solid var(--mint);
+    outline-offset: 4px;
+}
+.mini-cup-stage,
+.mini-house-stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    isolation: isolate;
+}
+.mini-cup-floor {
+    position: absolute;
+    left: 5%;
+    right: 5%;
+    top: 65%;
+    height: 16%;
+    border-radius: 50%;
+    background: var(--secondary-surface, #4b365f);
+    opacity: 0.7;
+}
+.mini-cup {
+    position: absolute;
+    width: min(22cqw, 38cqh);
+    height: min(25cqw, 42cqh);
+    transform: translate(-50%, -35%);
+    will-change: left, top;
+}
+.mini-cup > svg:not(.mini-cup-plummo) {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+.mini-cup .mini-cup-plummo {
+    position: absolute;
+    width: 65%;
+    left: 18%;
+    bottom: 0;
+}
+.mini-cup-slot {
+    position: absolute;
+    top: 85%;
+    transform: translateX(-50%);
+}
+.mini-house-path {
+    position: absolute;
+    left: 2%;
+    right: 6%;
+    top: 85%;
+    height: 4px;
+    background: var(--muted-foreground);
+    opacity: 0.4;
+}
+.mini-house {
+    position: absolute;
+    height: 82%;
+    width: 46%;
+    right: 2%;
+    bottom: 12%;
+    z-index: 1;
+}
+.mini-house-actor {
+    position: absolute;
+    bottom: 14%;
+    width: min(18cqw, 29cqh);
+    transform: translateX(-50%);
+    z-index: 2;
+}
+.mini-house-residents {
+    position: absolute;
+    left: 0;
+    right: 52%;
+    top: 0;
+    bottom: 12%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-content: center;
+    gap: 4px;
+}
+.mini-house-residents svg {
+    width: 100%;
+}
+.mini-watching {
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+    font-size: clamp(20px, 3vw, 36px);
+    font-weight: 600;
+}
+.mini-watching > svg {
+    width: min(36vw, 180px);
+    max-height: 24dvh;
+}
+.mini-watching > svg:first-child:not([data-plummo-key]) {
+    width: 56px;
+    height: 56px;
+    color: var(--primary);
+}
+.mini-secret {
+    font-family: Fredoka, sans-serif;
+    font-weight: 600;
+    font-size: clamp(24px, 3vw, 48px);
+    line-height: 1.2;
+    text-align: center;
+    overflow-wrap: anywhere;
+    padding: 16px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 3px solid var(--edge);
+    border-radius: 18px;
+    box-shadow: 0 6px 0 var(--edge);
+}
+.mini-writing {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: auto 0;
+}
+.mini-writing label {
+    font-weight: 700;
+}
+.mini-result {
+    text-align: center;
+    font-size: clamp(18px, 2.5vw, 32px);
+    font-weight: 700;
+    color: var(--mint);
+}
+.mini-choices.mini-many {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.mini-choices.mini-numbers .choice-face {
+    font-family: Fredoka, sans-serif;
+    font-size: clamp(24px, 4vw, 52px);
+}
+.mini-phone .mini-question {
+    font-size: clamp(20px, 5.6vw, 28px);
+    text-align: left;
+}
+.mini-phone .mini-secret {
+    font-size: 22px;
+    padding: 10px;
+}
+.mini-phone .mini-result {
+    font-size: 16px;
+}
+.mini-phone .mini-choices {
+    gap: 10px;
+    margin-bottom: 6px;
+}
+.mini-phone .mini-many:not(.mini-numbers) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (max-height: 500px) {
+    .mini-play {
+        gap: 6px;
+    }
+    .mini-question {
+        font-size: 22px;
+    }
+    .mini-secret {
+        padding: 6px;
+        font-size: 20px;
+    }
+    .mini-trial-list {
+        gap: 4px;
+    }
+    .mini-trial-list label {
+        min-height: 36px;
+        padding: 4px 10px;
+    }
+    .mini-phone .mini-question {
+        font-size: 18px;
+    }
+    .mini-phone .mini-many:not(.mini-numbers) {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+.mini-author-number {
+    color: var(--primary);
+    font-weight: 700;
+}
+.mini-author-roster {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.mini-author-roster > div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.mini-author-roster svg {
+    width: 58px;
+}
