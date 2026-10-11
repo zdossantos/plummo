@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch, onUnmounted } from 'vue';
-import { Brain, Music, Pencil, MessageSquare, Check } from '@lucide/vue';
+import {
+    Brain,
+    Music,
+    Pencil,
+    MessageSquare,
+    Check,
+    Shapes,
+} from '@lucide/vue';
 import PagedList from '@/components/PagedList.vue';
 import TextReader from '@/components/TextReader.vue';
 import { useMediaQuery } from '@vueuse/core';
@@ -12,6 +19,7 @@ import {
     DrawerClose,
 } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
+import type { MiniTrial } from '@/types/rooms';
 import { useTranslations } from '@/composables/useTranslations';
 const props = defineProps<{
     code: string;
@@ -20,7 +28,7 @@ const props = defineProps<{
     playerCount?: number;
     audioReady?: boolean;
     initialPacks?: number[];
-    initialType?: 'quiz' | 'blind_test' | 'drawing' | 'phrase';
+    initialType?: 'quiz' | 'blind_test' | 'drawing' | 'phrase' | 'mini_games';
 }>();
 const emit = defineEmits<{ start: [settings: object] }>();
 const { t } = useTranslations('rooms');
@@ -30,6 +38,7 @@ const games = [
     { type: 'quiz', label: 'quiz_name', icon: Brain },
     { type: 'blind_test', label: 'blind_name', icon: Music },
     { type: 'drawing', label: 'drawing_short', icon: Pencil },
+    { type: 'mini_games', label: 'mini_name', icon: Shapes },
     { type: 'phrase', label: 'phrase_short', icon: MessageSquare },
 ] as const;
 const gameLabel = computed(() =>
@@ -44,13 +53,32 @@ const packSummary = computed(() =>
             : t('packs_selected', { count: selected.value.length })
         : t('packs_all'),
 );
+const trials = [
+    { id: 'memory', label: 'mini_memory', icon: Brain },
+    { id: 'hide', label: 'mini_hide', icon: Shapes },
+    { id: 'count', label: 'mini_count_name', icon: Check },
+    { id: 'cups', label: 'mini_cups', icon: Shapes },
+    { id: 'author', label: 'mini_author', icon: MessageSquare },
+] as const;
+const selectedTrials = ref<MiniTrial[]>(trials.map((trial) => trial.id));
+const playableTrials = computed(() =>
+    trials.filter(
+        (trial) => trial.id !== 'author' || connectedPlayers.value >= 3,
+    ),
+);
+const activeTrials = computed(() =>
+    selectedTrials.value.filter((id) =>
+        playableTrials.value.some((trial) => trial.id === id),
+    ),
+);
 const packs = ref<{ id: number; name: string }[]>([]);
 const selected = ref<number[]>(props.initialPacks ?? []);
 const availability = ref<{ total: number; unseen: number } | null>(null);
-const gameType = ref<'quiz' | 'blind_test' | 'drawing' | 'phrase'>(
-    props.initialType ?? 'quiz',
-);
+const gameType = ref<
+    'quiz' | 'blind_test' | 'drawing' | 'phrase' | 'mini_games'
+>(props.initialType ?? 'quiz');
 const settings = ref({
+    mini_games: { rounds: 10, duration: 20 },
     quiz: { rounds: 10, duration: 30 },
     blind_test: { rounds: 10, duration: 30 },
     drawing: { rounds: 1, duration: 90 },
@@ -80,37 +108,45 @@ const playableGames = computed(() =>
     ),
 );
 const labels = computed(() =>
-    gameType.value === 'phrase'
+    gameType.value === 'mini_games'
         ? {
-              launch: 'launch_phrase',
-              available: 'available_phrases',
-              count: 'phrase_tours',
-              duration: 'phrase_duration',
-              start: 'start_phrase',
+              launch: 'launch_mini',
+              available: 'mini_selected',
+              count: 'mini_count',
+              duration: 'mini_duration',
+              start: 'start_mini',
           }
-        : gameType.value === 'drawing'
+        : gameType.value === 'phrase'
           ? {
-                launch: 'launch_drawing',
-                available: 'available_words',
-                count: 'drawing_tours',
-                duration: 'drawing_duration',
-                start: 'start_drawing',
+                launch: 'launch_phrase',
+                available: 'available_phrases',
+                count: 'phrase_tours',
+                duration: 'phrase_duration',
+                start: 'start_phrase',
             }
-          : gameType.value === 'quiz'
+          : gameType.value === 'drawing'
             ? {
-                  launch: 'launch_quiz',
-                  available: 'available_questions',
-                  count: 'question_count',
-                  duration: 'answer_duration',
-                  start: 'start_game',
+                  launch: 'launch_drawing',
+                  available: 'available_words',
+                  count: 'drawing_tours',
+                  duration: 'drawing_duration',
+                  start: 'start_drawing',
               }
-            : {
-                  launch: 'launch_blind',
-                  available: 'available_clips',
-                  count: 'clip_count',
-                  duration: 'clip_duration',
-                  start: 'start_blind',
-              },
+            : gameType.value === 'quiz'
+              ? {
+                    launch: 'launch_quiz',
+                    available: 'available_questions',
+                    count: 'question_count',
+                    duration: 'answer_duration',
+                    start: 'start_game',
+                }
+              : {
+                    launch: 'launch_blind',
+                    available: 'available_clips',
+                    count: 'clip_count',
+                    duration: 'clip_duration',
+                    start: 'start_blind',
+                },
 );
 const required = computed(() =>
     gameType.value === 'drawing'
@@ -133,20 +169,22 @@ const count = computed(
             ? availability.value?.total
             : availability.value?.unseen) ?? 0,
 );
-const valid = computed(
-    () =>
-        !!availability.value &&
-        (gameType.value !== 'blind_test' || (distinctSongs.value ?? 0) >= 8) &&
-        (gameType.value !== 'drawing' ||
-            props.recover ||
-            connectedPlayers.value >= 2) &&
-        (gameType.value !== 'phrase' ||
-            props.recover ||
-            connectedPlayers.value >= 3) &&
-        count.value >= required.value &&
-        (gameType.value !== 'blind_test' ||
-            props.recover ||
-            props.audioReady === true),
+const valid = computed(() =>
+    gameType.value === 'mini_games'
+        ? connectedPlayers.value >= 1 && activeTrials.value.length > 0
+        : !!availability.value &&
+          (gameType.value !== 'blind_test' ||
+              (distinctSongs.value ?? 0) >= 8) &&
+          (gameType.value !== 'drawing' ||
+              props.recover ||
+              connectedPlayers.value >= 2) &&
+          (gameType.value !== 'phrase' ||
+              props.recover ||
+              connectedPlayers.value >= 3) &&
+          count.value >= required.value &&
+          (gameType.value !== 'blind_test' ||
+              props.recover ||
+              props.audioReady === true),
 );
 async function load() {
     controller?.abort();
@@ -170,7 +208,9 @@ async function load() {
             },
             body: JSON.stringify({
                 type: gameType.value,
-                ...(selected.value.length ? { packs: selected.value } : {}),
+                ...(gameType.value !== 'mini_games' && selected.value.length
+                    ? { packs: selected.value }
+                    : {}),
             }),
         });
         if (!response.ok) throw new Error();
@@ -218,10 +258,11 @@ onUnmounted(() => controller?.abort());
         @submit.prevent="
             emit('start', {
                 type: gameType,
-                packs: selected,
+                ...(gameType === 'mini_games'
+                    ? { trials: activeTrials }
+                    : { packs: selected, allow_repeats: repeats }),
                 rounds,
                 duration,
-                allow_repeats: repeats,
                 ...(!recover
                     ? { bonuses: bonuses && connectedPlayers > 1 }
                     : {}),
@@ -249,13 +290,25 @@ onUnmounted(() => controller?.abort());
                     </Button>
                 </label>
                 <div class="setup-pack-choice">
-                    <span class="font-bold">{{ t('packs_label') }}</span>
+                    <span class="font-bold">{{
+                        t(
+                            gameType === 'mini_games'
+                                ? 'mini_trials'
+                                : 'packs_label',
+                        )
+                    }}</span>
                     <Button
                         type="button"
                         variant="outline"
                         data-choose-packs
                         @click="choosingPacks = true"
-                        >{{ packSummary }}</Button
+                        >{{
+                            gameType === 'mini_games'
+                                ? t('mini_selected', {
+                                      count: activeTrials.length,
+                                  })
+                                : packSummary
+                        }}</Button
                     >
                 </div>
                 <template v-if="!recover">
@@ -286,7 +339,7 @@ onUnmounted(() => controller?.abort());
                                     ? 30
                                     : 10
                             "
-                            max="150"
+                            :max="gameType === 'mini_games' ? 60 : 150"
                             required
                             class="w-full"
                     /></label>
@@ -306,7 +359,9 @@ onUnmounted(() => controller?.abort());
                                             ? connectedPlayers * 12 + 33
                                             : gameType === 'drawing'
                                               ? 18
-                                              : 3))) /
+                                              : gameType === 'mini_games'
+                                                ? 34
+                                                : 3))) /
                                     60,
                             ),
                         })
@@ -324,7 +379,9 @@ onUnmounted(() => controller?.abort());
                         })
                     }}
                 </p>
-                <label class="flex gap-3 text-sm"
+                <label
+                    v-if="gameType !== 'mini_games'"
+                    class="flex gap-3 text-sm"
                     ><input v-model="repeats" type="checkbox" />{{
                         t('allow_repeats')
                     }}</label
@@ -336,6 +393,9 @@ onUnmounted(() => controller?.abort());
                         t('bonus_enable')
                     }}</label
                 >
+                <p v-if="gameType === 'mini_games' && !valid" role="status">
+                    {{ t('mini_none') }}
+                </p>
                 <p v-if="availability" class="text-sm">
                     {{
                         t(labels.available, {
@@ -426,9 +486,29 @@ onUnmounted(() => controller?.abort());
                 v-if="choosingPacks"
                 class="game-drawer setup-pack-drawer"
             >
-                <DrawerTitle>{{ t('packs_label') }}</DrawerTitle>
-                <DrawerDescription>{{ t('packs_hint') }}</DrawerDescription>
-                <PagedList :items="packs" :row-height="60">
+                <DrawerTitle>{{
+                    t(gameType === 'mini_games' ? 'mini_trials' : 'packs_label')
+                }}</DrawerTitle>
+                <DrawerDescription>{{
+                    t(
+                        gameType === 'mini_games'
+                            ? 'mini_trials_hint'
+                            : 'packs_hint',
+                    )
+                }}</DrawerDescription>
+                <div v-if="gameType === 'mini_games'" class="mini-trial-list">
+                    <label v-for="trial in playableTrials" :key="trial.id">
+                        <input
+                            v-model="selectedTrials"
+                            type="checkbox"
+                            :value="trial.id"
+                            :data-mini-trial="trial.id"
+                        />
+                        <component :is="trial.icon" aria-hidden="true" />
+                        <span>{{ t(trial.label) }}</span>
+                    </label>
+                </div>
+                <PagedList v-else :items="packs" :row-height="60">
                     <template #default="{ item: pack }">
                         <label
                             class="flex items-center gap-3 rounded-xl bg-accent/30 px-4 py-3"
@@ -447,7 +527,13 @@ onUnmounted(() => controller?.abort());
                         </label>
                     </template>
                 </PagedList>
-                <p v-if="!loading && !packs.length">{{ t('no_packs') }}</p>
+                <p
+                    v-if="
+                        gameType !== 'mini_games' && !loading && !packs.length
+                    "
+                >
+                    {{ t('no_packs') }}
+                </p>
                 <DrawerClose as-child
                     ><Button>{{ ui.t('close') }}</Button></DrawerClose
                 >

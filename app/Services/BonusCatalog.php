@@ -10,6 +10,7 @@ class BonusCatalog
         $common = ['shield', 'soap', 'boomerang', 'pinata', 'washer', 'lock', 'mystery', 'bubbles', 'photobomb', 'jelly', 'strike', 'leak', 'freeze', 'extension', 'watch', 'overtime', 'last_breath', 'alarm', 'borrow'];
 
         return match ($type) {
+            'mini_games' => [...$common, 'bolt', 'dice', 'squatter', 'alphabet', 'curtain'],
             'quiz' => [...$common, 'bolt', 'dice', 'squatter', 'missing_word', 'alphabet', 'curtain'],
             'blind_test' => [...$common, 'bolt', 'dice', 'squatter', 'artist', 'curtain', 'scratch', 'speed', 'singer'],
             'phrase' => [...$common, 'bolt', 'accent', 'sneeze', 'translator', 'advert'],

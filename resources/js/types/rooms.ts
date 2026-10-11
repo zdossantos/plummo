@@ -195,7 +195,46 @@ export type PhraseGameState = Omit<
         points: number | null;
     } | null;
 };
-export type GameState = ChoiceGame | DrawingGameState | PhraseGameState;
+export type MiniTrial = 'memory' | 'hide' | 'count' | 'cups' | 'author';
+export type CupSwap = {
+    at: number;
+    duration: number;
+    positions: [number, number];
+};
+export type MiniScene = {
+    residents?: string[];
+    people?: { color: string; accessories: string[]; number: number }[];
+    events?: { at: number; direction: number; color: string }[];
+    swaps?: CupSwap[];
+    under?: number;
+    color?: string;
+};
+export type MiniGameState = Omit<
+    ChoiceGame,
+    'type' | 'phase' | 'round' | 'me'
+> & {
+    type: 'mini_games';
+    settings: ChoiceGame['settings'] & { trials: MiniTrial[] };
+    phase: ChoiceGame['phase'] | 'observing' | 'writing' | 'waiting';
+    round: Omit<ChoiceGame['round'], 'audio'> & {
+        trial: MiniTrial;
+        text: string | null;
+        scene: MiniScene | null;
+        elapsed: number;
+        observeDuration: number;
+        scenePhase: string;
+        participants: number[];
+    };
+    me:
+        | (NonNullable<ChoiceGame['me']> & {
+              authorNumber: number | null;
+              draft: string;
+              submitted: boolean;
+          })
+        | null;
+};
+export type GameState =
+    ChoiceGame | DrawingGameState | PhraseGameState | MiniGameState;
 export type DrawingSender = (
     action: string,
     values: Record<string, unknown>,
