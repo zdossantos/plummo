@@ -14,10 +14,15 @@ uses(DatabaseTransactions::class);
 
 beforeEach(fn () => $this->withCredentials());
 
+it('opens the device chooser without creating a room', function () {
+    $this->withoutVite()->get('/')->assertInertia(fn (Assert $page) => $page->component('rooms/Home'));
+    expect(Room::count())->toBe(0);
+});
+
 it('creates a room when opening the shared screen and reuses it on refresh', function () {
-    $this->withoutVite()->get('/')->assertRedirect();
+    $this->withoutVite()->get('/host')->assertRedirect();
     $room = Room::sole();
-    $this->get('/')->assertRedirect('/screen/'.$room->code);
+    $this->get('/host')->assertRedirect('/screen/'.$room->code);
     expect(Room::count())->toBe(1);
     $this->get('/screen/'.$room->code)->assertInertia(fn (Assert $page) => $page
         ->component('rooms/Screen')->where('room.code', $room->code)->where('room.capacity', 8)
@@ -187,7 +192,7 @@ it('rejects malformed manual codes without a server error', function () {
 it('creates a fresh room when the previous screen room has expired', function () {
     $room = openRoom();
     $room->update(['empty_since' => now()->subMinutes(31)]);
-    $this->get('/')->assertRedirect();
+    $this->get('/host')->assertRedirect();
     expect(Room::find($room->id))->toBeNull();
     expect(Room::count())->toBe(1);
 });

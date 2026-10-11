@@ -49,6 +49,8 @@ return [
     'invalid_content_count' => 'Quantité de contenus invalide.',
     'contents_exhausted' => 'Pas assez de contenus non joués. Changez de pack ou autorisez les répétitions.',
     'title' => 'Le salon',
+    'host_room' => 'Héberger un salon',
+    'join_room' => 'Rejoindre un salon',
     'join_title' => 'Rejoins la bande.',
     'screen_title' => 'Tout le monde joue.',
     'screen_intro' => 'Un grand écran. Vos téléphones. Et toute la bande.',

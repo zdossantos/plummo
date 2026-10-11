@@ -1074,7 +1074,9 @@
     --field-depth: 4px;
 }
 .viewport-shell button,
-.game-drawer button {
+.viewport-shell a[data-slot='button'],
+.game-drawer button,
+.game-drawer a[data-slot='button'] {
     --button-depth: 6px;
     border: 2px solid var(--edge);
     border-radius: 14px;
@@ -1087,7 +1089,9 @@
         box-shadow 100ms ease-out;
 }
 .viewport-shell button:active:not(:disabled),
-.game-drawer button:active:not(:disabled) {
+.viewport-shell a[data-slot='button']:active,
+.game-drawer button:active:not(:disabled),
+.game-drawer a[data-slot='button']:active {
     transform: translateY(4px);
     box-shadow: 0 2px 0 var(--edge);
 }
@@ -1308,7 +1312,9 @@
         --field-depth: 2px;
     }
     .viewport-shell button,
-    .game-drawer button {
+    .viewport-shell a[data-slot='button'],
+    .game-drawer button,
+    .game-drawer a[data-slot='button'] {
         --button-depth: 4px;
     }
     .viewport-shell [data-slot='button'],
@@ -1378,7 +1384,9 @@
 }
 @media (prefers-reduced-motion: reduce) {
     .viewport-shell button,
-    .game-drawer button {
+    .viewport-shell a[data-slot='button'],
+    .game-drawer button,
+    .game-drawer a[data-slot='button'] {
         transition: none;
     }
 }

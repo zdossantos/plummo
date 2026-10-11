@@ -12,7 +12,7 @@ pest()->extend(TestCase::class)->in('Feature', 'Browser');
 
 function openRoom(): Room
 {
-    test()->withoutVite()->get('/')->assertRedirect();
+    test()->withoutVite()->get('/host')->assertRedirect();
 
     return Room::latest('id')->firstOrFail();
 }

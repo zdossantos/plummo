@@ -18,7 +18,7 @@ Référence des premières maquettes : https://www.figma.com/design/6kioGGc1qTiF
 
 ## 2. Salon et arrivée des joueurs
 
-- Ouvrir Plummo sur le grand écran prépare directement un salon.
+- Ouvrir Plummo sur un écran large prépare directement un salon ; sur téléphone, l’accueil propose de rejoindre. Les deux accueils permettent de changer de parcours, y compris pour héberger depuis un téléphone. Le choix manuel reste conservé lors des rotations et redimensionnements.
 - Le grand écran affiche un QR code et un code de salon.
 - Un joueur peut scanner le QR code ou saisir le code ; le scan est facultatif.
 - Aucun compte n'est nécessaire pour jouer.
