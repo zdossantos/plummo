@@ -1,8 +1,19 @@
 <script setup lang="ts">
 import { computed, ref, watch, onUnmounted } from 'vue';
-import { useElementSize } from '@vueuse/core';
+import { useResizeObserver } from '@vueuse/core';
 const surface = ref<HTMLElement>();
-const { width: surfaceWidth, height: surfaceHeight } = useElementSize(surface);
+const surfaceWidth = ref(0);
+const surfaceHeight = ref(0);
+let resizeFrame = 0;
+useResizeObserver(surface, ([entry]) => {
+    if (!entry) return;
+    cancelAnimationFrame(resizeFrame);
+    // Update the SVG after observation to avoid a nested layout notification.
+    resizeFrame = requestAnimationFrame(() => {
+        surfaceWidth.value = entry.contentRect.width;
+        surfaceHeight.value = entry.contentRect.height;
+    });
+});
 const canvasWidth = computed(() =>
     Math.min(surfaceWidth.value, (surfaceHeight.value * 5) / 3),
 );
@@ -202,6 +213,7 @@ function up(event: PointerEvent) {
     schedule();
 }
 onUnmounted(() => {
+    cancelAnimationFrame(resizeFrame);
     stopped = true;
     clearTimeout(timer);
 });
