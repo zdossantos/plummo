@@ -10,6 +10,12 @@ colors:
     pink: '#f1b5c8'
     ink: '#21182f'
     edge: '#180f26'
+    bonus-border: '#328959'
+    bonus-background: '#dff0d8'
+    bonus-label: '#20623d'
+    prank-border: '#b64d68'
+    prank-background: '#f7dbe2'
+    prank-label: '#8d3048'
     muted: '#d0c0de'
     secondary-surface: '#4b365f'
 typography:
@@ -191,6 +197,10 @@ L’en-tête de jeu associe logo citron, libellé secondaire et code du salon. L
 ### Chrono et troupe
 
 Le chrono est un anneau citron portant un chiffre central. La troupe utilise les SVG du catalogue, quelques inclinaisons de composition et une célébration ponctuelle, sans altérer l’identité des personnages.
+
+### Objets bonus et malus
+
+Les 38 illustrations validées sont servies depuis `public/bonuses` par `BonusIcon`. Le Plummo existant reste intact. Les objets utiles ou protecteurs ont un contour vert et un fond vert clair ; les farces ont un contour rouge et un fond rose clair. Le libellé traduit Bonus/Malus complète la couleur. Le bouton d’information est placé au-dessus de l’objet ; toucher l’objet le lance immédiatement. Les emplacements libres gardent un contour neutre en pointillés. Un objet masqué ne révèle pas sa catégorie. Les formats courts réduisent les illustrations sans déplacer les commandes hors écran.
 
 ## Do's and Don'ts
 

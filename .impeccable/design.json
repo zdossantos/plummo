@@ -214,7 +214,27 @@
                 "name": "short-height",
                 "value": "450px"
             }
-        ]
+        ],
+        "bonusPocket": {
+            "approved": true,
+            "artwork": "public/bonuses/*.svg",
+            "helpful": {
+                "border": "#328959",
+                "background": "#dff0d8",
+                "label": "#20623d"
+            },
+            "prank": {
+                "border": "#b64d68",
+                "background": "#f7dbe2",
+                "label": "#8d3048"
+            },
+            "slot": {
+                "width": "102px",
+                "height": "116px",
+                "radius": "22px"
+            },
+            "behavior": "Direct launch, separate information button, neutral hidden category"
+        }
     },
     "components": [
         {

@@ -30,6 +30,18 @@ const strike = computed(() =>
 );
 const defensive = (kind: string) =>
     ['shield', 'soap', 'boomerang'].includes(kind);
+const helpful = (kind: string) =>
+    [
+        'shield',
+        'soap',
+        'boomerang',
+        'pinata',
+        'freeze',
+        'extension',
+        'overtime',
+        'last_breath',
+        'borrow',
+    ].includes(kind);
 const info = ref<string | null>(null);
 const choosing = ref(false);
 watch(
@@ -93,6 +105,12 @@ watch(
                             strike &&
                             !defensive(bonuses.inventory[slot - 1]!.kind),
                         'bonus-mystery': hidden,
+                        'bonus-helpful':
+                            !hidden &&
+                            helpful(bonuses.inventory[slot - 1]!.kind),
+                        'bonus-prank':
+                            !hidden &&
+                            !helpful(bonuses.inventory[slot - 1]!.kind),
                     }"
                     :data-bonus="bonuses.inventory[slot - 1]!.kind"
                     :aria-label="
@@ -124,6 +142,13 @@ watch(
                             ? t('bonus_mystery_name')
                             : t('bonus_' + bonuses.inventory[slot - 1]!.kind)
                     }}</small>
+                    <span v-if="!hidden" class="bonus-category">{{
+                        t(
+                            helpful(bonuses.inventory[slot - 1]!.kind)
+                                ? 'bonus_category_helpful'
+                                : 'bonus_category_prank',
+                        )
+                    }}</span>
                 </button>
             </template>
             <span v-else class="bonus-empty" :aria-label="t('bonus_empty')"
