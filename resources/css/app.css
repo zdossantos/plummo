@@ -2466,3 +2466,70 @@
         --screen-qr-size: clamp(160px, 36dvh, 440px);
     }
 }
+
+/* Let answers use their actual cell height instead of a fixed two-line limit. */
+.choice-face > .text-summary {
+    display: block;
+    -webkit-line-clamp: unset;
+    min-height: 0;
+    flex: 0 1 auto;
+    width: 100%;
+    line-height: 1.25;
+}
+.game-choice > .choice-face {
+    padding: 8px 10px;
+}
+.game-choice:has(.choice-letter) > .choice-face {
+    padding-top: 34px;
+}
+.display-screen .game-question h1,
+.display-screen .phrase-scene > h1 {
+    font-size: clamp(24px, 3.2vw, 54px);
+    line-height: 1.25;
+    -webkit-line-clamp: 3;
+}
+.display-screen .game-choice > .choice-face {
+    font-size: clamp(16px, 1.65vw, 28px);
+}
+@media (max-height: 500px) {
+    .display-screen .game-question h1,
+    .display-screen .phrase-scene > h1 {
+        font-size: 20px;
+        -webkit-line-clamp: 2;
+    }
+    .game-choice:has(.choice-letter) > .choice-face {
+        padding-top: 22px;
+    }
+}
+
+.display-screen .phone-scene {
+    width: 100%;
+    max-width: none;
+}
+@media (max-width: 600px) {
+    .game-choice > .choice-face {
+        font-size: 14px;
+    }
+}
+
+.display-screen .game-panel {
+    padding: 8px;
+}
+.display-screen:not([data-lobby]) .viewport-footer,
+.display-screen:not([data-lobby]) .player-cast {
+    height: clamp(96px, 16dvh, 150px);
+}
+.display-screen:not([data-lobby]) .player-character svg {
+    max-height: clamp(65px, 11dvh, 110px);
+}
+@media (max-width: 600px) {
+    .display-screen .game-choice > .choice-face {
+        font-size: 14px;
+    }
+}
+
+@media (min-height: 600px) {
+    .viewport-shell:not(.display-screen) .game-question h1 {
+        -webkit-line-clamp: 4;
+    }
+}
