@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Pest\Browser\Execution;
 
+pest()->browser()->timeout(5000);
+
 it('launches a collective bonus in one click while phone and screen stay inside their viewport', function (bool $reduced) {
     app()->terminating(function () {
         app('cookie')->flushQueuedCookies();
@@ -35,7 +37,12 @@ it('launches a collective bonus in one click while phone and screen stay inside 
         $first->page()->locator('button:has-text("Start quiz")')->click(['noWaitAfter' => true]);
         $first->assertSee('Quiz · Question 1 / 5');
         expect(Game::where('room_id', $room->id)->sole()->settings['bonuses'])->toBeTrue();
-        $first->assertPresent('.bonus-object');
+        $game = Game::where('room_id', $room->id)->sole();
+        $player = $room->players()->where('name', 'Camille')->sole();
+        $state = $game->state;
+        $state['bonuses']['inventory'][$player->id] = [['id' => 'launch-test', 'kind' => 'bolt']];
+        $game->update(['state' => $state]);
+        $first->refresh()->assertPresent('.bonus-object');
         $second->assertPresent('.bonus-object');
         foreach ([$first, $second, $screen] as $page) {
             expect($page->page()->evaluate('() => document.documentElement.scrollHeight <= innerHeight && document.documentElement.scrollWidth <= innerWidth'))->toBeTrue();
@@ -186,15 +193,36 @@ it('keeps collective overlays usable and accepts only one of two simultaneous la
         expect($bonus['launches'])->toHaveCount(1);
         expect($bonus['used'])->toBe([$player->id]);
         $selector = match ($kind) {
-            'bolt' => '.bonus-blackout', 'squatter' => '.bonus-squatter', default => '.game-choices'
+            'bolt' => '.bonus-blackout', 'squatter' => '.bonus-squatter', 'curtain' => '.answer-curtain', 'bubbles' => '.bonus-bubbles', 'mystery' => '.bonus-mystery', 'alphabet' => '.answer-upside', default => '.game-choices'
         };
         $second->assertPresent($selector);
         $first->assertMissing('.bonus-blackout')->assertMissing('.bonus-squatter');
         $second->page()->evaluate('() => new Promise(resolve => setTimeout(resolve, 300))');
-        if ($kind !== 'dice') {
+        if (in_array($kind, ['bolt', 'squatter'], true)) {
             expect($second->page()->evaluate('(selector) => getComputedStyle(document.querySelector(selector)).pointerEvents', $selector))->toBe('none');
         }
+        if ($kind === 'bubbles') {
+            foreach (range(1, 6) as $unused) {
+                // Moving bubbles deliberately never settle; skip Playwright's stability wait.
+                $second->page()->locator('.bonus-bubbles button')->first()->click(['force' => true, 'noWaitAfter' => true]);
+            }
+            $second->assertMissing('.bonus-bubbles button');
+        }
+        if ($kind === 'mystery') {
+            $second->assertSee('Surprise!')->assertMissing('.bonus-info');
+        }
+        if (in_array($kind, ['curtain', 'bubbles', 'alphabet'], true)) {
+            $second->screenshot(filename: 'bonus-catalogue-'.$kind);
+            expect($second->page()->evaluate('() => document.documentElement.scrollHeight <= innerHeight && document.documentElement.scrollWidth <= innerWidth'))->toBeTrue();
+        }
         $correct = $game->fresh()->state['round']['payload']['correct'];
+        if ($kind === 'curtain') {
+            $second->page()->locator('.game-choices button')->filter(['hasText' => ['A', 'B', 'C', 'D'][$correct]])->first()->click(['noWaitAfter' => true]);
+            $second->assertPresent('.answer-curtain');
+            expect($game->fresh()->state['round']['answers'])->toBeEmpty();
+            $second->page()->evaluate('() => new Promise(resolve => setTimeout(resolve, 1500))');
+            expect($second->page()->evaluate('() => document.querySelectorAll(".answer-curtain").length'))->toBe(3);
+        }
         $second->page()->locator('.game-choices button')->filter(['hasText' => ['A', 'B', 'C', 'D'][$correct]])->first()->click(['noWaitAfter' => true]);
         $second->assertNoJavaScriptErrors();
         expect($game->fresh()->state['round']['answers'][$room->players()->where('name', 'Alex')->sole()->id]['choice'])->toBe($correct);
@@ -205,7 +233,7 @@ it('keeps collective overlays usable and accepts only one of two simultaneous la
         $pack->delete();
         $tag->delete();
     }
-})->with(['bolt', 'dice', 'squatter']);
+})->with(['bolt', 'dice', 'squatter', 'curtain', 'bubbles', 'mystery', 'alphabet']);
 
 it('temporarily hides artists on opponents phones and restores all eight answers', function () {
     app()->terminating(function () {

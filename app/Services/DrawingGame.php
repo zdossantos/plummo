@@ -341,14 +341,14 @@ class DrawingGame
             abort_unless($index <= count($canvas) && $index >= count($canvas) - 1, 409);
             if ($index === count($canvas)) {
                 abort_unless($values['offset'] === 0, 409);
-                $canvas[] = ['id' => $values['id'], 'tool' => $tool, 'spans' => $spans, 'color' => $tool === 'erase' ? '#ffffff' : app(GameBonuses::class)->paint($game, $values['color']), 'input_color' => $values['color'], 'width' => $values['width'], 'points' => []];
+                $canvas[] = ['id' => $values['id'], 'tool' => $tool, 'spans' => $spans, 'color' => $tool === 'erase' ? '#ffffff' : app(GameBonuses::class)->paint($game, $values['color']), 'input_color' => $values['color'], 'input_width' => $values['width'], 'width' => $tool === 'brush' && app(GameBonuses::class)->drawingEffect($game, 'giant') ? min(36, $values['width'] * 3) : $values['width'], 'clumsy' => $tool === 'brush' && app(GameBonuses::class)->drawingEffect($game, 'clumsy'), 'input_points' => [], 'points' => []];
             }
             $stroke = $canvas[$index];
-            abort_unless(($stroke['input_color'] ?? $stroke['color']) === $values['color'] && $stroke['width'] === $values['width'], 409);
+            abort_unless(($stroke['input_color'] ?? $stroke['color']) === $values['color'] && ($stroke['input_width'] ?? $stroke['width']) === $values['width'], 409);
             abort_unless(($stroke['tool'] ?? 'brush') === $tool && ($stroke['spans'] ?? []) == $spans, 409);
             $offset = $values['offset'];
             if ($offset < count($stroke['points'])) {
-                abort_unless(array_slice($stroke['points'], $offset, count($values['points'])) == $values['points'], 409);
+                abort_unless(array_slice($stroke['input_points'] ?? $stroke['points'], $offset, count($values['points'])) == $values['points'], 409);
 
                 return;
             }
@@ -359,7 +359,8 @@ class DrawingGame
             if (array_sum(array_map(fn ($stroke) => count($stroke['spans'] ?? []), $canvas)) > 20000) {
                 throw ValidationException::withMessages(['spans' => __('rooms.drawing_limit')]);
             }
-            $canvas[$index]['points'] = [...$stroke['points'], ...$values['points']];
+            $canvas[$index]['input_points'] = [...($stroke['input_points'] ?? $stroke['points']), ...$values['points']];
+            $canvas[$index]['points'] = [...$stroke['points'], ...app(GameBonuses::class)->strokePoints($values['points'], $stroke['clumsy'] ?? false)];
         } else {
             if ($action === 'undo') {
                 array_pop($canvas);
@@ -381,7 +382,7 @@ class DrawingGame
         $artist = $me?->id === $round['artist'];
 
         return ['id' => $game->id, 'type' => 'drawing', 'phase' => $state['phase'], 'deadline' => $state['deadline'], 'settings' => $game->settings, 'scores' => $state['scores'], 'exhausted' => $state['exhausted'] ?? false, 'targetReached' => $game->status === 'finished' && $room->point_target !== null && (int) $room->players()->max('score') >= $room->point_target,
-            'round' => ['number' => $state['number'], 'total' => $game->settings['rounds'], 'tour' => $state['tour'], 'artistId' => $round['artist'], 'word' => $revealed ? $round['word'] : null, 'guesses' => array_map(fn ($guess) => [...$guess, 'text' => $guess['found'] && ! $revealed ? null : $guess['text']], $round['guesses'] ?? []), 'canvas' => $me === null || $artist ? $round['canvas'] : [], 'revision' => $round['revision'], 'awards' => $round['awards']],
+            'round' => ['number' => $state['number'], 'total' => $game->settings['rounds'], 'tour' => $state['tour'], 'artistId' => $round['artist'], 'word' => $revealed ? $round['word'] : null, 'guesses' => array_map(fn ($guess) => [...$guess, 'text' => $guess['found'] && ! $revealed ? null : $guess['text']], $round['guesses'] ?? []), 'canvas' => $me === null || $artist ? array_map(fn ($stroke) => array_diff_key($stroke, array_flip(['input_color', 'input_width', 'input_points', 'clumsy'])), $round['canvas']) : [], 'revision' => $round['revision'], 'awards' => $round['awards']],
             'me' => $me === null ? null : ['eligible' => $this->eligible($me, $state), 'found' => isset($round['answers'][$me->id]), 'canGuess' => $round['word'] !== null && $this->eligible($me, $state) && ! isset($round['answers'][$me->id]) && in_array($state['phase'], ['drawing', 'artist_missing'], true), 'near' => $round['near'][$me->id] ?? false, 'points' => $round['awards'][$me->id] ?? 0, 'words' => $artist && ($state['phase'] === 'selecting' || ($state['phase'] === 'resuming' && $state['previous_phase'] === 'selecting')) ? $round['words'] : [], 'word' => $artist ? $round['word'] : null, 'canDraw' => $artist && $me->connected() && $state['phase'] === 'drawing', 'canSkip' => $me->connected() && ! $artist && $state['phase'] === 'artist_missing', 'votedSkip' => in_array($me->id, $round['votes'], true)]];
     }
 }

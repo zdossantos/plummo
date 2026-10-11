@@ -298,9 +298,9 @@ Les propositions récentes du dessin apparaissent sur le grand écran. Une bonne
 
 ## Bonus farceurs optionnels
 
-Le chef peut activer les bonus pour chaque mini-jeu, uniquement avec plusieurs participants. L’option reste désactivée par défaut. Chaque joueur reçoit un objet compatible au départ et possède deux emplacements. Entre les manches, les joueurs strictement derrière le meilleur score du mini-jeu reçoivent un objet, avec un choix de remplacement si leur poche est pleine. Aucune attribution après la dernière manche ; les objets disparaissent à la fin du mini-jeu.
+Le chef peut activer les bonus pour chaque mini-jeu, uniquement avec plusieurs participants. L’option reste désactivée par défaut. Chaque joueur reçoit un objet compatible au départ et possède deux emplacements. À chaque nouvelle manche, tous reçoivent un objet et les joueurs strictement derrière le meilleur score du mini-jeu en reçoivent un supplémentaire, avec un choix de remplacement si leur poche est pleine. Aucune attribution après la dernière manche ; les objets disparaissent à la fin du mini-jeu.
 
-Un appui déclenche immédiatement le bonus sur tous les adversaires participants, sans sélection de cible ni confirmation. Le bouton d’information explique l’effet sans le consommer. Un lancement par joueur et par manche ; pause, reprise, révélation et résultats interdisent les lancements. Les effets distincts coexistent ; un même effet ne prolonge pas sa durée. La pause conserve le temps restant et la manche suivante efface les effets.
+Un appui déclenche immédiatement le bonus sur tous les adversaires participants, sans sélection de cible ni confirmation. Le bouton d’information explique l’effet sans le consommer. Un lancement offensif et jusqu’à deux défenses par joueur et par manche ; pause, reprise, révélation et résultats interdisent les lancements. Les effets distincts coexistent ; un même effet ne prolonge pas sa durée. La pause conserve le temps restant et la manche suivante efface les effets.
 
 - Quiz et blind test : éclair (écran sombre, 3 s), dé (trois déplacements des réponses, 6 s), Plummo squatteur (4 s). Le blind test propose aussi artiste incognito (artistes masqués, 4 s).
 - Phrases : accent Plummo (r/R devient w/W) et éternuement (« ATCHOUM ! »). Seules les contributions publiées sont transformées, y compris celles déjà validées pendant l’écriture. Le brouillon et le prompt restent intacts ; accent puis éternuement dans un ordre fixe. Aucun auteur n’est révélé lors du vote.
@@ -309,6 +309,22 @@ Un appui déclenche immédiatement le bonus sur tous les adversaires participant
 La réception est signalée par une icône glissant derrière le Plummo sur le grand écran et par un toast sur le téléphone. Les événements sont dédupliqués et une reconnexion ne rejoue pas les anciennes réceptions. La poche reste utilisable avec le clavier ouvert. Les animations ne capturent pas les appuis et respectent les mouvements réduits ; le grand écran reste passif.
 
 Chaque malus accepté diffuse un événement sonore public distinct, conservé huit secondes. Le grand écran joue une courte signature propre à l’objet via son système audio existant (activation, volume, atténuation blind test). Les snapshots répétés et les reconnexions ne rejouent pas les sons ; les lancements refusés restent silencieux.
+
+### Catalogue étendu (#56)
+
+Sablier de poche est exclu. Le catalogue contient les huit objets initiaux et trente nouveaux objets :
+
+- Communs : bouclier biscuit, savon magique, boomerang, piñata, machine à laver, cadenas, poche mystère, bulles, photobomb, gelée, grève ; fuite de temps, gel du chrono, rallonge, montre invisible, heures supplémentaires, dernier souffle, réveil et temps emprunté.
+- Quiz : mot mangé, alphabet retourné, rideau (premier appui ouvre, second répond). Le texte se déforme sans déplacer les zones tactiles ; le mot complet reste visible sur la TV.
+- Blind test : rideau, disque rayé, accélération et Plummo chanteur. Les effets audio partagés restent sur la TV et retrouvent automatiquement la lecture normale à expiration, pause ou résultats.
+- Phrases : traducteur pompeux et publicité. Les transformations portent sur les contributions publiées, jamais le brouillon ; ordre accent, éternuement, traducteur puis sponsor.
+- Dessin : pinceau géant, miroir TV et main maladroite. Géant/maladroit modifient seulement les nouveaux traits de pinceau, avec géométrie déterministe, retries idempotents et aperçu identique au serveur. Gomme et remplissage restent normaux. Le miroir ne change que la TV.
+
+Le bouclier absorbe le prochain malus individuel ; le boomerang le renvoie une fois à l’émetteur, sans chaîne. Pour les malus propres au dessinateur, le boomerang écarte le malus plutôt que l’envoyer à quelqu’un sans toile. Les effets partagés (chrono, lecteur, miroir TV) ne peuvent être bloqués. Le savon efface les malus individuels du joueur et garde ses protections. Ces défenses restent utilisables après une attaque, même sous cadenas ou grève. La machine à laver remplace les objets des deux emplacements adverses par des objets compatibles différents, sans modifier leur troisième objet en attente. La piñata distribue à tous sans écraser un remplacement en attente.
+
+Les farces communes durent entre 8 et 20 secondes selon la durée de la manche ; les effets initiaux conservent leurs durées courtes. L’accélération dure 8 secondes, photobomb/disque rayé/chanteur 4 secondes. Le réveil double le temps restant des malus individuels, avec au maximum 12 secondes supplémentaires ; le savon le dissipe.
+
+Le pas temporel vaut 20 % de la durée, borné de 6 à 20 secondes. Les ajouts et retraits cumulés sont chacun limités au minimum entre 30 secondes et la moitié de la durée ; une réduction laisse au moins 8 secondes pour agir. Le gel suspend le décompte visible mais laisse jouer. Les heures supplémentaires rallongent aussi légèrement les farces actives. Le dernier souffle s’arme puis se déclenche une fois dans les deux dernières secondes. Le temps emprunté est remboursé une seule fois à la prochaine manche et n’est pas utilisable à la dernière. La pause préserve les durées et les manches terminées tôt restent terminées.
 
 ### Extension à un nouveau mini-jeu
 

@@ -30,9 +30,9 @@ test('receipts animate only once and never replay after reconnect or late arriva
 
 test('each prank has its own short, restrained sound signature', async () => {
     const { bonusSoundNotes } = await import('../../resources/js/lib/soundscape');
-    const kinds = ['bolt', 'dice', 'squatter', 'artist', 'accent', 'sneeze', 'stamp', 'paint'] as const;
+    const kinds = ['bolt', 'dice', 'squatter', 'artist', 'accent', 'sneeze', 'stamp', 'paint', 'shield', 'soap', 'boomerang', 'pinata', 'washer', 'lock', 'mystery', 'bubbles', 'photobomb', 'jelly', 'strike', 'leak', 'freeze', 'extension', 'watch', 'overtime', 'last_breath', 'alarm', 'borrow', 'translator', 'advert', 'scratch', 'speed', 'singer', 'missing_word', 'alphabet', 'curtain', 'giant', 'mirror', 'clumsy'] as const;
     const signatures = kinds.map(kind => bonusSoundNotes(kind));
-    expect(new Set(signatures.map(notes => JSON.stringify(notes))).size).toBe(8);
+    expect(new Set(signatures.map(notes => JSON.stringify(notes))).size).toBe(38);
     for (const notes of signatures) {
         expect(notes.length).toBeGreaterThan(0);
         for (const note of notes) {
@@ -72,4 +72,33 @@ test('phrase effects persist while writing but never leak into voting or results
     for (const phase of ['paused', 'resuming', 'voting', 'results', 'reveal', 'selecting']) {
         expect(activeBonusEffects([effect], 101, phase)).toEqual([]);
     }
+});
+
+import { eatenQuestion, bonusStrokePoints, bonusPlaybackRate } from '../../resources/js/lib/bonuses';
+
+test('missing word preserves punctuation and hides one meaningful word only', () => {
+    expect(eatenQuestion('Combien de minutes contient une heure ?', true)).toBe('Combien de ▰▰▰▰ contient une heure ?');
+    expect(eatenQuestion('Combien de minutes contient une heure ?', false)).toBe('Combien de minutes contient une heure ?');
+});
+test('clumsy strokes are deterministic, bounded and leave erasers untouched', () => {
+    const input: [number, number][] = [[0, 0], [1, 1], [0.5, 0.5]];
+    expect(bonusStrokePoints(input, true, 'erase')).toEqual(input);
+    const one = bonusStrokePoints(input, true, 'brush');
+    expect(one).toEqual(bonusStrokePoints(input, true, 'brush'));
+    expect(one[2]).not.toEqual(input[2]);
+    expect(one.every(p => p.every(n => n >= 0 && n <= 1))).toBe(true);
+});
+test('shared audio speed restores on expiry', () => {
+    expect(bonusPlaybackRate([{id: 'fast',kind: 'speed',actorId: 1,startedAt: 0,expiresAt: 8}], 2)).toBe(1.25);
+    expect(bonusPlaybackRate([{id: 'fast',kind: 'speed',actorId: 1,startedAt: 0,expiresAt: 8}], 8)).toBe(1);
+});
+
+test('fill uses the same preview geometry as a local giant clumsy brush', async () => {
+    const { bonusRenderedStroke } = await import('../../resources/js/lib/bonuses');
+    const local = { id: 1, color: '#35236b', width: 4, bonusWidth: 12, clumsy: true, tool: 'brush' as const, points: [[0.5,0.5],[0.8,0.5]] as [number,number][] };
+    const displayed = bonusRenderedStroke(local);
+    expect(displayed.width).toBe(12);
+    expect(displayed.points).toEqual(bonusStrokePoints(local.points,true,'brush'));
+    expect(bonusRenderedStroke(displayed)).toEqual(displayed);
+    expect(local.width).toBe(4);
 });

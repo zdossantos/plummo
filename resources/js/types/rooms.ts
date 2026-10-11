@@ -6,8 +6,38 @@ export type BonusKind =
     | 'accent'
     | 'sneeze'
     | 'stamp'
-    | 'paint';
-export type BonusItem = { id: string; kind: BonusKind };
+    | 'paint'
+    | 'shield'
+    | 'soap'
+    | 'boomerang'
+    | 'pinata'
+    | 'washer'
+    | 'lock'
+    | 'mystery'
+    | 'bubbles'
+    | 'photobomb'
+    | 'jelly'
+    | 'strike'
+    | 'leak'
+    | 'freeze'
+    | 'extension'
+    | 'watch'
+    | 'overtime'
+    | 'last_breath'
+    | 'alarm'
+    | 'borrow'
+    | 'translator'
+    | 'advert'
+    | 'scratch'
+    | 'speed'
+    | 'singer'
+    | 'missing_word'
+    | 'alphabet'
+    | 'curtain'
+    | 'giant'
+    | 'mirror'
+    | 'clumsy';
+export type BonusItem = { id: string; kind: BonusKind; canUse?: boolean };
 export type BonusEffect = BonusItem & {
     actorId: number;
     startedAt: number;
@@ -16,12 +46,18 @@ export type BonusEffect = BonusItem & {
 export type BonusReceipt = BonusItem & { recipientId: number; at: number };
 export type BonusState = {
     enabled: boolean;
+    clock?: { frozenValue: number } | null;
     inventory: BonusItem[];
     canUse: boolean;
     effects: BonusEffect[];
     receipts: BonusReceipt[];
     pending?: BonusItem | null;
-    launches?: (BonusItem & { at: number; actorId: number })[];
+    launches?: (BonusItem & {
+        at: number;
+        actorId: number;
+        reaction?: boolean;
+        deflected?: boolean;
+    })[];
 };
 export type Player = {
     id: number;
@@ -76,6 +112,8 @@ export type ChoiceGame = {
     } | null;
 };
 export type Stroke = {
+    clumsy?: boolean;
+    bonusWidth?: number;
     tool?: 'brush' | 'fill' | 'erase';
     spans?: [number, number, number][];
     id: number;

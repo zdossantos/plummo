@@ -26,7 +26,7 @@ it('gives a compatible initial object only when enabled with opponents', functio
     [$room, $members, $game] = bonusQuiz();
     $view = $this->postJson('/rooms/'.$room->code.'/presence')->assertOk();
     expect($view->json('game.bonuses.inventory'))->toHaveCount(1);
-    expect($view->json('game.bonuses.inventory.0.kind'))->toBeIn(['bolt', 'dice', 'squatter']);
+    expect($view->json('game.bonuses.inventory.0.kind'))->toBeIn(app(GameBonuses::class)->kinds('quiz'));
     expect($game->state['bonuses']['inventory'][$members[1][0]])->toHaveCount(1);
 })->group('bonuses');
 
@@ -37,6 +37,7 @@ it('keeps bonuses unavailable in solo or disabled games', function (bool $enable
 
 it('consumes an object once and applies the effect to all opponents without exposing their inventory', function () {
     [$room, $members, $game] = bonusQuiz(true, 3);
+    giveTestBonus($game, $members[0][0], 'bolt');
     $item = $this->postJson('/rooms/'.$room->code.'/presence')->json('game.bonuses.inventory.0');
     $values = ['game_id' => $game->id, 'round' => 1, 'item_id' => $item['id']];
     $response = $this->postJson('/rooms/'.$room->code.'/bonuses', $values)->assertOk();
@@ -69,7 +70,8 @@ it('gives a catchup object to strict trailers once at the next round and preserv
     $this->travel(3)->seconds();
     $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.round.number', 2);
     $current = Game::findOrFail($game->id);
-    expect($current->state['bonuses']['inventory'][$members[0][0]])->toHaveCount(1);
+    expect($current->state['bonuses']['inventory'][$members[0][0]])->toHaveCount(2);
+    expect($current->state['bonuses']['pending'][$members[1][0]])->not->toBeNull();
     expect($current->state['bonuses']['inventory'][$members[1][0]])->toHaveCount(2);
     $this->postJson('/rooms/'.$room->code.'/presence')->assertOk();
     expect(Game::findOrFail($game->id)->state['bonuses']['inventory'][$members[1][0]])->toHaveCount(2);
@@ -84,7 +86,7 @@ it('does not give catchup objects to tied leaders', function () {
     $this->travel(3)->seconds();
     $this->postJson('/rooms/'.$room->code.'/presence')->assertOk();
     foreach (Game::findOrFail($game->id)->state['bonuses']['inventory'] as $items) {
-        expect($items)->toHaveCount(1);
+        expect($items)->toHaveCount(2);
     }
 })->group('bonuses');
 
@@ -270,10 +272,11 @@ it('launches every compatible object with the expected targets and lifetime', fu
     if ($type === 'drawing') {
         $this->postJson('/rooms/'.$room->code.'/drawing/choose', ['game_id' => $game->id, 'round' => 1, 'choice' => 0])->assertOk();
     }
-    giveTestBonus($game, $members[0][0], $kind);
-    $this->postJson('/rooms/'.$room->code.'/bonuses', ['game_id' => $game->id, 'round' => 1, 'item_id' => 'test-object'])->assertOk();
+    $sender = $type === 'drawing' ? 1 : 0;
+    giveTestBonus($game, $members[$sender][0], $kind);
+    $this->withCookie('plummo_player_'.$room->code, $members[$sender][1])->postJson('/rooms/'.$room->code.'/bonuses', ['game_id' => $game->id, 'round' => 1, 'item_id' => 'test-object'])->assertOk();
     $effects = $game->fresh()->state['bonuses']['effects'];
-    expect(array_column($effects, 'target'))->toBe($type === 'drawing' ? [0] : [$members[1][0], $members[2][0]]);
+    expect(array_column($effects, 'target'))->toBe($type === 'drawing' ? [$members[0][0]] : [$members[1][0], $members[2][0]]);
     foreach ($effects as $effect) {
         expect($effect['kind'])->toBe($kind);
         expect($effect['expiresAt'])->toBe($duration === null ? null : $effect['startedAt'] + $duration);
