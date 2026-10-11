@@ -419,3 +419,62 @@ it('restores the artist canvas after reconnecting without exposing it to guesser
     $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.phase', 'drawing')->assertJsonCount(1, 'game.round.canvas');
     $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/presence')->assertJsonCount(0, 'game.round.canvas');
 });
+
+it('synchronizes fill and eraser tools with immutable idempotent retries', function () {
+    $room = openRoom();
+    [, $one] = enterRoom($room);
+    [, $two] = enterRoom($room, 'Alex');
+    startDrawing($room, $one);
+    chooseDrawing($room, $one);
+    $url = '/rooms/'.$room->code.'/drawing/stroke';
+    $fill = drawingStroke($room, ['tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[0, 0, 500], [1, 10, 490]]]);
+    $this->postJson($url, $fill)->assertOk()->assertJsonPath('game.round.canvas.0.tool', 'fill')->assertJsonPath('game.round.canvas.0.spans', $fill['spans']);
+    $this->postJson($url, $fill)->assertOk()->assertJsonCount(1, 'game.round.canvas');
+    $this->postJson($url, [...$fill, 'spans' => [[2, 0, 500]]])->assertConflict();
+    $this->postJson($url, drawingStroke($room, ['id' => 2, 'tool' => 'erase']))->assertOk()->assertJsonPath('game.round.canvas.1.tool', 'erase')->assertJsonPath('game.round.canvas.1.color', '#ffffff');
+    $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.round.canvas.0.spans', $fill['spans'])->assertJsonPath('game.round.canvas.1.tool', 'erase');
+    $this->withCookie('plummo_player_'.$room->code, $two)->postJson($url, drawingStroke($room, ['id' => 3, 'tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[0, 0, 500]]]))->assertForbidden();
+    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/drawing/undo', drawingAction($room, ['revision' => 0]))->assertOk()->assertJsonCount(1, 'game.round.canvas');
+});
+
+it('rejects invalid fill geometry and tool payloads', function (array $values) {
+    $room = openRoom();
+    [, $one] = enterRoom($room);
+    enterRoom($room, 'Alex');
+    startDrawing($room, $one);
+    chooseDrawing($room, $one);
+    $this->postJson('/rooms/'.$room->code.'/drawing/stroke', drawingStroke($room, $values))->assertUnprocessable();
+})->with([
+    [['tool' => 'unknown']],
+    [['tool' => 'fill']],
+    [['tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[300, 0, 500]]]],
+    [['tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[0, 30, 20]]]],
+    [['tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[0, 0, 501]]]],
+    [['tool' => 'brush', 'spans' => [[0, 0, 500]]]],
+    [['tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[1, 0, 10], [0, 0, 10]]]],
+    [['tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[0, 0, 10], [0, 5, 20]]]],
+    [['tool' => 'erase', 'width' => 37]],
+]);
+
+it('bounds total fill geometry and preserves the eraser under the paint prank', function () {
+    $room = openRoom();
+    [, $one] = enterRoom($room);
+    enterRoom($room, 'Alex');
+    $game = startDrawing($room, $one);
+    chooseDrawing($room, $one);
+    $state = $game->fresh()->state;
+    $state['bonuses']['effects'] = [['id' => 'paint-tools', 'kind' => 'paint', 'target' => 0, 'actorId' => 0, 'startedAt' => app(GameEngine::class)->time(), 'expiresAt' => app(GameEngine::class)->time() + 4]];
+    $game->update(['state' => $state]);
+    $url = '/rooms/'.$room->code.'/drawing/stroke';
+    $this->postJson($url, drawingStroke($room, ['tool' => 'erase', 'width' => 36]))->assertOk()->assertJsonPath('game.round.canvas.0.color', '#ffffff');
+    $this->postJson($url, drawingStroke($room, ['id' => 2, 'tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[0, 0, 500]]]))->assertOk()->assertJsonPath('game.round.canvas.1.color', '#f05a78');
+    $state = $game->fresh()->state;
+    $spans = array_map(fn ($n) => [intdiv($n, 100), ($n % 100) * 2, ($n % 100) * 2 + 1], range(0, 9999));
+    $state['round']['canvas'] = [
+        ['id' => 1, 'tool' => 'fill', 'spans' => $spans, 'color' => '#35236b', 'width' => 4, 'points' => [[.5, .5]]],
+        ['id' => 2, 'tool' => 'fill', 'spans' => $spans, 'color' => '#35236b', 'width' => 4, 'points' => [[.5, .5]]],
+    ];
+    $game->update(['state' => $state]);
+    $this->postJson($url, drawingStroke($room, ['id' => 3, 'tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[0, 0, 500]]]))->assertUnprocessable();
+    expect($game->fresh()->state['round']['canvas'])->toHaveCount(2);
+});

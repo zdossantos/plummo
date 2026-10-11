@@ -235,4 +235,8 @@ return [
     'sound_off' => 'Mute sound',
     'sound_volume' => 'Volume',
     'drawing_found' => 'Found it!',
+    'drawing_tools' => 'Drawing tools',
+    'drawing_tool_brush' => 'Brush',
+    'drawing_tool_fill' => 'Fill',
+    'drawing_tool_erase' => 'Eraser',
 ];

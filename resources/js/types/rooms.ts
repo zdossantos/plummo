@@ -76,6 +76,8 @@ export type ChoiceGame = {
     } | null;
 };
 export type Stroke = {
+    tool?: 'brush' | 'fill' | 'erase';
+    spans?: [number, number, number][];
     id: number;
     color: string;
     width: number;
