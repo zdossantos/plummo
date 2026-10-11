@@ -127,6 +127,8 @@ class GameEngine
             }
             $this->save($game, ['state' => $state]);
         }
+        app(BonusClock::class)->tick($game);
+        $state = $game->state;
         if ($game->type === 'drawing') {
             return app(DrawingGame::class)->tick($room, $game);
         }

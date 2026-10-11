@@ -1,4 +1,5 @@
 import type { Stroke } from '@/types/rooms';
+import { bonusRenderedStroke } from './bonuses';
 import { floodSpans } from './drawing-fill';
 export function drawingFill(
     strokes: Stroke[],
@@ -12,7 +13,7 @@ export function drawingFill(
     if (!context) return [];
     context.fillStyle = '#ffffff';
     context.fillRect(0, 0, 500, 300);
-    for (const stroke of strokes) {
+    for (const stroke of strokes.map(bonusRenderedStroke)) {
         context.fillStyle = stroke.color;
         if (stroke.tool === 'fill') {
             for (const [row, start, end] of stroke.spans ?? [])

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import BonusIcon from '@/components/BonusIcon.vue';
 import { useTranslations } from '@/composables/useTranslations';
@@ -8,36 +8,84 @@ const props = defineProps<{
     effects: BonusEffect[];
     room: RoomState;
     canvas?: boolean;
+    now?: number;
 }>();
 const { t } = useTranslations('rooms');
-const squatter = computed(() =>
-    props.effects.find((effect) => effect.kind === 'squatter'),
+const has = (kind: string) => props.effects.some((e) => e.kind === kind);
+const visitor = computed(() =>
+    props.effects.find((e) =>
+        ['squatter', 'photobomb', 'singer', 'strike'].includes(e.kind),
+    ),
 );
 const actor = computed(() =>
-    props.room.players.find((player) => player.id === squatter.value?.actorId),
+    props.room.players.find((p) => p.id === visitor.value?.actorId),
 );
+const popped = ref(new Set<number>());
+watch(
+    () => props.effects.find((e) => e.kind === 'bubbles')?.id,
+    () => {
+        popped.value = new Set();
+    },
+);
+const labels = computed(() =>
+    props.effects
+        .filter(
+            (e) =>
+                ![
+                    'squatter',
+                    'photobomb',
+                    'stamp',
+                    'bubbles',
+                    'bolt',
+                    'scratch',
+                    'speed',
+                    'singer',
+                    'mirror',
+                ].includes(e.kind),
+        )
+        .slice(0, 3),
+);
+function remaining(e: BonusEffect) {
+    return e.expiresAt === null
+        ? null
+        : Math.max(
+              0,
+              Math.ceil(e.expiresAt - (props.now ?? Date.now() / 1000)),
+          );
+}
 </script>
 <template>
     <div
-        v-if="!canvas && effects.some((effect) => effect.kind === 'bolt')"
+        v-if="!canvas && has('bolt')"
         class="bonus-blackout"
         aria-hidden="true"
     >
         <BonusIcon kind="bolt" />
     </div>
     <div
-        v-if="!canvas && squatter && actor"
-        :key="squatter.id"
-        class="bonus-squatter"
+        v-if="!canvas && visitor && actor"
+        :key="visitor.id"
+        :class="[
+            'bonus-visitor',
+            'bonus-visitor-' + visitor.kind,
+            { 'bonus-squatter': visitor.kind === 'squatter' },
+        ]"
         aria-hidden="true"
     >
-        <PlummoAvatar :color="actor.color" :accessories="actor.accessories" />
+        <PlummoAvatar
+            :color="actor.color"
+            :accessories="actor.accessories"
+            motion="hello"
+            :motion-key="visitor.id"
+        />
+        <span v-if="visitor.kind === 'photobomb'" class="bonus-photo-flash"
+            >✦</span
+        >
+        <span v-if="visitor.kind === 'singer'" class="bonus-music-notes"
+            >♪ ♫</span
+        >
     </div>
-    <div
-        v-if="canvas && effects.some((effect) => effect.kind === 'stamp')"
-        class="bonus-stamp"
-        aria-hidden="true"
-    >
+    <div v-if="canvas && has('stamp')" class="bonus-stamp" aria-hidden="true">
         <svg viewBox="0 0 100 100">
             <circle
                 cx="50"
@@ -57,17 +105,40 @@ const actor = computed(() =>
             />
         </svg>
     </div>
-    <p
-        v-if="
-            !canvas &&
-            effects.some(
-                (effect) =>
-                    effect.kind === 'accent' || effect.kind === 'sneeze',
-            )
-        "
-        class="bonus-warning"
+    <div v-if="!canvas && has('bubbles')" class="bonus-bubbles">
+        <template v-for="n in 6" :key="n"
+            ><button
+                v-if="!popped.has(n)"
+                type="button"
+                :style="{ '--bubble-n': n }"
+                :aria-label="t('bonus_pop')"
+                @click="popped.add(n)"
+            >
+                <span aria-hidden="true" /></button
+            ><span
+                v-else
+                class="bonus-bubble-pop"
+                :style="{ '--bubble-n': n }"
+                aria-hidden="true"
+                >✦</span
+            ></template
+        >
+    </div>
+    <div
+        v-if="!canvas && labels.length"
+        class="bonus-effect-ribbon"
         role="status"
+        aria-live="polite"
     >
-        {{ t('bonus_phrase_warning') }}
-    </p>
+        <span
+            v-for="effect in labels"
+            :key="effect.id"
+            :class="['bonus-effect-token', 'bonus-token-' + effect.kind]"
+        >
+            <BonusIcon :kind="effect.kind" /><small>{{
+                t('bonus_' + effect.kind)
+            }}</small
+            ><b v-if="remaining(effect) !== null">{{ remaining(effect) }}</b>
+        </span>
+    </div>
 </template>

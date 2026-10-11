@@ -59,6 +59,10 @@ function actor(id: number) {
             v-for="event in active"
             :key="event.id"
             class="bonus-launch"
+            :class="[
+                'bonus-launch-' + event.kind,
+                { 'bonus-launch-reaction': event.reaction },
+            ]"
             data-testid="bonus-launch"
             :data-launch-id="event.id"
         >
@@ -76,7 +80,19 @@ function actor(id: number) {
             <span class="bonus-launch-caption"
                 ><small>{{ actor(event.actorId)?.name }}</small
                 ><strong>{{
-                    t('bonus_launched', { name: t('bonus_' + event.kind) })
+                    event.reaction && event.kind === 'shield'
+                        ? t('bonus_shield_broken')
+                        : event.reaction && event.kind === 'boomerang'
+                          ? t(
+                                event.deflected
+                                    ? 'bonus_deflected'
+                                    : 'bonus_reflected',
+                            )
+                          : event.kind === 'soap'
+                            ? t('bonus_clean')
+                            : t('bonus_launched', {
+                                  name: t('bonus_' + event.kind),
+                              })
                 }}</strong></span
             >
         </div>

@@ -2,6 +2,7 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { computed, onMounted, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
+import BonusLaunch from '@/components/BonusLaunch.vue';
 import BonusPocket from '@/components/BonusPocket.vue';
 import BonusReception from '@/components/BonusReception.vue';
 import GamePlummoAvatar from '@/components/GamePlummoAvatar.vue';
@@ -446,6 +447,13 @@ watch(chief, (value) => {
             "
             #footer
         >
+            <BonusLaunch
+                :game="game"
+                :room="room"
+                :server-now="serverNow"
+                :connected="connected"
+                :closed="closed"
+            />
             <div class="phone-bonus-footer">
                 <BonusPocket
                     v-if="game.bonuses"

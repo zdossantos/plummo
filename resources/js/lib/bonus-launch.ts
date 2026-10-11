@@ -2,7 +2,12 @@ import { BonusReceiptTracker } from './bonuses';
 import { PlummoSnapshotBaseline } from './plummo-motion';
 import type { BonusItem, GameState } from '@/types/rooms';
 
-export type BonusLaunchEvent = BonusItem & { at: number; actorId: number };
+export type BonusLaunchEvent = BonusItem & {
+    at: number;
+    actorId: number;
+    reaction?: boolean;
+    deflected?: boolean;
+};
 
 export class BonusLaunchTracker {
     private baseline = new PlummoSnapshotBaseline();

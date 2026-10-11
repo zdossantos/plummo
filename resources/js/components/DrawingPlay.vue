@@ -143,7 +143,13 @@ watch(
                 class="drawing-stage"
                 :class="{ 'with-guesses': !phone }"
             >
-                <div class="bonus-canvas">
+                <div
+                    class="bonus-canvas"
+                    :class="{
+                        'bonus-mirrored':
+                            !phone && effects.some((e) => e.kind === 'mirror'),
+                    }"
+                >
                     <DrawingBoard
                         :key="`${game.id}-${game.round.number}-${game.round.revision}`"
                         :strokes="game.round.canvas"
@@ -151,6 +157,8 @@ watch(
                         :busy="busy"
                         :color="effectiveColor"
                         :width="width"
+                        :giant="effects.some((e) => e.kind === 'giant')"
+                        :clumsy="effects.some((e) => e.kind === 'clumsy')"
                         :tool="tool"
                         :send="(values) => sendDrawingAction('stroke', values)"
                         @pending="pending = $event"

@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { useTranslations } from '@/composables/useTranslations';
 import type { Stroke } from '@/types/rooms';
 import { drawingFill } from '@/lib/drawing-raster';
+import { bonusStrokePoints } from '@/lib/bonuses';
 import { fillPath } from '@/lib/drawing-fill';
 const props = defineProps<{
     strokes: Stroke[];
@@ -28,6 +29,8 @@ const props = defineProps<{
     busy?: boolean;
     color?: string;
     width?: number;
+    giant?: boolean;
+    clumsy?: boolean;
     tool?: 'brush' | 'fill' | 'erase';
     send?: (values: Record<string, unknown>) => Promise<boolean>;
 }>();
@@ -101,13 +104,18 @@ watch(
 // Split a held stroke at a paint change so the prank starts and ends on time.
 // Existing segments keep their wire colour for acknowledged chunk retries.
 watch(
-    () => props.color,
-    (color) => {
+    () => [props.color, props.giant, props.clumsy] as const,
+    ([color]) => {
         if (
             active === null ||
             !current ||
             current.tool === 'erase' ||
-            current.color === color
+            (current.color === color &&
+                !!current.clumsy === !!props.clumsy &&
+                current.bonusWidth ===
+                    (props.giant
+                        ? Math.min(36, current.width * 3)
+                        : current.width))
         )
             return;
         if (local.value.length >= 100) return;
@@ -117,6 +125,10 @@ watch(
             id: local.value.length + 1,
             color: color ?? '#35236b',
             width: current.width,
+            clumsy: props.clumsy,
+            bonusWidth: props.giant
+                ? Math.min(36, current.width * 3)
+                : current.width,
             tool: current.tool,
             points: [[...last]],
         });
@@ -182,6 +194,11 @@ function down(event: PointerEvent) {
         ...(tool === 'fill' ? { spans } : {}),
         color,
         width: (props.width ?? 4) * (tool === 'erase' ? 3 : 1),
+        clumsy: tool === 'brush' && props.clumsy,
+        bonusWidth:
+            tool === 'brush' && props.giant
+                ? Math.min(36, (props.width ?? 4) * 3)
+                : undefined,
         points: [seed],
     };
     local.value.push(current);
@@ -249,21 +266,37 @@ onUnmounted(() => {
                     <template v-else>
                         <polyline
                             :points="
-                                stroke.points
+                                bonusStrokePoints(
+                                    stroke.points,
+                                    !!stroke.clumsy,
+                                    stroke.tool ?? 'brush',
+                                )
                                     .map(([x, y]) => `${x * 1000},${y * 600}`)
                                     .join(' ')
                             "
                             :stroke="stroke.color"
-                            :stroke-width="stroke.width"
+                            :stroke-width="stroke.bonusWidth ?? stroke.width"
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             fill="none"
                         />
                         <circle
                             v-if="stroke.points.length === 1"
-                            :cx="stroke.points[0][0] * 1000"
-                            :cy="stroke.points[0][1] * 600"
-                            :r="stroke.width / 2"
+                            :cx="
+                                bonusStrokePoints(
+                                    stroke.points,
+                                    !!stroke.clumsy,
+                                    stroke.tool ?? 'brush',
+                                )[0][0] * 1000
+                            "
+                            :cy="
+                                bonusStrokePoints(
+                                    stroke.points,
+                                    !!stroke.clumsy,
+                                    stroke.tool ?? 'brush',
+                                )[0][1] * 600
+                            "
+                            :r="(stroke.bonusWidth ?? stroke.width) / 2"
                             :fill="stroke.color"
                         />
                     </template>

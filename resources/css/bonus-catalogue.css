@@ -1,0 +1,436 @@
+/* Animate artwork without moving answer hitboxes. */
+.answer-upside {
+    transform: rotate(180deg);
+}
+.answer-curtain {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--paper);
+    border: 3px solid var(--edge);
+    background: repeating-linear-gradient(
+        90deg,
+        #754494 0,
+        #aa70bc 12%,
+        #663984 24%
+    );
+    box-shadow:
+        inset 0 8px 0 #efe681,
+        inset 0 -12px 18px #30214380;
+    animation: curtain-drop 0.35s cubic-bezier(0.2, 1.4, 0.5, 1);
+}
+.answer-curtain > span {
+    font-size: 32px;
+    color: var(--primary);
+}
+.answer-curtain small {
+    font-size: 12px;
+    font-weight: 900;
+}
+.game-jelly .text-summary,
+.game-jelly .game-question h1 {
+    animation: jelly-wobble 1.8s ease-in-out infinite;
+    transform-origin: 50% 75%;
+}
+.bonus-mirrored > .drawing-board {
+    transform: scaleX(-1);
+}
+.bonus-visitor {
+    position: absolute;
+    top: 35%;
+    left: 32%;
+    width: clamp(90px, 24vw, 160px);
+    z-index: 25;
+    pointer-events: none;
+}
+.bonus-visitor-squatter {
+    animation: bonus-walk 4s ease-in-out both;
+}
+.bonus-visitor-photobomb {
+    animation: photo-peek 4s ease-in-out both;
+}
+.bonus-visitor-singer {
+    animation: jelly-wobble 0.7s ease-in-out infinite;
+}
+.bonus-visitor-strike {
+    top: auto;
+    bottom: 0;
+    left: 18%;
+    animation: carry-away 2s ease-in-out infinite alternate;
+}
+.bonus-photo-flash {
+    position: absolute;
+    right: -5%;
+    top: 0;
+    font-size: 64px;
+    color: var(--primary);
+    animation: photo-flash 1.3s ease-out infinite;
+}
+.bonus-music-notes {
+    position: absolute;
+    right: -25%;
+    top: 10%;
+    color: var(--primary);
+    font-size: 36px;
+    animation: music-rise 1.3s ease-out infinite;
+}
+.bonus-bubbles {
+    position: absolute;
+    inset: 18% 0 6%;
+    z-index: 28;
+    pointer-events: none;
+}
+.bonus-bubbles button,
+.bonus-bubble-pop {
+    position: absolute;
+    left: calc(6% + (var(--bubble-n) - 1) * 14%);
+    top: 15%;
+    width: clamp(44px, 12vw, 64px);
+    height: clamp(44px, 12vw, 64px);
+    padding: 0;
+    border: 2px solid #ffffffa0;
+    border-radius: 50%;
+    pointer-events: auto;
+    background:
+        radial-gradient(
+            circle at 28% 22%,
+            #fff 0 4%,
+            #ffffff60 5% 12%,
+            transparent 15%
+        ),
+        conic-gradient(#f1b5c850, #aa83ec80, #b7e1c380, #efe68160, #f1b5c850);
+    box-shadow:
+        inset -5px -5px 8px #aa83ec60,
+        inset 4px 4px 8px #ffffff60;
+    animation: bubble-float 2.4s ease-in-out infinite alternate;
+    animation-delay: calc(var(--bubble-n) * -0.35s);
+}
+.bonus-bubbles :nth-child(2n) {
+    top: 45%;
+}
+.bonus-bubbles :nth-child(3n) {
+    top: 70%;
+}
+.bonus-bubble-pop {
+    pointer-events: none;
+    border: 0;
+    background: none;
+    color: var(--primary);
+    font-size: 44px;
+    text-align: center;
+    animation: bubble-pop 0.35s ease-out both;
+}
+.bonus-effect-ribbon {
+    position: absolute;
+    bottom: 2px;
+    right: 0;
+    left: 0;
+    z-index: 27;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    pointer-events: none;
+}
+.bonus-effect-token {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 32%;
+    padding: 4px 7px;
+    border: 2px solid var(--edge);
+    border-radius: 12px;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 3px 0 var(--edge);
+    animation: token-arrive 0.3s ease-out;
+}
+.bonus-effect-token svg {
+    width: 17px;
+    height: 17px;
+    flex: none;
+}
+.bonus-effect-token small {
+    font-size: 10px;
+    line-height: 1.05;
+    font-weight: 800;
+}
+.bonus-effect-token b {
+    font-size: 12px;
+}
+.bonus-token-shield,
+.bonus-token-boomerang {
+    background: var(--mint);
+}
+.bonus-token-freeze {
+    background: #c3eaf5;
+}
+.bonus-carried-away {
+    animation: object-leave 0.6s ease-in both;
+}
+.bonus-mystery {
+    background: repeating-linear-gradient(
+        135deg,
+        #aa83ec,
+        #aa83ec 8px,
+        #c1a1ed 8px,
+        #c1a1ed 16px
+    );
+}
+.bonus-strike-sign {
+    position: absolute;
+    inset: 10px 0 auto;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    color: var(--primary);
+}
+.bonus-strike-sign svg {
+    width: 28px;
+    height: 28px;
+    animation: carry-away 1s infinite alternate;
+}
+.bonus-launch-shield .bonus-launch-projectile,
+.bonus-launch-soap .bonus-launch-projectile,
+.bonus-launch-boomerang .bonus-launch-projectile {
+    background: var(--mint);
+}
+.bonus-launch-reaction.bonus-launch-shield .bonus-launch-projectile {
+    animation: shield-shatter 0.65s ease-out;
+}
+.bonus-launch-boomerang .bonus-launch-projectile {
+    animation: boomerang-return 0.8s ease-out;
+}
+.bonus-launch-washer .bonus-launch-projectile,
+.bonus-launch-scratch .bonus-launch-projectile {
+    animation: washer-spin 0.8s ease-out;
+}
+.bonus-launch-freeze .bonus-launch-projectile {
+    background: #c3eaf5;
+    animation: ice-settle 0.8s ease-out;
+}
+.bonus-launch-soap .bonus-launch-projectile {
+    animation: bubble-float 0.4s ease-in-out 2 alternate;
+    border-radius: 50%;
+}
+.bonus-launch-leak .bonus-launch-projectile,
+.bonus-launch-borrow .bonus-launch-projectile,
+.bonus-launch-alarm .bonus-launch-projectile {
+    background: var(--pink);
+    animation: alarm-ring 0.15s ease-in-out 5 alternate;
+}
+.bonus-launch-extension .bonus-launch-projectile,
+.bonus-launch-last_breath .bonus-launch-projectile,
+.bonus-launch-overtime .bonus-launch-projectile {
+    animation: time-grow 0.7s ease-out;
+}
+@keyframes curtain-drop {
+    from {
+        transform: scaleY(0.05);
+        transform-origin: top;
+    }
+    to {
+        transform: scaleY(1);
+        transform-origin: top;
+    }
+}
+@keyframes jelly-wobble {
+    0%,
+    100% {
+        transform: skew(-2deg) scaleY(0.98);
+    }
+    50% {
+        transform: skew(2deg) scaleY(1.02);
+    }
+}
+@keyframes photo-peek {
+    0%,
+    100% {
+        opacity: 0;
+        transform: translateY(60%) rotate(-20deg);
+    }
+    20%,
+    80% {
+        opacity: 1;
+        transform: translateY(0) rotate(12deg) scale(1.2);
+    }
+}
+@keyframes photo-flash {
+    0%,
+    70%,
+    100% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    20% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+@keyframes music-rise {
+    from {
+        opacity: 1;
+        transform: translateY(0) rotate(-15deg);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-45px) rotate(15deg);
+    }
+}
+@keyframes carry-away {
+    from {
+        transform: translateX(-20px) rotate(-5deg);
+    }
+    to {
+        transform: translateX(35px) rotate(5deg);
+    }
+}
+@keyframes bubble-float {
+    from {
+        transform: translateY(-8px) rotate(-8deg);
+    }
+    to {
+        transform: translateY(8px) rotate(8deg);
+    }
+}
+@keyframes bubble-pop {
+    from {
+        opacity: 1;
+        transform: scale(0.7);
+    }
+    to {
+        opacity: 0;
+        transform: scale(1.7);
+    }
+}
+@keyframes token-arrive {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+@keyframes object-leave {
+    to {
+        opacity: 0;
+        transform: translateY(20px) scale(0.3);
+    }
+}
+@keyframes shield-shatter {
+    20%,
+    60% {
+        transform: rotate(-15deg);
+    }
+    40% {
+        transform: rotate(15deg) scale(1.2);
+    }
+    80% {
+        transform: scale(0.8);
+    }
+}
+@keyframes boomerang-return {
+    0% {
+        transform: translateX(-50px) rotate(-180deg);
+    }
+    50% {
+        transform: translateX(45px) rotate(180deg);
+    }
+    100% {
+        transform: none;
+    }
+}
+@keyframes washer-spin {
+    from {
+        transform: rotate(-360deg) scale(0.5);
+    }
+    to {
+        transform: none;
+    }
+}
+@keyframes ice-settle {
+    0% {
+        transform: translateY(-30px);
+    }
+    35% {
+        transform: translateY(5px);
+    }
+    60% {
+        transform: translateY(-7px);
+    }
+    100% {
+        transform: none;
+    }
+}
+@keyframes alarm-ring {
+    from {
+        transform: rotate(-12deg);
+    }
+    to {
+        transform: rotate(12deg);
+    }
+}
+@keyframes time-grow {
+    0% {
+        transform: scale(0.3);
+    }
+    60% {
+        transform: scale(1.3);
+    }
+    100% {
+        transform: none;
+    }
+}
+@media (max-width: 640px) {
+    body .bonus-launch-layer {
+        bottom: clamp(96px, 20dvh, 150px);
+    }
+    body .bonus-launch {
+        padding: 5px 10px;
+        border-radius: 16px;
+        gap: 6px;
+        max-width: 95%;
+    }
+    body .bonus-launch-actor {
+        width: 40px;
+    }
+    body .bonus-launch-projectile {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+    }
+    body .bonus-launch-projectile svg {
+        width: 24px;
+        height: 24px;
+    }
+    body .bonus-launch-caption strong {
+        font-size: 14px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .answer-curtain,
+    .game-jelly .text-summary,
+    .game-jelly .game-question h1,
+    .bonus-visitor,
+    .bonus-photo-flash,
+    .bonus-music-notes,
+    .bonus-bubbles button,
+    .bonus-bubble-pop,
+    .bonus-effect-token,
+    .bonus-carried-away,
+    .bonus-strike-sign svg,
+    .bonus-launch .bonus-launch-projectile {
+        animation: none;
+    }
+    .bonus-carried-away {
+        visibility: hidden;
+    }
+}

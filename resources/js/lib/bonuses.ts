@@ -1,3 +1,4 @@
+import type { Stroke } from '@/types/rooms';
 import type { BonusEffect, BonusReceipt } from '@/types/rooms';
 
 export function activeBonusEffects(
@@ -67,4 +68,48 @@ export class BonusReceiptTracker<
         }
         return fresh;
     }
+}
+
+export function eatenQuestion(question: string, active: boolean): string {
+    if (!active) return question;
+    const words = question.match(/[\p{L}\p{N}]+/gu) ?? [];
+    const candidate =
+        words.slice(1).find((word) => word.length >= 6) ??
+        words.find((word) => word.length >= 4);
+    return candidate ? question.replace(candidate, '▰▰▰▰') : question;
+}
+
+export function bonusStrokePoints(
+    points: [number, number][],
+    active: boolean,
+    tool: string,
+): [number, number][] {
+    if (!active || tool !== 'brush') return points;
+    return points.map(([x, y]) => [
+        Math.min(1, Math.max(0, x + 0.008 * Math.sin(y * 90))),
+        Math.min(1, Math.max(0, y + 0.012 * Math.sin(x * 70))),
+    ]);
+}
+
+export function bonusPlaybackRate(effects: BonusEffect[], now: number): number {
+    return effects.some(
+        (e) =>
+            e.kind === 'speed' && (e.expiresAt === null || e.expiresAt > now),
+    )
+        ? 1.25
+        : 1;
+}
+
+/** Resolve unsent preview geometry once, before raster fill. */
+export function bonusRenderedStroke(stroke: Stroke): Stroke {
+    const { clumsy, bonusWidth, ...canonical } = stroke;
+    return {
+        ...canonical,
+        width: bonusWidth ?? stroke.width,
+        points: bonusStrokePoints(
+            stroke.points,
+            clumsy ?? false,
+            stroke.tool ?? 'brush',
+        ),
+    };
 }

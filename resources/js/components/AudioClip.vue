@@ -3,10 +3,14 @@ import { playAudio, fadeAudio } from '@/lib/audio';
 import { ref, watch, onUnmounted, onMounted, inject } from 'vue';
 import { useTranslations } from '@/composables/useTranslations';
 import { soundSettings } from '@/lib/soundscape';
+import { AudioPranks } from '@/lib/audio-pranks';
+import type { BonusEffect } from '@/types/rooms';
 const props = defineProps<{
     src: string;
     playing: boolean;
     revealing?: boolean;
+    effects?: BonusEffect[];
+    now?: number;
 }>();
 const sound = inject(soundSettings, undefined);
 let cancelFade: (() => void) | undefined;
@@ -89,6 +93,26 @@ watch(
     () => [sound?.enabled.value, sound?.volume.value],
     () => transition(!props.playing),
 );
+const pranks = new AudioPranks();
+function updatePranks() {
+    pranks.update(
+        audio.value,
+        props.effects ?? [],
+        props.now ?? Date.now() / 1000,
+        props.playing && !props.revealing,
+    );
+}
+watch(
+    () => [
+        props.effects,
+        props.now,
+        props.playing,
+        props.revealing,
+        audio.value,
+    ],
+    updatePranks,
+    { flush: 'post', immediate: true },
+);
 function mediaError() {
     failed.value = true;
     blocked.value = true;
@@ -99,6 +123,7 @@ onMounted(() => {
 });
 onUnmounted(() => {
     clearTimeout(release);
+    pranks.dispose();
     audio.value?.removeEventListener('error', mediaError);
     cancelFade?.();
     window.removeEventListener('plummo-audio-unlocked', play);

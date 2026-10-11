@@ -124,3 +124,29 @@ test('starts one continuous decoded loop and stops it when disposed', async () =
         globalThis.fetch = originalFetch;
     }
 });
+
+test('audio pranks reuse their loop and restore normal playback on pause, expiry and disposal', async () => {
+    const { AudioPranks } = await import('../../resources/js/lib/audio-pranks');
+    let repeat: (() => void) | undefined;
+    let starts = 0;
+    const pranks = new AudioPranks({ every(fn) { repeat = fn; starts++; return () => { repeat = undefined; }; } });
+    const audio = { playbackRate: 1, currentTime: 12, paused: false, duration: 30 };
+    const effects = [{id:'scratch',kind:'scratch' as const,actorId:1,startedAt:0,expiresAt:4}, {id:'speed',kind:'speed' as const,actorId:1,startedAt:0,expiresAt:8}];
+    pranks.update(audio, effects, 1, true);
+    pranks.update(audio, effects, 2, true);
+    expect(starts).toBe(1);
+    expect(audio.playbackRate).toBe(1.25);
+    audio.currentTime = 13;
+    repeat?.();
+    expect(audio.currentTime).toBe(12);
+    pranks.update(audio, effects, 4, true);
+    expect(repeat).toBeUndefined();
+    expect(audio.playbackRate).toBe(1.25);
+    pranks.update(audio, effects, 5, false);
+    expect(audio.playbackRate).toBe(1);
+    pranks.update(audio, effects, 6, true);
+    expect(audio.playbackRate).toBe(1.25);
+    pranks.dispose();
+    expect(audio.playbackRate).toBe(1);
+    expect(repeat).toBeUndefined();
+});
