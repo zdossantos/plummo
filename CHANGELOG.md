@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.0](https://github.com/zdossantos/plummo/compare/plummo-v0.7.0...plummo-v0.8.0) (2026-10-11)
+
+
+### Features
+
+* **bonuses:** expand prank catalogue with protections and animated effects ([#68](https://github.com/zdossantos/plummo/issues/68)) ([a528559](https://github.com/zdossantos/plummo/commit/a528559ed17b95656bdd72abcb4fa116225c2e5e))
+* **bonuses:** integrate illustrations and ranked object distribution ([#70](https://github.com/zdossantos/plummo/issues/70)) ([c563638](https://github.com/zdossantos/plummo/commit/c563638aa3a0101d5e0bfb753f98b2ade2da7275))
+
 ## [0.7.0](https://github.com/zdossantos/plummo/compare/plummo-v0.6.0...plummo-v0.7.0) (2026-10-11)
 
 
