@@ -18,6 +18,20 @@ class BonusCatalog
         };
     }
 
+    /** Internal disturbance score: protections and harmless gifts are zero. */
+    public function disturbance(string $kind): int
+    {
+        return match ($kind) {
+            'shield', 'soap', 'boomerang', 'pinata', 'freeze', 'extension', 'last_breath' => 0,
+            'mystery', 'bubbles', 'photobomb', 'borrow' => 1,
+            'squatter', 'artist', 'stamp', 'singer', 'overtime' => 2,
+            'bolt', 'paint', 'jelly', 'accent', 'sneeze', 'advert', 'scratch', 'mirror' => 3,
+            'dice', 'washer', 'watch', 'leak', 'alarm', 'translator', 'alphabet', 'giant', 'clumsy', 'speed' => 4,
+            'lock', 'strike', 'missing_word', 'curtain' => 5,
+            default => throw new \InvalidArgumentException('Unknown bonus kind: '.$kind),
+        };
+    }
+
     public function defense(string $kind): bool
     {
         return in_array($kind, ['shield', 'soap', 'boomerang'], true);

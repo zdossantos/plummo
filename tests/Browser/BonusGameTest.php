@@ -86,6 +86,7 @@ it('launches a collective bonus in one click while phone and screen stay inside 
         $first->refresh();
         $first->assertPresent('.bonus-pending');
         $first->assertPresent('.bonus-helpful')->assertPresent('.bonus-prank');
+        $first->page()->evaluate('async () => { await Promise.all([...document.querySelectorAll(".bonus-pocket .bonus-icon")].map(img => img.decode())); }');
         expect($first->page()->evaluate('() => [...document.querySelectorAll(".bonus-pocket .bonus-icon")].every(img => img.complete && img.naturalWidth > 0 && img.getAttribute("src").startsWith("/bonuses/"))'))->toBeTrue();
         $first->screenshot(filename: 'bonus-illustrated-pocket');
         $first->page()->setViewportSize(320, 664);
