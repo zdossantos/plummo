@@ -342,7 +342,7 @@ const ranking = computed(() => {
                     :key="index"
                     class="game-choice"
                     :data-answer="index"
-                    :data-color="index % 4"
+                    :data-color="index % 8"
                     :class="{
                         correct: revealed && game.round.correct === index,
                         wrong:
@@ -376,7 +376,7 @@ const ranking = computed(() => {
                             ><span>✦</span
                             ><small>{{ t('bonus_reveal') }}</small></span
                         >
-                        <AnswerTexture :variant="index % 4" />
+                        <AnswerTexture :variant="index % 8" />
                         <span
                             class="choice-letter"
                             :class="{
@@ -395,7 +395,7 @@ const ranking = computed(() => {
                         >
                     </button>
                     <p v-else class="choice-face font-bold">
-                        <AnswerTexture :variant="index % 4" />
+                        <AnswerTexture :variant="index % 8" />
                         <span
                             class="choice-letter"
                             :class="{

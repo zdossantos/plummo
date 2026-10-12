@@ -180,7 +180,17 @@ watch(
                         :send="(values) => sendDrawingAction('stroke', values)"
                         @pending="pending = $event"
                     />
-                    <BonusEffects :effects="effects" :room="room" canvas />
+                    <BonusEffects
+                        :effects="
+                            phone
+                                ? effects.filter(
+                                      (effect) => effect.kind !== 'bolt',
+                                  )
+                                : effects
+                        "
+                        :room="room"
+                        canvas
+                    />
                 </div>
                 <aside v-if="!phone" class="drawing-guesses" aria-live="polite">
                     <h2>{{ t('drawing_guesses') }}</h2>

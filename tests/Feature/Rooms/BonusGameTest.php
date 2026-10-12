@@ -389,3 +389,27 @@ it('combines phrase pranks after validation without modifying saved drafts', fun
     expect($entry['text'])->toEndWith('Wiwe avec ATCHOUM ! Wobewt');
     $this->getJson('/rooms/'.$room->code.'/state')->assertJsonMissingPath('game.round.entries.0.author')->assertJsonMissingPath('game.round.drafts');
 })->group('bonuses');
+
+it('projects drawing lightning onto the TV canvas only when an opponent is hit', function (bool $artistLaunch, bool $protected) {
+    $this->freezeTime();
+    $room = openRoom();
+    [$artist, $one] = enterRoom($room);
+    [$other, $two] = enterRoom($room, 'Autre');
+    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', ['type' => 'drawing', 'packs' => [drawingPack()], 'rounds' => 1, 'duration' => 90, 'bonuses' => true])->assertCreated();
+    $game = Game::where('room_id', $room->id)->sole();
+    $values = ['game_id' => $game->id, 'round' => 1];
+    $this->postJson('/rooms/'.$room->code.'/drawing/choose', [...$values, 'choice' => 0])->assertOk();
+    [$sender, $senderToken, $target, $targetToken] = $artistLaunch ? [$artist, $one, $other, $two] : [$other, $two, $artist, $one];
+    if ($protected) {
+        giveTestBonus($game, $target, 'shield');
+        $this->withCookie('plummo_player_'.$room->code, $targetToken)->postJson('/rooms/'.$room->code.'/bonuses', [...$values, 'item_id' => 'test-object'])->assertOk();
+    }
+    giveTestBonus($game, $sender, 'bolt');
+    $this->withCookie('plummo_player_'.$room->code, $senderToken)->postJson('/rooms/'.$room->code.'/bonuses', [...$values, 'item_id' => 'test-object'])->assertOk()->assertJsonPath('game.bonuses.effects', []);
+    $bonuses = app(GameBonuses::class);
+    expect($bonuses->view($game->fresh(), null, true)['effects'])->toHaveCount($protected ? 0 : 1);
+    $response = $this->withCookie('plummo_player_'.$room->code, $targetToken)->postJson('/rooms/'.$room->code.'/presence')->assertOk();
+    $response->assertJsonCount($protected ? 0 : 1, 'game.bonuses.effects');
+    $this->travel(3)->seconds();
+    expect($bonuses->view($game->fresh(), null, true)['effects'])->toBe([]);
+})->with([[true, false], [false, false], [true, true], [false, true]]);

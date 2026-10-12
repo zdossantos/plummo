@@ -295,7 +295,7 @@ const showChoices = computed(
                     :key="index"
                     class="game-choice"
                     :data-answer="index"
-                    :data-color="index % 4"
+                    :data-color="index % 8"
                     :class="{
                         correct: revealed && game.round.correct === index,
                         wrong:
@@ -326,7 +326,7 @@ const showChoices = computed(
                         "
                         @click="phone && choose(index)"
                     >
-                        <AnswerTexture :variant="index % 4" />
+                        <AnswerTexture :variant="index % 8" />
                         <span
                             v-if="
                                 !['hide', 'count', 'cups'].includes(

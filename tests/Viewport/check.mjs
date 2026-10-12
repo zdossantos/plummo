@@ -347,6 +347,69 @@ for (const [width, height] of formats)
                 .locator('.drawing-settings-drawer [data-slot="drawer-close"]')
                 .click();
         }
+        if (mode === 'blind') {
+            const identities = () =>
+                page.locator('.game-choice').evaluateAll((cards) =>
+                    Object.fromEntries(
+                        cards.map((card) => [
+                            card.dataset.answer,
+                            {
+                                color: getComputedStyle(
+                                    card.querySelector('.choice-face'),
+                                ).backgroundColor,
+                                pattern:
+                                    card.querySelector('.answer-texture')
+                                        .innerHTML,
+                            },
+                        ]),
+                    ),
+                );
+            const before = await identities();
+            assert.equal(
+                new Set(Object.values(before).map((value) => value.color)).size,
+                8,
+                'Eight answers must have distinct colors',
+            );
+            assert.equal(
+                new Set(Object.values(before).map((value) => value.pattern))
+                    .size,
+                8,
+                'Eight answers must have distinct SVG patterns',
+            );
+            await page.evaluate((g) => window.updateGame(g), {
+                ...game,
+                bonuses: {
+                    ...bonuses,
+                    effects: [
+                        {
+                            id: 'eight-dice',
+                            kind: 'dice',
+                            startedAt: 100,
+                            expiresAt: 110,
+                        },
+                    ],
+                },
+            });
+            for (const now of [100, 102, 104]) {
+                await page.evaluate((now) => window.setServerNow(now), now);
+                await page.waitForTimeout(450);
+                assert.deepEqual(
+                    await identities(),
+                    before,
+                    'Dice changed the color or pattern assigned to an answer',
+                );
+                if (width < 1000)
+                    assert.notDeepEqual(
+                        await page
+                            .locator('.game-choice')
+                            .evaluateAll((cards) =>
+                                cards.map((card) => card.dataset.answer),
+                            ),
+                        Array.from({ length: 8 }, (_, i) => String(i)),
+                        'Dice did not move eight cards',
+                    );
+            }
+        }
         if (mode === 'quiz' && width < 1000) {
             const colors = await page
                 .locator('.game-choice')

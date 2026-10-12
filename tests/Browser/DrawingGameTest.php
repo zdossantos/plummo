@@ -133,3 +133,53 @@ it('draws from two separate phones and plays every artist before returning to th
         $tag->delete();
     }
 });
+
+it('darkens only the TV canvas and opponents phones when the artist launches lightning', function () {
+    app()->terminating(function () {
+        app('cookie')->flushQueuedCookies();
+        app('session.store')->flush();
+    });
+    $pack = Pack::findOrFail(drawingPack());
+    $tag = $pack->tags()->sole();
+    $ids = $tag->contents()->pluck('contents.id');
+    $screen = visit('/')->withLocale('en-US')->assertSee('Everyone plays.');
+    $room = Room::latest('id')->firstOrFail();
+    try {
+        $first = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Camille')->click('Continue')->click('Enter the room')->assertSee('Prepare a quiz');
+        $second = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Alex')->click('Continue')->click('Enter the room')->assertSee('Alex');
+        $first->click('[data-choose-game]')->click('[data-game-option="drawing"]')->assertSee('Prepare a drawing game');
+        $first->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")')->assertSee('2 drawings');
+        $first->click('label:has-text("Prank bonuses")');
+        $first->page()->locator('button:has-text("Start drawing")')->click(['noWaitAfter' => true]);
+        $first->assertSee('Choose a word');
+        $second->assertSee('Camille is choosing a word');
+        $game = Game::where('room_id', $room->id)->sole();
+        $word = $game->state['round']['words'][0];
+        $first->page()->locator('[data-testid="drawing-word"]')->first()->click(['noWaitAfter' => true]);
+        $first->assertSee('Your word: '.$word);
+        $second->assertDontSee($word)->assertMissing('[data-testid="drawing-board"]');
+        $state = $game->fresh()->state;
+        $player = $room->players()->where('name', 'Camille')->sole();
+        $state['bonuses']['inventory'][$player->id] = [['id' => 'drawing-bolt', 'kind' => 'bolt']];
+        $game->update(['state' => $state]);
+        $first->refresh()->assertPresent('.bonus-object');
+        $first->click('.bonus-object');
+        $screen->assertVisible('.bonus-blackout-canvas');
+        $second->assertVisible('.bonus-blackout');
+        $first->assertMissing('.bonus-blackout');
+        expect($screen->page()->evaluate('() => { const layer = document.querySelector(".bonus-blackout-canvas"); const board = document.querySelector(".bonus-canvas"); const a = layer.getBoundingClientRect(), b = board.getBoundingClientRect(); return getComputedStyle(layer).position === "absolute" && getComputedStyle(layer).pointerEvents === "none" && Math.abs(a.width-b.width) < 2 && Math.abs(a.height-b.height) < 2; }'))->toBeTrue();
+        $second->fill('drawing-guess', 'Still usable');
+        $screen->page()->evaluate('() => new Promise(resolve => setTimeout(resolve, 3200))');
+        $screen->assertMissing('.bonus-blackout');
+        $second->assertMissing('.bonus-blackout');
+
+    } finally {
+        Game::where('room_id', $room->id)->delete();
+        $room->players()->delete();
+        $room->delete();
+        $pack->tags()->detach();
+        $pack->delete();
+        Content::whereIn('id', $ids)->delete();
+        $tag->delete();
+    }
+});

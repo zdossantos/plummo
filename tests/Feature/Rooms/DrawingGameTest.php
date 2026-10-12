@@ -494,3 +494,19 @@ it('preserves the geometry and fill bounds of legacy drawing rounds', function (
     $this->postJson($url, drawingStroke($room, ['tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[300, 0, 500]]]))->assertUnprocessable();
     $this->postJson($url, drawingStroke($room, ['tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[299, 0, 500]]]))->assertOk();
 });
+
+it('awards a plural answer without leaking the word or keeping a near hint', function () {
+    $room = openRoom();
+    [, $one] = enterRoom($room);
+    [$guesser, $two] = enterRoom($room, 'Alex');
+    enterRoom($room, 'Sam');
+    $game = startDrawing($room, $one);
+    chooseDrawing($room, $one);
+    $state = $game->fresh()->state;
+    $state['round']['word'] = 'Cheval';
+    $game->update(['state' => $state]);
+    $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => 'CHEVAUX']))
+        ->assertOk()->assertJsonPath('game.me.found', true)->assertJsonPath('game.me.near', false)
+        ->assertJsonPath('game.round.guesses.0.text', null);
+    expect($game->fresh()->state['round']['awards'][$guesser])->toBeGreaterThan(0);
+});
