@@ -48,7 +48,7 @@ jobs:
             - run: bunx playwright install --with-deps chromium
             - run: bun run test:viewport
             - run: APP_ENV=testing php artisan migrate --force
-            - run: php artisan test
+            - run: php artisan test --stop-on-failure
     runtime:
         runs-on: ubuntu-latest
         timeout-minutes: 15
