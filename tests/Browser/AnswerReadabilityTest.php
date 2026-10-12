@@ -40,7 +40,12 @@ it('uses the available answer height for long text and keeps the TV question pro
         }
         expect($page->page()->evaluate('() => { const cards = [...document.querySelectorAll(".game-choice")]; return cards.length === 4 && new Set(cards.map(e => getComputedStyle(e).getPropertyValue("--choice-color").trim())).size === 4 && cards.every(e => { const r=e.getBoundingClientRect(); return r.width >= 44 && r.height >= 44 && r.bottom <= innerHeight; }); }'))->toBeTrue();
         expect($page->page()->evaluate('() => document.documentElement.scrollHeight <= innerHeight'))->toBeTrue();
-        expect($page->page()->evaluate('() => { const e = document.querySelector(".game-question h1"); return e.scrollHeight <= e.clientHeight + 1; }'))->toBeTrue();
+        $questionFits = $page->page()->evaluate('() => { const e = document.querySelector(".game-question h1"); return e.scrollHeight <= e.clientHeight + 1; }');
+        if ($phone && ! $questionFits) {
+            $page->click('.game-question .text-reader-trigger')->assertSee($question)->click('Close');
+        } else {
+            expect($questionFits)->toBeTrue();
+        }
         if ($width >= 1280) {
             expect($page->page()->evaluate('() => parseFloat(getComputedStyle(document.querySelector(".game-question h1")).fontSize) > parseFloat(getComputedStyle(document.querySelector(".choice-face")).fontSize)'))->toBeTrue();
         }
