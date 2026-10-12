@@ -11,7 +11,8 @@
     "format:check": "prettier --check resources/js resources/css vite.config.ts",
     "format": "prettier --write resources/js resources/css vite.config.ts",
     "types:check": "vue-tsc --noEmit",
-    "test:unit": "bun test tests/Frontend"
+    "test:unit": "bun test tests/Frontend",
+    "test:viewport": "vite build --config tests/Viewport/vite.config.mjs && bun tests/Viewport/check.mjs"
   },
   "dependencies": {
     "@inertiajs/vite": "^3.0.0",

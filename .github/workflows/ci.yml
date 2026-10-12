@@ -46,6 +46,7 @@ jobs:
             - run: composer lint:check && composer analyse
             - run: bun run lint:check && bun run format:check && bun run types:check && bun run test:unit && bun run build
             - run: bunx playwright install --with-deps chromium
+            - run: bun run test:viewport
             - run: APP_ENV=testing php artisan migrate --force
             - run: php artisan test
     runtime:

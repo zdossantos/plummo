@@ -31,11 +31,9 @@ class GameBonuses
             $bonus['effects'] = [];
             $bonus['defenses'] = [];
             $scores = $this->participantScores($state);
-            $best = max([0, ...array_values($scores)]);
             foreach (array_keys($scores) as $id) {
                 $bonus['inventory'][$id] ??= [];
-                $this->give($bonus, $id, $game->type, $scores);
-                if (($state['scores'][$id] ?? 0) < $best) {
+                if (($state['number'] - 1) % 3 === 0) {
                     $this->give($bonus, $id, $game->type, $scores);
                 }
             }

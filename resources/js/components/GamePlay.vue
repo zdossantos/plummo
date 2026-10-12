@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Pause } from '@lucide/vue';
 import BonusEffects from '@/components/BonusEffects.vue';
 import { activeBonusEffects, bonusChoices, eatenQuestion } from '@/lib/bonuses';
 import PagedList from '@/components/PagedList.vue';
@@ -139,7 +140,7 @@ const ranking = computed(() => {
             :now="serverNow"
         />
         <div
-            class="flex items-center justify-between gap-5 font-bold text-primary"
+            class="game-phase-bar flex items-center justify-between gap-5 font-bold text-primary"
         >
             <p>
                 {{
@@ -165,6 +166,20 @@ const ranking = computed(() => {
                     )
                 }}
             </p>
+            <button
+                v-if="
+                    chief &&
+                    phone &&
+                    !['paused', 'results'].includes(game.phase)
+                "
+                class="game-pause"
+                type="button"
+                :disabled="busy"
+                :aria-label="t('pause_game')"
+                @click="emit('control', 'pause')"
+            >
+                <Pause aria-hidden="true" />
+            </button>
             <p
                 v-if="
                     [
@@ -316,11 +331,18 @@ const ranking = computed(() => {
             <p v-if="phone && !game.me?.eligible && !revealed" class="text-sm">
                 {{ t('next_round_wait') }}
             </p>
-            <div class="game-choices">
+            <TransitionGroup
+                tag="div"
+                class="game-choices"
+                :class="{ 'controller-answers': phone }"
+                name="answer"
+            >
                 <div
                     v-for="{ choice, index } in choices"
                     :key="index"
                     class="game-choice"
+                    :data-answer="index"
+                    :data-color="index % 4"
                     :class="{
                         correct: revealed && game.round.correct === index,
                         wrong:
@@ -355,9 +377,12 @@ const ranking = computed(() => {
                             ><small>{{ t('bonus_reveal') }}</small></span
                         >
                         <AnswerTexture :variant="index % 4" />
-                        <span class="choice-letter">{{
-                            String.fromCharCode(65 + index)
-                        }}</span
+                        <span
+                            class="choice-letter"
+                            :class="{
+                                'answer-upside': phone && hasEffect('alphabet'),
+                            }"
+                            >{{ String.fromCharCode(65 + index) }}</span
                         ><span
                             class="text-summary"
                             :class="{
@@ -371,9 +396,12 @@ const ranking = computed(() => {
                     </button>
                     <p v-else class="choice-face font-bold">
                         <AnswerTexture :variant="index % 4" />
-                        <span class="choice-letter">{{
-                            String.fromCharCode(65 + index)
-                        }}</span
+                        <span
+                            class="choice-letter"
+                            :class="{
+                                'answer-upside': phone && hasEffect('alphabet'),
+                            }"
+                            >{{ String.fromCharCode(65 + index) }}</span
                         ><span class="text-summary">{{
                             choiceText(choice)
                         }}</span>
@@ -393,10 +421,12 @@ const ranking = computed(() => {
                     <TextReader
                         v-if="phone && !concealed(index)"
                         :text="choiceText(choice)"
+                        :force="phone"
+                        :upside="phone && hasEffect('alphabet')"
                         :label="String.fromCharCode(65 + index)"
                     />
                 </div>
-            </div>
+            </TransitionGroup>
             <p
                 v-if="phone && game.me?.answered && !revealed"
                 class="text-sm font-semibold"
@@ -413,29 +443,20 @@ const ranking = computed(() => {
             </p>
         </template>
         <div
-            v-if="chief && phone && game.phase !== 'results'"
+            v-if="chief && phone && game.phase === 'paused'"
             class="flex flex-wrap gap-2"
         >
             <Button
-                v-if="game.phase !== 'paused'"
+                :disabled="busy || game.exhausted"
+                @click="emit('control', 'resume')"
+                >{{ t('resume_game') }}</Button
+            >
+            <Button
                 variant="outline"
                 :disabled="busy"
-                @click="emit('control', 'pause')"
-                >{{ t('pause_game') }}</Button
+                @click="emit('control', 'stop')"
+                >{{ t('stop_game') }}</Button
             >
-            <template v-else>
-                <Button
-                    :disabled="busy || game.exhausted"
-                    @click="emit('control', 'resume')"
-                    >{{ t('resume_game') }}</Button
-                >
-                <Button
-                    variant="outline"
-                    :disabled="busy"
-                    @click="emit('control', 'stop')"
-                    >{{ t('stop_game') }}</Button
-                >
-            </template>
         </div>
     </section>
 </template>

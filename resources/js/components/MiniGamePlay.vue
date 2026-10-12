@@ -278,8 +278,10 @@ const showChoices = computed(
                     )
                 }}
             </p>
-            <div
+            <TransitionGroup
                 v-if="showChoices"
+                tag="div"
+                name="answer"
                 class="game-choices mini-choices"
                 :class="{
                     'mini-numbers': ['hide', 'count', 'cups'].includes(
@@ -292,6 +294,8 @@ const showChoices = computed(
                     v-for="{ choice, index } in choices"
                     :key="index"
                     class="game-choice"
+                    :data-answer="index"
+                    :data-color="index % 4"
                     :class="{
                         correct: revealed && game.round.correct === index,
                         wrong:
@@ -357,7 +361,7 @@ const showChoices = computed(
                         />
                     </div>
                 </div>
-            </div>
+            </TransitionGroup>
             <p v-if="revealed" class="mini-result" role="status">
                 {{
                     game.round.correct !== null

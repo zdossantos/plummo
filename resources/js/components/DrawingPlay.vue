@@ -1,10 +1,24 @@
 <script setup lang="ts">
-import { Check, Paintbrush, PaintBucket, Eraser } from '@lucide/vue';
+import {
+    Check,
+    Paintbrush,
+    PaintBucket,
+    Eraser,
+    Undo2,
+    Palette,
+} from '@lucide/vue';
 import BonusEffects from '@/components/BonusEffects.vue';
 import { activeBonusEffects } from '@/lib/bonuses';
 import { computed, ref, watch } from 'vue';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import DrawingBoard from '@/components/DrawingBoard.vue';
+import {
+    Drawer,
+    DrawerContent,
+    DrawerTitle,
+    DrawerDescription,
+    DrawerClose,
+} from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from '@/composables/useTranslations';
 import type { DrawingGameState, DrawingSender, RoomState } from '@/types/rooms';
@@ -18,6 +32,7 @@ const props = defineProps<{
     send?: DrawingSender;
 }>();
 const { t } = useTranslations('rooms');
+const { t: ti } = useTranslations('interface');
 const effects = computed(() =>
     activeBonusEffects(
         props.game.bonuses?.effects ?? [],
@@ -30,6 +45,7 @@ const effectiveColor = computed(() =>
         ? '#f05a78'
         : color.value,
 );
+const settingsOpen = ref(false);
 const guess = ref('');
 const color = ref('#35236b');
 const width = ref(4);
@@ -201,62 +217,83 @@ watch(
                     </div>
                 </aside>
             </div>
-            <div v-if="editable" class="drawing-tools">
-                <div
-                    class="drawing-tool-picker"
-                    :aria-label="t('drawing_tools')"
+            <div v-if="editable" class="drawing-tools drawing-toolbar">
+                <button
+                    v-for="item in tools"
+                    :key="item.value"
+                    type="button"
+                    :data-drawing-tool="item.value"
+                    :aria-pressed="tool === item.value"
+                    :aria-label="t('drawing_tool_' + item.value)"
+                    @click="tool = item.value"
                 >
-                    <button
-                        v-for="item in tools"
-                        :key="item.value"
-                        type="button"
-                        :data-drawing-tool="item.value"
-                        :aria-pressed="tool === item.value"
-                        :aria-label="t('drawing_tool_' + item.value)"
-                        @click="tool = item.value"
-                    >
-                        <component :is="item.icon" aria-hidden="true" />
-                        <span>{{ t('drawing_tool_' + item.value) }}</span>
-                    </button>
-                </div>
-                <div class="drawing-palette">
-                    <button
-                        v-for="(value, index) in palette"
-                        :key="value"
-                        type="button"
-                        :aria-label="t('drawing_color', { number: index + 1 })"
-                        :aria-pressed="color === value"
-                        :data-drawing-color="value"
-                        :style="{
-                            backgroundColor: value,
-                            color: value === '#35236b' ? '#fff9e6' : '#20132e',
-                        }"
-                        @click="color = value"
-                    >
-                        <Check v-if="color === value" aria-hidden="true" />
-                    </button>
-                </div>
-                <label class="flex items-center gap-2"
-                    >{{ t('drawing_width')
-                    }}<input
-                        v-model.number="width"
-                        type="range"
-                        min="2"
-                        max="12"
-                /></label>
-                <Button
-                    variant="outline"
+                    <component :is="item.icon" aria-hidden="true" />
+                </button>
+                <button
+                    type="button"
+                    data-drawing-settings
+                    :aria-label="t('drawing_settings')"
+                    :style="{ '--active-color': color }"
+                    @click="settingsOpen = true"
+                >
+                    <Palette aria-hidden="true" /><span
+                        class="drawing-current-color"
+                    />
+                </button>
+                <button
+                    type="button"
+                    :aria-label="t('drawing_undo')"
                     :disabled="busy || pending || !game.round.canvas.length"
                     @click="sendDrawingAction('undo', {})"
-                    >{{ t('drawing_undo') }}</Button
                 >
-                <Button
-                    variant="outline"
-                    :disabled="busy || pending || !game.round.canvas.length"
-                    @click="sendDrawingAction('clear', {})"
-                    >{{ t('drawing_clear') }}</Button
-                >
+                    <Undo2 aria-hidden="true" />
+                </button>
             </div>
+            <Drawer v-model:open="settingsOpen"
+                ><DrawerContent class="game-drawer drawing-settings-drawer">
+                    <DrawerTitle>{{ t('drawing_settings') }}</DrawerTitle>
+                    <DrawerDescription>{{
+                        t('drawing_settings_hint')
+                    }}</DrawerDescription>
+                    <div class="drawing-palette">
+                        <button
+                            v-for="(value, index) in palette"
+                            :key="value"
+                            type="button"
+                            :aria-label="
+                                t('drawing_color', { number: index + 1 })
+                            "
+                            :aria-pressed="color === value"
+                            :data-drawing-color="value"
+                            :style="{
+                                backgroundColor: value,
+                                color:
+                                    value === '#35236b' ? '#fff9e6' : '#20132e',
+                            }"
+                            @click="color = value"
+                        >
+                            <Check v-if="color === value" aria-hidden="true" />
+                        </button>
+                    </div>
+                    <label class="flex items-center gap-2"
+                        >{{ t('drawing_width')
+                        }}<input
+                            v-model.number="width"
+                            type="range"
+                            min="2"
+                            max="12"
+                    /></label>
+                    <Button
+                        variant="outline"
+                        :disabled="busy || pending || !game.round.canvas.length"
+                        @click="sendDrawingAction('clear', {})"
+                        >{{ t('drawing_clear') }}</Button
+                    >
+                    <DrawerClose as-child
+                        ><Button>{{ ti('close') }}</Button></DrawerClose
+                    >
+                </DrawerContent></Drawer
+            >
             <form
                 v-if="canGuess"
                 class="mt-2 flex gap-2"

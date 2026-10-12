@@ -204,7 +204,7 @@ export type CupSwap = {
 export type MiniScene = {
     residents?: string[];
     people?: { color: string; accessories: string[]; number: number }[];
-    events?: { at: number; direction: number; color: string }[];
+    events?: { at: number; direction: number; side?: number; color: string }[];
     swaps?: CupSwap[];
     under?: number;
     color?: string;

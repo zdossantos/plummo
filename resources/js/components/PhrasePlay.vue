@@ -28,7 +28,6 @@ const canWrite = computed(
         props.game.me?.eligible &&
         !props.game.me.submitted,
 );
-const length = computed(() => Array.from(draft.value).length);
 async function sendAction(action: string, values: Record<string, unknown>) {
     return (
         (await props.send?.(action, {
@@ -116,7 +115,6 @@ const author = (id?: number) =>
                     @input="input"
                 />
                 <p class="mt-2 text-sm" aria-live="polite">
-                    {{ t('phrase_characters', { count: length }) }} ·
                     {{
                         t(
                             pending
