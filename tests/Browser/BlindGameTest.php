@@ -13,7 +13,6 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         app('cookie')->flushQueuedCookies();
         app('session.store')->flush();
     });
-    fprintf(STDERR, "Blind browser checkpoint: storage\n");
     Storage::fake('local');
     // Pest trims streamed bodies: keep the final PCM byte non-whitespace.
     $samples = str_repeat("\x01\x01", 8000);
@@ -22,7 +21,6 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
     $pack = Pack::findOrFail(blindPack());
     $tag = $pack->tags()->sole();
     $ids = $tag->contents()->pluck('contents.id');
-    fprintf(STDERR, "Blind browser checkpoint: screen\n");
     $screen = visit('/')->withLocale('en-US')->assertSee('Everyone plays.');
     // Model WebKit's per-element permission, granted only during the actual click.
     $screen->page()->evaluate('() => {
@@ -38,30 +36,23 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
     }');
     $room = Room::latest('id')->firstOrFail();
     try {
-        fprintf(STDERR, "Blind browser checkpoint: join\n");
         $phone = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')
             ->fill('player-name', 'Camille')->click('Continue')->click('Enter the room')->assertSee('Prepare a quiz');
-        fprintf(STDERR, "Blind browser checkpoint: session\n");
         $phone->click('button[aria-label="Controls"]')->click('Session')->assertSee('No point limit')->click('label:has-text("No point limit")')->fill('session-target', '50')->click('Save target')->assertSee('Target: 50 points');
         $phone->click('button[aria-label="Play"]')->assertSee('Mini-game');
         $phone->click('[data-choose-game]')->click('[data-game-option="blind_test"]');
-        fprintf(STDERR, "Blind browser checkpoint: packs\n");
         $phone->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")')->assertSee('8 unseen clips')->fill('game-rounds', '5');
         $phone->assertDisabled('button:has-text("Start blind test")')->assertSee('Press Enable sound on the big screen');
-        fprintf(STDERR, "Blind browser checkpoint: enable-sound\n");
         $screen->click('button[aria-label="Enable sound"]')->assertPresent('.sound-controls button[aria-pressed="true"]');
         expect($screen->page()->evaluate('() => { window.unlockedAudio = document.querySelector("audio"); return !!window.unlockedAudio; }'))->toBeTrue();
         $phone->assertEnabled('button:has-text("Start blind test")');
-        fprintf(STDERR, "Blind browser checkpoint: start\n");
         $phone->page()->locator('button:has-text("Start blind test")')->click(['noWaitAfter' => true]);
         $phone->assertSee('Blind test · Clip 1 / 5');
         $screen->assertSee('Blind test · Clip 1 / 5')->assertDontSee('Your browser blocks automatic sound.')->assertMissing('.game-play button');
         expect($screen->page()->evaluate('() => document.querySelector("audio") === window.unlockedAudio && !window.unlockedAudio.paused && !window.unlockedAudio.muted'))->toBeTrue();
-        fprintf(STDERR, "Blind browser checkpoint: pause\n");
         $phone->page()->locator('button[aria-label="Pause game"]')->click(['noWaitAfter' => true]);
         $phone->assertSee('Game paused');
         $screen->assertSee('Game paused');
-        fprintf(STDERR, "Blind browser checkpoint: resume\n");
         $phone->page()->locator('button:has-text("Resume")')->click(['noWaitAfter' => true]);
         $screen->assertSee('Resuming in…');
         Playwright::usingTimeout(10000, fn () => $screen->assertSee('Which song is playing?'));
@@ -70,7 +61,6 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         expect($screen->page()->evaluate('document.querySelector("audio").loop && !document.querySelector("audio").paused'))->toBeTrue();
         expect($phone->page()->evaluate('document.querySelectorAll(".game-choice > button:first-child").length'))->toBe(8);
         expect($phone->page()->evaluate('document.querySelector("audio") === null'))->toBeTrue();
-        fprintf(STDERR, "Blind browser checkpoint: pause\n");
         $phone->page()->locator('button[aria-label="Pause game"]')->click(['noWaitAfter' => true]);
         $phone->assertSee('Game paused');
         $screen->assertSee('Game paused');
@@ -79,7 +69,6 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         $screen->page()->evaluate('() => { window.pausedAudio = document.querySelector("audio"); }');
         $screen->assertMissing('.game-play button')->assertMissing('.page-controls');
         expect($screen->page()->evaluate('document.querySelector("audio") === window.pausedAudio'))->toBeTrue();
-        fprintf(STDERR, "Blind browser checkpoint: resume\n");
         $phone->page()->locator('button:has-text("Resume")')->click(['noWaitAfter' => true]);
         $phone->assertSee('Resuming in…');
         $screen->assertSee('Resuming in…');
@@ -87,12 +76,10 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         expect($screen->page()->evaluate('document.querySelector("audio").currentTime'))->toBe($position);
         Playwright::usingTimeout(10000, fn () => $screen->assertSee('Which song is playing?'));
         expect($screen->page()->evaluate('!document.querySelector("audio").paused'))->toBeTrue();
-        fprintf(STDERR, "Blind browser checkpoint: offline\n");
         $screen->page()->evaluate('() => { window.dispatchEvent(new Event("offline")); }');
         expect($screen->page()->evaluate('document.querySelector("audio").paused'))->toBeTrue();
         $screen->page()->evaluate('() => { window.dispatchEvent(new Event("online")); }');
         $screen->assertDontSee('Connection interrupted. Trying again…');
-        fprintf(STDERR, "Blind browser checkpoint: answer\n");
         $game = Game::where('room_id', $room->id)->sole();
         $choice = $game->state['round']['payload']['correct'];
         $phone->assertSee('Which song is playing?');
@@ -101,11 +88,9 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         $screen->assertSee('Mini-game leaderboard')->assertSee('Well done, Camille!');
         $phone->assertSee('Mini-game leaderboard');
         Storage::disk('local')->assertMissing($game->state['round']['payload']['audio_path']);
-        fprintf(STDERR, "Blind browser checkpoint: lobby\n");
         $phone->page()->locator('button:has-text("Back to lobby")')->click(['noWaitAfter' => true]);
         $screen->assertSee('Everyone plays.')->assertSee('65 Points')->assertNoJavaScriptErrors();
         $screen->click('button[aria-label="Mute sound"]')->assertPresent('.sound-controls button[aria-pressed="false"]')->click('button[aria-label="Enable sound"]')->assertPresent('.sound-controls button[aria-pressed="true"]');
-        fprintf(STDERR, "Blind browser checkpoint: ambient-check\n");
         Execution::instance()->waitForExpectation(function () use ($screen) {
             expect($screen->page()->evaluate('() => document.querySelector("audio") === window.unlockedAudio && new URL(window.unlockedAudio.src).pathname === "/audio/plummo-ambiance.mp3" && !window.unlockedAudio.loop && window.unlockedAudio.paused'))->toBeTrue();
         });
