@@ -3190,8 +3190,19 @@
     gap: 8px;
     min-height: 40px;
 }
-.controller-active .phone-status > .text-summary {
-    font-size: 12px;
+.controller-active .phone-status > .text-summary,
+.controller-active .phone-status > .text-primary {
+    display: none;
+}
+.controller-active .phone-status .game-hud-controls {
+    margin-left: auto;
+}
+.controller-active .message-shortcut {
+    width: var(--control-height);
+    padding: 6px;
+}
+.controller-active .message-shortcut span {
+    display: none;
 }
 .controller-active .controller-inventory {
     flex: none;
@@ -3225,11 +3236,16 @@
     display: none;
 }
 .controller-active .bonus-info {
-    top: -8px;
-    right: -8px;
+    top: 3px;
+    right: 3px;
     width: 24px;
     height: 24px;
+    padding: 0;
     z-index: 2;
+}
+.controller-active .bonus-info svg {
+    width: 16px;
+    height: 16px;
 }
 .controller-active .bonus-tooltip {
     position: fixed;
@@ -3530,4 +3546,116 @@
 .bonus-blackout-canvas {
     position: absolute;
     border-radius: 1rem;
+}
+
+/* Keep the portrait HUD together at the bottom, within thumb reach. */
+.controller-active .controller-inventory {
+    z-index: 3;
+    pointer-events: none;
+}
+.controller-active .controller-inventory button {
+    pointer-events: auto;
+}
+@media (max-width: 599px) and (min-height: 451px) {
+    .controller-active:has(.controller-inventory .bonus-pocket) .phone-status {
+        height: 0;
+        min-height: 0;
+        position: static;
+        z-index: 4;
+    }
+    .controller-active:has(.controller-inventory .bonus-pocket) .phone-scene {
+        margin-bottom: 112px;
+    }
+    .controller-active:has(.controller-inventory .bonus-pocket)
+        .controller-inventory {
+        position: absolute;
+        right: 0;
+        bottom: 4px;
+    }
+    .controller-active:has(.controller-inventory .bonus-pocket)
+        .game-hud-controls {
+        position: absolute;
+        left: 0;
+        bottom: 56px;
+        gap: 8px;
+    }
+    .controller-active .phone-status .command-trigger,
+    .controller-active .phone-status .message-shortcut,
+    .controller-active .game-pause,
+    .controller-active .game-timer {
+        width: 44px;
+        height: 44px;
+        min-height: 44px;
+        padding: 0;
+        margin-bottom: 0;
+        border: 2px solid var(--ink);
+        border-radius: 14px;
+        box-shadow: 0 4px 0 var(--ink);
+        display: grid;
+        place-items: center;
+    }
+    .controller-active .game-timer {
+        background: var(--primary);
+        color: var(--ink);
+    }
+    .controller-active .bonus-pocket {
+        padding: 0;
+        gap: 8px;
+        height: 96px;
+        min-height: 96px;
+    }
+    .controller-active .bonus-pocket .bonus-slot,
+    .controller-active .bonus-pocket .bonus-object,
+    .controller-active .bonus-pocket .bonus-empty,
+    .controller-active .bonus-pocket .bonus-pending {
+        width: clamp(58px, 18vw, 72px);
+        height: 96px;
+        min-height: 96px;
+        margin-bottom: 0;
+    }
+    .controller-active .bonus-pocket .bonus-object,
+    .controller-active .bonus-pocket .bonus-pending {
+        justify-content: center;
+    }
+    .controller-active .bonus-pocket .bonus-object .bonus-icon,
+    .controller-active .bonus-pending .bonus-icon {
+        width: 54px;
+        height: 54px;
+    }
+    .controller-active .bonus-pocket .bonus-pending {
+        width: 52px;
+        height: 68px;
+        min-height: 68px;
+        align-self: center;
+    }
+    .controller-active .bonus-pocket .bonus-pending .bonus-icon {
+        width: 40px;
+        height: 40px;
+    }
+    .controller-active .bonus-tooltip {
+        top: auto;
+        bottom: 140px;
+    }
+    .controller-active:has(.controller-inventory .bonus-pocket)
+        .game-phase-bar {
+        position: static;
+        margin-top: 0;
+    }
+    .controller-active:has(.controller-inventory .bonus-pocket)
+        .game-phase-bar
+        > p:first-child {
+        margin: 0;
+    }
+    .controller-active:has(.controller-inventory .bonus-pocket) .game-pause,
+    .controller-active:has(.controller-inventory .bonus-pocket) .game-timer {
+        position: absolute;
+        bottom: -108px;
+        z-index: 4;
+    }
+    .controller-active:has(.controller-inventory .bonus-pocket) .game-pause {
+        left: 0;
+    }
+    .controller-active:has(.controller-inventory .bonus-pocket) .game-timer {
+        left: 52px;
+    }
 }

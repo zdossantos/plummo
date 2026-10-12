@@ -27,7 +27,11 @@ window.mountLayout = (game, phone = true) => {
                                           { class: 'text-summary' },
                                           'Camille · 1020 Points',
                                       ),
-                                      h('b', 'MUSY36'),
+                                      h(
+                                          'b',
+                                          { class: 'text-primary' },
+                                          'MUSY36',
+                                      ),
                                       h(GameControls, {
                                           modelValue: 'play',
                                           session: false,
