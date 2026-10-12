@@ -17,7 +17,9 @@ it('launches a collective bonus in one click while phone and screen stay inside 
         app('cookie')->flushQueuedCookies();
         app('session.store')->flush();
     });
+    fwrite(STDERR, "bonus fixture start\n");
     $tag = Tag::create(['name' => 'Bonus '.Str::uuid()]);
+    fwrite(STDERR, "bonus fixture tag created\n");
     $pack = Pack::create(['name' => 'Bonus quiz']);
     $pack->tags()->sync([$tag->id]);
     foreach (range(1, 5) as $number) {
