@@ -478,3 +478,19 @@ it('bounds total fill geometry and preserves the eraser under the paint prank', 
     $this->postJson($url, drawingStroke($room, ['id' => 3, 'tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[0, 0, 500]]]))->assertUnprocessable();
     expect($game->fresh()->state['round']['canvas'])->toHaveCount(2);
 });
+
+it('awards a plural answer without leaking the word or keeping a near hint', function () {
+    $room = openRoom();
+    [, $one] = enterRoom($room);
+    [$guesser, $two] = enterRoom($room, 'Alex');
+    enterRoom($room, 'Sam');
+    $game = startDrawing($room, $one);
+    chooseDrawing($room, $one);
+    $state = $game->fresh()->state;
+    $state['round']['word'] = 'Cheval';
+    $game->update(['state' => $state]);
+    $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => 'CHEVAUX']))
+        ->assertOk()->assertJsonPath('game.me.found', true)->assertJsonPath('game.me.near', false)
+        ->assertJsonPath('game.round.guesses.0.text', null);
+    expect($game->fresh()->state['round']['awards'][$guesser])->toBeGreaterThan(0);
+});

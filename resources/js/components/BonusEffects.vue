@@ -56,8 +56,9 @@ function remaining(e: BonusEffect) {
 </script>
 <template>
     <div
-        v-if="!canvas && has('bolt')"
+        v-if="has('bolt')"
         class="bonus-blackout"
+        :class="{ 'bonus-blackout-canvas': canvas }"
         aria-hidden="true"
     >
         <BonusIcon kind="bolt" />
