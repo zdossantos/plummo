@@ -102,3 +102,17 @@ test('fill uses the same preview geometry as a local giant clumsy brush', async 
     expect(bonusRenderedStroke(displayed)).toEqual(displayed);
     expect(local.width).toBe(4);
 });
+
+test('dice alternates two vote choices without losing their candidate identities', () => {
+    expect(activeBonusEffects([dice], 101, 'voting')).toHaveLength(1);
+    const choices = ['For', 'Against'];
+    expect(bonusChoices(choices, [dice], 100).map(item => item.index)).toEqual([1, 0]);
+    expect(bonusChoices(choices, [dice], 102).map(item => item.index)).toEqual([0, 1]);
+    expect(bonusChoices(choices, [dice], 104).map(item => item.index)).toEqual([1, 0]);
+});
+
+test('voting retains common visual maluses until they expire', () => {
+    const effects: BonusEffect[] = ['bubbles', 'photobomb', 'jelly', 'watch'].map(kind => ({ ...dice, kind: kind as BonusEffect['kind'] }));
+    expect(activeBonusEffects(effects, 101, 'voting')).toEqual(effects);
+    expect(activeBonusEffects(effects, 106, 'voting')).toEqual([]);
+});

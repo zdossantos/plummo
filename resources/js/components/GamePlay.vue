@@ -6,6 +6,7 @@ import TextReader from '@/components/TextReader.vue';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import GameWinners from '@/components/GameWinners.vue';
 import PhrasePlay from '@/components/PhrasePlay.vue';
+import TribunalGamePlay from '@/components/TribunalGamePlay.vue';
 import MiniGamePlay from '@/components/MiniGamePlay.vue';
 import DrawingPlay from '@/components/DrawingPlay.vue';
 import AnswerTexture from '@/components/AnswerTexture.vue';
@@ -26,6 +27,7 @@ const props = defineProps<{
     sendDrawing?: DrawingSender;
     sendPhrase?: DrawingSender;
     sendMini?: DrawingSender;
+    sendTribunal?: DrawingSender;
 }>();
 const emit = defineEmits<{
     answer: [choice: number];
@@ -142,15 +144,17 @@ const ranking = computed(() => {
             <p>
                 {{
                     t(
-                        game.type === 'phrase'
-                            ? 'phrase_round'
-                            : game.type === 'drawing'
-                              ? 'drawing_round'
-                              : game.type === 'mini_games'
-                                ? 'mini_round'
-                                : game.type === 'quiz'
-                                  ? 'quiz_round'
-                                  : 'blind_round',
+                        game.type === 'tribunal'
+                            ? 'tribunal_round'
+                            : game.type === 'phrase'
+                              ? 'phrase_round'
+                              : game.type === 'drawing'
+                                ? 'drawing_round'
+                                : game.type === 'mini_games'
+                                  ? 'mini_round'
+                                  : game.type === 'quiz'
+                                    ? 'quiz_round'
+                                    : 'blind_round',
                         {
                             number:
                                 game.type === 'drawing'
@@ -164,6 +168,9 @@ const ranking = computed(() => {
             <p
                 v-if="
                     [
+                        'preparing',
+                        'speaking_first',
+                        'speaking_second',
                         'observing',
                         'answer',
                         'selecting',
@@ -171,7 +178,8 @@ const ranking = computed(() => {
                         'writing',
                         'presenting',
                         'voting',
-                    ].includes(game.phase)
+                    ].includes(game.phase) &&
+                    (phone || game.type !== 'tribunal')
                 "
                 class="game-timer tabular-nums"
                 role="timer"
@@ -275,6 +283,17 @@ const ranking = computed(() => {
             :connected="connected"
             :server-now="serverNow"
             :send="sendDrawing"
+        />
+        <TribunalGamePlay
+            v-else-if="game.type === 'tribunal'"
+            :game="game"
+            :room="room"
+            :phone="phone"
+            :busy="busy"
+            :connected="connected"
+            :server-now="serverNow"
+            :send="sendTribunal"
+            :seconds="timerValue"
         />
         <MiniGamePlay
             v-else-if="game.type === 'mini_games'"

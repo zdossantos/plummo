@@ -296,6 +296,14 @@ watch(chief, (value) => {
                             :busy="busy"
                             phone
                             :connected="connected"
+                            :send-tribunal="
+                                (action, values) =>
+                                    request(
+                                        'tribunal/' + action,
+                                        'POST',
+                                        values,
+                                    )
+                            "
                             :send-mini="
                                 (_action, values) =>
                                     request('mini-write', 'POST', values)

@@ -6,9 +6,14 @@ export function activeBonusEffects(
     now: number,
     phase: string,
 ) {
-    if (!['answer', 'drawing', 'writing'].includes(phase)) return [];
+    if (!['answer', 'drawing', 'writing', 'voting'].includes(phase)) return [];
     return effects.filter(
-        (effect) => effect.expiresAt === null || effect.expiresAt > now,
+        (effect) =>
+            (phase !== 'voting' ||
+                !['accent', 'sneeze', 'translator', 'advert'].includes(
+                    effect.kind,
+                )) &&
+            (effect.expiresAt === null || effect.expiresAt > now),
     );
 }
 
@@ -30,7 +35,8 @@ export function bonusChoices(
         2,
         Math.max(0, Math.floor((now - dice.startedAt) / 2)),
     );
-    const offset = 1 + (step % (items.length - 1));
+    const offset =
+        items.length === 2 ? (step + 1) % 2 : 1 + (step % (items.length - 1));
     return [...items.slice(offset), ...items.slice(0, offset)];
 }
 

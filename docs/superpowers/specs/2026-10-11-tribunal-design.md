@@ -1,6 +1,6 @@
 # Tribunal des Plummos — proposition pour #54
 
-Statut : défense orale validée ; règles ci-dessous proposées à validation.
+Statut : règles et défense orale validées par l’utilisateur.
 
 ## But et parcours
 
@@ -18,7 +18,7 @@ Les gains sont engagés une fois, dans les scores du jeu et de la session. Le po
 
 ## Variété et contenus
 
-Cinquante sujets absurdes, familiaux et traduits en français/anglais sont livrés avec le jeu : objets quotidiens, animaux, nourriture, école, travail, habitudes. Aucun sujet politique, religieux ou visant un participant. Les sujets sont mélangés sans répétition dans une partie ; aucun pack à sélectionner ni nouveau type d'import dans cette première version. Les camps pour/contre suffisent ; pas de contrainte supplémentaire à retenir.
+Cinquante sujets absurdes, familiaux et traduits en français/anglais sont livrés avec le jeu : objets quotidiens, animaux, nourriture, école, travail, habitudes. Aucun sujet politique, religieux ou visant un participant. Les sujets sont mélangés sans répétition tant que le catalogue n’est pas épuisé ; une partie dépassant cinquante débats renouvelle le catalogue sans répéter immédiatement le dernier sujet ; aucun pack à sélectionner ni nouveau type d'import dans cette première version. Les camps pour/contre suffisent ; pas de contrainte supplémentaire à retenir.
 
 ## Affichage
 

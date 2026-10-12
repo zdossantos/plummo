@@ -40,7 +40,7 @@ class GameBonuses
                 }
             }
         }
-        if ($status === 'active' && $state['phase'] === app(BonusCatalog::class)->phase($game->type) && (($state['number'] ?? 0) > ($old['number'] ?? 0) || (($old['phase'] ?? '') === 'selecting' || ($game->type === 'mini_games' && in_array($old['phase'] ?? '', ['observing', 'writing'], true))))) {
+        if ($status === 'active' && $state['phase'] === app(BonusCatalog::class)->phase($game->type) && (($state['number'] ?? 0) > ($old['number'] ?? 0) || (($old['phase'] ?? '') === 'selecting' || ($game->type === 'mini_games' && in_array($old['phase'] ?? '', ['observing', 'writing'], true)) || ($game->type === 'tribunal' && ($old['phase'] ?? '') === 'speaking_second')))) {
             $state = app(BonusClock::class)->start($game, $state, $bonus);
         }
         $now = app(GameEngine::class)->time();
@@ -112,9 +112,7 @@ class GameBonuses
         $game = $engine->tick($room);
         abort_unless($game !== null && $game->id === $gameId && $game->state['number'] === $round, 409);
         $state = $game->state;
-        $phase = match ($game->type) {
-            'phrase' => 'writing', 'drawing' => 'drawing', default => 'answer',
-        };
+        $phase = app(BonusCatalog::class)->phase($game->type);
         abort_unless($state['phase'] === $phase && ($state['bonuses']['enabled'] ?? false), 409);
         abort_unless($player->connected() && in_array($player->id, $state['round']['participants'], true) && ! in_array($player->id, $state['excluded'] ?? [], true), 403);
         $bonus = $state['bonuses'];
@@ -140,7 +138,7 @@ class GameBonuses
         }
         $now = $engine->time();
         $bonus['launches'][] = ['id' => (string) Str::uuid(), 'kind' => $kind, 'actorId' => $player->id, 'at' => $now];
-        $duration = $catalog->duration($kind, $game->settings['duration']);
+        $duration = $catalog->duration($kind, $game->type === 'tribunal' ? 20 : $game->settings['duration']);
         if ($kind === 'soap') {
             $bonus['effects'] = array_values(array_filter($bonus['effects'], fn ($effect) => $effect['target'] !== $player->id || $catalog->defense($effect['kind'])));
         } elseif ($kind === 'pinata') {
@@ -194,9 +192,7 @@ class GameBonuses
     public function view(Game $game, ?RoomPlayer $me, bool $screen): array
     {
         $bonus = $game->state['bonuses'] ?? [];
-        $phase = match ($game->type) {
-            'phrase' => 'writing', 'drawing' => 'drawing', default => 'answer'
-        };
+        $phase = app(BonusCatalog::class)->phase($game->type);
         $playing = $game->state['phase'] === $phase && $game->status === 'active';
         $effects = $playing ? array_values(array_filter($bonus['effects'] ?? [], fn ($effect) => ($effect['expiresAt'] === null || $effect['expiresAt'] > app(GameEngine::class)->time()) && ($effect['target'] === 0 || (($screen || $me === null) && $game->type === 'drawing' && $effect['target'] === ($game->state['round']['artist'] ?? null) && in_array($effect['kind'], ['stamp', 'paint', 'giant', 'clumsy'], true)) || (! $screen && $effect['target'] === $me?->id)))) : [];
         $effects = array_map(function ($effect) {
@@ -225,7 +221,7 @@ class GameBonuses
         if (in_array($kind, ['stamp', 'paint', 'giant', 'clumsy'], true) && ($state['round']['artist'] ?? null) === $player->id) {
             return false;
         }
-        if ($kind === 'borrow' && ($game->type === 'drawing' ? ($state['tour'] >= $game->settings['rounds'] && ($state['queue'] ?? []) === []) : $state['number'] >= $game->settings['rounds'])) {
+        if ($kind === 'borrow' && (in_array($game->type, ['drawing', 'tribunal'], true) ? ($state['tour'] >= $game->settings['rounds'] && ($state['queue'] ?? []) === []) : $state['number'] >= $game->settings['rounds'])) {
             return false;
         }
 

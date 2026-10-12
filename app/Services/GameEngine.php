@@ -30,6 +30,9 @@ class GameEngine
         if ($settings['type'] === 'phrase') {
             return app(PhraseGame::class)->start($room, $settings);
         }
+        if ($settings['type'] === 'tribunal') {
+            return app(TribunalGame::class)->start($room, $settings);
+        }
         if ($settings['type'] === 'mini_games') {
             return app(MiniGames::class)->start($room, $settings);
         }
@@ -137,6 +140,9 @@ class GameEngine
         }
         if ($game->type === 'phrase') {
             return app(PhraseGame::class)->tick($room, $game);
+        }
+        if ($game->type === 'tribunal') {
+            return app(TribunalGame::class)->tick($room, $game);
         }
         if ($game->type === 'mini_games') {
             return app(MiniGames::class)->tick($room, $game);
@@ -295,6 +301,9 @@ class GameEngine
         $state = $game->state;
         if ($game->type === 'phrase') {
             return [...app(PhraseGame::class)->view($room, $game, $me), 'bonuses' => app(GameBonuses::class)->view($game, $me, $screen)];
+        }
+        if ($game->type === 'tribunal') {
+            return [...app(TribunalGame::class)->view($room, $game, $me), 'bonuses' => app(GameBonuses::class)->view($game, $me, $screen)];
         }
         if ($game->type === 'mini_games') {
             return [...app(MiniGames::class)->view($room, $game, $me, $screen), 'bonuses' => app(GameBonuses::class)->view($game, $me, $screen)];

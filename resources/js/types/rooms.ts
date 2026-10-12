@@ -233,8 +233,50 @@ export type MiniGameState = Omit<
           })
         | null;
 };
+export type TribunalGameState = Omit<
+    ChoiceGame,
+    'type' | 'phase' | 'round' | 'me'
+> & {
+    type: 'tribunal';
+    phase:
+        | 'preparing'
+        | 'speaking_first'
+        | 'speaking_second'
+        | 'voting'
+        | 'waiting'
+        | 'reveal'
+        | 'paused'
+        | 'resuming'
+        | 'results';
+    round: {
+        number: number;
+        total: number;
+        tour: number;
+        tours: number;
+        question: string;
+        advocates: [number, number];
+        speakerId: number | null;
+        votes: Record<number, number>;
+        counts: number[];
+        awards: Record<number, number>;
+        canceled: boolean;
+    };
+    me: {
+        eligible: boolean;
+        camp: number | null;
+        canSpeak: boolean;
+        canVote: boolean;
+        answered: boolean;
+        choice: number | null;
+        points: number | null;
+    } | null;
+};
 export type GameState =
-    ChoiceGame | DrawingGameState | PhraseGameState | MiniGameState;
+    | ChoiceGame
+    | DrawingGameState
+    | PhraseGameState
+    | MiniGameState
+    | TribunalGameState;
 export type DrawingSender = (
     action: string,
     values: Record<string, unknown>,
