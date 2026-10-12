@@ -1,17 +1,23 @@
 <?php
 
+use App\Models\Content;
 use App\Models\Game;
+use App\Models\Pack;
 use App\Models\RoomPlayer;
 use App\Services\BonusClock;
 use App\Services\GameEngine;
+use Database\Seeders\TribunalCatalogSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 uses(DatabaseTransactions::class);
-beforeEach(fn () => $this->withCredentials());
+beforeEach(function () {
+    $this->withCredentials();
+    $this->seed(TribunalCatalogSeeder::class);
+});
 
 function tribunalSettings(array $extra = []): array
 {
-    return [...['type' => 'tribunal', 'rounds' => 1, 'duration' => 20], ...$extra];
+    return [...['type' => 'tribunal', 'rounds' => 1, 'duration' => 20, 'packs' => [Pack::where('name', 'Tribunal · Français')->sole()->id]], ...$extra];
 }
 
 function tribunalDeadline(): Game
@@ -24,7 +30,7 @@ function tribunalDeadline(): Game
     return $game;
 }
 
-it('refills the subject catalog for long sessions without repeating the previous subject', function () {
+it('draws a new published subject from the selected pack without repetition', function () {
     $room = openRoom();
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
@@ -32,27 +38,26 @@ it('refills the subject catalog for long sessions without repeating the previous
     $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertCreated();
     $game = Game::latest('id')->firstOrFail();
     $state = $game->state;
-    $previous = $state['round']['topic'];
-    $state['topics'] = [];
+    $previous = $state['round']['content_id'];
     $state['phase'] = 'reveal';
     $state['deadline'] = app(GameEngine::class)->time();
     $game->update(['state' => $state]);
     $view = $this->getJson('/rooms/'.$room->code.'/state')->assertOk()->assertJsonPath('game.phase', 'preparing')->json('game');
-    expect($view['round']['question'])->toBeIn(array_values(__('tribunal.topics')));
-    expect($game->fresh()->state['round']['topic'])->not->toBe($previous);
+    expect($view['round']['question'])->toBeIn(array_values(__('tribunal.topics', [], 'fr')));
+    expect($game->fresh()->state['round']['content_id'])->not->toBe($previous);
 });
 
-it('requires three players and starts without packs with two advocates and a jury', function () {
+it('requires three players and starts with packs with two advocates and a jury', function () {
     $room = openRoom();
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     $this->withCookie('plummo_player_'.$room->code, $token);
     $this->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertUnprocessable();
     enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/game-options', ['type' => 'tribunal'])->assertOk()->assertJsonPath('packs', []);
+    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/game-options', ['type' => 'tribunal'])->assertOk()->assertJsonCount(2, 'packs');
     $response = $this->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertCreated()->assertJsonPath('game.phase', 'preparing')->assertJsonCount(2, 'game.round.advocates');
     expect($response->json('game.round.question'))->not->toBeEmpty();
-    $this->assertDatabaseCount('room_content_history', 0);
+    $this->assertDatabaseCount('room_content_history', 1);
 });
 
 it('permits only the current speaker to finish and keeps votes private until a single award', function () {
@@ -284,4 +289,47 @@ it('waits with two players and continues without replaying the canceled debate a
     $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.phase', 'waiting');
     RoomPlayer::findOrFail($left)->update(['left_at' => null]);
     $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.phase', 'preparing')->assertJsonPath('game.round.number', 2);
+});
+
+it('filters published subjects by pack and snapshots the current subject despite admin edits', function () {
+    $room = openRoom();
+    [$id, $token] = enterRoom($room);
+    enterRoom($room, 'Deux');
+    enterRoom($room, 'Trois');
+    $pack = tribunalSettings()['packs'][0];
+    $content = Content::where('type', 'tribunal')->whereHas('tags', fn ($query) => $query->where('name', 'Français'))->firstOrFail();
+    Content::where('type', 'tribunal')->where('id', '!=', $content->id)->update(['published' => false]);
+    $this->withCookie('plummo_player_'.$room->code, $token);
+    $this->postJson('/rooms/'.$room->code.'/game-options', ['type' => 'tribunal', 'packs' => [$pack]])->assertJsonPath('availability.total', 1)->assertJsonCount(1, 'packs');
+    $this->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertUnprocessable()->assertJsonValidationErrors('packs');
+    $this->postJson('/rooms/'.$room->code.'/games', [...tribunalSettings(), 'packs' => []])->assertUnprocessable();
+    $question = $content->payload['question'];
+    $this->postJson('/rooms/'.$room->code.'/games', tribunalSettings(['allow_repeats' => true]))->assertCreated()->assertJsonPath('game.round.question', $question);
+    $content->delete();
+    $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.round.question', $question);
+});
+
+it('pauses on exhausted subjects and recovers without skipping a debate or losing scores', function () {
+    $room = openRoom();
+    [$id, $token] = enterRoom($room);
+    enterRoom($room, 'Deux');
+    enterRoom($room, 'Trois');
+    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertCreated();
+    $game = Game::latest('id')->firstOrFail();
+    $state = $game->state;
+    $queue = $state['queue'];
+    $state['phase'] = 'reveal';
+    $state['deadline'] = app(GameEngine::class)->time();
+    $game->update(['state' => $state]);
+    Content::where('type', 'tribunal')->update(['published' => false]);
+    $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.phase', 'paused')->assertJsonPath('game.exhausted', true);
+    expect($game->fresh()->state['queue'])->toBe($queue);
+    $this->postJson('/rooms/'.$room->code.'/game-recovery', ['packs' => tribunalSettings()['packs'], 'allow_repeats' => false])->assertUnprocessable();
+    $content = Content::findOrFail($state['round']['content_id']);
+    $content->update(['published' => true]);
+    $this->postJson('/rooms/'.$room->code.'/game-recovery', ['packs' => tribunalSettings()['packs'], 'allow_repeats' => true])->assertOk()->assertJsonPath('game.phase', 'resuming');
+    tribunalDeadline();
+    $this->getJson('/rooms/'.$room->code.'/state')->assertOk();
+    $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.phase', 'preparing')->assertJsonPath('game.round.number', 2)->assertJsonPath('game.round.advocates', $queue[0]);
+    expect($game->fresh()->state['scores'])->toBe($state['scores']);
 });

@@ -1,8 +1,12 @@
 <?php
 
+use App\Models\Content;
 use App\Models\Game;
+use App\Models\Pack;
 use App\Models\Room;
+use App\Models\Tag;
 use App\Services\GameEngine;
+use Illuminate\Support\Str;
 
 beforeEach(function () {
     app()->terminating(function () {
@@ -15,6 +19,13 @@ beforeEach(function () {
 afterEach(fn () => pest()->browser()->timeout(5000));
 
 it('keeps the tribunal passive on TV and playable without scroll on compact phones', function (int $width, int $height, bool $phone) {
+    $tag = Tag::create(['name' => 'Tribunal browser '.Str::uuid()]);
+    $pack = Pack::create(['name' => $tag->name]);
+    $pack->tags()->sync([$tag->id]);
+    foreach (range(1, 3) as $number) {
+        $content = Content::create(['type' => 'tribunal', 'published' => true, 'payload' => ['question' => 'Should Plummos get holidays? '.$number]]);
+        $content->tags()->sync([$tag->id]);
+    }
     $screen = visit('/host', ['viewport' => ['width' => 1280, 'height' => 720]])->withLocale('en-US')->assertSee('Everyone plays.');
     $room = Room::latest('id')->firstOrFail();
     try {
@@ -23,7 +34,7 @@ it('keeps the tribunal passive on TV and playable without scroll on compact phon
             $page = visit('/join/'.$room->code, ['viewport' => ['width' => $width, 'height' => $height]])->withLocale('en-US')->fill('player-name', $name)->click('Continue')->click('Enter the room')->assertSee($name);
             $pages[$room->players()->latest('id')->firstOrFail()->id] = $page;
         }
-        reset($pages)->refresh()->click('[data-choose-game]')->click('[data-game-option="tribunal"]')->assertSee('Prepare the tribunal')->assertDontSee('The packs')->assertDontSee('{count}')->click('Open the tribunal')->assertPresent('[data-testid="tribunal-play"]');
+        reset($pages)->refresh()->click('[data-choose-game]')->click('[data-game-option="tribunal"]')->assertSee('Prepare the tribunal')->assertSee('Content packs')->click('[data-choose-packs]')->check($pack->name)->click('Close')->assertDontSee('{count}')->click('Open the tribunal')->assertPresent('[data-testid="tribunal-play"]');
         $game = Game::where('room_id', $room->id)->latest('id')->firstOrFail();
         $jury = array_values(array_diff(array_keys($pages), $game->state['round']['advocates']))[0];
         $page = $phone ? $pages[$jury] : $screen;
@@ -68,5 +79,8 @@ it('keeps the tribunal passive on TV and playable without scroll on compact phon
         }
     } finally {
         $room->delete();
+        Content::whereHas('tags', fn ($query) => $query->whereKey($tag->id))->delete();
+        $pack->delete();
+        $tag->delete();
     }
 })->with([[390, 844, false], [390, 844, true], [360, 640, true]]);

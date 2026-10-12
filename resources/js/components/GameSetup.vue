@@ -176,7 +176,9 @@ const required = computed(() =>
             : connectedPlayers.value * rounds.value * 3
         : props.recover || repeats.value
           ? 1
-          : rounds.value,
+          : gameType.value === 'tribunal'
+            ? connectedPlayers.value * rounds.value
+            : rounds.value,
 );
 const distinctSongs = ref<number | null>(null);
 const repeats = ref(false);
@@ -191,23 +193,21 @@ const count = computed(
             : availability.value?.unseen) ?? 0,
 );
 const valid = computed(() =>
-    gameType.value === 'tribunal'
-        ? connectedPlayers.value >= 3
-        : gameType.value === 'mini_games'
-          ? connectedPlayers.value >= 1 && activeTrials.value.length > 0
-          : !!availability.value &&
-            (gameType.value !== 'blind_test' ||
-                (distinctSongs.value ?? 0) >= 8) &&
-            (gameType.value !== 'drawing' ||
-                props.recover ||
-                connectedPlayers.value >= 2) &&
-            (gameType.value !== 'phrase' ||
-                props.recover ||
-                connectedPlayers.value >= 3) &&
-            count.value >= required.value &&
-            (gameType.value !== 'blind_test' ||
-                props.recover ||
-                props.audioReady === true),
+    gameType.value === 'mini_games'
+        ? connectedPlayers.value >= 1 && activeTrials.value.length > 0
+        : !!availability.value &&
+          (gameType.value !== 'blind_test' ||
+              (distinctSongs.value ?? 0) >= 8) &&
+          (gameType.value !== 'drawing' ||
+              props.recover ||
+              connectedPlayers.value >= 2) &&
+          (!['phrase', 'tribunal'].includes(gameType.value) ||
+              props.recover ||
+              connectedPlayers.value >= 3) &&
+          count.value >= required.value &&
+          (gameType.value !== 'blind_test' ||
+              props.recover ||
+              props.audioReady === true),
 );
 async function load() {
     controller?.abort();
@@ -231,8 +231,7 @@ async function load() {
             },
             body: JSON.stringify({
                 type: gameType.value,
-                ...(!['mini_games', 'tribunal'].includes(gameType.value) &&
-                selected.value.length
+                ...(gameType.value !== 'mini_games' && selected.value.length
                     ? { packs: selected.value }
                     : {}),
             }),
@@ -282,11 +281,9 @@ onUnmounted(() => controller?.abort());
         @submit.prevent="
             emit('start', {
                 type: gameType,
-                ...(gameType === 'tribunal'
-                    ? {}
-                    : gameType === 'mini_games'
-                      ? { trials: activeTrials }
-                      : { packs: selected, allow_repeats: repeats }),
+                ...(gameType === 'mini_games'
+                    ? { trials: activeTrials }
+                    : { packs: selected, allow_repeats: repeats }),
                 rounds,
                 duration,
                 ...(!recover
@@ -315,7 +312,7 @@ onUnmounted(() => controller?.abort());
                         {{ gameLabel }}
                     </Button>
                 </label>
-                <div v-if="gameType !== 'tribunal'" class="setup-pack-choice">
+                <div class="setup-pack-choice">
                     <span class="font-bold">{{
                         t(
                             gameType === 'mini_games'
@@ -426,7 +423,7 @@ onUnmounted(() => controller?.abort());
                     }}
                 </p>
                 <label
-                    v-if="!['mini_games', 'tribunal'].includes(gameType)"
+                    v-if="gameType !== 'mini_games'"
                     class="flex gap-3 text-sm"
                     ><input v-model="repeats" type="checkbox" />{{
                         t('allow_repeats')

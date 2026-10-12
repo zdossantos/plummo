@@ -48,6 +48,8 @@ return [
     'quiz' => 'Quiz',
     'blind_test' => 'Blind test',
     'drawing' => 'Dessin à deviner',
+    'tribunal' => 'Tribunal',
+    'tribunal_subject' => 'Sujet du Tribunal',
     'phrase' => 'Phrase à compléter',
     'type' => 'Mini-jeu',
     'all_types' => 'Tous les mini-jeux',

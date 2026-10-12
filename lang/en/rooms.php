@@ -6,7 +6,7 @@ return [
     'tribunal_tours' => 'Number of tours',
     'tribunal_duration' => 'Speech per player (s)',
     'start_tribunal' => 'Open the tribunal',
-    'tribunal_topics' => 'Tribunal topics',
+    'tribunal_topics' => ':unseen unseen subjects out of :total available',
     'tribunal_setup_count' => '{count} debates · everyone defends both sides per tour.',
     'tribunal_round' => 'Tribunal · Debate {number} / {total}',
     'tribunal_for' => 'For',

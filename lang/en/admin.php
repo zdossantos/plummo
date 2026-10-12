@@ -48,6 +48,8 @@ return [
     'quiz' => 'Quiz',
     'blind_test' => 'Music quiz',
     'drawing' => 'Drawing',
+    'tribunal' => 'Tribunal',
+    'tribunal_subject' => 'Tribunal subject',
     'phrase' => 'Complete the sentence',
     'type' => 'Game',
     'all_types' => 'All games',

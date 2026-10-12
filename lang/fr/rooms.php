@@ -6,7 +6,7 @@ return [
     'tribunal_tours' => 'Nombre de tours',
     'tribunal_duration' => 'Parole par joueur (s)',
     'start_tribunal' => 'Ouvrir le tribunal',
-    'tribunal_topics' => 'Sujets du tribunal',
+    'tribunal_topics' => ':unseen sujets inédits sur :total disponibles',
     'tribunal_setup_count' => '{count} débats · chacun défend les deux camps par tour.',
     'tribunal_round' => 'Tribunal · Débat {number} / {total}',
     'tribunal_for' => 'Pour',
