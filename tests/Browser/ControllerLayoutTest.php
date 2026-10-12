@@ -48,7 +48,7 @@ it('keeps a full bonus pocket above a usable drawing canvas at every controller 
         }
         JS);
         expect($geometry['canvasHeight'])->toBeGreaterThanOrEqual($height < 420 ? 100 : 170);
-        expect($geometry['canvasWidth'])->toBeGreaterThanOrEqual(250);
+        expect(abs($geometry['canvasWidth'] - $geometry['canvasHeight']))->toBeLessThan(2);
         expect($geometry['above'])->toBeTrue();
         expect($phone->page()->evaluate('() => { const canvas=document.querySelector("[data-testid=drawing-board]").getBoundingClientRect(); return [...document.querySelectorAll(".drawing-toolbar > button")].every(e => { const r=e.getBoundingClientRect(); const top=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2); return r.width >= 40 && r.height >= 40 && !!top?.closest("button") && (r.bottom <= canvas.top || r.top >= canvas.bottom || r.right <= canvas.left || r.left >= canvas.right); }); }'))->toBeTrue();
         expect($geometry['reachable'])->toBeTrue();

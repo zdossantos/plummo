@@ -55,7 +55,7 @@ it('gives leaders an object too and never overwrites a third waiting object', fu
     $state['scores'] = [$members[0][0] => 100, $members[1][0] => 0];
     $state['bonuses']['pending'][$members[1][0]] = ['id' => 'waiting', 'kind' => 'shield'];
     $game->update(['state' => $state]);
-    $next = app(GameBonuses::class)->transition($game, [...$state, 'number' => 2], 'active');
+    $next = app(GameBonuses::class)->transition($game, [...$state, 'number' => 4], 'active');
     expect($next['bonuses']['inventory'][$members[0][0]])->toHaveCount(2);
     expect($next['bonuses']['pending'][$members[1][0]]['id'])->toBe('waiting');
 })->group('bonuses');
@@ -264,7 +264,7 @@ it('ignores departed and excluded scores when granting catchup objects and keeps
     $state['bonuses']['inventory'] = [];
     $state['bonuses']['pending'] = [];
     $game->update(['state' => $state]);
-    $next = app(GameBonuses::class)->transition($game, [...$state, 'number' => 2], 'active');
+    $next = app(GameBonuses::class)->transition($game, [...$state, 'number' => 4], 'active');
     foreach ([$members[0][0], $members[1][0]] as $id) {
         expect($next['bonuses']['inventory'][$id])->toHaveCount(1);
         expect(array_keys($next['bonuses']['inventory'][$id][0]))->toBe(['id', 'kind']);

@@ -198,8 +198,9 @@ it('generates count and cup scenes whose visible events agree with the solution'
         foreach ($cups['scene']['swaps'] as $swap) {
             [$a, $b] = $swap['positions'];
             [$order[$a], $order[$b]] = [$order[$b], $order[$a]];
-            expect($swap['duration'])->toBe(0.7);
+            expect($swap['duration'])->toBeGreaterThanOrEqual(0.32)->toBeLessThanOrEqual(0.72);
         }
+        expect(array_unique(array_column($cups['scene']['swaps'], 'duration')))->not->toHaveCount(1);
         expect($order[$cups['correct']])->toBe(0);
     }
 });
