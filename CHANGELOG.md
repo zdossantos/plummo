@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.9.0](https://github.com/zdossantos/plummo/compare/plummo-v0.8.0...plummo-v0.9.0) (2026-10-12)
+
+
+### Features
+
+* add Plummo tribunal game ([#74](https://github.com/zdossantos/plummo/issues/74)) ([b744e3a](https://github.com/zdossantos/plummo/commit/b744e3a10070deb4f6f5998e6f0867f050872bb9))
+* add shared-screen mini games ([#73](https://github.com/zdossantos/plummo/issues/73)) ([32ff33b](https://github.com/zdossantos/plummo/commit/32ff33b16bed95f32aa3d1106bb8000ca6e2f83a))
+* **home:** rejoindre ou héberger selon le format de l’appareil ([#71](https://github.com/zdossantos/plummo/issues/71)) ([2b35828](https://github.com/zdossantos/plummo/commit/2b35828006a45bb86f37ad0d10e47f9916d7f9a5))
+* manage tribunal subjects through the content catalogue ([#75](https://github.com/zdossantos/plummo/issues/75)) ([fa87a3c](https://github.com/zdossantos/plummo/commit/fa87a3c8454c0ba4b02f8f8f1ceb3f1491ff2971))
+
 ## [0.8.0](https://github.com/zdossantos/plummo/compare/plummo-v0.7.0...plummo-v0.8.0) (2026-10-11)
 
 
