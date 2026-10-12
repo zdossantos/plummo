@@ -33,16 +33,17 @@ it('keeps a full bonus pocket clear of a usable drawing canvas at every controll
         $phone->page()->setViewportSize($width, $height);
         $phone->refresh()->assertVisible('[data-testid="drawing-board"]')->assertVisible('.bonus-pending');
         $phone->page()->evaluate('() => document.fonts.ready');
-        // Visibility can precede the ResizeObserver/requestAnimationFrame sizing of the SVG.
-        // Wait for a usable canvas; keep the geometry assertions below unchanged.
-        $phone->page()->waitForFunction(<<<'JS'
-        (() => {
-            const canvas = document.querySelector('[data-testid="drawing-board"]');
-            return canvas && canvas.getBoundingClientRect().height >= (innerHeight < 420 ? 100 : 170);
-        })()
-        JS);
+        // ResizeObserver sizes the SVG on the next animation frame after visibility.
+        // Await readiness and measure in one evaluation; Page::waitForFunction does
+        // not consume its lazy protocol generator in the installed Pest version.
         $geometry = $phone->page()->evaluate(<<<'JS'
-        () => {
+        async () => {
+            const minimum = innerHeight < 420 ? 100 : 170;
+            const deadline = performance.now() + 5000;
+            while (document.querySelector('[data-testid="drawing-board"]').getBoundingClientRect().height < minimum) {
+                if (performance.now() >= deadline) throw new Error('Drawing canvas did not reach its usable height');
+                await new Promise(requestAnimationFrame);
+            }
             const canvas = document.querySelector('[data-testid="drawing-board"]').getBoundingClientRect();
             const pocket = document.querySelector('.bonus-pocket').getBoundingClientRect();
             const objects = [...document.querySelectorAll('.bonus-object, .bonus-pending, [data-drawing-settings], .game-pause')].map(e => e.getBoundingClientRect());
