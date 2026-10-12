@@ -3200,14 +3200,14 @@
 .controller-active .bonus-pocket {
     padding: 6px 0 4px;
     gap: 12px;
-    min-height: 54px;
+    min-height: 62px;
 }
 .controller-active .bonus-pocket .bonus-slot,
 .controller-active .bonus-pocket .bonus-object,
 .controller-active .bonus-pocket .bonus-empty {
-    width: 48px;
-    height: 44px;
-    min-height: 44px;
+    width: 56px;
+    height: 52px;
+    min-height: 52px;
 }
 .controller-active .bonus-pocket .bonus-object {
     padding: 2px;
@@ -3216,8 +3216,8 @@
 }
 .controller-active .bonus-pocket .bonus-object .bonus-icon {
     position: static;
-    width: 34px;
-    height: 34px;
+    width: 40px;
+    height: 40px;
 }
 .controller-active .bonus-object small,
 .controller-active .bonus-category,
@@ -3241,14 +3241,14 @@
     z-index: 50;
 }
 .controller-active .bonus-pocket .bonus-pending {
-    width: 48px;
-    height: 44px;
+    width: 56px;
+    height: 52px;
     padding: 3px;
     border-radius: 14px;
 }
 .controller-active .bonus-pending .bonus-icon {
-    width: 32px;
-    height: 32px;
+    width: 38px;
+    height: 38px;
 }
 .controller-active .phone-scene {
     gap: 6px;
@@ -3462,7 +3462,7 @@
         z-index: 5;
     }
     .controller-active .phone-status {
-        padding-right: 190px;
+        padding-right: 214px;
     }
     .controller-active .viewport-footer {
         height: 0;
