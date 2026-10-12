@@ -6,7 +6,7 @@ use App\Models\Room;
 use App\Services\DrawingGame;
 use App\Services\GameEngine;
 
-it('keeps a full bonus pocket above a usable drawing canvas at every controller size', function (int $width, int $height) {
+it('keeps a full bonus pocket clear of a usable drawing canvas at every controller size', function (int $width, int $height) {
     app()->terminating(function () {
         app('cookie')->flushQueuedCookies();
         app('session.store')->flush();
@@ -41,7 +41,14 @@ it('keeps a full bonus pocket above a usable drawing canvas at every controller 
             return {
                 canvasHeight: canvas.height,
                 canvasWidth: canvas.width,
-                above: pocket.bottom <= canvas.top,
+                below: pocket.top >= canvas.bottom,
+                clear: pocket.bottom <= canvas.top || pocket.top >= canvas.bottom || pocket.right <= canvas.left || pocket.left >= canvas.right,
+                touchable: [...document.querySelectorAll('.bonus-object, .bonus-pending')].every(e => {
+                    const r = e.getBoundingClientRect();
+                    const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+                    return r.width >= 44 && r.height >= 44 && !!hit && e.contains(hit);
+                }),
+                pendingFirst: document.querySelector('.bonus-pocket').firstElementChild.matches('.bonus-pending'),
                 reachable: objects.every(r => r.top >= 0 && r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth),
                 overflow: document.documentElement.scrollHeight > innerHeight || document.documentElement.scrollWidth > innerWidth
             };
@@ -49,7 +56,12 @@ it('keeps a full bonus pocket above a usable drawing canvas at every controller 
         JS);
         expect($geometry['canvasHeight'])->toBeGreaterThanOrEqual($height < 420 ? 100 : 170);
         expect(abs($geometry['canvasWidth'] - $geometry['canvasHeight']))->toBeLessThan(2);
-        expect($geometry['above'])->toBeTrue();
+        expect($geometry['clear'])->toBeTrue();
+        if ($width < 600 && $height > 450) {
+            expect($geometry['below'])->toBeTrue();
+        }
+        expect($geometry['touchable'])->toBeTrue();
+        expect($geometry['pendingFirst'])->toBeTrue();
         expect($phone->page()->evaluate('() => { const canvas=document.querySelector("[data-testid=drawing-board]").getBoundingClientRect(); return [...document.querySelectorAll(".drawing-toolbar > button")].every(e => { const r=e.getBoundingClientRect(); const top=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2); return r.width >= 40 && r.height >= 40 && !!top?.closest("button") && (r.bottom <= canvas.top || r.top >= canvas.bottom || r.right <= canvas.left || r.left >= canvas.right); }); }'))->toBeTrue();
         expect($geometry['reachable'])->toBeTrue();
         expect($geometry['overflow'])->toBeFalse();
