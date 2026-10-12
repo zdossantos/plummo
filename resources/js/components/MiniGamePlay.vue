@@ -23,13 +23,11 @@ const { t } = useTranslations('rooms');
 const now = computed(() => props.serverNow ?? Date.now() / 1000);
 const revealed = computed(() => props.game.phase === 'reveal');
 const effects = computed(() =>
-    props.phone
-        ? activeBonusEffects(
-              props.game.bonuses?.effects ?? [],
-              now.value,
-              props.game.phase,
-          )
-        : [],
+    activeBonusEffects(
+        props.game.bonuses?.effects ?? [],
+        now.value,
+        props.game.phase,
+    ),
 );
 const hasEffect = (kind: string) => effects.value.some((e) => e.kind === kind);
 const choices = computed(() =>

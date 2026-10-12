@@ -209,7 +209,11 @@ const formats = [
     [1920, 1080],
 ];
 const results = [];
-for (const [width, height] of formats)
+for (const [width, height] of formats.filter(
+    ([w, h]) =>
+        !process.env.PLUMMO_VIEWPORT_FORMAT ||
+        process.env.PLUMMO_VIEWPORT_FORMAT === `${w}x${h}`,
+))
     for (const [mode, game] of Object.entries(games)) {
         await page.setViewportSize({ width, height });
         await page.setContent(
@@ -346,6 +350,100 @@ for (const [width, height] of formats)
             await page
                 .locator('.drawing-settings-drawer [data-slot="drawer-close"]')
                 .click();
+        }
+        if (mode === 'quiz' || mode === 'blind') {
+            const geometry = () =>
+                page.locator('.game-choice').evaluateAll((cards) =>
+                    cards.map((card) => {
+                        const r = card.getBoundingClientRect();
+                        return {
+                            id: card.dataset.answer,
+                            x: r.x,
+                            y: r.y,
+                            width: r.width,
+                            height: r.height,
+                            color: getComputedStyle(
+                                card.querySelector('.choice-face'),
+                            ).backgroundColor,
+                            pattern:
+                                card.querySelector('.answer-texture').innerHTML,
+                        };
+                    }),
+                );
+            const baseline = await geometry();
+            for (const kind of [
+                'squatter',
+                'photobomb',
+                'singer',
+                'strike',
+                'bubbles',
+                'soap',
+            ]) {
+                await page.evaluate((g) => window.updateGame(g), {
+                    ...game,
+                    bonuses: {
+                        ...bonuses,
+                        effects: [
+                            {
+                                id: 'geometry-' + kind,
+                                kind,
+                                actorId: 2,
+                                startedAt: 100,
+                                expiresAt: 140,
+                            },
+                        ],
+                    },
+                });
+                await page.waitForTimeout(250);
+                if (
+                    width < 1000 &&
+                    ['squatter', 'photobomb', 'singer', 'strike'].includes(kind)
+                )
+                    assert.equal(
+                        await page.locator('.bonus-visitor').count(),
+                        1,
+                        'Visitor effect was not rendered',
+                    );
+                assert.deepEqual(
+                    await geometry(),
+                    baseline,
+                    kind +
+                        ' changed answer geometry at ' +
+                        width +
+                        'x' +
+                        height,
+                );
+            }
+            await page.evaluate((g) => window.updateGame(g), game);
+            await page.waitForTimeout(250);
+            assert.deepEqual(
+                await geometry(),
+                baseline,
+                'Expiring effects changed answer geometry',
+            );
+        }
+        if (mode === 'quiz' && width >= 1000) {
+            await page.evaluate((g) => window.updateGame(g), {
+                ...game,
+                bonuses: {
+                    ...bonuses,
+                    effects: [
+                        {
+                            id: 'display-reading',
+                            kind: 'missing_word',
+                            actorId: 2,
+                            startedAt: 100,
+                            expiresAt: 140,
+                        },
+                    ],
+                },
+            });
+            assert.match(
+                await page.locator('.game-question h1').textContent(),
+                /▰▰▰▰/,
+                'Mange-mot must affect the display too',
+            );
+            await page.evaluate((g) => window.updateGame(g), game);
         }
         if (mode === 'blind') {
             const identities = () =>
@@ -488,5 +586,5 @@ await browser.close();
 fs.writeFileSync(cache + '/results.json', JSON.stringify(results, null, 2));
 assert.deepEqual(errors, [], 'Vue rendering or console errors');
 console.log(
-    `${results.length} viewport checks passed across ${formats.length} screen formats, including drawing tools, answer readers and stable dice colors.`,
+    `${results.length} viewport checks passed across ${process.env.PLUMMO_VIEWPORT_FORMAT ? 1 : formats.length} screen formats, including drawing tools, answer readers and stable dice colors.`,
 );

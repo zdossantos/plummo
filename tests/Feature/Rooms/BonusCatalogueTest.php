@@ -271,3 +271,13 @@ it('ignores departed and excluded scores when granting catchup objects and keeps
     }
     expect($next['bonuses']['inventory'])->not->toHaveKeys([$members[2][0], 999999]);
 });
+
+it('projects reading maluses once on the display while keeping the sender protected', function (string $kind) {
+    [$room, $members, $game] = bonusQuiz(true, 3);
+    launchCatalogueBonus($this, $room, $members[0], $game, $kind);
+    $service = app(GameBonuses::class);
+    expect(array_column($service->view($game->fresh(), null, true)['effects'], 'kind'))->toBe([$kind]);
+    expect($service->view($game->fresh(), RoomPlayer::findOrFail($members[0][0]), false)['effects'])->toBeEmpty();
+    $this->travel(30)->seconds();
+    expect($service->view($game->fresh(), null, true)['effects'])->toBeEmpty();
+})->with(['missing_word', 'alphabet', 'squatter', 'watch'])->group('bonuses');

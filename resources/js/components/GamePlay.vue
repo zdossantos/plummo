@@ -45,10 +45,7 @@ const effects = computed(() =>
 const hasEffect = (kind: string) => effects.value.some((e) => e.kind === kind);
 const question = computed(() =>
     'question' in props.game.round
-        ? eatenQuestion(
-              props.game.round.question,
-              !!props.phone && hasEffect('missing_word'),
-          )
+        ? eatenQuestion(props.game.round.question, hasEffect('missing_word'))
         : '',
 );
 const revealedCurtains = ref(new Set<number>());
@@ -78,7 +75,7 @@ function choose(index: number) {
     emit('answer', index);
 }
 const timerValue = computed(() =>
-    props.phone && hasEffect('watch')
+    hasEffect('watch')
         ? '—'
         : (props.game.bonuses?.clock?.frozenValue ?? props.seconds),
 );
@@ -86,7 +83,7 @@ const choices = computed(() =>
     'choices' in props.game.round
         ? bonusChoices(
               props.game.round.choices,
-              props.phone ? effects.value : [],
+              effects.value,
               props.serverNow ?? Date.now() / 1000,
           )
         : [],
@@ -129,12 +126,12 @@ const ranking = computed(() => {
         :class="{
             'game-results-scene': game.phase === 'results',
             'has-ranking-list': phone && ranking.length > 3,
-            'game-jelly': phone && hasEffect('jelly'),
+            'game-jelly': hasEffect('jelly'),
         }"
         data-testid="game-play"
     >
         <BonusEffects
-            v-if="phone || game.type === 'blind_test'"
+            v-if="phone || game.type !== 'drawing'"
             :effects="effects"
             :room="room"
             :now="serverNow"
@@ -380,13 +377,13 @@ const ranking = computed(() => {
                         <span
                             class="choice-letter"
                             :class="{
-                                'answer-upside': phone && hasEffect('alphabet'),
+                                'answer-upside': hasEffect('alphabet'),
                             }"
                             >{{ String.fromCharCode(65 + index) }}</span
                         ><span
                             class="text-summary"
                             :class="{
-                                'answer-upside': phone && hasEffect('alphabet'),
+                                'answer-upside': hasEffect('alphabet'),
                                 'answer-concealed': concealed(index),
                             }"
                             >{{
@@ -399,12 +396,14 @@ const ranking = computed(() => {
                         <span
                             class="choice-letter"
                             :class="{
-                                'answer-upside': phone && hasEffect('alphabet'),
+                                'answer-upside': hasEffect('alphabet'),
                             }"
                             >{{ String.fromCharCode(65 + index) }}</span
-                        ><span class="text-summary">{{
-                            choiceText(choice)
-                        }}</span>
+                        ><span
+                            class="text-summary"
+                            :class="{ 'answer-upside': hasEffect('alphabet') }"
+                            >{{ choiceText(choice) }}</span
+                        >
                     </p>
                     <div
                         v-if="revealed && responders(index).length"
@@ -422,7 +421,7 @@ const ranking = computed(() => {
                         v-if="phone && !concealed(index)"
                         :text="choiceText(choice)"
                         :force="phone"
-                        :upside="phone && hasEffect('alphabet')"
+                        :upside="hasEffect('alphabet')"
                         :label="String.fromCharCode(65 + index)"
                     />
                 </div>

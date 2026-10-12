@@ -192,7 +192,10 @@ class GameBonuses
         $bonus = $game->state['bonuses'] ?? [];
         $phase = app(BonusCatalog::class)->phase($game->type);
         $playing = $game->state['phase'] === $phase && $game->status === 'active';
-        $effects = $playing ? array_values(array_filter($bonus['effects'] ?? [], fn ($effect) => ($effect['expiresAt'] === null || $effect['expiresAt'] > app(GameEngine::class)->time()) && ($effect['target'] === 0 || (($screen || $me === null) && $game->type === 'drawing' && ($effect['kind'] === 'bolt' || ($effect['target'] === ($game->state['round']['artist'] ?? null) && in_array($effect['kind'], ['stamp', 'paint', 'giant', 'clumsy'], true)))) || (! $screen && $effect['target'] === $me?->id)))) : [];
+        $effects = $playing ? array_values(array_filter($bonus['effects'] ?? [], fn ($effect) => ($effect['expiresAt'] === null || $effect['expiresAt'] > app(GameEngine::class)->time()) && ($effect['target'] === 0 || (($screen || $me === null) && in_array($effect['kind'], ['missing_word', 'artist', 'alphabet', 'watch', 'dice', 'squatter', 'photobomb', 'singer', 'jelly', 'strike'], true)) || (($screen || $me === null) && $game->type === 'drawing' && ($effect['kind'] === 'bolt' || ($effect['target'] === ($game->state['round']['artist'] ?? null) && in_array($effect['kind'], ['stamp', 'paint', 'giant', 'clumsy'], true)))) || (! $screen && $effect['target'] === $me?->id)))) : [];
+        if ($screen || $me === null) {
+            $effects = collect($effects)->unique('kind')->values()->all();
+        }
         $effects = array_map(function ($effect) {
             unset($effect['target']);
 

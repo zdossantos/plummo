@@ -283,7 +283,7 @@ it('launches every compatible object with the expected targets and lifetime', fu
     }
     $view = $this->getJson('/rooms/'.$room->code.'/state')->assertOk();
     expect($view->json('game.bonuses.inventory'))->toBe([]);
-    expect($view->json('game.bonuses.effects'))->toHaveCount($type === 'drawing' ? 1 : 0);
+    expect($view->json('game.bonuses.effects'))->toHaveCount($type === 'drawing' || in_array($kind, ['dice', 'squatter', 'artist'], true) ? 1 : 0);
 })->with([
     ['quiz', 'bolt', 3], ['quiz', 'dice', 6], ['quiz', 'squatter', 4],
     ['blind_test', 'bolt', 3], ['blind_test', 'dice', 6], ['blind_test', 'squatter', 4], ['blind_test', 'artist', 4],
