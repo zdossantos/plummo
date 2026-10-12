@@ -427,8 +427,8 @@ it('synchronizes fill and eraser tools with immutable idempotent retries', funct
     startDrawing($room, $one);
     chooseDrawing($room, $one);
     $url = '/rooms/'.$room->code.'/drawing/stroke';
-    $fill = drawingStroke($room, ['tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[0, 0, 500], [1, 10, 490]]]);
-    $this->postJson($url, $fill)->assertOk()->assertJsonPath('game.round.canvas.0.tool', 'fill')->assertJsonPath('game.round.canvas.0.spans', $fill['spans']);
+    $fill = drawingStroke($room, ['tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[0, 0, 500], [1, 10, 490], [499, 0, 500]]]);
+    $this->postJson($url, $fill)->assertOk()->assertJsonPath('game.round.canvasHeight', 1000)->assertJsonPath('game.round.canvas.0.tool', 'fill')->assertJsonPath('game.round.canvas.0.spans', $fill['spans']);
     $this->postJson($url, $fill)->assertOk()->assertJsonCount(1, 'game.round.canvas');
     $this->postJson($url, [...$fill, 'spans' => [[2, 0, 500]]])->assertConflict();
     $this->postJson($url, drawingStroke($room, ['id' => 2, 'tool' => 'erase']))->assertOk()->assertJsonPath('game.round.canvas.1.tool', 'erase')->assertJsonPath('game.round.canvas.1.color', '#ffffff');
@@ -447,7 +447,7 @@ it('rejects invalid fill geometry and tool payloads', function (array $values) {
 })->with([
     [['tool' => 'unknown']],
     [['tool' => 'fill']],
-    [['tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[300, 0, 500]]]],
+    [['tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[500, 0, 500]]]],
     [['tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[0, 30, 20]]]],
     [['tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[0, 0, 501]]]],
     [['tool' => 'brush', 'spans' => [[0, 0, 500]]]],
@@ -477,4 +477,20 @@ it('bounds total fill geometry and preserves the eraser under the paint prank', 
     $game->update(['state' => $state]);
     $this->postJson($url, drawingStroke($room, ['id' => 3, 'tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[0, 0, 500]]]))->assertUnprocessable();
     expect($game->fresh()->state['round']['canvas'])->toHaveCount(2);
+});
+
+it('preserves the geometry and fill bounds of legacy drawing rounds', function () {
+    $room = openRoom();
+    [, $one] = enterRoom($room);
+    enterRoom($room, 'Alex');
+    $game = startDrawing($room, $one);
+    chooseDrawing($room, $one);
+    $game->refresh();
+    $state = $game->state;
+    unset($state['round']['canvas_height']);
+    $game->update(['state' => $state]);
+    $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.round.canvasHeight', 600);
+    $url = '/rooms/'.$room->code.'/drawing/stroke';
+    $this->postJson($url, drawingStroke($room, ['tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[300, 0, 500]]]))->assertUnprocessable();
+    $this->postJson($url, drawingStroke($room, ['tool' => 'fill', 'points' => [[.5, .5]], 'spans' => [[299, 0, 500]]]))->assertOk();
 });

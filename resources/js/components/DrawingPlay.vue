@@ -169,6 +169,7 @@ watch(
                     <DrawingBoard
                         :key="`${game.id}-${game.round.number}-${game.round.revision}`"
                         :strokes="game.round.canvas"
+                        :canvas-height="game.round.canvasHeight"
                         :editable="editable"
                         :busy="busy"
                         :color="effectiveColor"

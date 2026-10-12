@@ -143,6 +143,7 @@ export type DrawingGameState = Omit<
         artistId: number;
         word: string | null;
         canvas: Stroke[];
+        canvasHeight?: number;
         revision: number;
         awards: Record<number, number>;
     };

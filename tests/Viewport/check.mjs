@@ -105,6 +105,7 @@ const games = {
             word: null,
             artistId: 1,
             canvas: [],
+            canvasHeight: 1000,
             revision: 1,
         },
         me: {
@@ -229,7 +230,13 @@ for (const [width, height] of formats)
             const canvas = document
                 .querySelector('[data-testid="drawing-board"]')
                 ?.getBoundingClientRect();
+            const space = document
+                .querySelector('.drawing-space')
+                ?.getBoundingClientRect();
             return {
+                drawingSpace: space
+                    ? { width: space.width, height: space.height }
+                    : null,
                 canvas: canvas
                     ? { width: canvas.width, height: canvas.height }
                     : null,
@@ -285,7 +292,22 @@ for (const [width, height] of formats)
                 'House masks revealed residents',
             );
         }
+        if (mode === 'drawing') {
+            assert.ok(
+                Math.abs(geometry.canvas.width - geometry.canvas.height) < 2,
+                'Square drawing proportions must match the TV',
+            );
+        }
         if (mode === 'drawing' && width < 1000) {
+            assert.ok(
+                geometry.canvas.height >=
+                    Math.min(
+                        geometry.drawingSpace.width,
+                        geometry.drawingSpace.height,
+                    ) -
+                        2,
+                `Drawing should use available height: ${width}x${height}`,
+            );
             assert.ok(
                 geometry.canvas.height >= (width < height ? 170 : 100),
                 `Drawing canvas too short: ${width}x${height}`,
