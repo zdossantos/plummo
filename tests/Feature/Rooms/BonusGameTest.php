@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Game;
-use App\Models\RoomPlayer;
 use App\Services\GameBonuses;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Storage;
@@ -62,31 +61,24 @@ it('refuses paused stale missing and incompatible objects without consuming them
     expect(Game::findOrFail($game->id)->state['bonuses']['inventory'][$members[0][0]])->toHaveCount(1);
 })->group('bonuses');
 
-it('gives a catchup object to strict trailers once at the next round and preserves full pockets', function () {
-    $this->freezeTime();
+it('limits automatic awards to one object every three rounds even for trailers', function () {
     [$room, $members, $game] = bonusQuiz();
-    $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk();
-    $this->withCookie('plummo_player_'.$room->code, $members[1][1])->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 1))->assertOk();
-    $this->travel(3)->seconds();
-    $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.round.number', 2);
-    $current = Game::findOrFail($game->id);
-    expect($current->state['bonuses']['inventory'][$members[0][0]])->toHaveCount(2);
-    expect($current->state['bonuses']['pending'][$members[1][0]])->not->toBeNull();
-    expect($current->state['bonuses']['inventory'][$members[1][0]])->toHaveCount(2);
-    $this->postJson('/rooms/'.$room->code.'/presence')->assertOk();
-    expect(Game::findOrFail($game->id)->state['bonuses']['inventory'][$members[1][0]])->toHaveCount(2);
-    expect(RoomPlayer::findOrFail($members[0][0])->score)->toBe(100);
-})->group('bonuses');
-
-it('does not give catchup objects to tied leaders', function () {
-    $this->freezeTime();
-    [$room, $members, $game] = bonusQuiz();
-    $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk();
-    $this->withCookie('plummo_player_'.$room->code, $members[1][1])->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk();
-    $this->travel(3)->seconds();
-    $this->postJson('/rooms/'.$room->code.'/presence')->assertOk();
-    foreach (Game::findOrFail($game->id)->state['bonuses']['inventory'] as $items) {
-        expect($items)->toHaveCount(2);
+    $service = app(GameBonuses::class);
+    $state = $game->state;
+    $state['scores'][$members[0][0]] = 300;
+    foreach (range(2, 7) as $round) {
+        $game->state = $state;
+        $next = $state;
+        $next['number'] = $round;
+        $next['bonuses']['used'] = [$members[0][0]];
+        $state = $service->transition($game, $next, 'active');
+        foreach ($members as [$id]) {
+            expect($state['bonuses']['inventory'][$id])->toHaveCount($round < 4 ? 1 : 2);
+            expect(isset($state['bonuses']['pending'][$id]))->toBe($round === 7);
+        }
+        expect($state['bonuses']['used'])->toBe([]);
+        $game->state = $state;
+        expect($service->transition($game, $state, 'active')['bonuses'])->toBe($state['bonuses']);
     }
 })->group('bonuses');
 
@@ -164,7 +156,10 @@ it('imposes paint on new strokes without corrupting existing strokes or chunk re
 it('keeps a full pocket unchanged across another lost round and clears objects at the natural end', function () {
     $this->freezeTime();
     [$room, $members, $game] = bonusQuiz();
-    $full = null;
+    $state = $game->state;
+    $full = [['id' => 'first', 'kind' => 'bolt'], ['id' => 'second', 'kind' => 'dice']];
+    $state['bonuses']['inventory'][$members[1][0]] = $full;
+    $game->update(['state' => $state]);
     foreach (range(1, 5) as $round) {
         $this->withCookie('plummo_player_'.$room->code, $members[0][1])->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk();
         $this->withCookie('plummo_player_'.$room->code, $members[1][1])->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 1))->assertOk();
@@ -219,15 +214,20 @@ it('offers a third object privately and replaces only the chosen owned object', 
     $state = $game->state;
     $state['bonuses']['inventory'][$members[1][0]] = [['id' => 'first', 'kind' => 'bolt'], ['id' => 'second', 'kind' => 'dice']];
     $game->update(['state' => $state]);
-    $this->withCookie('plummo_player_'.$room->code, $members[0][1])->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk();
-    $this->withCookie('plummo_player_'.$room->code, $members[1][1])->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 1))->assertOk();
-    $this->travel(3)->seconds();
-    $view = $this->postJson('/rooms/'.$room->code.'/presence')->assertOk();
+    foreach (range(1, 3) as $round) {
+        $this->withCookie('plummo_player_'.$room->code, $members[0][1])->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk();
+        $this->withCookie('plummo_player_'.$room->code, $members[1][1])->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 1))->assertOk();
+        $this->travel(3)->seconds();
+        $view = $this->postJson('/rooms/'.$room->code.'/presence')->assertOk();
+        if ($round < 3) {
+            $view->assertJsonPath('game.bonuses.pending', null);
+        }
+    }
     $pending = $view->json('game.bonuses.pending');
     expect($pending)->not->toBeNull();
     expect($view->json('game.bonuses.inventory'))->toHaveCount(2);
     $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.bonuses.pending', null);
-    $values = ['game_id' => $game->id, 'round' => 2, 'item_id' => $pending['id'], 'replace_id' => 'second'];
+    $values = ['game_id' => $game->id, 'round' => 4, 'item_id' => $pending['id'], 'replace_id' => 'second'];
     $this->withCookie('plummo_player_'.$room->code, $members[0][1])->postJson('/rooms/'.$room->code.'/bonuses/replace', $values)->assertConflict();
     $this->withCookie('plummo_player_'.$room->code, $members[1][1])->postJson('/rooms/'.$room->code.'/bonuses/replace', [...$values, 'replace_id' => 'missing'])->assertConflict();
     $this->postJson('/rooms/'.$room->code.'/bonuses/replace', $values)->assertOk()->assertJsonPath('game.bonuses.inventory.0.id', 'first')->assertJsonPath('game.bonuses.inventory.1.id', $pending['id'])->assertJsonPath('game.bonuses.pending', null);
@@ -283,7 +283,7 @@ it('launches every compatible object with the expected targets and lifetime', fu
     }
     $view = $this->getJson('/rooms/'.$room->code.'/state')->assertOk();
     expect($view->json('game.bonuses.inventory'))->toBe([]);
-    expect($view->json('game.bonuses.effects'))->toHaveCount($type === 'drawing' ? 1 : 0);
+    expect($view->json('game.bonuses.effects'))->toHaveCount($type === 'drawing' || in_array($kind, ['dice', 'squatter', 'artist'], true) ? 1 : 0);
 })->with([
     ['quiz', 'bolt', 3], ['quiz', 'dice', 6], ['quiz', 'squatter', 4],
     ['blind_test', 'bolt', 3], ['blind_test', 'dice', 6], ['blind_test', 'squatter', 4], ['blind_test', 'artist', 4],

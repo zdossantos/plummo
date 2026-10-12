@@ -217,7 +217,7 @@ it('keeps collective overlays usable and accepts only one of two simultaneous la
             $second->assertMissing('.bonus-bubbles button');
         }
         if ($kind === 'mystery') {
-            $second->assertSee('Surprise!')->assertMissing('.bonus-info');
+            $second->assertPresent('.bonus-object.bonus-mystery[aria-label*="Surprise!"]')->assertMissing('.bonus-info');
         }
         if (in_array($kind, ['curtain', 'bubbles', 'alphabet'], true)) {
             $second->screenshot(filename: 'bonus-catalogue-'.$kind);

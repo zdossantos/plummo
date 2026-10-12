@@ -110,7 +110,11 @@ watch(chief, (value) => {
 </script>
 <template>
     <Head :title="t('join_title')" />
-    <ViewportShell>
+    <ViewportShell
+        :class="{
+            'controller-active': !!me && !!game && !editing && view === 'play',
+        }"
+    >
         <RoomNotice :message="error" />
         <PhonePointsFeedback
             v-if="me && !closed && !editing"
@@ -245,6 +249,37 @@ watch(chief, (value) => {
                         v-model="view"
                         :session="chief && !game"
                         :chat="canChat"
+                    />
+                </div>
+                <div
+                    v-if="
+                        game &&
+                        !editing &&
+                        view === 'play' &&
+                        game.phase !== 'results'
+                    "
+                    class="controller-inventory"
+                >
+                    <BonusPocket
+                        v-if="game.bonuses"
+                        :bonuses="game.bonuses"
+                        :busy="busy"
+                        :connected="connected"
+                        @replace="replaceBonus"
+                        @launch="
+                            request('bonuses', 'POST', {
+                                game_id: game.id,
+                                round: game.round.number,
+                                item_id: $event,
+                            })
+                        "
+                    />
+                    <BonusReception
+                        :game="game"
+                        :server-now="serverNow"
+                        :connected="connected"
+                        :recipient-id="me.id"
+                        phone
                     />
                 </div>
                 <p v-if="me.status === 'left'" role="status">{{ t('left') }}</p>
@@ -475,27 +510,6 @@ watch(chief, (value) => {
                 :closed="closed"
             />
             <div class="phone-bonus-footer">
-                <BonusPocket
-                    v-if="game.bonuses"
-                    :bonuses="game.bonuses"
-                    :busy="busy"
-                    :connected="connected"
-                    @replace="replaceBonus"
-                    @launch="
-                        request('bonuses', 'POST', {
-                            game_id: game.id,
-                            round: game.round.number,
-                            item_id: $event,
-                        })
-                    "
-                />
-                <BonusReception
-                    :game="game"
-                    :recipient-id="me.id"
-                    :server-now="serverNow"
-                    :connected="connected"
-                    phone
-                />
                 <GamePlummoAvatar
                     :connected="connected"
                     :game="game"

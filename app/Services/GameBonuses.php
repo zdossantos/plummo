@@ -31,11 +31,9 @@ class GameBonuses
             $bonus['effects'] = [];
             $bonus['defenses'] = [];
             $scores = $this->participantScores($state);
-            $best = max([0, ...array_values($scores)]);
             foreach (array_keys($scores) as $id) {
                 $bonus['inventory'][$id] ??= [];
-                $this->give($bonus, $id, $game->type, $scores);
-                if (($state['scores'][$id] ?? 0) < $best) {
+                if (($state['number'] - 1) % 3 === 0) {
                     $this->give($bonus, $id, $game->type, $scores);
                 }
             }
@@ -194,7 +192,10 @@ class GameBonuses
         $bonus = $game->state['bonuses'] ?? [];
         $phase = app(BonusCatalog::class)->phase($game->type);
         $playing = $game->state['phase'] === $phase && $game->status === 'active';
-        $effects = $playing ? array_values(array_filter($bonus['effects'] ?? [], fn ($effect) => ($effect['expiresAt'] === null || $effect['expiresAt'] > app(GameEngine::class)->time()) && ($effect['target'] === 0 || (($screen || $me === null) && $game->type === 'drawing' && ($effect['kind'] === 'bolt' || ($effect['target'] === ($game->state['round']['artist'] ?? null) && in_array($effect['kind'], ['stamp', 'paint', 'giant', 'clumsy'], true)))) || (! $screen && $effect['target'] === $me?->id)))) : [];
+        $effects = $playing ? array_values(array_filter($bonus['effects'] ?? [], fn ($effect) => ($effect['expiresAt'] === null || $effect['expiresAt'] > app(GameEngine::class)->time()) && ($effect['target'] === 0 || (($screen || $me === null) && in_array($effect['kind'], ['missing_word', 'artist', 'alphabet', 'watch', 'dice', 'squatter', 'photobomb', 'singer', 'jelly', 'strike'], true)) || (($screen || $me === null) && $game->type === 'drawing' && ($effect['kind'] === 'bolt' || ($effect['target'] === ($game->state['round']['artist'] ?? null) && in_array($effect['kind'], ['stamp', 'paint', 'giant', 'clumsy'], true)))) || (! $screen && $effect['target'] === $me?->id)))) : [];
+        if ($screen || $me === null) {
+            $effects = collect($effects)->unique('kind')->values()->all();
+        }
         $effects = array_map(function ($effect) {
             unset($effect['target']);
 

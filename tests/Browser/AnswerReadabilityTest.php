@@ -26,11 +26,26 @@ it('uses the available answer height for long text and keeps the TV question pro
         $controller = visit('/join/'.$room->code, ['viewport' => compact('width', 'height')])->withLocale('en-US')->fill('player-name', 'Camille')->click('Continue')->click('Enter the room')->assertSee('Prepare a quiz');
         app(GameEngine::class)->start($room, ['type' => 'quiz', 'packs' => [$pack->id], 'rounds' => 5, 'duration' => 150]);
         $page = ($phone ? $controller : $screen)->refresh();
-        $page->assertSee($question)->assertSee($answer)->assertMissing('.page-controls');
+        $page->assertSee($question)->assertMissing('.page-controls');
+        if ($phone) {
+            $page->assertVisible('.game-choice[data-answer="0"] .choice-letter')->assertPresent('.text-reader-trigger');
+            expect($page->page()->evaluate('() => Array.from(document.querySelectorAll(".controller-answers .choice-face > .text-summary")).every(e => getComputedStyle(e).display === "none")'))->toBeTrue();
+            $page->click('.game-choice[data-answer="0"] .text-reader-trigger')->assertSee($answer)->click('Close');
+        } else {
+            $page->assertSee($answer);
+        }
         $page->page()->evaluate('() => document.fonts.ready');
-        expect($page->page()->evaluate('() => Array.from(document.querySelectorAll(".choice-face > .text-summary")).every(e => e.scrollHeight <= e.clientHeight + 1)'))->toBeTrue();
+        if (! $phone) {
+            expect($page->page()->evaluate('() => Array.from(document.querySelectorAll(".choice-face > .text-summary")).every(e => e.scrollHeight <= e.clientHeight + 1)'))->toBeTrue();
+        }
+        expect($page->page()->evaluate('() => { const cards = [...document.querySelectorAll(".game-choice")]; return cards.length === 4 && new Set(cards.map(e => getComputedStyle(e).getPropertyValue("--choice-color").trim())).size === 4 && cards.every(e => { const r=e.getBoundingClientRect(); return r.width >= 44 && r.height >= 44 && r.bottom <= innerHeight; }); }'))->toBeTrue();
         expect($page->page()->evaluate('() => document.documentElement.scrollHeight <= innerHeight'))->toBeTrue();
-        expect($page->page()->evaluate('() => { const e = document.querySelector(".game-question h1"); return e.scrollHeight <= e.clientHeight + 1; }'))->toBeTrue();
+        $questionFits = $page->page()->evaluate('() => { const e = document.querySelector(".game-question h1"); return e.scrollHeight <= e.clientHeight + 1; }');
+        if ($phone && ! $questionFits) {
+            $page->click('.game-question .text-reader-trigger')->assertSee($question)->click('Close');
+        } else {
+            expect($questionFits)->toBeTrue();
+        }
         if ($width >= 1280) {
             expect($page->page()->evaluate('() => parseFloat(getComputedStyle(document.querySelector(".game-question h1")).fontSize) > parseFloat(getComputedStyle(document.querySelector(".choice-face")).fontSize)'))->toBeTrue();
         }
@@ -41,7 +56,7 @@ it('uses the available answer height for long text and keeps the TV question pro
         $pack->delete();
         $tag->delete();
     }
-})->with([[1920, 1080, false], [1280, 720, false], [390, 844, true]]);
+})->with([[1920, 1080, false], [1280, 720, false], [320, 568, true], [360, 640, true], [375, 667, true], [390, 664, true], [430, 740, true], [667, 375, true], [844, 390, true], [768, 1024, true]]);
 
 it('shows a long phrase during presentation and voting using the available space', function (int $width, int $height, bool $phone) {
     app()->terminating(function () {
@@ -74,7 +89,7 @@ it('shows a long phrase during presentation and voting using the available space
         $page->refresh()->assertSee('Vote for your favourite sentence');
         $page->page()->evaluate('() => document.fonts.ready');
         if ($phone) {
-            $page->assertPresent('.text-reader-trigger');
+            expect($page->page()->evaluate('() => Array.from(document.querySelectorAll(".game-choice")).every(card => { const text = card.querySelector(".choice-face > .text-summary"); return text && (text.scrollHeight <= text.clientHeight + 1 || card.querySelector(".text-reader-trigger")); })'))->toBeTrue();
             expect($page->page()->evaluate('() => Array.from(document.querySelectorAll(".choice-face > .text-summary")).every(e => getComputedStyle(e).webkitLineClamp === "none")'))->toBeTrue();
         } else {
             $metrics = $page->page()->evaluate('() => Array.from(document.querySelectorAll(".choice-face > .text-summary")).map(e => ({height: e.clientHeight, content: e.scrollHeight, width: e.clientWidth, font: getComputedStyle(e).font, card: e.parentElement.clientHeight, scene: document.querySelector(".phrase-scene").clientHeight}))');
@@ -89,4 +104,4 @@ it('shows a long phrase during presentation and voting using the available space
         $pack->delete();
         $tag->delete();
     }
-})->with([[1920, 1080, false], [1280, 720, false], [390, 844, true]]);
+})->with([[1920, 1080, false], [1280, 720, false], [320, 568, true], [360, 640, true], [375, 667, true], [390, 664, true], [430, 740, true], [667, 375, true], [844, 390, true], [768, 1024, true]]);

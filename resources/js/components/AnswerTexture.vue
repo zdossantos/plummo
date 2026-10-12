@@ -79,7 +79,7 @@ defineProps<{ variant: number }>();
                 />
             </g>
         </template>
-        <template v-else>
+        <template v-else-if="variant === 3">
             <path
                 class="texture-light"
                 d="M0 89c28-6 54 17 52 51H0ZM151 0h49v47c-26-1-47-22-49-47Z"
@@ -103,6 +103,42 @@ defineProps<{ variant: number }>();
                     r="1.8"
                 />
             </g>
+        </template>
+        <template v-else-if="variant === 4">
+            <g class="texture-line">
+                <path d="M-8 30h60M22 0v60M148 110h60M178 80v60" />
+                <circle cx="22" cy="30" r="20" />
+                <circle cx="178" cy="110" r="20" />
+            </g>
+            <path class="texture-light" d="M150 0h50v45h-25V22h-25Z" />
+        </template>
+        <template v-else-if="variant === 5">
+            <path
+                class="texture-light"
+                d="m0 0 50 0-25 44ZM150 140l25-44 25 44Z"
+            />
+            <g class="texture-line">
+                <path
+                    d="m-10 65 20-30 20 30 20-30 20 30M140 115l15-25 15 25 15-25 15 25"
+                />
+            </g>
+        </template>
+        <template v-else-if="variant === 6">
+            <g class="texture-line">
+                <path
+                    d="M-10 20Q5 0 20 20T50 20T80 20M120 120q15-20 30 0t30 0t30 0M-10 35Q5 15 20 35T50 35"
+                />
+            </g>
+            <circle class="texture-light" cx="182" cy="20" r="22" />
+        </template>
+        <template v-else>
+            <g class="texture-line">
+                <path
+                    d="m15 5 12 14-12 14L3 19ZM178 103l14 16-14 16-14-16ZM158 0l10 12-10 12-10-12Z"
+                />
+            </g>
+            <path class="texture-light" d="m0 95 45 45H0ZM155 0h45v45Z" />
+            <circle class="texture-shade" cx="42" cy="12" r="6" />
         </template>
     </svg>
 </template>

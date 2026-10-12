@@ -1,12 +1,14 @@
 <?php
 
 return [
+    'drawing_settings' => 'Atelier de dessin',
+    'drawing_settings_hint' => 'Choisis ta couleur et la taille du trait.',
     'tribunal_name' => 'Tribunal des Plummos',
     'launch_tribunal' => 'Préparer le tribunal',
     'tribunal_tours' => 'Nombre de tours',
     'tribunal_duration' => 'Parole par joueur (s)',
     'start_tribunal' => 'Ouvrir le tribunal',
-    'tribunal_topics' => ':unseen sujets inédits sur :total disponibles',
+    'tribunal_topics' => '{unseen} sujets inédits sur {total} disponibles',
     'tribunal_setup_count' => '{count} débats · chacun défend les deux camps par tour.',
     'tribunal_round' => 'Tribunal · Débat {number} / {total}',
     'tribunal_for' => 'Pour',

@@ -27,13 +27,13 @@ it('plays a quiz with a shared screen and two separate phones then returns to th
         $first->assertSee('Quiz · Question 1 / 5');
         $second->assertSee('Quiz · Question 1 / 5');
         $screen->assertSee('Quiz · Question 1 / 5')->assertVisible('[data-testid="screen-header-qr"]')->assertNoJavaScriptErrors();
-        $first->page()->locator('button:has-text("Pause")')->click(['noWaitAfter' => true]);
+        $first->page()->locator('button[aria-label="Pause game"]')->click(['noWaitAfter' => true]);
         $screen->assertSee('Game paused')->assertVisible('[data-testid="screen-header-qr"]');
         $first->page()->locator('button:has-text("Resume")')->click(['noWaitAfter' => true]);
-        $first->assertEnabled('.game-choices button:has-text("AA")');
-        $first->page()->locator('.game-choices button:has-text("AA")')->click(['noWaitAfter' => true]);
+        $first->assertEnabled('.game-choice[data-answer="0"] > button:first-child');
+        $first->page()->locator('.game-choice[data-answer="0"] > button:first-child')->click(['noWaitAfter' => true]);
         $first->assertSee('Answer saved.');
-        $second->page()->locator('.game-choices button:has-text("BB")')->click(['noWaitAfter' => true]);
+        $second->page()->locator('.game-choice[data-answer="1"] > button:first-child')->click(['noWaitAfter' => true]);
         $second->assertSee('0 points for this question');
         $first->assertSee('100 points for this question');
         $first->assertVisible('[data-testid="phone-points-gain"]')->assertSee('+100 points');

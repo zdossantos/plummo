@@ -39,7 +39,7 @@ class DrawingController extends Controller
                     'points' => ['required', 'array', 'min:1', $request->input('tool') === 'fill' ? 'max:1' : 'max:200', 'list'],
                     'spans' => ['required_if:tool,fill', 'prohibited_unless:tool,fill', 'array', 'min:1', 'max:10000', 'list'],
                     'spans.*' => ['required', 'array', 'size:3', 'list'],
-                    'spans.*.0' => ['required', 'integer', 'between:0,299'],
+                    'spans.*.0' => ['required', 'integer', 'between:0,499'],
                     'spans.*.1' => ['required', 'integer', 'between:0,499'],
                     'spans.*.2' => ['required', 'integer', 'between:1,500'],
                     'points.*' => ['required', 'array', 'size:2', 'list'],

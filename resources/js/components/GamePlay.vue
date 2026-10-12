@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Pause } from '@lucide/vue';
 import BonusEffects from '@/components/BonusEffects.vue';
 import { activeBonusEffects, bonusChoices, eatenQuestion } from '@/lib/bonuses';
 import PagedList from '@/components/PagedList.vue';
@@ -44,10 +45,7 @@ const effects = computed(() =>
 const hasEffect = (kind: string) => effects.value.some((e) => e.kind === kind);
 const question = computed(() =>
     'question' in props.game.round
-        ? eatenQuestion(
-              props.game.round.question,
-              !!props.phone && hasEffect('missing_word'),
-          )
+        ? eatenQuestion(props.game.round.question, hasEffect('missing_word'))
         : '',
 );
 const revealedCurtains = ref(new Set<number>());
@@ -77,7 +75,7 @@ function choose(index: number) {
     emit('answer', index);
 }
 const timerValue = computed(() =>
-    props.phone && hasEffect('watch')
+    hasEffect('watch')
         ? '—'
         : (props.game.bonuses?.clock?.frozenValue ?? props.seconds),
 );
@@ -85,7 +83,7 @@ const choices = computed(() =>
     'choices' in props.game.round
         ? bonusChoices(
               props.game.round.choices,
-              props.phone ? effects.value : [],
+              effects.value,
               props.serverNow ?? Date.now() / 1000,
           )
         : [],
@@ -128,18 +126,18 @@ const ranking = computed(() => {
         :class="{
             'game-results-scene': game.phase === 'results',
             'has-ranking-list': phone && ranking.length > 3,
-            'game-jelly': phone && hasEffect('jelly'),
+            'game-jelly': hasEffect('jelly'),
         }"
         data-testid="game-play"
     >
         <BonusEffects
-            v-if="phone || game.type === 'blind_test'"
+            v-if="phone || game.type !== 'drawing'"
             :effects="effects"
             :room="room"
             :now="serverNow"
         />
         <div
-            class="flex items-center justify-between gap-5 font-bold text-primary"
+            class="game-phase-bar flex items-center justify-between gap-5 font-bold text-primary"
         >
             <p>
                 {{
@@ -165,6 +163,20 @@ const ranking = computed(() => {
                     )
                 }}
             </p>
+            <button
+                v-if="
+                    chief &&
+                    phone &&
+                    !['paused', 'results'].includes(game.phase)
+                "
+                class="game-pause"
+                type="button"
+                :disabled="busy"
+                :aria-label="t('pause_game')"
+                @click="emit('control', 'pause')"
+            >
+                <Pause aria-hidden="true" />
+            </button>
             <p
                 v-if="
                     [
@@ -316,11 +328,18 @@ const ranking = computed(() => {
             <p v-if="phone && !game.me?.eligible && !revealed" class="text-sm">
                 {{ t('next_round_wait') }}
             </p>
-            <div class="game-choices">
+            <TransitionGroup
+                tag="div"
+                class="game-choices"
+                :class="{ 'controller-answers': phone }"
+                name="answer"
+            >
                 <div
                     v-for="{ choice, index } in choices"
                     :key="index"
                     class="game-choice"
+                    :data-answer="index"
+                    :data-color="index % 8"
                     :class="{
                         correct: revealed && game.round.correct === index,
                         wrong:
@@ -354,14 +373,17 @@ const ranking = computed(() => {
                             ><span>✦</span
                             ><small>{{ t('bonus_reveal') }}</small></span
                         >
-                        <AnswerTexture :variant="index % 4" />
-                        <span class="choice-letter">{{
-                            String.fromCharCode(65 + index)
-                        }}</span
+                        <AnswerTexture :variant="index % 8" />
+                        <span
+                            class="choice-letter"
+                            :class="{
+                                'answer-upside': hasEffect('alphabet'),
+                            }"
+                            >{{ String.fromCharCode(65 + index) }}</span
                         ><span
                             class="text-summary"
                             :class="{
-                                'answer-upside': phone && hasEffect('alphabet'),
+                                'answer-upside': hasEffect('alphabet'),
                                 'answer-concealed': concealed(index),
                             }"
                             >{{
@@ -370,13 +392,18 @@ const ranking = computed(() => {
                         >
                     </button>
                     <p v-else class="choice-face font-bold">
-                        <AnswerTexture :variant="index % 4" />
-                        <span class="choice-letter">{{
-                            String.fromCharCode(65 + index)
-                        }}</span
-                        ><span class="text-summary">{{
-                            choiceText(choice)
-                        }}</span>
+                        <AnswerTexture :variant="index % 8" />
+                        <span
+                            class="choice-letter"
+                            :class="{
+                                'answer-upside': hasEffect('alphabet'),
+                            }"
+                            >{{ String.fromCharCode(65 + index) }}</span
+                        ><span
+                            class="text-summary"
+                            :class="{ 'answer-upside': hasEffect('alphabet') }"
+                            >{{ choiceText(choice) }}</span
+                        >
                     </p>
                     <div
                         v-if="revealed && responders(index).length"
@@ -393,10 +420,12 @@ const ranking = computed(() => {
                     <TextReader
                         v-if="phone && !concealed(index)"
                         :text="choiceText(choice)"
+                        :force="phone"
+                        :upside="hasEffect('alphabet')"
                         :label="String.fromCharCode(65 + index)"
                     />
                 </div>
-            </div>
+            </TransitionGroup>
             <p
                 v-if="phone && game.me?.answered && !revealed"
                 class="text-sm font-semibold"
@@ -413,29 +442,20 @@ const ranking = computed(() => {
             </p>
         </template>
         <div
-            v-if="chief && phone && game.phase !== 'results'"
+            v-if="chief && phone && game.phase === 'paused'"
             class="flex flex-wrap gap-2"
         >
             <Button
-                v-if="game.phase !== 'paused'"
+                :disabled="busy || game.exhausted"
+                @click="emit('control', 'resume')"
+                >{{ t('resume_game') }}</Button
+            >
+            <Button
                 variant="outline"
                 :disabled="busy"
-                @click="emit('control', 'pause')"
-                >{{ t('pause_game') }}</Button
+                @click="emit('control', 'stop')"
+                >{{ t('stop_game') }}</Button
             >
-            <template v-else>
-                <Button
-                    :disabled="busy || game.exhausted"
-                    @click="emit('control', 'resume')"
-                    >{{ t('resume_game') }}</Button
-                >
-                <Button
-                    variant="outline"
-                    :disabled="busy"
-                    @click="emit('control', 'stop')"
-                    >{{ t('stop_game') }}</Button
-                >
-            </template>
         </div>
     </section>
 </template>

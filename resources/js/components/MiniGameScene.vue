@@ -51,11 +51,12 @@ const actor = computed(() =>
 const actorProgress = computed(() =>
     actor.value ? (elapsed.value - actor.value.at) / 1.1 : 0,
 );
-const actorX = computed(() =>
-    actor.value?.direction === 1
-        ? 5 + actorProgress.value * 73
-        : 78 - actorProgress.value * 73,
-);
+const actorX = computed(() => {
+    const edge = actor.value?.side === 1 ? 95 : 5;
+    return actor.value?.direction === 1
+        ? edge + (50 - edge) * actorProgress.value
+        : 50 + (edge - 50) * actorProgress.value;
+});
 </script>
 <template>
     <div

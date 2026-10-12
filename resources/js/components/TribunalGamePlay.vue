@@ -559,9 +559,29 @@ const voters = (index: number) =>
         min-height: 60px;
     }
 }
-</style>
-
-<style scoped>
+@media (max-height: 450px) and (min-width: 600px) {
+    .tribunal-phone {
+        gap: 6px;
+    }
+    .tribunal-phone .tribunal-question {
+        font-size: 18px;
+    }
+    .tribunal-phone .tribunal-stage {
+        min-height: 60px;
+    }
+    .tribunal-phone .tribunal-directive p {
+        font-size: 18px;
+    }
+    .tribunal-phone .tribunal-role {
+        font-size: 12px;
+        margin-top: 2px;
+    }
+    .tribunal-phone
+        .tribunal-ballot[data-slot='button'][data-variant='outline'] {
+        min-height: 44px;
+        padding: 6px;
+    }
+}
 .tribunal-phone .tribunal-voters svg {
     width: 24px;
     height: 24px;

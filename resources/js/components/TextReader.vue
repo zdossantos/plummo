@@ -12,7 +12,12 @@ import {
 import { BookOpen } from '@lucide/vue';
 import PageControls from '@/components/PageControls.vue';
 import { useTranslations } from '@/composables/useTranslations';
-const props = defineProps<{ text: string; label?: string }>();
+const props = defineProps<{
+    text: string;
+    label?: string;
+    force?: boolean;
+    upside?: boolean;
+}>();
 const { t } = useTranslations('interface');
 const desktop = useMediaQuery('(min-width: 768px)');
 const page = ref(0);
@@ -99,7 +104,7 @@ watch(parts, () => {
     >
         <DrawerTrigger as-child
             ><button
-                v-if="truncated"
+                v-if="truncated || force"
                 type="button"
                 class="text-reader-trigger"
                 :aria-label="t('read') + (label ? ' · ' + label : '')"
@@ -114,7 +119,13 @@ watch(parts, () => {
             <DrawerDescription class="sr-only">{{
                 t('read')
             }}</DrawerDescription>
-            <p ref="reader" class="reader-text">{{ parts[page] }}</p>
+            <p
+                ref="reader"
+                class="reader-text"
+                :class="{ 'answer-upside': upside }"
+            >
+                {{ parts[page] }}
+            </p>
             <PageControls v-model="page" :total="parts.length" />
             <DrawerClose as-child
                 ><button type="button" class="game-action">

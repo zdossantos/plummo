@@ -50,7 +50,7 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         $phone->assertSee('Blind test · Clip 1 / 5');
         $screen->assertSee('Blind test · Clip 1 / 5')->assertDontSee('Your browser blocks automatic sound.')->assertMissing('.game-play button');
         expect($screen->page()->evaluate('() => document.querySelector("audio") === window.unlockedAudio && !window.unlockedAudio.paused && !window.unlockedAudio.muted'))->toBeTrue();
-        $phone->page()->locator('button:has-text("Pause")')->click(['noWaitAfter' => true]);
+        $phone->page()->locator('button[aria-label="Pause game"]')->click(['noWaitAfter' => true]);
         $phone->assertSee('Game paused');
         $screen->assertSee('Game paused');
         $phone->page()->locator('button:has-text("Resume")')->click(['noWaitAfter' => true]);
@@ -61,7 +61,7 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         expect($screen->page()->evaluate('document.querySelector("audio").loop && !document.querySelector("audio").paused'))->toBeTrue();
         expect($phone->page()->evaluate('document.querySelectorAll(".game-choice > button:first-child").length'))->toBe(8);
         expect($phone->page()->evaluate('document.querySelector("audio") === null'))->toBeTrue();
-        $phone->page()->locator('button:has-text("Pause")')->click(['noWaitAfter' => true]);
+        $phone->page()->locator('button[aria-label="Pause game"]')->click(['noWaitAfter' => true]);
         $phone->assertSee('Game paused');
         $screen->assertSee('Game paused');
         $position = $screen->page()->evaluate('document.querySelector("audio").currentTime');

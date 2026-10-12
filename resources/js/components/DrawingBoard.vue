@@ -15,7 +15,10 @@ useResizeObserver(surface, ([entry]) => {
     });
 });
 const canvasWidth = computed(() =>
-    Math.min(surfaceWidth.value, (surfaceHeight.value * 5) / 3),
+    Math.min(
+        surfaceWidth.value,
+        (surfaceHeight.value * 1000) / (props.canvasHeight ?? 600),
+    ),
 );
 import { Button } from '@/components/ui/button';
 import { useTranslations } from '@/composables/useTranslations';
@@ -25,6 +28,7 @@ import { bonusStrokePoints } from '@/lib/bonuses';
 import { fillPath } from '@/lib/drawing-fill';
 const props = defineProps<{
     strokes: Stroke[];
+    canvasHeight?: number;
     editable?: boolean;
     busy?: boolean;
     color?: string;
@@ -175,7 +179,10 @@ function down(event: PointerEvent) {
     const tool = props.tool ?? 'brush';
     const seed = point(event);
     const color = tool === 'erase' ? '#ffffff' : (props.color ?? '#35236b');
-    const spans = tool === 'fill' ? drawingFill(local.value, seed, color) : [];
+    const spans =
+        tool === 'fill'
+            ? drawingFill(local.value, seed, color, props.canvasHeight ?? 600)
+            : [];
     if (tool === 'fill' && !spans.length) return;
     if (
         spans.length > 10000 ||
@@ -241,10 +248,10 @@ onUnmounted(() => {
             <svg
                 :style="{
                     width: canvasWidth + 'px',
-                    height: (canvasWidth * 3) / 5 + 'px',
+                    height: (canvasWidth * (canvasHeight ?? 600)) / 1000 + 'px',
                 }"
                 data-testid="drawing-board"
-                viewBox="0 0 1000 600"
+                :viewBox="`0 0 1000 ${canvasHeight ?? 600}`"
                 :aria-label="t('drawing_canvas')"
                 class="drawing-surface rounded-2xl border-2 border-primary/20 bg-white"
                 :class="editable ? 'touch-none cursor-crosshair' : ''"
@@ -271,7 +278,10 @@ onUnmounted(() => {
                                     !!stroke.clumsy,
                                     stroke.tool ?? 'brush',
                                 )
-                                    .map(([x, y]) => `${x * 1000},${y * 600}`)
+                                    .map(
+                                        ([x, y]) =>
+                                            `${x * 1000},${y * (canvasHeight ?? 600)}`,
+                                    )
                                     .join(' ')
                             "
                             :stroke="stroke.color"
@@ -294,7 +304,7 @@ onUnmounted(() => {
                                     stroke.points,
                                     !!stroke.clumsy,
                                     stroke.tool ?? 'brush',
-                                )[0][1] * 600
+                                )[0][1] * (canvasHeight ?? 600)
                             "
                             :r="(stroke.bonusWidth ?? stroke.width) / 2"
                             :fill="stroke.color"

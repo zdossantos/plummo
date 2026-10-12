@@ -23,13 +23,11 @@ const { t } = useTranslations('rooms');
 const now = computed(() => props.serverNow ?? Date.now() / 1000);
 const revealed = computed(() => props.game.phase === 'reveal');
 const effects = computed(() =>
-    props.phone
-        ? activeBonusEffects(
-              props.game.bonuses?.effects ?? [],
-              now.value,
-              props.game.phase,
-          )
-        : [],
+    activeBonusEffects(
+        props.game.bonuses?.effects ?? [],
+        now.value,
+        props.game.phase,
+    ),
 );
 const hasEffect = (kind: string) => effects.value.some((e) => e.kind === kind);
 const choices = computed(() =>
@@ -278,8 +276,10 @@ const showChoices = computed(
                     )
                 }}
             </p>
-            <div
+            <TransitionGroup
                 v-if="showChoices"
+                tag="div"
+                name="answer"
                 class="game-choices mini-choices"
                 :class="{
                     'mini-numbers': ['hide', 'count', 'cups'].includes(
@@ -292,6 +292,8 @@ const showChoices = computed(
                     v-for="{ choice, index } in choices"
                     :key="index"
                     class="game-choice"
+                    :data-answer="index"
+                    :data-color="index % 8"
                     :class="{
                         correct: revealed && game.round.correct === index,
                         wrong:
@@ -322,7 +324,7 @@ const showChoices = computed(
                         "
                         @click="phone && choose(index)"
                     >
-                        <AnswerTexture :variant="index % 4" />
+                        <AnswerTexture :variant="index % 8" />
                         <span
                             v-if="
                                 !['hide', 'count', 'cups'].includes(
@@ -357,7 +359,7 @@ const showChoices = computed(
                         />
                     </div>
                 </div>
-            </div>
+            </TransitionGroup>
             <p v-if="revealed" class="mini-result" role="status">
                 {{
                     game.round.correct !== null

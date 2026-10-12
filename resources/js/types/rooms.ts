@@ -143,6 +143,7 @@ export type DrawingGameState = Omit<
         artistId: number;
         word: string | null;
         canvas: Stroke[];
+        canvasHeight?: number;
         revision: number;
         awards: Record<number, number>;
     };
@@ -204,7 +205,7 @@ export type CupSwap = {
 export type MiniScene = {
     residents?: string[];
     people?: { color: string; accessories: string[]; number: number }[];
-    events?: { at: number; direction: number; color: string }[];
+    events?: { at: number; direction: number; side?: number; color: string }[];
     swaps?: CupSwap[];
     under?: number;
     color?: string;

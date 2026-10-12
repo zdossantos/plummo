@@ -60,7 +60,7 @@ class MiniGameScenes
                 } else {
                     $color = array_pop($residents);
                 }
-                $events[] = ['at' => 1 + $index * 1.35, 'direction' => $direction, 'color' => $color];
+                $events[] = ['at' => 1 + $index * 1.35, 'direction' => $direction, 'side' => $index % 2 === 0 ? -1 : 1, 'color' => $color];
             }
 
             return ['scene' => ['events' => $events, 'residents' => $residents], 'observe' => 12, 'question' => 'mini_count_question', 'args' => [], 'choiceKind' => 'number', 'choices' => array_map('strval', range(0, 8)), 'correct' => $inside];
@@ -70,15 +70,18 @@ class MiniGameScenes
             $swaps = [];
             $last = null;
             $pairs = [[0, 1], [1, 2], [0, 2]];
+            $at = 2.1;
+            $durations = [0.72, 0.5, 0.36, 0.58, 0.32, 0.44];
             foreach (range(0, 5) as $index) {
                 $possible = array_values(array_filter($pairs, fn ($pair) => $pair !== $last));
                 $pair = collect($possible)->random();
                 [$order[$pair[0]], $order[$pair[1]]] = [$order[$pair[1]], $order[$pair[0]]];
-                $swaps[] = ['at' => 2.5 + $index * 0.88, 'duration' => 0.7, 'positions' => $pair];
+                $swaps[] = ['at' => $at, 'duration' => $durations[$index], 'positions' => $pair];
+                $at += $durations[$index] + 0.12;
                 $last = $pair;
             }
 
-            return ['scene' => ['swaps' => $swaps, 'under' => 0, 'color' => $colors[array_rand($colors)]], 'observe' => 8.8, 'question' => 'mini_cups_question', 'args' => [], 'choiceKind' => 'number', 'choices' => ['1', '2', '3'], 'correct' => array_search(0, $order, true)];
+            return ['scene' => ['swaps' => $swaps, 'under' => 0, 'color' => $colors[array_rand($colors)]], 'observe' => $at + 0.7, 'question' => 'mini_cups_question', 'args' => [], 'choiceKind' => 'number', 'choices' => ['1', '2', '3'], 'correct' => array_search(0, $order, true)];
         }
 
         return ['scene' => null, 'observe' => 0, 'question' => 'mini_author_prompt_'.random_int(1, 4), 'args' => [], 'choiceKind' => 'author', 'choices' => [], 'correct' => null];
