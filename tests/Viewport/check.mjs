@@ -396,7 +396,6 @@ for (const [width, height] of formats.filter(
                 });
                 await page.waitForTimeout(250);
                 if (
-                    width < 1000 &&
                     ['squatter', 'photobomb', 'singer', 'strike'].includes(kind)
                 )
                     assert.equal(
@@ -496,16 +495,15 @@ for (const [width, height] of formats.filter(
                     before,
                     'Dice changed the color or pattern assigned to an answer',
                 );
-                if (width < 1000)
-                    assert.notDeepEqual(
-                        await page
-                            .locator('.game-choice')
-                            .evaluateAll((cards) =>
-                                cards.map((card) => card.dataset.answer),
-                            ),
-                        Array.from({ length: 8 }, (_, i) => String(i)),
-                        'Dice did not move eight cards',
-                    );
+                assert.notDeepEqual(
+                    await page
+                        .locator('.game-choice')
+                        .evaluateAll((cards) =>
+                            cards.map((card) => card.dataset.answer),
+                        ),
+                    Array.from({ length: 8 }, (_, i) => String(i)),
+                    'Dice did not move eight cards',
+                );
             }
         }
         if (mode === 'quiz' && width < 1000) {

@@ -50,6 +50,7 @@ jobs:
             - run: APP_ENV=testing php artisan migrate --force
             - run: php artisan test --testsuite=Unit --stop-on-failure
             - run: php artisan test --testsuite=Feature --stop-on-failure
+            - run: timeout 180 php artisan test tests/Browser/BlindGameTest.php --stop-on-failure
             - run: php artisan test --testsuite=Browser --stop-on-failure
     runtime:
         runs-on: ubuntu-latest
