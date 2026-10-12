@@ -6,7 +6,6 @@ use App\Enums\ContentType;
 use App\Models\Game;
 use App\Models\Room;
 use App\Models\RoomPlayer;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class DrawingGame
@@ -235,23 +234,20 @@ class DrawingGame
         abort_unless($state['round']['word'] !== null && $this->eligible($player, $state), 403);
         abort_if(isset($state['round']['answers'][$player->id]), 409);
         $submitted = $guess;
-        $word = $this->normalize($state['round']['word']);
-        $guess = $this->normalize($guess);
-        $state['round']['near'][$player->id] = $guess !== $word && $this->distance($guess, $word) <= (mb_strlen($word) > 7 ? 2 : 1);
-        if ($word === $guess) {
+        $answers = app(DrawingAnswer::class);
+        $found = $answers->matches($state['round']['word'], $guess);
+        $word = $answers->normalize($state['round']['word']);
+        $guess = $answers->normalize($guess);
+        $state['round']['near'][$player->id] = $found === false && $this->distance($guess, $word) <= (mb_strlen($word) > 7 ? 2 : 1);
+        if ($found) {
             $state['round']['answers'][$player->id] = ['at' => $this->time()];
         }
-        $state['round']['guesses'] = array_slice([...($state['round']['guesses'] ?? []), ['playerId' => $player->id, 'text' => $submitted, 'found' => $word === $guess]], -12);
+        $state['round']['guesses'] = array_slice([...($state['round']['guesses'] ?? []), ['playerId' => $player->id, 'text' => $submitted, 'found' => $found]], -12);
         $this->save($game, $state);
-        if ($word === $guess) {
+        if ($found) {
             $this->award($room, $game);
         }
         $this->tick($room, $game);
-    }
-
-    private function normalize(string $value): string
-    {
-        return preg_replace('/[^\p{L}\p{N}]/u', '', Str::lower(Str::ascii($value)));
     }
 
     private function distance(string $a, string $b): int

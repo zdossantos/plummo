@@ -3188,3 +3188,8 @@
 .mini-author-roster svg {
     width: 58px;
 }
+
+.bonus-blackout-canvas {
+    position: absolute;
+    border-radius: 1rem;
+}

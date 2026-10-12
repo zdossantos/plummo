@@ -154,7 +154,7 @@ Un joueur qui part volontairement ou se déconnecte avant son passage est retir�
 - Le chrono de dessin démarre après le choix.
 - Le joueur dessine sur son téléphone et le dessin apparaît en direct sur le grand écran.
 - Les autres écrivent leurs propositions sur leur téléphone et peuvent faire plusieurs tentatives.
-- Les différences de casse, d’accents, d’espaces, de tirets et de ponctuation sont ignorées pour valider une réponse ; une faute de lettre reste incorrecte.
+- Les différences de casse, d’accents, d’espaces, de tirets et de ponctuation sont ignorées pour valider une réponse ; les formes singulier/pluriel courantes françaises et anglaises sont acceptées dans les deux sens (y compris quelques irréguliers comme cheval/chevaux, œil/yeux et child/children). Les mots invariants ne sont pas tronqués ; une faute de lettre reste incorrecte.
 - Une proposition proche par son écriture peut déclencher un retour privé « Presque ! Vérifie l'orthographe. », sans accorder de points.
 - Les joueurs qui trouvent gagnent des points selon leur ordre d'arrivée.
 - Le dessinateur gagne des points selon la proportion des joueurs ayant trouvé. Si tous trouvent, il reçoit le maximum prévu pour ce dessin.
@@ -304,6 +304,7 @@ Le tirage est pondéré uniquement côté serveur, y compris les cadeaux de piñ
 
 Un appui déclenche immédiatement le bonus sur tous les adversaires participants, sans sélection de cible ni confirmation. Le bouton d’information explique l’effet sans le consommer. Un lancement offensif et jusqu’à deux défenses par joueur et par manche ; pause, reprise, révélation et résultats interdisent les lancements. Les effets distincts coexistent ; un même effet ne prolonge pas sa durée. La pause conserve le temps restant et la manche suivante efface les effets.
 
+- Dessin : l’éclair assombrit pendant 3 secondes les téléphones adverses et uniquement la toile du grand écran. Le lanceur garde son affichage ; les commandes restent accessibles. Les boucliers et renvois existants s’appliquent, et le grand écran ne s’assombrit que si un effet atteint réellement un joueur.
 - Quiz et blind test : éclair (écran sombre, 3 s), dé (trois déplacements des réponses, 6 s), Plummo squatteur (4 s). Le blind test propose aussi artiste incognito (artistes masqués, 4 s).
 - Phrases : accent Plummo (r/R devient w/W) et éternuement (« ATCHOUM ! »). Seules les contributions publiées sont transformées, y compris celles déjà validées pendant l’écriture. Le brouillon et le prompt restent intacts ; accent puis éternuement dans un ordre fixe. Aucun auteur n’est révélé lors du vote.
 - Dessin : tampon temporaire (4 s, traits conservés) et pot renversé (couleur imposée, 4 s). La toile est commune ; le crayon revient à la couleur choisie après l’effet. Un trait maintenu est segmenté au changement de couleur pour conserver les échanges et les retries des traits existants.
