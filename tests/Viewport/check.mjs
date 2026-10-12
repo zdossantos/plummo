@@ -277,6 +277,56 @@ for (const [width, height] of formats.filter(
             [],
             `${mode} ${width}x${height}: controls outside viewport`,
         );
+        if (width < 600 && height > 450) {
+            const hud = await page.evaluate(() => {
+                const rect = (selector) => {
+                    const r = document
+                        .querySelector(selector)
+                        ?.getBoundingClientRect();
+                    return r
+                        ? { left: r.left, top: r.top, bottom: r.bottom }
+                        : null;
+                };
+                const controls = [
+                    ...document.querySelectorAll(
+                        '.bonus-object,.bonus-pending,.command-trigger,.message-shortcut,.game-pause',
+                    ),
+                ];
+                return {
+                    bonus: rect('.bonus-object'),
+                    menu: rect('.command-trigger'),
+                    pause: rect('.game-pause'),
+                    blocked: controls
+                        .filter((e) => {
+                            const r = e.getBoundingClientRect();
+                            const hit = document.elementFromPoint(
+                                r.x + r.width / 2,
+                                r.y + r.height / 2,
+                            );
+                            return !hit || !e.contains(hit);
+                        })
+                        .map((e) => e.className),
+                };
+            });
+            assert.deepEqual(
+                hud.blocked,
+                [],
+                `${mode} ${width}x${height}: blocked HUD controls`,
+            );
+            assert.ok(
+                hud.menu.left < hud.bonus.left,
+                `${mode}: commands must be left of bonuses`,
+            );
+            assert.ok(
+                Math.abs(hud.menu.top - hud.bonus.top) < 1,
+                `${mode}: HUD top edges must align`,
+            );
+            if (hud.pause)
+                assert.ok(
+                    Math.abs(hud.pause.bottom - hud.bonus.bottom) < 1,
+                    `${mode}: HUD bottom edges must align`,
+                );
+        }
         if (mode === 'countReveal' && width >= 1000) {
             const residents = page.locator('.mini-house-residents');
             assert.equal(await residents.locator('svg').count(), 8);

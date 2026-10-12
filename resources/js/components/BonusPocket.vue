@@ -64,6 +64,18 @@ watch(
         class="bonus-pocket"
         :aria-label="t('bonus_pocket')"
     >
+        <button
+            v-if="bonuses.pending"
+            type="button"
+            class="bonus-pending"
+            :aria-label="t('bonus_new')"
+            :disabled="busy || connected === false"
+            @click="choosing = true"
+        >
+            <BonusIcon
+                :kind="hidden ? 'mystery' : bonuses.pending.kind"
+            /><small>{{ t('bonus_new') }}</small>
+        </button>
         <div v-for="slot in 2" :key="slot" class="bonus-slot">
             <template v-if="bonuses.inventory[slot - 1]">
                 <button
@@ -158,18 +170,6 @@ watch(
         <div v-if="strike" class="bonus-strike-sign" aria-hidden="true">
             <BonusIcon kind="strike" />
         </div>
-        <button
-            v-if="bonuses.pending"
-            type="button"
-            class="bonus-pending"
-            :aria-label="t('bonus_new')"
-            :disabled="busy || connected === false"
-            @click="choosing = true"
-        >
-            <BonusIcon
-                :kind="hidden ? 'mystery' : bonuses.pending.kind"
-            /><small>{{ t('bonus_new') }}</small>
-        </button>
         <Drawer v-model:open="choosing">
             <DrawerContent
                 v-if="choosing && bonuses.pending"
