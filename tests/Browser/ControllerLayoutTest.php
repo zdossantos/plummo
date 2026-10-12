@@ -33,6 +33,14 @@ it('keeps a full bonus pocket clear of a usable drawing canvas at every controll
         $phone->page()->setViewportSize($width, $height);
         $phone->refresh()->assertVisible('[data-testid="drawing-board"]')->assertVisible('.bonus-pending');
         $phone->page()->evaluate('() => document.fonts.ready');
+        // Visibility can precede the ResizeObserver/requestAnimationFrame sizing of the SVG.
+        // Wait for a usable canvas; keep the geometry assertions below unchanged.
+        $phone->page()->waitForFunction(<<<'JS'
+        minimum => {
+            const canvas = document.querySelector('[data-testid="drawing-board"]');
+            return canvas && canvas.getBoundingClientRect().height >= minimum;
+        }
+        JS, $height < 420 ? 100 : 170);
         $geometry = $phone->page()->evaluate(<<<'JS'
         () => {
             const canvas = document.querySelector('[data-testid="drawing-board"]').getBoundingClientRect();
