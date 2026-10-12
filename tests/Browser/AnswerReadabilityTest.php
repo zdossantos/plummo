@@ -89,7 +89,7 @@ it('shows a long phrase during presentation and voting using the available space
         $page->refresh()->assertSee('Vote for your favourite sentence');
         $page->page()->evaluate('() => document.fonts.ready');
         if ($phone) {
-            $page->assertPresent('.text-reader-trigger');
+            expect($page->page()->evaluate('() => Array.from(document.querySelectorAll(".game-choice")).every(card => { const text = card.querySelector(".choice-face > .text-summary"); return text && (text.scrollHeight <= text.clientHeight + 1 || card.querySelector(".text-reader-trigger")); })'))->toBeTrue();
             expect($page->page()->evaluate('() => Array.from(document.querySelectorAll(".choice-face > .text-summary")).every(e => getComputedStyle(e).webkitLineClamp === "none")'))->toBeTrue();
         } else {
             $metrics = $page->page()->evaluate('() => Array.from(document.querySelectorAll(".choice-face > .text-summary")).map(e => ({height: e.clientHeight, content: e.scrollHeight, width: e.clientWidth, font: getComputedStyle(e).font, card: e.parentElement.clientHeight, scene: document.querySelector(".phrase-scene").clientHeight}))');
