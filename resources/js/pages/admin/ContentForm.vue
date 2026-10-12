@@ -160,6 +160,13 @@ function upload(event: Event) {
                         t('word_help')
                     }}</span></label
                 >
+                <label v-else-if="form.type === 'tribunal'" class="grid gap-2"
+                    >{{ t('tribunal_subject')
+                    }}<PagedTextField
+                        v-model="form.payload.question"
+                        :maxlength="500"
+                    />
+                </label>
                 <label v-else class="grid gap-2"
                     >{{ t('prompt')
                     }}<PagedTextField

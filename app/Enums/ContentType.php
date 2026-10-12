@@ -8,4 +8,5 @@ enum ContentType: string
     case BlindTest = 'blind_test';
     case Drawing = 'drawing';
     case Phrase = 'phrase';
+    case Tribunal = 'tribunal';
 }

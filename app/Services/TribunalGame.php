@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ContentType;
 use App\Models\Game;
 use App\Models\Room;
 use App\Models\RoomPlayer;
@@ -21,9 +22,12 @@ class TribunalGame
         if (count($this->players($room)) < 3) {
             throw ValidationException::withMessages(['type' => __('rooms.tribunal_minimum')]);
         }
-        $topics = array_keys(__('tribunal.topics'));
-        shuffle($topics);
-        $game = Game::create(['room_id' => $room->id, 'type' => 'tribunal', 'settings' => [...$settings, 'packs' => []], 'state' => ['scores' => [], 'number' => 0, 'tour' => 0, 'queue' => [], 'topics' => $topics]]);
+        $counts = app(RoomContentCatalog::class)->availability($room, ContentType::Tribunal, $settings['packs']);
+        $required = ($settings['allow_repeats'] ?? false) ? 1 : count($this->players($room)) * $settings['rounds'];
+        if (($settings['allow_repeats'] ?? false) ? $counts['total'] < $required : $counts['unseen'] < $required) {
+            throw ValidationException::withMessages(['packs' => __('rooms.contents_exhausted')]);
+        }
+        $game = Game::create(['room_id' => $room->id, 'type' => 'tribunal', 'settings' => $settings, 'state' => ['scores' => [], 'number' => 0, 'tour' => 0, 'queue' => []]]);
         $this->next($room, $game);
 
         return $game;
@@ -65,15 +69,24 @@ class TribunalGame
             }
         }
         $participants = array_values(array_intersect($state['tourPlayers'], $players));
-        if ($state['topics'] === []) {
-            $state['topics'] = array_keys(__('tribunal.topics'));
-            shuffle($state['topics']);
-            if ($state['topics'][0] === ($state['round']['topic'] ?? null)) {
-                $state['topics'][] = array_shift($state['topics']);
+        try {
+            $content = app(RoomContentCatalog::class)->reveal($room, ContentType::Tribunal, $game->settings['packs'], 1, $game->settings['allow_repeats'] ?? false)->firstOrFail();
+        } catch (ValidationException $exception) {
+            if (! isset($game->state['round'])) {
+                throw $exception;
             }
+            // Keep the previous rotation intact so recovery retries this same debate.
+            $state = $game->state;
+            $state['previous_phase'] = 'reveal';
+            $state['phase'] = 'paused';
+            $state['remaining'] = 0.0;
+            $state['exhausted'] = true;
+            $state['manual_pause'] = true;
+            app(GameEngine::class)->save($game, ['state' => $state]);
+
+            return;
         }
-        $topic = array_shift($state['topics']);
-        $state = [...$state, 'scores' => $state['scores'] + array_fill_keys($participants, 0), 'number' => $state['number'] + 1, 'excluded' => [], 'phase' => 'preparing', 'previous_phase' => 'preparing', 'remaining' => 0, 'manual_pause' => false, 'deadline' => app(GameEngine::class)->time() + 15, 'round' => ['topic' => $topic, 'advocates' => $pair, 'participants' => $participants, 'votes' => [], 'awards' => [], 'canceled' => false]];
+        $state = [...$state, 'scores' => $state['scores'] + array_fill_keys($participants, 0), 'number' => $state['number'] + 1, 'excluded' => [], 'phase' => 'preparing', 'previous_phase' => 'preparing', 'remaining' => 0, 'manual_pause' => false, 'deadline' => app(GameEngine::class)->time() + 15, 'round' => ['content_id' => $content->id, 'question' => $content->payload['question'], 'advocates' => $pair, 'participants' => $participants, 'votes' => [], 'awards' => [], 'canceled' => false]];
         app(GameEngine::class)->save($game, ['state' => $state]);
     }
 
@@ -189,6 +202,6 @@ class TribunalGame
         $eligible = $me !== null && $this->eligible($me, $state);
         $camp = $me === null ? false : array_search($me->id, $round['advocates'], true);
 
-        return ['id' => $game->id, 'type' => 'tribunal', 'settings' => $game->settings, 'exhausted' => false, 'targetReached' => $game->status === 'finished' && $room->point_target !== null && (int) $room->players()->max('score') >= $room->point_target, 'phase' => $state['phase'], 'deadline' => $state['deadline'], 'scores' => $state['scores'], 'round' => ['number' => $state['number'], 'total' => $state['number'] + count($state['queue']), 'tour' => $state['tour'], 'tours' => $game->settings['rounds'], 'question' => __('tribunal.topics.'.$round['topic']), 'advocates' => $round['advocates'], 'speakerId' => $speaker, 'votes' => $revealed && ! $round['canceled'] ? $round['votes'] : [], 'counts' => $revealed && ! $round['canceled'] ? $counts : [], 'awards' => $revealed ? $round['awards'] : [], 'canceled' => $round['canceled']], 'me' => $me === null ? null : ['eligible' => $eligible, 'camp' => $camp === false ? null : $camp, 'canSpeak' => $eligible && $speaker === $me->id && $state['phase'] === $phase, 'canVote' => $eligible && $camp === false && $state['phase'] === 'voting', 'answered' => isset($round['votes'][$me->id]), 'choice' => $round['votes'][$me->id] ?? null, 'points' => $revealed ? ($round['awards'][$me->id] ?? 0) : null]];
+        return ['id' => $game->id, 'type' => 'tribunal', 'settings' => $game->settings, 'exhausted' => $state['exhausted'] ?? false, 'targetReached' => $game->status === 'finished' && $room->point_target !== null && (int) $room->players()->max('score') >= $room->point_target, 'phase' => $state['phase'], 'deadline' => $state['deadline'], 'scores' => $state['scores'], 'round' => ['number' => $state['number'], 'total' => $state['number'] + count($state['queue']), 'tour' => $state['tour'], 'tours' => $game->settings['rounds'], 'question' => $round['question'] ?? __('tribunal.topics.'.$round['topic']), 'advocates' => $round['advocates'], 'speakerId' => $speaker, 'votes' => $revealed && ! $round['canceled'] ? $round['votes'] : [], 'counts' => $revealed && ! $round['canceled'] ? $counts : [], 'awards' => $revealed ? $round['awards'] : [], 'canceled' => $round['canceled']], 'me' => $me === null ? null : ['eligible' => $eligible, 'camp' => $camp === false ? null : $camp, 'canSpeak' => $eligible && $speaker === $me->id && $state['phase'] === $phase, 'canVote' => $eligible && $camp === false && $state['phase'] === 'voting', 'answered' => isset($round['votes'][$me->id]), 'choice' => $round['votes'][$me->id] ?? null, 'points' => $revealed ? ($round['awards'][$me->id] ?? 0) : null]];
     }
 }

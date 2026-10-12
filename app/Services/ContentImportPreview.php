@@ -21,6 +21,7 @@ class ContentImportPreview
             ContentType::BlindTest => ['titre', 'artiste', 'fichier_audio', 'tags'],
             ContentType::Drawing => ['mot', 'tags'],
             ContentType::Phrase => ['debut_phrase', 'tags'],
+            ContentType::Tribunal => ['sujet', 'tags'],
         };
     }
 
@@ -67,6 +68,7 @@ class ContentImportPreview
                 ContentType::BlindTest => ['title' => $values['titre'], 'artist' => $values['artiste']],
                 ContentType::Drawing => ['word' => $values['mot']],
                 ContentType::Phrase => ['prompt' => $values['debut_phrase']],
+                ContentType::Tribunal => ['question' => $values['sujet']],
             };
             $tagIds = [];
             foreach (array_unique(array_filter(array_map('trim', explode('|', $values['tags'])))) as $tagName) {

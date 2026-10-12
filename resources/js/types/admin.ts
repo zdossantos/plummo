@@ -1,4 +1,5 @@
-export type ContentType = 'quiz' | 'blind_test' | 'drawing' | 'phrase';
+export type ContentType =
+    'quiz' | 'blind_test' | 'drawing' | 'phrase' | 'tribunal';
 export type Tag = {
     id: number;
     name: string;
@@ -32,4 +33,5 @@ export const contentTypes: ContentType[] = [
     'blind_test',
     'drawing',
     'phrase',
+    'tribunal',
 ];
