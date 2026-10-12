@@ -351,3 +351,13 @@ Pour Qui a écrit ça ?, chacun écrit pendant trente secondes une réponse priv
 Le barème de rapidité commun s'applique aux bonnes réponses. Une révélation de quatre secondes précède automatiquement la prochaine manche ; le score est attribué une seule fois. L'objectif de session est vérifié à la fin de la manche. Les arrivants ou joueurs de retour attendent la suivante, les départs ne bloquent pas la clôture et les exclusions sont réinitialisées à chaque manche. Si aucune épreuve sélectionnée n'est compatible avec l'effectif restant, le jeu attend le retour des joueurs.
 
 La pause conserve le temps d'observation, d'écriture ou de réponse et la reprise laisse cinq secondes. La distribution et les effets de bonus compatibles utilisent le moteur commun ; les lancements sont réservés à la réponse. Les farces génériques, l'éclair, les réponses mélangées, le squatteur, l'alphabet inversé et le rideau sont disponibles. Les effets propres à l'audio, au dessin ou aux phrases sont exclus. Une dette temporelle commence avec la réponse, jamais avec l'observation.
+
+## Tribunal des Plummos
+
+Jeu autonome dès trois joueurs, sans pack : cinquante sujets absurdes traduits sont mélangés sans répétition. Un tour contient une rotation circulaire mélangée des joueurs présents au début du tour ; chacun défend une fois pour et une fois contre. Le chef choisit 1 à 5 tours et 10 à 60 secondes de parole par personne (20 par défaut).
+
+Chaque débat laisse 15 secondes de préparation, une prise de parole orale par camp, puis 20 secondes de vote maximum et 6 secondes de verdict. Seul le débatteur courant peut terminer sa parole plus tôt. Les autres participants forment le jury, avec un vote définitif privé jusqu'au verdict. Chaque vote donne 65 points au débatteur choisi, sans prime de victoire ni points pour le jury. Égalité : deux célébrations ; abstention : aucun point. Le podium et l'objectif de session sont communs.
+
+La télé reste une scène passive, sans pagination : grand sujet, deux Plummos et pupitres, camp et orateur. Sur téléphone, le rôle précède les deux cartes de vote ou le bouton de fin de parole. Le départ d'un débatteur annule le débat sans points ; celui d'un juré conserve son vote sans bloquer la clôture. Les arrivants entrent au tour suivant. Les rencontres sans débatteur ou sans jury sont sautées ; moins de trois joueurs connectés suspendent la progression. La pause et la reprise conservent le temps de la phase.
+
+Bonus désactivés initialement : catalogue commun, éclair, dé, squatteur et rideau uniquement pendant le vote. Les effets temporels et les dettes utilisent les 20 secondes de vote, jamais la durée de parole. Les objets, défenses, remplacements, animations et sons réutilisent le système commun.

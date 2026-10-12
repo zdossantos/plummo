@@ -29,6 +29,9 @@ class RoomChat
 
             return $game['phase'] === 'selecting' || ! $me['eligible'] || $me['found'];
         }
+        if ($game['type'] === 'tribunal') {
+            return $game['phase'] === 'voting' ? (! $me['canVote'] || $me['answered']) : ! $me['canSpeak'] && $me['camp'] === null;
+        }
         if (! $me['eligible']) {
             return true;
         }

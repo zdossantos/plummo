@@ -9,7 +9,7 @@ class BonusClock
 {
     public function step(Game $game): int
     {
-        return min(20, max(6, (int) round($game->settings['duration'] * 0.2)));
+        return min(20, max(6, (int) round(($game->type === 'tribunal' ? 20 : $game->settings['duration']) * 0.2)));
     }
 
     /** @param array<string, mixed> $state
@@ -58,7 +58,7 @@ class BonusClock
     {
         $now = app(GameEngine::class)->time();
         $key = $requested < 0 ? 'removed' : 'added';
-        $cap = min(30, $game->settings['duration'] * 0.5);
+        $cap = min(30, ($game->type === 'tribunal' ? 20 : $game->settings['duration']) * 0.5);
         $delta = min(abs($requested), max(0, $cap - ($bonus['clock'][$key] ?? 0)));
         if ($requested < 0) {
             $delta = -min($delta, max(0, $state['deadline'] - $now - 8));
