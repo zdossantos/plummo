@@ -28,7 +28,7 @@ it('uses the available answer height for long text and keeps the TV question pro
         $page = ($phone ? $controller : $screen)->refresh();
         $page->assertSee($question)->assertMissing('.page-controls');
         if ($phone) {
-            $page->assertVisible('.choice-letter')->assertPresent('.text-reader-trigger');
+            $page->assertVisible('.game-choice[data-answer="0"] .choice-letter')->assertPresent('.text-reader-trigger');
             expect($page->page()->evaluate('() => Array.from(document.querySelectorAll(".controller-answers .choice-face > .text-summary")).every(e => getComputedStyle(e).display === "none")'))->toBeTrue();
             $page->click('.game-choice[data-answer="0"] .text-reader-trigger')->assertSee($answer)->click('Close');
         } else {
