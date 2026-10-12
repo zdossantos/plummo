@@ -36,11 +36,11 @@ it('keeps a full bonus pocket clear of a usable drawing canvas at every controll
         // Visibility can precede the ResizeObserver/requestAnimationFrame sizing of the SVG.
         // Wait for a usable canvas; keep the geometry assertions below unchanged.
         $phone->page()->waitForFunction(<<<'JS'
-        minimum => {
+        (() => {
             const canvas = document.querySelector('[data-testid="drawing-board"]');
-            return canvas && canvas.getBoundingClientRect().height >= minimum;
-        }
-        JS, $height < 420 ? 100 : 170);
+            return canvas && canvas.getBoundingClientRect().height >= (innerHeight < 420 ? 100 : 170);
+        })()
+        JS);
         $geometry = $phone->page()->evaluate(<<<'JS'
         () => {
             const canvas = document.querySelector('[data-testid="drawing-board"]').getBoundingClientRect();
