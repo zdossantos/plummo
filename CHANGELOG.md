@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1](https://github.com/zdossantos/plummo/compare/plummo-v0.9.0...plummo-v0.9.1) (2026-10-12)
+
+
+### Bug Fixes
+
+* **drawing:** accept plural guesses and display lightning on canvas ([#76](https://github.com/zdossantos/plummo/issues/76)) ([7c7b699](https://github.com/zdossantos/plummo/commit/7c7b69999c79233009366dc82b9e049bd17466d1))
+
 ## [0.9.0](https://github.com/zdossantos/plummo/compare/plummo-v0.8.0...plummo-v0.9.0) (2026-10-12)
 
 
