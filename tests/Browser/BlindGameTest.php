@@ -45,6 +45,7 @@ it('plays looping audio on the screen and pauses it while phones select eight ch
         $phone->assertDisabled('button:has-text("Start blind test")')->assertSee('Press Enable sound on the big screen');
         $screen->click('button[aria-label="Enable sound"]')->assertPresent('.sound-controls button[aria-pressed="true"]');
         expect($screen->page()->evaluate('() => { window.unlockedAudio = document.querySelector("audio"); return !!window.unlockedAudio; }'))->toBeTrue();
+        confirmReadyPhone($phone, $room);
         $phone->assertEnabled('button:has-text("Start blind test")');
         $phone->page()->locator('button:has-text("Start blind test")')->click(['noWaitAfter' => true]);
         $phone->assertSee('Blind test · Clip 1 / 5');

@@ -24,7 +24,7 @@ it('authorizes private room updates only for the screen or a connected player', 
 it('broadcasts only an invalidation and processes deadlines without a phone request', function () {
     $room = openRoom();
     [$chief, $token] = enterRoom($room);
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 10])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 10])->assertCreated();
     $event = new RoomChanged($room->code);
     expect($event->broadcastWith())->toBe([])->and($event->broadcastOn()->name)->toBe('private-room.'.$room->code);
     $this->travel(10)->seconds();

@@ -21,11 +21,11 @@ class Room extends Model
         });
     }
 
-    protected $fillable = ['code', 'owner_id', 'empty_since', 'point_target', 'screen_seen_at'];
+    protected $fillable = ['code', 'owner_id', 'empty_since', 'point_target', 'screen_seen_at', 'game_setup', 'setup_revision'];
 
     protected function casts(): array
     {
-        return ['empty_since' => 'immutable_datetime', 'screen_seen_at' => 'immutable_datetime', 'point_target' => 'integer'];
+        return ['empty_since' => 'immutable_datetime', 'screen_seen_at' => 'immutable_datetime', 'point_target' => 'integer', 'game_setup' => 'array', 'setup_revision' => 'integer'];
     }
 
     /** @return HasMany<RoomPlayer, $this> */

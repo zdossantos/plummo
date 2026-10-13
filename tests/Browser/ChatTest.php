@@ -26,6 +26,8 @@ it('shows escaped chat bubbles, returns to game controls and celebrates tied win
         $first->assertSee('Wait');
         $first->click('button[aria-label="Play"]')->click('[data-choose-packs]');
         $first->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")')->fill('game-rounds', '5');
+        confirmReadyPhone($first, $room);
+        confirmReadyPhone($second, $room);
         $first->page()->locator('button:has-text("Start quiz")')->click(['noWaitAfter' => true]);
         $first->assertSee('Question')->assertMissing('#chat-message');
         $second->assertSee('Question')->assertMissing('#chat-message');

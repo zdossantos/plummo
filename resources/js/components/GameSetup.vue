@@ -21,11 +21,14 @@ import {
     DrawerClose,
 } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
-import type { MiniTrial } from '@/types/rooms';
+import GameRules from '@/components/GameRules.vue';
+import type { MiniTrial, GameSetupState, GameType } from '@/types/rooms';
 import { useTranslations } from '@/composables/useTranslations';
 const props = defineProps<{
     code: string;
     busy: boolean;
+    canStart?: boolean;
+    initialSetup?: GameSetupState | null;
     recover?: boolean;
     playerCount?: number;
     audioReady?: boolean;
@@ -39,7 +42,10 @@ const props = defineProps<{
         | 'tribunal'
         | 'bluff';
 }>();
-const emit = defineEmits<{ start: [settings: object] }>();
+const emit = defineEmits<{
+    start: [settings: object];
+    change: [settings: GameSetupState];
+}>();
 const { t } = useTranslations('rooms');
 const choosingPacks = ref(false);
 const choosingGame = ref(false);
@@ -71,7 +77,9 @@ const trials = [
     { id: 'cups', label: 'mini_cups', icon: Shapes },
     { id: 'author', label: 'mini_author', icon: MessageSquare },
 ] as const;
-const selectedTrials = ref<MiniTrial[]>(trials.map((trial) => trial.id));
+const selectedTrials = ref<MiniTrial[]>(
+    props.initialSetup?.trials ?? trials.map((trial) => trial.id),
+);
 const playableTrials = computed(() =>
     trials.filter(
         (trial) => trial.id !== 'author' || connectedPlayers.value >= 3,
@@ -83,17 +91,13 @@ const activeTrials = computed(() =>
     ),
 );
 const packs = ref<{ id: number; name: string }[]>([]);
-const selected = ref<number[]>(props.initialPacks ?? []);
+const selected = ref<number[]>(
+    props.initialPacks ?? props.initialSetup?.packs ?? [],
+);
 const availability = ref<{ total: number; unseen: number } | null>(null);
-const gameType = ref<
-    | 'quiz'
-    | 'blind_test'
-    | 'drawing'
-    | 'phrase'
-    | 'mini_games'
-    | 'tribunal'
-    | 'bluff'
->(props.initialType ?? 'quiz');
+const gameType = ref<GameType>(
+    props.initialType ?? props.initialSetup?.type ?? 'quiz',
+);
 const settings = ref({
     bluff: { rounds: 5, duration: 60 },
     tribunal: { rounds: 1, duration: 20 },
@@ -103,6 +107,12 @@ const settings = ref({
     drawing: { rounds: 1, duration: 90 },
     phrase: { rounds: 1, duration: 60 },
 });
+if (props.initialSetup && !props.recover) {
+    settings.value[props.initialSetup.type] = {
+        rounds: props.initialSetup.rounds,
+        duration: props.initialSetup.duration,
+    };
+}
 const rounds = computed({
     get: () => settings.value[gameType.value].rounds,
     set: (value) => {
@@ -199,8 +209,8 @@ const required = computed(() =>
             : rounds.value,
 );
 const distinctSongs = ref<number | null>(null);
-const repeats = ref(false);
-const bonuses = ref(false);
+const repeats = ref(props.initialSetup?.allow_repeats ?? false);
+const bonuses = ref(props.initialSetup?.bonuses ?? false);
 const loading = ref(true);
 const error = ref('');
 let controller: AbortController | undefined;
@@ -290,7 +300,26 @@ watch(
         void load();
     },
 );
-onMounted(() => void load());
+const draft = computed<GameSetupState>(() => ({
+    type: gameType.value,
+    ...(gameType.value === 'mini_games'
+        ? { trials: activeTrials.value }
+        : { packs: selected.value, allow_repeats: repeats.value }),
+    rounds: rounds.value,
+    duration: duration.value,
+    bonuses: bonuses.value && connectedPlayers.value > 1,
+}));
+watch(
+    draft,
+    (value) => {
+        if (!props.recover) emit('change', value);
+    },
+    { deep: true },
+);
+onMounted(() => {
+    void load();
+    if (!props.recover) emit('change', draft.value);
+});
 onUnmounted(() => controller?.abort());
 </script>
 <template>
@@ -310,9 +339,12 @@ onUnmounted(() => controller?.abort());
             })
         "
     >
-        <h2 class="text-2xl">
-            {{ t(recover ? 'recover_packs' : labels.launch) }}
-        </h2>
+        <div class="setup-heading">
+            <h2 class="text-2xl">
+                {{ t(recover ? 'recover_packs' : labels.launch) }}
+            </h2>
+            <GameRules :type="gameType" :trials="activeTrials" />
+        </div>
         <div class="setup-main">
             <div class="setup-fields">
                 <label class="setup-type" for="game-type">
@@ -507,10 +539,11 @@ onUnmounted(() => controller?.abort());
             {{ t('blind_audio_prepare') }}
         </p>
         <p v-if="error" role="alert">{{ error }}</p>
+        <slot v-if="!recover" name="readiness" />
         <Button
             type="submit"
             class="setup-launch"
-            :disabled="busy || loading || !valid"
+            :disabled="busy || loading || !valid || (!recover && !canStart)"
             >{{ t(recover ? 'recover_game' : labels.start) }}</Button
         >
         <Drawer

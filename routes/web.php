@@ -37,6 +37,8 @@ Route::prefix('rooms/{code}')->middleware('throttle:900,1')->group(function (): 
     Route::post('chat', [ChatController::class, 'store']);
     Route::post('phrases/{action}', [PhraseController::class, 'action']);
     Route::post('drawing/{action}', [DrawingController::class, 'action']);
+    Route::post('game-setup', [GameController::class, 'setup']);
+    Route::post('ready', [GameController::class, 'ready']);
     Route::post('games', [GameController::class, 'store']);
     Route::post('game-recovery', [GameController::class, 'recover']);
     Route::post('game-options', [GameController::class, 'options']);

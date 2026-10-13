@@ -22,6 +22,7 @@ it('keeps a full bonus pocket clear of a usable drawing canvas at every controll
         $phone = visit('/join/'.$room->code)->withLocale('en-US')->fill('player-name', 'Camille')->click('Continue')->click('Enter the room');
         visit('/join/'.$room->code)->withLocale('en-US')->fill('player-name', 'Alex')->click('Continue')->click('Enter the room');
         $engine = app(GameEngine::class);
+        prepareReadyGame($room, ['type' => 'drawing', 'packs' => [$pack->id], 'rounds' => 1, 'duration' => 150, 'bonuses' => true]);
         $game = $engine->start($room, ['type' => 'drawing', 'packs' => [$pack->id], 'rounds' => 1, 'duration' => 150, 'bonuses' => true]);
         $player = $room->players()->where('name', 'Camille')->sole();
         app(DrawingGame::class)->choose($room, $player, 0, $game->id, 1);

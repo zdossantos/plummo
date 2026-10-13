@@ -19,6 +19,8 @@ it('animates a confirmed response once and suppresses old gestures after reconne
         $phone = visit('/join/'.$room->code, ['viewport' => ['width' => 390, 'height' => 844]])->withLocale('en-US')->fill('player-name', 'Camille')->click('Continue')->click('Enter the room')->assertSee('Prepare a quiz');
         $other = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Alex')->click('Continue')->click('Enter the room');
         $phone->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")')->fill('game-rounds', '5');
+        confirmReadyPhone($phone, $room);
+        confirmReadyPhone($other, $room);
         $phone->page()->locator('button:has-text("Start quiz")')->click(['noWaitAfter' => true]);
         $phone->assertSee('Quiz · Question 1 / 5');
         $phone->assertPresent('.phone-game-plummo [data-plummo-part="iris-left"]');

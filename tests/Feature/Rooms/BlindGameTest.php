@@ -23,8 +23,8 @@ it('plays eight immediate choices with the same scoring and remembers only the c
     [$first, $one] = enterRoom($room);
     [$second, $two] = enterRoom($room, 'Alex');
     $settings = ['type' => 'blind_test', 'packs' => [blindPack()], 'rounds' => 5, 'duration' => 30];
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', [...$settings, 'duration' => 9])->assertUnprocessable();
-    $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertCreated()->assertJsonCount(8, 'game.round.choices')->assertJsonPath('game.round.correct', null)->assertJsonPath('game.round.audio', null)->assertJsonMissingPath('game.round.audio_path');
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, [...$settings, 'duration' => 9])->assertUnprocessable();
+    $this->startReadyGame($room, $settings)->assertCreated()->assertJsonCount(8, 'game.round.choices')->assertJsonPath('game.round.correct', null)->assertJsonPath('game.round.audio', null)->assertJsonMissingPath('game.round.audio_path');
     $game = Game::where('room_id', $room->id)->sole();
     $choice = $game->state['round']['payload']['correct'];
     $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, $choice))->assertOk();
@@ -43,7 +43,7 @@ it('serves copied audio only to the owning screen and rejects stale rounds', fun
     $room = openRoom();
     $this->postJson('/rooms/'.$room->code.'/screen-presence', ['audio_ready' => true])->assertOk();
     [, $token] = enterRoom($room);
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', ['type' => 'blind_test', 'packs' => [blindPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, ['type' => 'blind_test', 'packs' => [blindPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
     $response = $this->postJson('/rooms/'.$room->code.'/screen-presence')->assertOk();
     $url = $response->json('game.round.audio');
     expect($url)->toBeString();
@@ -73,10 +73,10 @@ it('refuses an insufficient global catalogue and an unavailable audio without re
     $last = Content::latest('id')->firstOrFail();
     $last->update(['published' => false]);
     $settings = ['type' => 'blind_test', 'packs' => [$pack], 'rounds' => 5, 'duration' => 30];
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', $settings)->assertUnprocessable()->assertJsonValidationErrors('packs');
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, $settings)->assertUnprocessable()->assertJsonValidationErrors('packs');
     $last->update(['published' => true]);
     Storage::disk('local')->delete('audio/test.wav');
-    $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertUnprocessable();
+    $this->startReadyGame($room, $settings)->assertUnprocessable();
     $this->assertDatabaseCount('games', 0);
     $this->assertDatabaseCount('room_content_history', 0);
 });
@@ -86,7 +86,7 @@ it('keeps blind test pause and recovery settings attached to its own catalogue',
     $this->postJson('/rooms/'.$room->code.'/screen-presence', ['audio_ready' => true])->assertOk();
     [, $token] = enterRoom($room);
     $pack = blindPack();
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', ['type' => 'blind_test', 'packs' => [$pack], 'rounds' => 5, 'duration' => 10])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, ['type' => 'blind_test', 'packs' => [$pack], 'rounds' => 5, 'duration' => 10])->assertCreated();
     $this->postJson('/rooms/'.$room->code.'/game/pause')->assertJsonPath('game.phase', 'paused');
     $this->postJson('/rooms/'.$room->code.'/game/resume')->assertJsonPath('game.phase', 'resuming');
     $this->travel(5)->seconds();
@@ -104,7 +104,7 @@ it('does not consume a song when its audio disappears before the next round', fu
     $room = openRoom();
     $this->postJson('/rooms/'.$room->code.'/screen-presence', ['audio_ready' => true])->assertOk();
     [, $token] = enterRoom($room);
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', ['type' => 'blind_test', 'packs' => [blindPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, ['type' => 'blind_test', 'packs' => [blindPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
     $game = Game::where('room_id', $room->id)->sole();
     $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, $game->state['round']['payload']['correct']))->assertOk();
     Storage::disk('local')->delete('audio/test.wav');
@@ -117,7 +117,7 @@ it('retires private audio only after committed round replacement or stop', funct
     $room = openRoom();
     $this->postJson('/rooms/'.$room->code.'/screen-presence', ['audio_ready' => true])->assertOk();
     [, $token] = enterRoom($room);
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', ['type' => 'blind_test', 'packs' => [blindPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, ['type' => 'blind_test', 'packs' => [blindPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
     $game = Game::where('room_id', $room->id)->sole();
     $first = $game->state['round']['payload']['audio_path'];
     $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk();
@@ -142,14 +142,14 @@ it('requires a recent authorized screen audio check before the first blind test'
     $room = openRoom();
     [, $token] = enterRoom($room);
     $settings = ['type' => 'blind_test', 'packs' => [blindPack()], 'rounds' => 5, 'duration' => 30];
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', $settings)
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, $settings)
         ->assertUnprocessable()->assertJsonValidationErrors('audio');
     $this->withSession(['plummo.screen' => null])->postJson('/rooms/'.$room->code.'/screen-presence', ['audio_ready' => true])->assertForbidden();
     $this->withSession(['plummo.screen' => $room->id])->postJson('/rooms/'.$room->code.'/screen-presence', ['audio_ready' => false])->assertOk()->assertJsonPath('room.audioReady', false);
-    $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertUnprocessable()->assertJsonValidationErrors('audio');
+    $this->startReadyGame($room, $settings)->assertUnprocessable()->assertJsonValidationErrors('audio');
     $this->postJson('/rooms/'.$room->code.'/screen-presence', ['audio_ready' => true])->assertOk()->assertJsonPath('room.audioReady', true);
     $this->travel(10)->seconds();
-    $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertUnprocessable()->assertJsonValidationErrors('audio');
+    $this->startReadyGame($room, $settings)->assertUnprocessable()->assertJsonValidationErrors('audio');
     $this->postJson('/rooms/'.$room->code.'/screen-presence', ['audio_ready' => true])->assertOk();
-    $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertCreated();
+    $this->startReadyGame($room, $settings)->assertCreated();
 });

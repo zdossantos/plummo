@@ -24,6 +24,7 @@ it('uses the available answer height for long text and keeps the TV question pro
     test()->withVite();
     try {
         $controller = visit('/join/'.$room->code, ['viewport' => compact('width', 'height')])->withLocale('en-US')->fill('player-name', 'Camille')->click('Continue')->click('Enter the room')->assertSee('Prepare a quiz');
+        prepareReadyGame($room, ['type' => 'quiz', 'packs' => [$pack->id], 'rounds' => 5, 'duration' => 150]);
         app(GameEngine::class)->start($room, ['type' => 'quiz', 'packs' => [$pack->id], 'rounds' => 5, 'duration' => 150]);
         $page = ($phone ? $controller : $screen)->refresh();
         $page->assertSee($question)->assertMissing('.page-controls');
@@ -73,6 +74,7 @@ it('shows a long phrase during presentation and voting using the available space
         $controller = visit('/join/'.$room->code, ['viewport' => compact('width', 'height')])->withLocale('en-US')->fill('player-name', 'Camille')->click('Continue')->click('Enter the room')->assertSee('Prepare a quiz');
         visit('/join/'.$room->code)->withLocale('en-US')->fill('player-name', 'Alex')->click('Continue')->click('Enter the room')->assertSee('Alex');
         visit('/join/'.$room->code)->withLocale('en-US')->fill('player-name', 'Morgan')->click('Continue')->click('Enter the room')->assertSee('Morgan');
+        prepareReadyGame($room, ['type' => 'phrase', 'packs' => [$pack->id], 'rounds' => 1, 'duration' => 150]);
         $game = app(GameEngine::class)->start($room, ['type' => 'phrase', 'packs' => [$pack->id], 'rounds' => 1, 'duration' => 150]);
         $text = 'Pour retrouver leur chemin dans la forêt enchantée, les voyageurs demandent au petit personnage de dessiner une carte avec tous les arbres et les chemins qui les séparent encore de leur destination.';
         $state = $game->state;

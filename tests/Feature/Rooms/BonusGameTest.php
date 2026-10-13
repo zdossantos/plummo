@@ -16,7 +16,7 @@ function bonusQuiz(bool $enabled = true, int $players = 2): array
     foreach (range(1, $players) as $index) {
         $members[] = enterRoom($room, 'Joueur '.$index);
     }
-    test()->withCookie('plummo_player_'.$room->code, $members[0][1])->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30, 'bonuses' => $enabled])->assertCreated();
+    test()->withCookie('plummo_player_'.$room->code, $members[0][1])->startReadyGame($room, ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30, 'bonuses' => $enabled])->assertCreated();
 
     return [$room, $members, Game::where('room_id', $room->id)->sole()];
 }
@@ -119,7 +119,7 @@ it('refuses a second launch even with another object and clears the pocket when 
 it('transforms only opponents validated phrases and keeps drafts and authors private', function (string $kind, string $expected) {
     $room = openRoom();
     $members = [enterRoom($room, 'Un'), enterRoom($room, 'Deux'), enterRoom($room, 'Trois')];
-    $this->withCookie('plummo_player_'.$room->code, $members[0][1])->postJson('/rooms/'.$room->code.'/games', ['type' => 'phrase', 'packs' => [phrasePack()], 'rounds' => 1, 'duration' => 60, 'bonuses' => true])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $members[0][1])->startReadyGame($room, ['type' => 'phrase', 'packs' => [phrasePack()], 'rounds' => 1, 'duration' => 60, 'bonuses' => true])->assertCreated();
     $game = Game::where('room_id', $room->id)->sole();
     giveTestBonus($game, $members[0][0], $kind);
     $values = ['game_id' => $game->id, 'round' => 1];
@@ -139,7 +139,7 @@ it('imposes paint on new strokes without corrupting existing strokes or chunk re
     $room = openRoom();
     [$artist, $one] = enterRoom($room);
     [$other, $two] = enterRoom($room, 'Autre');
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', ['type' => 'drawing', 'packs' => [drawingPack()], 'rounds' => 1, 'duration' => 90, 'bonuses' => true])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, ['type' => 'drawing', 'packs' => [drawingPack()], 'rounds' => 1, 'duration' => 90, 'bonuses' => true])->assertCreated();
     $game = Game::where('room_id', $room->id)->sole();
     $values = ['game_id' => $game->id, 'round' => 1];
     $this->postJson('/rooms/'.$room->code.'/drawing/choose', [...$values, 'choice' => 0])->assertOk();
@@ -263,7 +263,7 @@ it('launches every compatible object with the expected targets and lifetime', fu
     $pack = match ($type) {
         'quiz' => quizPack(), 'blind_test' => blindPack(), 'phrase' => phrasePack(), 'drawing' => drawingPack(),
     };
-    $this->withCookie('plummo_player_'.$room->code, $members[0][1])->postJson('/rooms/'.$room->code.'/games', ['type' => $type, 'packs' => [$pack], 'rounds' => in_array($type, ['quiz', 'blind_test'], true) ? 5 : 1, 'duration' => 60, 'bonuses' => true])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $members[0][1])->startReadyGame($room, ['type' => $type, 'packs' => [$pack], 'rounds' => in_array($type, ['quiz', 'blind_test'], true) ? 5 : 1, 'duration' => 60, 'bonuses' => true])->assertCreated();
     $game = Game::where('room_id', $room->id)->sole();
     $allowed = app(GameBonuses::class)->kinds($type);
     foreach ($game->state['bonuses']['inventory'] as $items) {
@@ -383,7 +383,7 @@ it('rejects launching during reveal or resuming without consuming the object', f
 it('combines phrase pranks after validation without modifying saved drafts', function () {
     $room = openRoom();
     $members = [enterRoom($room, 'Un'), enterRoom($room, 'Deux'), enterRoom($room, 'Trois')];
-    $this->withCookie('plummo_player_'.$room->code, $members[0][1])->postJson('/rooms/'.$room->code.'/games', ['type' => 'phrase', 'packs' => [phrasePack()], 'rounds' => 1, 'duration' => 60, 'bonuses' => true])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $members[0][1])->startReadyGame($room, ['type' => 'phrase', 'packs' => [phrasePack()], 'rounds' => 1, 'duration' => 60, 'bonuses' => true])->assertCreated();
     $game = Game::where('room_id', $room->id)->sole();
     giveTestBonus($game, $members[0][0], 'accent', 'accent');
     giveTestBonus($game, $members[1][0], 'sneeze', 'sneeze');
@@ -403,7 +403,7 @@ it('projects drawing lightning onto the TV canvas only when an opponent is hit',
     $room = openRoom();
     [$artist, $one] = enterRoom($room);
     [$other, $two] = enterRoom($room, 'Autre');
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', ['type' => 'drawing', 'packs' => [drawingPack()], 'rounds' => 1, 'duration' => 90, 'bonuses' => true])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, ['type' => 'drawing', 'packs' => [drawingPack()], 'rounds' => 1, 'duration' => 90, 'bonuses' => true])->assertCreated();
     $game = Game::where('room_id', $room->id)->sole();
     $values = ['game_id' => $game->id, 'round' => 1];
     $this->postJson('/rooms/'.$room->code.'/drawing/choose', [...$values, 'choice' => 0])->assertOk();

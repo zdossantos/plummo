@@ -29,7 +29,7 @@ function phraseSetup(int $rounds = 1): array
 {
     $room = openRoom();
     $players = [enterRoom($room), enterRoom($room, 'Alex'), enterRoom($room, 'Sam')];
-    test()->withCookie('plummo_player_'.$room->code, $players[0][1])->postJson('/rooms/'.$room->code.'/games', ['type' => 'phrase', 'packs' => [phrasePack()], 'rounds' => $rounds, 'duration' => 60])->assertCreated()->assertJsonPath('game.phase', 'writing');
+    test()->withCookie('plummo_player_'.$room->code, $players[0][1])->startReadyGame($room, ['type' => 'phrase', 'packs' => [phrasePack()], 'rounds' => $rounds, 'duration' => 60])->assertCreated()->assertJsonPath('game.phase', 'writing');
 
     return [$room, $players];
 }
@@ -58,15 +58,15 @@ it('requires three players, valid settings and chief authorization', function ()
     $room = openRoom();
     [, $token] = enterRoom($room);
     $settings = ['type' => 'phrase', 'packs' => [phrasePack()], 'rounds' => 1, 'duration' => 60];
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', $settings)->assertUnprocessable();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, $settings)->assertUnprocessable();
     enterRoom($room, 'Alex');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', $settings)->assertUnprocessable();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, $settings)->assertUnprocessable();
     enterRoom($room, 'Sam');
-    $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertForbidden();
+    $this->startReadyGame($room, $settings)->assertForbidden();
     foreach ([['rounds' => 0], ['rounds' => 6], ['duration' => 29], ['duration' => 151]] as $invalid) {
-        $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', [...$settings, ...$invalid])->assertUnprocessable();
+        $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, [...$settings, ...$invalid])->assertUnprocessable();
     }
-    $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertCreated();
+    $this->startReadyGame($room, $settings)->assertCreated();
     $this->assertDatabaseCount('room_content_history', 1);
 });
 

@@ -19,7 +19,7 @@ it('starts without packs and exposes only one Mini games entry and eligible tria
     [$id, $token] = enterRoom($room);
     $this->withCookie('plummo_player_'.$room->code, $token);
     $this->postJson('/rooms/'.$room->code.'/game-options', ['type' => 'mini_games'])->assertOk()->assertJsonPath('packs', [])->assertJsonCount(4, 'trials');
-    $this->postJson('/rooms/'.$room->code.'/games', miniSettings())->assertCreated()->assertJsonPath('game.type', 'mini_games')->assertJsonPath('game.phase', 'observing')->assertJsonPath('game.round.scene', null)->assertJsonPath('game.round.correct', null)->assertJsonPath('game.round.choices', []);
+    $this->startReadyGame($room, miniSettings())->assertCreated()->assertJsonPath('game.type', 'mini_games')->assertJsonPath('game.phase', 'observing')->assertJsonPath('game.round.scene', null)->assertJsonPath('game.round.correct', null)->assertJsonPath('game.round.choices', []);
     $this->assertDatabaseCount('room_content_history', 0);
 });
 
@@ -28,17 +28,17 @@ it('rejects unsupported duplicate empty and unavailable trials and bad settings'
     [$id, $token] = enterRoom($room);
     $this->withCookie('plummo_player_'.$room->code, $token);
     foreach ([[], ['invalid'], ['memory', 'memory'], ['author']] as $trials) {
-        $this->postJson('/rooms/'.$room->code.'/games', miniSettings($trials))->assertUnprocessable();
+        $this->startReadyGame($room, miniSettings($trials))->assertUnprocessable();
     }
-    $this->postJson('/rooms/'.$room->code.'/games', [...miniSettings(), 'duration' => 61])->assertUnprocessable();
-    $this->postJson('/rooms/'.$room->code.'/games', [...miniSettings(), 'rounds' => 4])->assertUnprocessable();
+    $this->startReadyGame($room, [...miniSettings(), 'duration' => 61])->assertUnprocessable();
+    $this->startReadyGame($room, [...miniSettings(), 'rounds' => 4])->assertUnprocessable();
 });
 
 it('freezes the observation during pause and resumes at the same scene progress', function () {
     $room = openRoom();
     [$id, $token] = enterRoom($room);
     $this->withCookie('plummo_player_'.$room->code, $token);
-    $this->postJson('/rooms/'.$room->code.'/games', miniSettings(['cups']))->assertCreated();
+    $this->startReadyGame($room, miniSettings(['cups']))->assertCreated();
     $this->travel(2)->seconds();
     $before = app(GameEngine::class)->view($room->refresh(), null, true)['round']['elapsed'];
     $this->postJson('/rooms/'.$room->code.'/game/pause')->assertOk();
@@ -57,7 +57,7 @@ it('rejects observation answers and awards once with a private solution until re
     $room = openRoom();
     [$first, $one] = enterRoom($room);
     [$second, $two] = enterRoom($room, 'Autre');
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', miniSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, miniSettings())->assertCreated();
     $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertConflict();
     $this->travel(8)->seconds();
     $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.phase', 'answer')->assertJsonPath('game.round.scene', null)->assertJsonPath('game.round.correct', null);
@@ -76,7 +76,7 @@ it('rejects choices outside the actual trial and late round identifiers', functi
     $room = openRoom();
     [$id, $token] = enterRoom($room);
     $this->withCookie('plummo_player_'.$room->code, $token);
-    $this->postJson('/rooms/'.$room->code.'/games', miniSettings(['hide']))->assertCreated()->assertJsonCount(12, 'game.round.choices');
+    $this->startReadyGame($room, miniSettings(['hide']))->assertCreated()->assertJsonCount(12, 'game.round.choices');
     $this->postJson('/rooms/'.$room->code.'/answer', [...quizAnswer($room, 0), 'round' => 999])->assertConflict();
     $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 12))->assertUnprocessable();
     $game = Game::latest('id')->firstOrFail();
@@ -88,7 +88,7 @@ it('writes privately and excludes the selected author from guessing and scoring'
     [$first, $one] = enterRoom($room);
     [$second, $two] = enterRoom($room, 'Autre');
     [$third, $three] = enterRoom($room, 'Encore');
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', miniSettings(['author']))->assertCreated()->assertJsonPath('game.phase', 'writing');
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, miniSettings(['author']))->assertCreated()->assertJsonPath('game.phase', 'writing');
     $game = Game::latest('id')->firstOrFail();
     $data = ['game_id' => $game->id, 'round' => 1, 'text' => 'Mon secret rigolo', 'submit' => true];
     $this->postJson('/rooms/'.$room->code.'/mini-write', $data)->assertOk()->assertJsonPath('game.me.submitted', true);
@@ -107,7 +107,7 @@ it('uses every selected trial per cycle and finishes at the configured count', f
     $room = openRoom();
     [$id, $token] = enterRoom($room);
     $this->withCookie('plummo_player_'.$room->code, $token);
-    $this->postJson('/rooms/'.$room->code.'/games', miniSettings(['memory', 'hide', 'count', 'cups']))->assertCreated();
+    $this->startReadyGame($room, miniSettings(['memory', 'hide', 'count', 'cups']))->assertCreated();
     $played = [];
     foreach (range(1, 5) as $number) {
         $game = Game::latest('id')->firstOrFail();
@@ -125,7 +125,7 @@ it('keeps bonuses unusable during observation and starts their clock only with a
     $room = openRoom();
     [$chief, $token] = enterRoom($room);
     enterRoom($room, 'Autre');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', [...miniSettings(), 'bonuses' => true])->assertCreated()->assertJsonPath('game.bonuses.canUse', false);
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, [...miniSettings(), 'bonuses' => true])->assertCreated()->assertJsonPath('game.bonuses.canUse', false);
     $game = Game::latest('id')->firstOrFail();
     $state = $game->state;
     $state['bonuses']['debt'] = 6;
@@ -139,7 +139,7 @@ it('keeps late arrivals out until the next challenge and continues after a depar
     $room = openRoom();
     [$first, $one] = enterRoom($room);
     [$second] = enterRoom($room, 'Autre');
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', miniSettings(['hide']))->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, miniSettings(['hide']))->assertCreated();
     [$late, $token] = enterRoom($room, 'Arrivant');
     $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertForbidden();
     RoomPlayer::findOrFail($second)->update(['left_at' => now()]);
@@ -154,7 +154,7 @@ it('waits when only the author challenge is selected and resumes once three play
     [$first, $one] = enterRoom($room);
     [$second] = enterRoom($room, 'Autre');
     [$third] = enterRoom($room, 'Encore');
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', miniSettings(['author']))->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, miniSettings(['author']))->assertCreated();
     $game = Game::latest('id')->firstOrFail();
     $state = $game->state;
     $state['phase'] = 'reveal';
@@ -171,7 +171,7 @@ it('reveals an empty writing round without inventing answers or points', functio
     [$first, $one] = enterRoom($room);
     enterRoom($room, 'Autre');
     enterRoom($room, 'Encore');
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', miniSettings(['author']))->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, miniSettings(['author']))->assertCreated();
     $game = Game::latest('id')->firstOrFail();
     $state = $game->state;
     $state['deadline'] = app(GameEngine::class)->time();
@@ -209,7 +209,7 @@ it('readmits a withdrawn player in the following challenge', function () {
     $room = openRoom();
     [$first, $one] = enterRoom($room);
     [$second, $two] = enterRoom($room, 'Autre');
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', miniSettings(['hide']))->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, miniSettings(['hide']))->assertCreated();
     app(GameEngine::class)->withdraw($room, RoomPlayer::findOrFail($second));
     $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertForbidden();
     $game = Game::latest('id')->firstOrFail();
@@ -224,7 +224,7 @@ it('numbers homonymous authors so their answers stay distinguishable', function 
     [$first, $one] = enterRoom($room, 'Alex');
     [$second, $two] = enterRoom($room, 'Alex');
     [$third, $three] = enterRoom($room, 'Alex');
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', miniSettings(['author']))->assertCreated()->assertJsonPath('game.me.authorNumber', 1);
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, miniSettings(['author']))->assertCreated()->assertJsonPath('game.me.authorNumber', 1);
     $game = Game::latest('id')->firstOrFail();
     $data = ['game_id' => $game->id, 'round' => 1, 'text' => 'Secret', 'submit' => true];
     $this->postJson('/rooms/'.$room->code.'/mini-write', $data)->assertOk();
@@ -239,6 +239,6 @@ it('keeps author participants as a list after a player in the middle leaves', fu
     [$third] = enterRoom($room, 'Alex');
     [$fourth] = enterRoom($room, 'Morgan');
     RoomPlayer::findOrFail($second)->update(['left_at' => now()]);
-    $response = $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', miniSettings(['author']))->assertCreated();
+    $response = $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, miniSettings(['author']))->assertCreated();
     expect($response->json('game.round.participants'))->toBe([$first, $third, $fourth]);
 });

@@ -25,7 +25,7 @@ it('selects all available challenges instead of packs and plays the cups from a 
         foreach (['memory', 'hide', 'count'] as $trial) {
             $phone->click('[data-mini-trial="'.$trial.'"]');
         }
-        $phone->click('[data-slot="drawer-content"] button:has-text("Close")')->assertSee('1 challenges selected')->fill('game-rounds', '5')->click('Start mini games')->assertSee('Watch the big screen!');
+        $phone->click('[data-slot="drawer-content"] button:has-text("Close")')->assertSee('1 challenges selected')->fill('game-rounds', '5')->assertEnabled('[data-ready]')->click('[data-ready]')->assertSee('Withdraw readiness')->click('Start mini games')->assertSee('Watch the big screen!');
         $screen->assertPresent('[data-mini-scene="cups"]')->assertMissing('.page-controls');
         $phone->assertMissing('[data-mini-scene]')->assertSee('Which cup is hiding the Plummo?')->assertEnabled('[data-mini-choice="0"]')->click('[data-mini-choice="0"]');
         $phone->assertSee('The correct answer:')->assertNoJavaScriptErrors();
@@ -44,6 +44,7 @@ it('keeps each mini game readable on TV and phone without scroll or revealing ph
             visit('/join/'.$room->code)->withLocale('en-US')->fill('player-name', 'Alex')->click('Continue')->click('Enter the room')->assertSee('Alex');
             visit('/join/'.$room->code)->withLocale('en-US')->fill('player-name', 'Morgan')->click('Continue')->click('Enter the room')->assertSee('Morgan');
         }
+        prepareReadyGame($room, ['type' => 'mini_games', 'trials' => [$trial], 'rounds' => 5, 'duration' => 20]);
         $game = app(GameEngine::class)->start($room, ['type' => 'mini_games', 'trials' => [$trial], 'rounds' => 5, 'duration' => 20]);
         // Hold this stage while measuring real viewport geometry.
         $state = $game->state;

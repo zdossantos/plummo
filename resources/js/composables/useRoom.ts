@@ -29,6 +29,7 @@ export function useRoom(
     let clockTimer: ReturnType<typeof setInterval> | undefined;
     const me = ref<Player | null>(initial?.me ?? null);
     const error = ref('');
+    let errorAction = '';
     const closed = ref(false);
     const connected = ref(true);
     const offline = () => {
@@ -54,6 +55,7 @@ export function useRoom(
         method = 'POST',
         body?: unknown,
         background = false,
+        preserveError = false,
     ): Promise<boolean> {
         if (!code || busy.value || closed.value || stopped) return false;
         if (action === 'screen-presence')
@@ -61,7 +63,8 @@ export function useRoom(
         const ticket = requests.begin(background);
         if (!ticket) return false;
         busy.value = requests.busy;
-        if (!background) errors.value = {};
+        const preserveExistingError = preserveError && errorAction !== action;
+        if (!background && !preserveExistingError) errors.value = {};
         const timeout = setTimeout(() => ticket.controller.abort(), 8000);
         try {
             const response = await fetch(
@@ -84,11 +87,13 @@ export function useRoom(
             if (stopped || !requests.current(ticket)) return false;
             connected.value = response.status < 500;
             if (response.status === 404) {
+                errorAction = action;
                 closed.value = true;
                 error.value = t('closed');
                 return false;
             }
             if (response.status === 403) {
+                errorAction = action;
                 error.value = t('forbidden');
                 return false;
             }
@@ -96,15 +101,20 @@ export function useRoom(
                 const data = await response.json();
                 if (!requests.current(ticket)) return false;
                 errors.value = data.errors;
+                errorAction = action;
                 error.value =
                     Object.values(errors.value).flat()[0] ?? t('room_error');
                 return false;
             }
             if (!response.ok) {
+                errorAction = action;
                 error.value = t('room_error');
                 return false;
             }
-            if (!background || !Object.keys(errors.value).length)
+            if (
+                !preserveExistingError &&
+                (!background || !Object.keys(errors.value).length)
+            )
                 error.value = '';
             if (response.status === 204) {
                 closed.value = true;
@@ -120,6 +130,7 @@ export function useRoom(
             return true;
         } catch {
             if (!stopped && requests.current(ticket)) {
+                errorAction = action;
                 connected.value = false;
                 error.value = t('network');
             }

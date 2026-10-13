@@ -33,6 +33,10 @@ Le premier joueur connecté devient chef de partie. Il participe aux jeux comme 
 
 Depuis son téléphone, il choisit le mini-jeu, les packs et les réglages, lance la partie, met en pause et reprend. Il peut transmettre volontairement son rôle à un autre joueur.
 
+Avant chaque mini-jeu, tous les joueurs connectés, chef compris, confirment qu’ils sont prêts sur leur téléphone. Chacun peut retirer sa confirmation. Le chef voit les joueurs prêts et ceux attendus ; le serveur refuse tout lancement tant qu’une confirmation manque. Un changement de mini-jeu, de réglages ou d’objectif de session efface les confirmations. Un nouvel arrivant ou un joueur qui se reconnecte doit confirmer ; les départs et déconnexions cessent de bloquer le lancement.
+
+Les règles du jeu choisi sont consultables sur chaque téléphone pendant la préparation et pendant le jeu : objectif, déroulement, actions et points. Pour les mini-épreuves, seules les épreuves sélectionnées sont détaillées. Leur lecture paginée ne met pas la partie en pause ; fermer le lecteur conserve l’écran de jeu et les saisies en cours.
+
 S'il se déconnecte, le joueur connecté présent depuis le plus longtemps assure le relais. Le chef initial récupère son rôle à son retour. Un transfert volontaire est distinct de ce relais : le retour de l'ancien chef n'annule pas un transfert volontaire.
 
 Si le chef temporaire se déconnecte à son tour, le relais est transmis au joueur connecté présent depuis le plus longtemps. Cette règle s'applique aux relais successifs : le chef initial conserve la priorité de récupération à son retour, sauf transfert volontaire.

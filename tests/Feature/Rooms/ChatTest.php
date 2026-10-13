@@ -23,7 +23,7 @@ function chatGame(string $type): array
     $pack = match ($type) {
         'drawing' => drawingPack(), 'phrase' => phrasePack(), default => quizPack()
     };
-    test()->withCookie('plummo_player_'.$room->code, $players[0][1])->postJson('/rooms/'.$room->code.'/games', ['type' => $type, 'packs' => [$pack], 'rounds' => $type === 'quiz' ? 5 : 1, 'duration' => 60])->assertCreated();
+    test()->withCookie('plummo_player_'.$room->code, $players[0][1])->startReadyGame($room, ['type' => $type, 'packs' => [$pack], 'rounds' => $type === 'quiz' ? 5 : 1, 'duration' => 60])->assertCreated();
 
     return [$room, $players, Game::where('room_id', $room->id)->sole()];
 }

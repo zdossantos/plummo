@@ -159,7 +159,7 @@ it('extends temporary opponent effects under an alarm and lets soap clear them',
 it('keeps giant and clumsy brush geometry stable across retries and leaves erasers unchanged', function () {
     $room = openRoom();
     $members = [enterRoom($room, 'Artiste'), enterRoom($room, 'Un'), enterRoom($room, 'Deux')];
-    $this->withCookie('plummo_player_'.$room->code, $members[0][1])->postJson('/rooms/'.$room->code.'/games', ['type' => 'drawing', 'packs' => [drawingPack()], 'rounds' => 1, 'duration' => 90, 'bonuses' => true])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $members[0][1])->startReadyGame($room, ['type' => 'drawing', 'packs' => [drawingPack()], 'rounds' => 1, 'duration' => 90, 'bonuses' => true])->assertCreated();
     $game = Game::where('room_id', $room->id)->sole();
     $values = ['game_id' => $game->id, 'round' => 1];
     $this->postJson('/rooms/'.$room->code.'/drawing/choose', [...$values, 'choice' => 0])->assertOk();
@@ -178,7 +178,7 @@ it('keeps giant and clumsy brush geometry stable across retries and leaves erase
 it('deflects an artist prank without applying it to a player without a canvas', function () {
     $room = openRoom();
     $members = [enterRoom($room, 'Artiste'), enterRoom($room, 'Un'), enterRoom($room, 'Deux')];
-    $this->withCookie('plummo_player_'.$room->code, $members[0][1])->postJson('/rooms/'.$room->code.'/games', ['type' => 'drawing', 'packs' => [drawingPack()], 'rounds' => 1, 'duration' => 90, 'bonuses' => true])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $members[0][1])->startReadyGame($room, ['type' => 'drawing', 'packs' => [drawingPack()], 'rounds' => 1, 'duration' => 90, 'bonuses' => true])->assertCreated();
     $game = Game::where('room_id', $room->id)->sole();
     $this->postJson('/rooms/'.$room->code.'/drawing/choose', ['game_id' => $game->id, 'round' => 1, 'choice' => 0])->assertOk();
     launchCatalogueBonus($this, $room, $members[0], $game, 'boomerang');
@@ -200,7 +200,7 @@ it('supports each new object in its compatible modes and keeps inventories off t
     $pack = match ($type) {
         'quiz' => quizPack(), 'blind_test' => blindPack(), 'phrase' => phrasePack(), 'drawing' => drawingPack(100)
     };
-    $this->withCookie('plummo_player_'.$room->code, $members[0][1])->postJson('/rooms/'.$room->code.'/games', ['type' => $type, 'packs' => [$pack], 'rounds' => 5, 'duration' => 60, 'bonuses' => true])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $members[0][1])->startReadyGame($room, ['type' => $type, 'packs' => [$pack], 'rounds' => 5, 'duration' => 60, 'bonuses' => true])->assertCreated();
     $game = Game::where('room_id', $room->id)->sole();
     if ($type === 'drawing') {
         $this->postJson('/rooms/'.$room->code.'/drawing/choose', ['game_id' => $game->id, 'round' => 1, 'choice' => 0])->assertOk();
