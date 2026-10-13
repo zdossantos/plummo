@@ -11,14 +11,14 @@ function readySettings(): array
     return ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30, 'allow_repeats' => false, 'bonuses' => false];
 }
 
-it('accepts an incomplete selection while preparing but requires it before launch', function () {
+it('accepts all packs while preparing but requires confirmations and selected mini trials before launch', function () {
     $room = openRoom();
     [, $token] = enterRoom($room);
     $this->withCookie('plummo_player_'.$room->code, $token);
     foreach ([['type' => 'quiz', 'packs' => []], ['type' => 'mini_games', 'trials' => []]] as $selection) {
         $settings = [...$selection, 'rounds' => 5, 'duration' => 30];
         $this->postJson('/rooms/'.$room->code.'/game-setup', $settings)->assertOk()->assertJsonPath('room.gameSetup.type', $selection['type']);
-        $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertUnprocessable()->assertJsonValidationErrors($selection['type'] === 'quiz' ? 'packs' : 'trials');
+        $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertUnprocessable()->assertJsonValidationErrors($selection['type'] === 'quiz' ? 'ready' : 'trials');
     }
     $this->assertDatabaseCount('games', 0);
 });

@@ -102,7 +102,7 @@ Limites V1 : 500 lignes, tableau 5 Mio, 50 extraits de 20 Mio. Les lots sont pri
 
 ## Quiz et temps réel
 
-Le chef connecté choisit jusqu’à trois packs, 5 à 30 questions et une durée de 10 à 150 secondes (30 par défaut). Quatre choix sont affichés dès le début ; une réponse est définitive et porte l’identifiant de partie et de manche pour refuser les requêtes retardées. La manche finit quand les participants encore disponibles ont répondu, ou à l’échéance ; la bonne réponse reste affichée trois secondes. Les points sont validés une seule fois. Les résultats distinguent le classement du mini-jeu et celui de la session.
+Le chef connecté choisit jusqu’à trois packs (ou tous les packs en laissant la sélection vide), 5 à 30 questions et une durée de 10 à 150 secondes (30 par défaut). Quatre choix sont affichés dès le début ; une réponse est définitive et porte l’identifiant de partie et de manche pour refuser les requêtes retardées. La manche finit quand les participants encore disponibles ont répondu, ou à l’échéance ; la bonne réponse reste affichée trois secondes. Les points sont validés une seule fois. Les résultats distinguent le classement du mini-jeu et celui de la session.
 
 Les arrivants et joueurs reconnectés attendent la prochaine question. La perte du grand écran ou de tous les joueurs met automatiquement en pause ; le chef peut aussi mettre en pause puis arrêter, en conservant les points des manches terminées. Toute reprise laisse cinq secondes pour se préparer. Si le catalogue est épuisé après une modification administrative, le chef choisit d’autres packs ou autorise explicitement la répétition ; l’historique reste conservé.
 

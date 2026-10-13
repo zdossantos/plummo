@@ -42,7 +42,7 @@ return [
     'contents' => 'Content',
     'tags' => 'Tags',
     'packs' => 'Packs',
-    'invalid_packs' => 'Choose one to three existing packs.',
+    'invalid_packs' => 'Choose up to three existing packs, or none to use them all.',
     'audio_required' => 'Add a prepared audio clip before publishing.',
     'tag_used' => 'This tag is required by a pack. Edit the pack before deleting it.',
     'quiz' => 'Quiz',

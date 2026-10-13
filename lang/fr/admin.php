@@ -42,7 +42,7 @@ return [
     'contents' => 'Contenus',
     'tags' => 'Tags',
     'packs' => 'Packs',
-    'invalid_packs' => 'Choisissez de un à trois packs existants.',
+    'invalid_packs' => 'Choisissez jusqu’à trois packs existants, ou aucun pour tous les utiliser.',
     'audio_required' => 'Ajoutez un extrait audio préparé avant publication.',
     'tag_used' => 'Ce tag est encore requis par un pack. Modifiez le pack avant de le supprimer.',
     'quiz' => 'Quiz',

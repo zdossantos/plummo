@@ -200,7 +200,7 @@ Points: a correct answer earns 30 to 100 points depending on speed; a wrong or m
     'session_results' => 'Session target reached',
     'target_reached' => 'Choose an extension, no point limit or a new session in the lobby before playing again.',
     'launch_quiz' => 'Prepare a quiz',
-    'packs_hint' => 'Choose up to three packs. Shared contents are counted only once.',
+    'packs_hint' => 'Choose up to three packs. Leave the selection empty to use all packs. Shared contents are counted only once.',
     'packs_selected' => '{count} packs',
     'pack_selected' => '1 pack',
     'phrase_short' => 'Sentences',
