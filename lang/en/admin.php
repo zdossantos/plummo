@@ -92,4 +92,10 @@ return [
     'pack_help' => 'Content must have every required tag to belong to this pack.',
     'required_tags' => 'Required tags',
     'audio_failed' => 'The audio clip could not be saved. Try again.',
+    'bluff' => 'Bluff',
+    'bluff_answer' => 'True answer',
+    'bluff_format' => 'Topic format',
+    'bluff_definition' => 'Definition',
+    'bluff_expression' => 'Expression',
+    'bluff_anecdote' => 'Anecdote',
 ];

@@ -3659,3 +3659,7 @@
         left: 52px;
     }
 }
+
+.game-choice[data-color='8'] {
+    --choice-color: #8ce0d5;
+}

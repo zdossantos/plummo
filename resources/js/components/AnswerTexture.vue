@@ -131,7 +131,7 @@ defineProps<{ variant: number }>();
             </g>
             <circle class="texture-light" cx="182" cy="20" r="22" />
         </template>
-        <template v-else>
+        <template v-else-if="variant === 7">
             <g class="texture-line">
                 <path
                     d="m15 5 12 14-12 14L3 19ZM178 103l14 16-14 16-14-16ZM158 0l10 12-10 12-10-12Z"
@@ -139,6 +139,17 @@ defineProps<{ variant: number }>();
             </g>
             <path class="texture-light" d="m0 95 45 45H0ZM155 0h45v45Z" />
             <circle class="texture-shade" cx="42" cy="12" r="6" />
+        </template>
+        <template v-else>
+            <g class="texture-line">
+                <path d="M0 10h40v30H10v30M160 140v-40h40M170 0v20h30" />
+                <circle cx="178" cy="60" r="12" />
+                <path d="M12 112h36M30 94v36" />
+            </g>
+            <path
+                class="texture-light"
+                d="M0 0h55v12H12v43H0ZM155 140v-12h33v-33h12v45Z"
+            />
         </template>
     </svg>
 </template>

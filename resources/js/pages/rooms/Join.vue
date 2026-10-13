@@ -331,6 +331,10 @@ watch(chief, (value) => {
                             :busy="busy"
                             phone
                             :connected="connected"
+                            :send-bluff="
+                                (action, values) =>
+                                    request('bluff/' + action, 'POST', values)
+                            "
                             :send-tribunal="
                                 (action, values) =>
                                     request(

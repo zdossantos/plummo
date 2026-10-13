@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pack;
 use App\Models\Room;
 use App\Services\BlindChoices;
+use App\Services\BluffGame;
 use App\Services\ContentCatalog;
 use App\Services\GameEngine;
 use App\Services\MiniGames;
@@ -28,7 +29,7 @@ class GameController extends Controller
         return $this->rooms->locked($code, function (Room $room) use ($request): JsonResponse {
             $player = $this->rooms->requirePlayer($room, $request);
             $this->rooms->requireChief($room, $player);
-            $settings = $request->validate(['type' => ['required', 'in:quiz,blind_test,drawing,phrase,mini_games,tribunal'], 'packs' => ['exclude_if:type,mini_games', 'required', 'array', 'min:1', 'max:3'], 'packs.*' => ['integer', 'distinct', 'exists:packs,id'], 'rounds' => ['required', 'integer', in_array($request->input('type'), ['drawing', 'phrase', 'tribunal'], true) ? 'min:1' : 'min:5', in_array($request->input('type'), ['drawing', 'phrase', 'tribunal'], true) ? 'max:5' : 'max:30'], 'duration' => ['required', 'integer', in_array($request->input('type'), ['drawing', 'phrase'], true) ? 'min:30' : 'min:10', in_array($request->input('type'), ['mini_games', 'tribunal'], true) ? 'max:60' : 'max:150'], 'trials' => ['required_if:type,mini_games', 'array', 'min:1', 'max:5'], 'trials.*' => ['string', 'distinct', 'in:'.implode(',', MiniGameScenes::TRIALS)], 'allow_repeats' => ['sometimes', 'boolean'], 'bonuses' => ['sometimes', 'boolean']]);
+            $settings = $request->validate(['type' => ['required', 'in:quiz,blind_test,drawing,phrase,mini_games,tribunal,bluff'], 'packs' => ['exclude_if:type,mini_games', 'required', 'array', 'min:1', 'max:3'], 'packs.*' => ['integer', 'distinct', 'exists:packs,id'], 'rounds' => ['required', 'integer', in_array($request->input('type'), ['drawing', 'phrase', 'tribunal'], true) ? 'min:1' : 'min:5', in_array($request->input('type'), ['drawing', 'phrase', 'tribunal'], true) ? 'max:5' : 'max:30'], 'duration' => ['required', 'integer', in_array($request->input('type'), ['drawing', 'phrase', 'bluff'], true) ? 'min:30' : 'min:10', in_array($request->input('type'), ['mini_games', 'tribunal'], true) ? 'max:60' : 'max:150'], 'trials' => ['required_if:type,mini_games', 'array', 'min:1', 'max:5'], 'trials.*' => ['string', 'distinct', 'in:'.implode(',', MiniGameScenes::TRIALS)], 'allow_repeats' => ['sometimes', 'boolean'], 'bonuses' => ['sometimes', 'boolean']]);
             $this->games->start($room, $settings);
 
             return response()->json($this->rooms->state($room, $player), 201);
@@ -39,10 +40,10 @@ class GameController extends Controller
     {
         return $this->rooms->locked($code, function (Room $room) use ($request): JsonResponse {
             $this->rooms->requireChief($room, $this->rooms->requirePlayer($room, $request));
-            $packs = $request->validate(['type' => ['sometimes', 'in:quiz,blind_test,drawing,phrase,mini_games,tribunal'], 'packs' => ['sometimes', 'array', 'min:1', 'max:3'], 'packs.*' => ['integer', 'distinct', 'exists:packs,id']]);
+            $packs = $request->validate(['type' => ['sometimes', 'in:quiz,blind_test,drawing,phrase,mini_games,tribunal,bluff'], 'packs' => ['sometimes', 'array', 'min:1', 'max:3'], 'packs.*' => ['integer', 'distinct', 'exists:packs,id']]);
             $connected = $room->players()->get()->filter(fn ($player) => $player->connected())->count();
-            $games = array_values(array_filter(['quiz', 'blind_test', 'drawing', 'phrase', 'mini_games', 'tribunal'], fn ($game) => $connected >= match ($game) {
-                'drawing' => 2, 'phrase', 'tribunal' => 3, default => 1
+            $games = array_values(array_filter(['quiz', 'blind_test', 'drawing', 'phrase', 'mini_games', 'tribunal', 'bluff'], fn ($game) => $connected >= match ($game) {
+                'drawing' => 2, 'phrase', 'tribunal', 'bluff' => 3, default => 1
             }));
             if (($packs['type'] ?? '') === 'mini_games') {
                 return response()->json(['games' => $games, 'connectedPlayers' => $connected, 'packs' => [], 'trials' => app(MiniGameScenes::class)->available($connected), 'availability' => null, 'distinctSongs' => null]);
@@ -76,6 +77,23 @@ class GameController extends Controller
                 'blind_test' => 7, 'mini_games' => 11, default => 3
             })], 'game_id' => ['required', 'integer', 'min:1'], 'round' => ['required', 'integer', 'min:1']]);
             $this->games->answer($room, $player, $values['choice'], $values['game_id'], $values['round']);
+
+            return response()->json($this->rooms->state($room, $player));
+        });
+    }
+
+    public function bluff(Request $request, string $code, string $action): JsonResponse
+    {
+        abort_unless(in_array($action, ['write', 'vote'], true), 404);
+
+        return $this->rooms->locked($code, function (Room $room) use ($request, $action): JsonResponse {
+            $player = $this->rooms->requirePlayer($room, $request);
+            $values = $request->validate(['game_id' => ['required', 'integer', 'min:1'], 'round' => ['required', 'integer', 'min:1'], 'text' => ['nullable', 'string', 'max:120'], 'submit' => [$action === 'write' ? 'required' : 'nullable', 'boolean'], 'choice' => [$action === 'vote' ? 'required' : 'nullable', 'uuid']]);
+            if ($action === 'write') {
+                app(BluffGame::class)->write($room, $player, $values['text'] ?? '', $values['submit'], $values['game_id'], $values['round']);
+            } else {
+                app(BluffGame::class)->vote($room, $player, $values['choice'], $values['game_id'], $values['round']);
+            }
 
             return response()->json($this->rooms->state($room, $player));
         });

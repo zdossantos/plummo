@@ -12,6 +12,7 @@ class BonusCatalog
         return match ($type) {
             'tribunal' => [...$common, 'bolt', 'dice', 'squatter', 'curtain'],
             'mini_games' => [...$common, 'bolt', 'dice', 'squatter', 'alphabet', 'curtain'],
+            'bluff' => [...$common, 'bolt', 'dice', 'squatter', 'missing_word', 'alphabet', 'curtain'],
             'quiz' => [...$common, 'bolt', 'dice', 'squatter', 'missing_word', 'alphabet', 'curtain'],
             'blind_test' => [...$common, 'bolt', 'dice', 'squatter', 'artist', 'curtain', 'scratch', 'speed', 'singer'],
             'phrase' => [...$common, 'bolt', 'accent', 'sneeze', 'translator', 'advert'],
@@ -61,7 +62,7 @@ class BonusCatalog
     public function phase(string $type): string
     {
         return match ($type) {
-            'tribunal' => 'voting', 'phrase' => 'writing', 'drawing' => 'drawing', default => 'answer',
+            'tribunal', 'bluff' => 'voting', 'phrase' => 'writing', 'drawing' => 'drawing', default => 'answer',
         };
     }
 }

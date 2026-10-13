@@ -23,7 +23,7 @@ class ContentController extends Controller
 {
     public function index(Request $request): InertiaResponse
     {
-        $filters = $request->validate(['status' => ['nullable', 'in:draft,published'], 'type' => ['nullable', 'string', 'in:quiz,blind_test,drawing,phrase,tribunal'], 'search' => ['nullable', 'string', 'max:100']]);
+        $filters = $request->validate(['status' => ['nullable', 'in:draft,published'], 'type' => ['nullable', 'string', 'in:quiz,blind_test,drawing,phrase,tribunal,bluff'], 'search' => ['nullable', 'string', 'max:100']]);
         $query = Content::with('tags')->latest('id');
         if (! empty($filters['type'])) {
             $query->where('type', $filters['type']);
@@ -69,6 +69,7 @@ class ContentController extends Controller
             ContentType::Drawing => ['word'],
             ContentType::Phrase => ['prompt'],
             ContentType::Tribunal => ['question'],
+            ContentType::Bluff => ['question', 'answer', 'format'],
         };
         $payload = array_intersect_key($values['payload'] ?? [], array_flip($keys));
         $oldAudio = null;

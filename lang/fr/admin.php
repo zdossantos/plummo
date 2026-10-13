@@ -92,4 +92,10 @@ return [
     'pack_help' => 'Un contenu doit avoir tous les tags requis pour appartenir à ce pack.',
     'required_tags' => 'Tags requis',
     'audio_failed' => 'L’extrait audio n’a pas pu être enregistré. Réessayez.',
+    'bluff' => 'Bluff',
+    'bluff_answer' => 'Vraie réponse',
+    'bluff_format' => 'Format du sujet',
+    'bluff_definition' => 'Définition',
+    'bluff_expression' => 'Expression',
+    'bluff_anecdote' => 'Anecdote',
 ];
