@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.9.2](https://github.com/zdossantos/plummo/compare/plummo-v0.9.1...plummo-v0.9.2) (2026-10-12)
+
+
+### Bug Fixes
+
+* compact mobile controls and enlarge bottom bonus slots ([#81](https://github.com/zdossantos/plummo/issues/81)) ([f939139](https://github.com/zdossantos/plummo/commit/f93913907c192e920fb2f4ebd8d3fe22ecf04c1e))
+* enlarge controller bonus touch targets ([#80](https://github.com/zdossantos/plummo/issues/80)) ([347a7c4](https://github.com/zdossantos/plummo/commit/347a7c4457ad7e9ee7b52473baa77e517969aa4c))
+* simplify mobile gameplay and distinguish eight answers ([#78](https://github.com/zdossantos/plummo/issues/78)) ([65217dc](https://github.com/zdossantos/plummo/commit/65217dc49ebd3a264d41733a632d375edde1ab14))
+
 ## [0.9.1](https://github.com/zdossantos/plummo/compare/plummo-v0.9.0...plummo-v0.9.1) (2026-10-12)
 
 
