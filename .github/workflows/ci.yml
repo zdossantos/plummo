@@ -57,7 +57,6 @@ jobs:
                   s = p.read_text().replace('$this->command,', "$this->command.' 2>/tmp/plummo-playwright.log',", 1)
                   p.write_text(s)
                   PYTHON
-                  export DEBUG=pw:api
                   touch /tmp/plummo-playwright.log
                   tail -n +1 -F /tmp/plummo-playwright.log &
                   (sleep 90; ps -eo pid,ppid,stat,pcpu,wchan:30,comm; ss -tpn) &
