@@ -9,4 +9,5 @@ enum ContentType: string
     case Drawing = 'drawing';
     case Phrase = 'phrase';
     case Tribunal = 'tribunal';
+    case Bluff = 'bluff';
 }

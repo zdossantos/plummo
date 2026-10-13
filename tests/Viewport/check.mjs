@@ -196,6 +196,52 @@ games.countReveal = {
     },
     me: { ...base.me, answered: true, choice: 8 },
 };
+const bluffEntries = Array.from({ length: 9 }, (_, i) => ({
+    id: `bluff-${i}`,
+    text: 'Une réponse de cent vingt caractères, suffisamment longue pour vérifier la lecture des propositions et leur mise en page.',
+    own: i === 8,
+    correct: null,
+    authors: [],
+    voters: [],
+}));
+games.bluffWriting = {
+    ...base,
+    type: 'bluff',
+    phase: 'writing',
+    round: { ...base.round, question: ('Une définition mystérieuse demande une explication inventée et convaincante pour tromper les autres joueurs. ').repeat(5).slice(0, 500), index: 0, entries: [] },
+    me: {
+        ...base.me,
+        draft: '',
+        submitted: false,
+        foundTruth: false,
+        canVote: false,
+    },
+};
+games.bluffPresenting = {
+    ...games.bluffWriting,
+    phase: 'presenting',
+    round: { ...games.bluffWriting.round, entries: bluffEntries },
+};
+games.bluffVoting = {
+    ...games.bluffPresenting,
+    phase: 'voting',
+    me: { ...games.bluffWriting.me, canVote: true },
+};
+games.bluffReveal = {
+    ...games.bluffVoting,
+    phase: 'reveal',
+    round: {
+        ...games.bluffVoting.round,
+        entries: bluffEntries.map((e, i) => ({
+            ...e,
+            correct: i === 0,
+            authors: i === 0 ? [] : [2],
+            voters: i === 0 ? [1] : [],
+        })),
+        awards: { 1: 65 },
+    },
+    me: { ...games.bluffVoting.me, points: 65 },
+};
 const formats = [
     [320, 568],
     [360, 640],
@@ -624,6 +670,62 @@ for (const [width, height] of formats.filter(
                 .click();
         }
 
+        if (mode.startsWith('bluff')) {
+            assert.ok(
+                await page.locator('[data-testid="bluff-play"]').isVisible(),
+            );
+            const expected =
+                mode === 'bluffWriting'
+                    ? 0
+                    : mode === 'bluffPresenting'
+                      ? 1
+                      : 9;
+            assert.equal(
+                await page.locator('.bluff-choices .game-choice').count(),
+                expected,
+            );
+            if (mode === 'bluffWriting' && width < 1000) {
+                await page.evaluate(() => { window.bluffSlow = true; });
+                const field = page.locator('#bluff-draft');
+                await field.fill('Un bluff en cours');
+                await page.waitForTimeout(450);
+                assert.ok(await field.isEnabled(), 'Autosave disabled the editor');
+                assert.ok(await field.evaluate((el) => document.activeElement === el), 'Autosave lost keyboard focus');
+                await field.press('End');
+                await field.press('!');
+                await page.waitForTimeout(1400);
+                await page.evaluate(() => { window.bluffSlow = false; });
+            }
+            if (mode === 'bluffVoting') {
+                const colors = await page
+                    .locator('.bluff-choices .choice-face')
+                    .evaluateAll((cards) =>
+                        cards.map((c) => getComputedStyle(c).backgroundColor),
+                    );
+                assert.equal(
+                    new Set(colors).size,
+                    9,
+                    'Nine distinct bluff identities',
+                );
+                if (width < 1000) {
+                    assert.ok(
+                        await page
+                            .locator('[data-answer="8"] .choice-face')
+                            .isDisabled(),
+                        'Cannot vote for own bluff',
+                    );
+                    await page
+                        .locator('[data-answer="0"] .choice-face')
+                        .click();
+                    assert.equal(
+                        await page.evaluate(
+                            () => window.lastBluffAction?.values.choice,
+                        ),
+                        'bluff-0',
+                    );
+                }
+            }
+        }
         if (process.env.VIEWPORT_SCREENSHOTS)
             await page.screenshot({
                 path: cache + `/${mode}-${width}x${height}.png`,

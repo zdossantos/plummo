@@ -23,6 +23,8 @@ const form = useForm({
         artist: '',
         word: '',
         prompt: '',
+        answer: '',
+        format: 'definition' as const,
         ...props.content?.payload,
     },
     tag_ids: props.content?.tags.map((tag) => tag.id) ?? [],
@@ -160,6 +162,36 @@ function upload(event: Event) {
                         t('word_help')
                     }}</span></label
                 >
+                <template v-else-if="form.type === 'bluff'">
+                    <label class="grid gap-2"
+                        >{{ t('question')
+                        }}<PagedTextField
+                            v-model="form.payload.question"
+                            :maxlength="500"
+                    /></label>
+                    <label class="grid gap-2"
+                        >{{ t('bluff_answer')
+                        }}<PagedTextField
+                            v-model="form.payload.answer"
+                            :maxlength="120"
+                    /></label>
+                    <label class="grid gap-2"
+                        >{{ t('bluff_format')
+                        }}<select v-model="form.payload.format">
+                            <option
+                                v-for="format in [
+                                    'definition',
+                                    'expression',
+                                    'anecdote',
+                                ]"
+                                :key="format"
+                                :value="format"
+                            >
+                                {{ t('bluff_' + format) }}
+                            </option>
+                        </select></label
+                    >
+                </template>
                 <label v-else-if="form.type === 'tribunal'" class="grid gap-2"
                     >{{ t('tribunal_subject')
                     }}<PagedTextField

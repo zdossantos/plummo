@@ -1,5 +1,5 @@
 export type ContentType =
-    'quiz' | 'blind_test' | 'drawing' | 'phrase' | 'tribunal';
+    'quiz' | 'blind_test' | 'drawing' | 'phrase' | 'tribunal' | 'bluff';
 export type Tag = {
     id: number;
     name: string;
@@ -19,6 +19,8 @@ export type Content = {
         audio_path?: string;
         word?: string;
         prompt?: string;
+        answer?: string;
+        format?: 'definition' | 'expression' | 'anecdote';
     };
     tags: Tag[];
 };
@@ -34,4 +36,5 @@ export const contentTypes: ContentType[] = [
     'drawing',
     'phrase',
     'tribunal',
+    'bluff',
 ];

@@ -8,6 +8,7 @@ import {
     Check,
     Shapes,
     Gavel,
+    VenetianMask,
 } from '@lucide/vue';
 import PagedList from '@/components/PagedList.vue';
 import TextReader from '@/components/TextReader.vue';
@@ -35,13 +36,15 @@ const props = defineProps<{
         | 'drawing'
         | 'phrase'
         | 'mini_games'
-        | 'tribunal';
+        | 'tribunal'
+        | 'bluff';
 }>();
 const emit = defineEmits<{ start: [settings: object] }>();
 const { t } = useTranslations('rooms');
 const choosingPacks = ref(false);
 const choosingGame = ref(false);
 const games = [
+    { type: 'bluff', label: 'bluff_name', icon: VenetianMask },
     { type: 'tribunal', label: 'tribunal_name', icon: Gavel },
     { type: 'quiz', label: 'quiz_name', icon: Brain },
     { type: 'blind_test', label: 'blind_name', icon: Music },
@@ -83,9 +86,16 @@ const packs = ref<{ id: number; name: string }[]>([]);
 const selected = ref<number[]>(props.initialPacks ?? []);
 const availability = ref<{ total: number; unseen: number } | null>(null);
 const gameType = ref<
-    'quiz' | 'blind_test' | 'drawing' | 'phrase' | 'mini_games' | 'tribunal'
+    | 'quiz'
+    | 'blind_test'
+    | 'drawing'
+    | 'phrase'
+    | 'mini_games'
+    | 'tribunal'
+    | 'bluff'
 >(props.initialType ?? 'quiz');
 const settings = ref({
+    bluff: { rounds: 5, duration: 60 },
     tribunal: { rounds: 1, duration: 20 },
     mini_games: { rounds: 10, duration: 20 },
     quiz: { rounds: 10, duration: 30 },
@@ -115,59 +125,67 @@ const playableGames = computed(() =>
             connectedPlayers.value >=
             (game.type === 'drawing'
                 ? 2
-                : ['phrase', 'tribunal'].includes(game.type)
+                : ['phrase', 'tribunal', 'bluff'].includes(game.type)
                   ? 3
                   : 1),
     ),
 );
 const labels = computed(() =>
-    gameType.value === 'tribunal'
+    gameType.value === 'bluff'
         ? {
-              launch: 'launch_tribunal',
-              available: 'tribunal_topics',
-              count: 'tribunal_tours',
-              duration: 'tribunal_duration',
-              start: 'start_tribunal',
+              launch: 'launch_bluff',
+              available: 'available_bluffs',
+              count: 'bluff_rounds',
+              duration: 'bluff_duration',
+              start: 'start_bluff',
           }
-        : gameType.value === 'mini_games'
+        : gameType.value === 'tribunal'
           ? {
-                launch: 'launch_mini',
-                available: 'mini_selected',
-                count: 'mini_count',
-                duration: 'mini_duration',
-                start: 'start_mini',
+                launch: 'launch_tribunal',
+                available: 'tribunal_topics',
+                count: 'tribunal_tours',
+                duration: 'tribunal_duration',
+                start: 'start_tribunal',
             }
-          : gameType.value === 'phrase'
+          : gameType.value === 'mini_games'
             ? {
-                  launch: 'launch_phrase',
-                  available: 'available_phrases',
-                  count: 'phrase_tours',
-                  duration: 'phrase_duration',
-                  start: 'start_phrase',
+                  launch: 'launch_mini',
+                  available: 'mini_selected',
+                  count: 'mini_count',
+                  duration: 'mini_duration',
+                  start: 'start_mini',
               }
-            : gameType.value === 'drawing'
+            : gameType.value === 'phrase'
               ? {
-                    launch: 'launch_drawing',
-                    available: 'available_words',
-                    count: 'drawing_tours',
-                    duration: 'drawing_duration',
-                    start: 'start_drawing',
+                    launch: 'launch_phrase',
+                    available: 'available_phrases',
+                    count: 'phrase_tours',
+                    duration: 'phrase_duration',
+                    start: 'start_phrase',
                 }
-              : gameType.value === 'quiz'
+              : gameType.value === 'drawing'
                 ? {
-                      launch: 'launch_quiz',
-                      available: 'available_questions',
-                      count: 'question_count',
-                      duration: 'answer_duration',
-                      start: 'start_game',
+                      launch: 'launch_drawing',
+                      available: 'available_words',
+                      count: 'drawing_tours',
+                      duration: 'drawing_duration',
+                      start: 'start_drawing',
                   }
-                : {
-                      launch: 'launch_blind',
-                      available: 'available_clips',
-                      count: 'clip_count',
-                      duration: 'clip_duration',
-                      start: 'start_blind',
-                  },
+                : gameType.value === 'quiz'
+                  ? {
+                        launch: 'launch_quiz',
+                        available: 'available_questions',
+                        count: 'question_count',
+                        duration: 'answer_duration',
+                        start: 'start_game',
+                    }
+                  : {
+                        launch: 'launch_blind',
+                        available: 'available_clips',
+                        count: 'clip_count',
+                        duration: 'clip_duration',
+                        start: 'start_blind',
+                    },
 );
 const required = computed(() =>
     gameType.value === 'drawing'
@@ -201,7 +219,7 @@ const valid = computed(() =>
           (gameType.value !== 'drawing' ||
               props.recover ||
               connectedPlayers.value >= 2) &&
-          (!['phrase', 'tribunal'].includes(gameType.value) ||
+          (!['phrase', 'tribunal', 'bluff'].includes(gameType.value) ||
               props.recover ||
               connectedPlayers.value >= 3) &&
           count.value >= required.value &&
@@ -364,7 +382,9 @@ onUnmounted(() => controller?.abort());
                             v-model.number="duration"
                             type="number"
                             :min="
-                                ['drawing', 'phrase'].includes(gameType)
+                                ['drawing', 'phrase', 'bluff'].includes(
+                                    gameType,
+                                )
                                     ? 30
                                     : 10
                             "
@@ -396,15 +416,20 @@ onUnmounted(() => controller?.abort());
                                                   ? connectedPlayers
                                                   : 1) *
                                               (duration +
-                                                  (gameType === 'phrase'
-                                                      ? connectedPlayers * 12 +
+                                                  (gameType === 'bluff'
+                                                      ? (connectedPlayers + 1) *
+                                                            3 +
                                                         33
-                                                      : gameType === 'drawing'
-                                                        ? 18
-                                                        : gameType ===
-                                                            'mini_games'
-                                                          ? 34
-                                                          : 3))) /
+                                                      : gameType === 'phrase'
+                                                        ? connectedPlayers *
+                                                              12 +
+                                                          33
+                                                        : gameType === 'drawing'
+                                                          ? 18
+                                                          : gameType ===
+                                                              'mini_games'
+                                                            ? 34
+                                                            : 3))) /
                                               60,
                                       ),
                         })

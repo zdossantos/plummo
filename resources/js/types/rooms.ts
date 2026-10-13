@@ -272,12 +272,53 @@ export type TribunalGameState = Omit<
         points: number | null;
     } | null;
 };
+export type BluffGameState = Omit<
+    ChoiceGame,
+    'type' | 'phase' | 'round' | 'me'
+> & {
+    type: 'bluff';
+    phase:
+        | 'writing'
+        | 'presenting'
+        | 'voting'
+        | 'waiting'
+        | 'reveal'
+        | 'paused'
+        | 'resuming'
+        | 'results';
+    round: {
+        number: number;
+        total: number;
+        question: string;
+        index: number;
+        entries: {
+            id: string;
+            text: string;
+            own: boolean;
+            correct: boolean | null;
+            authors: number[];
+            voters: number[];
+        }[];
+        awards: Record<number, number>;
+    };
+    me: {
+        eligible: boolean;
+        draft: string;
+        submitted: boolean;
+        foundTruth: boolean;
+        canVote: boolean;
+        answered: boolean;
+        choice: string | null;
+        points: number | null;
+    } | null;
+};
 export type GameState =
     | ChoiceGame
     | DrawingGameState
     | PhraseGameState
     | MiniGameState
-    | TribunalGameState;
+    | TribunalGameState
+    | BluffGameState;
 export type DrawingSender = (
     action: string,
     values: Record<string, unknown>,

@@ -38,7 +38,7 @@ class GameBonuses
                 }
             }
         }
-        if ($status === 'active' && $state['phase'] === app(BonusCatalog::class)->phase($game->type) && (($state['number'] ?? 0) > ($old['number'] ?? 0) || (($old['phase'] ?? '') === 'selecting' || ($game->type === 'mini_games' && in_array($old['phase'] ?? '', ['observing', 'writing'], true)) || ($game->type === 'tribunal' && ($old['phase'] ?? '') === 'speaking_second')))) {
+        if ($status === 'active' && $state['phase'] === app(BonusCatalog::class)->phase($game->type) && (($state['number'] ?? 0) > ($old['number'] ?? 0) || (($old['phase'] ?? '') === 'selecting' || ($game->type === 'mini_games' && in_array($old['phase'] ?? '', ['observing', 'writing'], true)) || ($game->type === 'tribunal' && ($old['phase'] ?? '') === 'speaking_second') || ($game->type === 'bluff' && ($old['phase'] ?? '') === 'presenting')))) {
             $state = app(BonusClock::class)->start($game, $state, $bonus);
         }
         $now = app(GameEngine::class)->time();
@@ -136,7 +136,7 @@ class GameBonuses
         }
         $now = $engine->time();
         $bonus['launches'][] = ['id' => (string) Str::uuid(), 'kind' => $kind, 'actorId' => $player->id, 'at' => $now];
-        $duration = $catalog->duration($kind, $game->type === 'tribunal' ? 20 : $game->settings['duration']);
+        $duration = $catalog->duration($kind, app(BonusClock::class)->duration($game));
         if ($kind === 'soap') {
             $bonus['effects'] = array_values(array_filter($bonus['effects'], fn ($effect) => $effect['target'] !== $player->id || $catalog->defense($effect['kind'])));
         } elseif ($kind === 'pinata') {
