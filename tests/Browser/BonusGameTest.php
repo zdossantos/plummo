@@ -45,7 +45,17 @@ it('launches a collective bonus in one click while phone and screen stay inside 
         $checkpoint('prank label visible');
         $first->assertSee('Prank bonuses');
         $checkpoint('prank toggle');
+        if (getenv('CI') && function_exists('pcntl_alarm')) {
+            pcntl_async_signals(true);
+            pcntl_signal(SIGALRM, function () {
+                fwrite(STDERR, '[bonus-ci] stalled click stack '.json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)).PHP_EOL);
+            });
+            pcntl_alarm(30);
+        }
         $first->click('label:has-text("Prank bonuses")');
+        if (getenv('CI') && function_exists('pcntl_alarm')) {
+            pcntl_alarm(0);
+        }
         $checkpoint('rounds');
         $first->fill('game-rounds', '5');
         $checkpoint('duration');

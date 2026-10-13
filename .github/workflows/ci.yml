@@ -51,6 +51,8 @@ jobs:
             - run: php artisan test --testsuite=Feature --stop-on-failure
             - name: Browser tests
               run: |
+                  php -r 'require "vendor/autoload.php"; echo "Event loop: ", Revolt\EventLoop::getDriver()::class, PHP_EOL;'
+                  (sleep 90; ps -eo pid,ppid,stat,pcpu,wchan:30,comm; ss -tpn) &
                   progress_log=$(mktemp)
                   tail -n +1 -F "$progress_log" &
                   progress_pid=$!
