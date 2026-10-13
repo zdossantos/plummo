@@ -52,7 +52,7 @@ it('launches a collective bonus in one click while phone and screen stay inside 
             });
             pcntl_alarm(30);
         }
-        $first->click('label:has-text("Prank bonuses")');
+        $first->page()->locator('label:has-text("Prank bonuses")')->click(['noWaitAfter' => true]);
         if (getenv('CI') && function_exists('pcntl_alarm')) {
             pcntl_alarm(0);
         }
