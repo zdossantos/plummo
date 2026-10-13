@@ -5,6 +5,10 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
+        <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="16x16 32x32 48x48">
+        <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml" sizes="any">
+        <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" sizes="180x180">
+
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>
             (function() {
