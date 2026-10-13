@@ -50,7 +50,13 @@ jobs:
             - run: APP_ENV=testing php artisan migrate --force
             - run: php artisan test --testsuite=Unit --stop-on-failure
             - run: php artisan test --testsuite=Feature --stop-on-failure
-            - run: php vendor/bin/pest --testsuite=Browser --stop-on-failure --debug
+            - name: Browser tests
+              run: |
+                  progress_log=$(mktemp)
+                  tail -n +1 -F "$progress_log" &
+                  progress_pid=$!
+                  trap 'kill "$progress_pid" 2>/dev/null || true; rm -f "$progress_log"' EXIT
+                  php artisan test --testsuite=Browser --stop-on-failure --log-events-text "$progress_log"
     runtime:
         runs-on: ubuntu-latest
         timeout-minutes: 15
