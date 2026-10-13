@@ -51,7 +51,10 @@ window.mountLayout = (game, phone = true) => {
                                 h(GamePlay, {
                                     game: current.value,
                                     room: {
-                                        ranking: [],
+                                        ranking: [
+                                            { id: 1, name: 'Camille', color: 'violet', accessories: [] },
+                                            { id: 2, name: 'Alex', color: 'vert', accessories: [] },
+                                        ],
                                         players: [
                                             {
                                                 id: 1,
@@ -73,6 +76,14 @@ window.mountLayout = (game, phone = true) => {
                                     seconds: 45,
                                     serverNow: now.value,
                                     sendDrawing: async () => true,
+                                    sendBluff: async (action, values) => {
+                                        if (window.bluffSlow) await new Promise((resolve) => setTimeout(resolve, 700));
+                                        window.lastBluffAction = {
+                                            action,
+                                            values,
+                                        };
+                                        return true;
+                                    },
                                     sendPhrase: async () => true,
                                 }),
                             ]),

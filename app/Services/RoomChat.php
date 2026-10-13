@@ -43,6 +43,10 @@ class RoomChat
             };
         }
 
+        if ($game['type'] === 'bluff') {
+            return $game['phase'] === 'writing' ? $me['submitted'] : $me['answered'] || ! $me['canVote'];
+        }
+
         if ($game['type'] === 'mini_games' && $game['phase'] === 'writing') {
             return $me['submitted'];
         }

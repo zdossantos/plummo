@@ -22,6 +22,7 @@ class ContentImportPreview
             ContentType::Drawing => ['mot', 'tags'],
             ContentType::Phrase => ['debut_phrase', 'tags'],
             ContentType::Tribunal => ['sujet', 'tags'],
+            ContentType::Bluff => ['question', 'reponse', 'format', 'tags'],
         };
     }
 
@@ -69,6 +70,7 @@ class ContentImportPreview
                 ContentType::Drawing => ['word' => $values['mot']],
                 ContentType::Phrase => ['prompt' => $values['debut_phrase']],
                 ContentType::Tribunal => ['question' => $values['sujet']],
+                ContentType::Bluff => ['question' => $values['question'], 'answer' => $values['reponse'], 'format' => $values['format']],
             };
             $tagIds = [];
             foreach (array_unique(array_filter(array_map('trim', explode('|', $values['tags'])))) as $tagName) {

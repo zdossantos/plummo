@@ -7,6 +7,7 @@ import TextReader from '@/components/TextReader.vue';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import GameWinners from '@/components/GameWinners.vue';
 import PhrasePlay from '@/components/PhrasePlay.vue';
+import BluffGamePlay from '@/components/BluffGamePlay.vue';
 import TribunalGamePlay from '@/components/TribunalGamePlay.vue';
 import MiniGamePlay from '@/components/MiniGamePlay.vue';
 import DrawingPlay from '@/components/DrawingPlay.vue';
@@ -29,6 +30,7 @@ const props = defineProps<{
     sendPhrase?: DrawingSender;
     sendMini?: DrawingSender;
     sendTribunal?: DrawingSender;
+    sendBluff?: DrawingSender;
 }>();
 const emit = defineEmits<{
     answer: [choice: number];
@@ -142,17 +144,19 @@ const ranking = computed(() => {
             <p>
                 {{
                     t(
-                        game.type === 'tribunal'
-                            ? 'tribunal_round'
-                            : game.type === 'phrase'
-                              ? 'phrase_round'
-                              : game.type === 'drawing'
-                                ? 'drawing_round'
-                                : game.type === 'mini_games'
-                                  ? 'mini_round'
-                                  : game.type === 'quiz'
-                                    ? 'quiz_round'
-                                    : 'blind_round',
+                        game.type === 'bluff'
+                            ? 'bluff_round'
+                            : game.type === 'tribunal'
+                              ? 'tribunal_round'
+                              : game.type === 'phrase'
+                                ? 'phrase_round'
+                                : game.type === 'drawing'
+                                  ? 'drawing_round'
+                                  : game.type === 'mini_games'
+                                    ? 'mini_round'
+                                    : game.type === 'quiz'
+                                      ? 'quiz_round'
+                                      : 'blind_round',
                         {
                             number:
                                 game.type === 'drawing'
@@ -295,6 +299,16 @@ const ranking = computed(() => {
             :connected="connected"
             :server-now="serverNow"
             :send="sendDrawing"
+        />
+        <BluffGamePlay
+            v-else-if="game.type === 'bluff'"
+            :game="game"
+            :room="room"
+            :phone="phone"
+            :busy="busy"
+            :connected="connected"
+            :server-now="serverNow"
+            :send="sendBluff"
         />
         <TribunalGamePlay
             v-else-if="game.type === 'tribunal'"

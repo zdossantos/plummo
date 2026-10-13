@@ -28,6 +28,7 @@ class ContentRules
             ],
             'blind_test' => ['payload.title' => [$required, 'string', 'max:200'], 'payload.artist' => [$required, 'string', 'max:200']],
             'drawing' => ['payload.word' => [$required, 'string', 'max:100']],
+            'bluff' => ['payload.question' => [$required, 'string', 'max:500'], 'payload.answer' => [$required, 'string', 'max:120', 'regex:/[\pL\pN]/u'], 'payload.format' => [$required, Rule::in(['definition', 'expression', 'anecdote'])]],
             'tribunal' => ['payload.question' => [$required, 'string', 'max:500']],
             'phrase' => ['payload.prompt' => [$required, 'string', 'max:240']],
             default => [],
