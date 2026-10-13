@@ -13,8 +13,6 @@ use Pest\Browser\Execution;
 pest()->browser()->timeout(5000);
 
 it('launches a collective bonus in one click while phone and screen stay inside their viewport', function (bool $reduced) {
-    $checkpoint = fn (string $step) => fwrite(STDERR, '[bonus-ci] '.$step.PHP_EOL);
-    $checkpoint('fixture');
     app()->terminating(function () {
         app('cookie')->flushQueuedCookies();
         app('session.store')->flush();
@@ -28,43 +26,18 @@ it('launches a collective bonus in one click while phone and screen stay inside 
     }
     $tag = $pack->tags()->sole();
     $ids = $tag->contents()->pluck('contents.id');
-    $checkpoint('screen');
     $screen = visit('/', ['reducedMotion' => $reduced ? 'reduce' : 'no-preference', 'viewport' => ['width' => $reduced ? 1280 : 1920, 'height' => $reduced ? 720 : 1080]])->withLocale('en-US')->assertSee('Everyone plays.');
     $room = Room::latest('id')->firstOrFail();
     try {
-        $checkpoint('first phone');
         $first = visit('/join/'.$room->code, ['viewport' => ['width' => 390, 'height' => 664]])->withLocale('en-US')->fill('player-name', 'Camille')->click('Continue')->click('Enter the room');
-        $checkpoint('second phone');
         $second = visit('/join/'.$room->code, ['viewport' => ['width' => 390, 'height' => 664]])->withLocale('en-US')->fill('player-name', 'Alex')->click('Continue')->click('Enter the room');
-        $checkpoint('setup');
-        $first->click('[data-choose-packs]');
-        $checkpoint('pack checkbox');
-        $first->click('input[type="checkbox"][value="'.$pack->id.'"]');
-        $checkpoint('close pack drawer');
-        $first->click('[data-slot="drawer-content"] button:has-text("Close")');
-        $checkpoint('prank label visible');
+        $first->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")');
         $first->assertSee('Prank bonuses');
-        $checkpoint('prank toggle');
-        if (getenv('CI') && function_exists('pcntl_alarm')) {
-            pcntl_async_signals(true);
-            pcntl_signal(SIGALRM, function () {
-                fwrite(STDERR, '[bonus-ci] stalled click stack '.json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)).PHP_EOL);
-            });
-            pcntl_alarm(30);
-        }
-        $first->page()->locator('label:has-text("Prank bonuses")')->click(['noWaitAfter' => true]);
-        if (getenv('CI') && function_exists('pcntl_alarm')) {
-            pcntl_alarm(0);
-        }
-        $checkpoint('rounds');
-        $first->fill('game-rounds', '5');
-        $checkpoint('duration');
-        $first->fill('game-duration', '60');
-        $checkpoint('first readiness');
+        expect($first->page()->evaluate('() => { const label = [...document.querySelectorAll(".setup-details label")].find(e => e.textContent.includes("Prank bonuses")); const r = label.getBoundingClientRect(); return label.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)); }'))->toBeTrue();
+        $first->click('label:has-text("Prank bonuses")');
+        $first->fill('game-rounds', '5')->fill('game-duration', '60');
         confirmReadyPhone($first, $room);
-        $checkpoint('second readiness');
         confirmReadyPhone($second, $room);
-        $checkpoint('start quiz');
         $first->page()->locator('button:has-text("Start quiz")')->click(['noWaitAfter' => true]);
         $first->assertSee('Quiz · Question 1 / 5');
         expect(Game::where('room_id', $room->id)->sole()->settings['bonuses'])->toBeTrue();
@@ -73,33 +46,28 @@ it('launches a collective bonus in one click while phone and screen stay inside 
         $state = $game->state;
         $state['bonuses']['inventory'][$player->id] = [['id' => 'launch-test', 'kind' => 'bolt']];
         $game->update(['state' => $state]);
-        $checkpoint('bonus refresh');
         $first->refresh()->assertPresent('.bonus-object');
         $second->assertPresent('.bonus-object');
         foreach ([$first, $second, $screen] as $page) {
             expect($page->page()->evaluate('() => document.documentElement.scrollHeight <= innerHeight && document.documentElement.scrollWidth <= innerWidth'))->toBeTrue();
             $page->assertNoJavaScriptErrors();
         }
-        $checkpoint('tooltip');
         $first->click('.bonus-info')->assertPresent('.bonus-tooltip');
         $first->page()->setViewportSize(390, 360);
         $first->page()->evaluate('() => new Promise(resolve => setTimeout(resolve, 200))');
         $first->assertVisible('.bonus-object');
         expect($first->page()->evaluate('() => { const r = document.querySelector(".bonus-object").getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight; }'))->toBeTrue();
         $first->page()->setViewportSize(390, 664);
-        $checkpoint('audio');
         $screen->assertSee('Quiz · Question 1 / 5');
         $screen->page()->evaluate('() => { window.bonusNotes = 0; const original = AudioContext.prototype.createOscillator; AudioContext.prototype.createOscillator = function(...args) { window.bonusNotes++; return original.apply(this, args); }; }');
         $screen->click('.sound-controls button')->assertAttribute('.sound-controls button', 'aria-pressed', 'true');
         $screen->page()->evaluate('() => { window.launchIds = new Set(); new MutationObserver(() => document.querySelectorAll("[data-testid=bonus-launch]").forEach(item => window.launchIds.add(item.dataset.launchId))).observe(document.body, {subtree:true,childList:true}); }');
-        $checkpoint('launch');
         $first->click('.bonus-object')->assertMissing('.bonus-object');
         $screen->assertVisible('[data-testid="bonus-launch"]')->assertSee('Camille');
         expect($screen->page()->evaluate('() => getComputedStyle(document.querySelector(".bonus-launch-layer")).pointerEvents'))->toBe('none');
         if ($reduced) {
             expect($screen->page()->evaluate('() => [".bonus-launch", ".bonus-launch-projectile"].every(selector => getComputedStyle(document.querySelector(selector)).animationName === "none")'))->toBeTrue();
         }
-        $checkpoint('launch screenshot');
         $screen->screenshot(filename: 'bonus-launch-'.($reduced ? 'reduced' : 'animated'));
 
         $screen->page()->evaluate('() => new Promise(resolve => { const until = Date.now() + 4000; const check = () => window.bonusNotes > 0 || Date.now() >= until ? resolve() : setTimeout(check, 50); check(); })');
@@ -108,7 +76,6 @@ it('launches a collective bonus in one click while phone and screen stay inside 
         $screen->page()->evaluate('() => new Promise(resolve => setTimeout(resolve, 1200))');
         expect($screen->page()->evaluate('() => window.bonusNotes'))->toBe($notes);
         expect($screen->page()->evaluate('() => window.launchIds.size'))->toBe(1);
-        $checkpoint('screen refresh');
         $screen->refresh()->assertMissing('[data-testid="bonus-launch"]');
         $second->assertPresent('.game-choices button');
         $screen->assertMissing('.bonus-pocket')->assertMissing('.page-deck');
@@ -120,20 +87,16 @@ it('launches a collective bonus in one click while phone and screen stay inside 
         $state['bonuses']['inventory'][$player->id] = [['id' => 'keep', 'kind' => 'shield'], ['id' => 'replace', 'kind' => 'dice']];
         $state['bonuses']['pending'][$player->id] = ['id' => 'third', 'kind' => 'squatter'];
         $game->update(['state' => $state]);
-        $checkpoint('inventory refresh');
         $first->refresh();
         $first->assertPresent('.bonus-pending');
         $first->assertPresent('.bonus-helpful')->assertPresent('.bonus-prank');
-        $checkpoint('image decode');
         $first->page()->evaluate('async () => { await Promise.all([...document.querySelectorAll(".bonus-pocket .bonus-icon")].map(img => img.decode())); }');
         expect($first->page()->evaluate('() => [...document.querySelectorAll(".bonus-pocket .bonus-icon")].every(img => img.complete && img.naturalWidth > 0 && img.getAttribute("src").startsWith("/bonuses/"))'))->toBeTrue();
-        $checkpoint('inventory screenshot');
         $first->screenshot(filename: 'bonus-illustrated-pocket');
         $first->page()->setViewportSize(320, 664);
         $first->page()->evaluate('() => new Promise(resolve => setTimeout(resolve, 200))');
         expect($first->page()->evaluate('() => [...document.querySelectorAll(".bonus-object, .bonus-pending, .phone-game-plummo")].every(el => { const r = el.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight; })'))->toBeTrue();
         $first->page()->setViewportSize(390, 664);
-        $checkpoint('replacement');
         $first->click('.bonus-pending')->assertSee('A new object!');
         expect($first->page()->evaluate('() => document.documentElement.scrollHeight <= innerHeight && document.documentElement.scrollWidth <= innerWidth'))->toBeTrue();
         $first->page()->setViewportSize(390, 360);
@@ -142,7 +105,6 @@ it('launches a collective bonus in one click while phone and screen stay inside 
         $first->page()->locator('button:has-text("Replace Tricky die")')->click(['noWaitAfter' => true]);
         $first->assertMissing('.bonus-pending');
         expect($game->fresh()->state['bonuses']['inventory'][$player->id][1]['id'])->toBe('third');
-        $checkpoint('finish');
         expect($game->fresh()->state['bonuses']['inventory'][$player->id][0]['id'])->toBe('keep');
     } finally {
         $room->delete();

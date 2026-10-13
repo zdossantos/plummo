@@ -836,6 +836,25 @@ for (const language of ['fr', 'en']) {
                     [],
                     `Preparation ${language} ${type} ${chief} ${width}x${height} controls outside`,
                 );
+                if (chief) {
+                    const blocked = await page
+                        .locator('.setup-details label')
+                        .evaluateAll((labels) =>
+                            labels.filter((label) => {
+                                const r = label.getBoundingClientRect();
+                                const target = document.elementFromPoint(
+                                    r.x + r.width / 2,
+                                    r.y + r.height / 2,
+                                );
+                                return !label.contains(target);
+                            }).map((label) => label.textContent),
+                        );
+                    assert.deepEqual(
+                        blocked,
+                        [],
+                        `Preparation ${language} ${type} ${width}x${height} options blocked`,
+                    );
+                }
                 await page.locator('[data-game-rules]').click();
                 await page.locator('.reader-text').waitFor();
                 await page.waitForTimeout(100);

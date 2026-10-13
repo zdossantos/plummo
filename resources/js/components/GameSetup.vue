@@ -339,10 +339,12 @@ onUnmounted(() => controller?.abort());
             })
         "
     >
-        <h2 class="text-2xl">
-            {{ t(recover ? 'recover_packs' : labels.launch) }}
-        </h2>
-        <GameRules :type="gameType" :trials="activeTrials" />
+        <div class="setup-heading">
+            <h2 class="text-2xl">
+                {{ t(recover ? 'recover_packs' : labels.launch) }}
+            </h2>
+            <GameRules :type="gameType" :trials="activeTrials" />
+        </div>
         <div class="setup-main">
             <div class="setup-fields">
                 <label class="setup-type" for="game-type">

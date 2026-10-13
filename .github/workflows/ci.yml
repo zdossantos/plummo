@@ -9,7 +9,7 @@ permissions:
 jobs:
     quality:
         runs-on: ubuntu-latest
-        timeout-minutes: 30
+        timeout-minutes: 15
         services:
             mysql:
                 image: mysql:8.4
@@ -46,26 +46,17 @@ jobs:
             - run: composer lint:check && composer analyse
             - run: bun run lint:check && bun run format:check && bun run types:check && bun run test:unit && bun run build
             - run: bunx playwright install --with-deps chromium
+            - run: bun run test:viewport
             - run: APP_ENV=testing php artisan migrate --force
             - run: php artisan test --testsuite=Unit --stop-on-failure
             - run: php artisan test --testsuite=Feature --stop-on-failure
             - name: Browser tests
               run: |
-                  python3 - <<'PYTHON'
-                  from pathlib import Path
-                  p = Path('vendor/pestphp/pest-plugin-browser/src/Playwright/Servers/PlaywrightNpmServer.php')
-                  s = p.read_text().replace('$this->command,', "$this->command.' 2>/tmp/plummo-playwright.log',", 1)
-                  p.write_text(s)
-                  PYTHON
-                  touch /tmp/plummo-playwright.log
-                  tail -n +1 -F /tmp/plummo-playwright.log &
-                  (sleep 90; ps -eo pid,ppid,stat,pcpu,wchan:30,comm; ss -tpn) &
                   progress_log=$(mktemp)
                   tail -n +1 -F "$progress_log" &
                   progress_pid=$!
                   trap 'kill "$progress_pid" 2>/dev/null || true; rm -f "$progress_log"' EXIT
                   php artisan test --testsuite=Browser --stop-on-failure --log-events-text "$progress_log"
-            - run: bun run test:viewport
     runtime:
         runs-on: ubuntu-latest
         timeout-minutes: 15
