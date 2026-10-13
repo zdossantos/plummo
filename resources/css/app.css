@@ -1554,6 +1554,21 @@
         gap: 4px;
     }
 }
+@media (max-height: 500px) and (min-width: 600px) {
+    .setup-main {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+    }
+    .setup-fields {
+        flex: 1;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .setup-details {
+        flex: 1;
+        min-width: 0;
+    }
+}
 .viewport-shell[data-compact] .setup-main {
     gap: 8px;
 }
