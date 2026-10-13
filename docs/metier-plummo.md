@@ -225,8 +225,8 @@ Les administrateurs gèrent les tags et les définitions des packs. Ajouter un c
 
 ### Sélection et répétitions
 
-- Le chef choisit de un à trois packs pour le mini-jeu.
-- Les contenus sont tirés au hasard dans l'ensemble des contenus admissibles de ces packs.
+- Le chef peut choisir de un à trois packs pour le mini-jeu ou laisser la sélection vide pour utiliser tous les packs disponibles pour ce mini-jeu.
+- Les contenus sont tirés au hasard dans l'union des contenus publiés admissibles des packs sélectionnés, ou de tous les packs disponibles sans sélection. Les contenus n'appartenant à aucun pack restent exclus.
 - Un contenu présent dans plusieurs packs n'est pas compté plusieurs fois.
 - Le salon mémorise les contenus déjà joués, y compris quand le groupe change de pack ou remet les scores à zéro.
 - Les contenus déjà joués sont évités tant que des contenus admissibles non joués sont disponibles.
@@ -359,7 +359,7 @@ La pause conserve le temps d'observation, d'écriture ou de réponse et la repri
 
 ## Tribunal des Plummos
 
-Jeu autonome dès trois joueurs. Les sujets publiés sont des contenus `tribunal` (`payload.question`, 500 caractères maximum), administrables et importables en CSV/XLSX avec les colonnes `sujet,tags`. Le chef choisit un à trois packs ; les tags, unions sans doublons et historique du salon suivent les règles communes. Sans répétition, le lancement exige un sujet inédit par débat prévu (joueurs présents × tours) ; avec répétition explicite, un sujet publié suffit. Le sujet est figé dans la manche même après modification ou suppression administrative. Un catalogue épuisé suspend le jeu et permet de changer de packs ou d’autoriser les répétitions sans sauter de débat. Un tour contient une rotation circulaire mélangée des joueurs présents au début du tour ; chacun défend une fois pour et une fois contre. Le chef choisit 1 à 5 tours et 10 à 60 secondes de parole par personne (20 par défaut).
+Jeu autonome dès trois joueurs. Les sujets publiés sont des contenus `tribunal` (`payload.question`, 500 caractères maximum), administrables et importables en CSV/XLSX avec les colonnes `sujet,tags`. Le chef peut choisir un à trois packs ou tous les packs en laissant la sélection vide ; les tags, unions sans doublons et historique du salon suivent les règles communes. Sans répétition, le lancement exige un sujet inédit par débat prévu (joueurs présents × tours) ; avec répétition explicite, un sujet publié suffit. Le sujet est figé dans la manche même après modification ou suppression administrative. Un catalogue épuisé suspend le jeu et permet de changer de packs ou d’autoriser les répétitions sans sauter de débat. Un tour contient une rotation circulaire mélangée des joueurs présents au début du tour ; chacun défend une fois pour et une fois contre. Le chef choisit 1 à 5 tours et 10 à 60 secondes de parole par personne (20 par défaut).
 
 Chaque débat laisse 15 secondes de préparation, une prise de parole orale par camp, puis 20 secondes de vote maximum et 6 secondes de verdict. Seul le débatteur courant peut terminer sa parole plus tôt. Les autres participants forment le jury, avec un vote définitif privé jusqu'au verdict. Chaque vote donne 65 points au débatteur choisi, sans prime de victoire ni points pour le jury. Égalité : deux célébrations ; abstention : aucun point. Le podium et l'objectif de session sont communs.
 

@@ -200,7 +200,7 @@ Points : une bonne réponse rapporte 30 à 100 points selon ta rapidité ; une r
     'session_results' => 'Objectif de la session atteint',
     'target_reached' => 'Choisissez une prolongation, le mode sans limite ou une nouvelle session au salon pour rejouer.',
     'launch_quiz' => 'Préparer un quiz',
-    'packs_hint' => 'Choisis jusqu’à trois packs. Les contenus communs ne sont comptées qu’une fois.',
+    'packs_hint' => 'Choisis jusqu’à trois packs. Sans sélection, tous les packs sont utilisés. Les contenus communs ne sont comptés qu’une fois.',
     'packs_selected' => '{count} packs',
     'pack_selected' => '1 pack',
     'phrase_short' => 'Phrases',

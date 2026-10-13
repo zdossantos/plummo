@@ -17,7 +17,7 @@ class GameSetup
 
         return [
             'type' => ['required', 'in:quiz,blind_test,drawing,phrase,mini_games,tribunal,bluff'],
-            'packs' => ['exclude_if:type,mini_games', $launch ? 'required' : 'present', 'array', $launch ? 'min:1' : 'min:0', 'max:3'],
+            'packs' => ['exclude_if:type,mini_games', 'present', 'array', 'max:3'],
             'packs.*' => ['integer', 'distinct', 'exists:packs,id'],
             'rounds' => ['required', 'integer', $tours ? 'min:1' : 'min:5', $tours ? 'max:5' : 'max:30'],
             'duration' => ['required', 'integer', in_array($type, ['drawing', 'phrase', 'bluff'], true) ? 'min:30' : 'min:10', in_array($type, ['mini_games', 'tribunal'], true) ? 'max:60' : 'max:150'],

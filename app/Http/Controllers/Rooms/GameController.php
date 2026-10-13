@@ -68,7 +68,7 @@ class GameController extends Controller
     {
         return $this->rooms->locked($code, function (Room $room) use ($request): JsonResponse {
             $this->rooms->requireChief($room, $this->rooms->requirePlayer($room, $request));
-            $packs = $request->validate(['type' => ['sometimes', 'in:quiz,blind_test,drawing,phrase,mini_games,tribunal,bluff'], 'packs' => ['sometimes', 'array', 'min:1', 'max:3'], 'packs.*' => ['integer', 'distinct', 'exists:packs,id']]);
+            $packs = $request->validate(['type' => ['sometimes', 'in:quiz,blind_test,drawing,phrase,mini_games,tribunal,bluff'], 'packs' => ['sometimes', 'array', 'max:3'], 'packs.*' => ['integer', 'distinct', 'exists:packs,id']]);
             $connected = $room->players()->get()->filter(fn ($player) => $player->connected())->count();
             $games = array_values(array_filter(['quiz', 'blind_test', 'drawing', 'phrase', 'mini_games', 'tribunal', 'bluff'], fn ($game) => $connected >= match ($game) {
                 'drawing' => 2, 'phrase', 'tribunal', 'bluff' => 3, default => 1
@@ -81,7 +81,7 @@ class GameController extends Controller
 
             $available = Pack::orderBy('name')->get(['id', 'name'])->filter(fn ($pack) => app(ContentCatalog::class)->query($type, [$pack->id])->exists())->values();
 
-            return response()->json(['games' => $games, 'connectedPlayers' => $connected, 'packs' => $available, 'distinctSongs' => $type === ContentType::BlindTest ? app(BlindChoices::class)->count() : null, 'availability' => $packs === [] ? null : app(RoomContentCatalog::class)->availability($room, $type, $packs)]);
+            return response()->json(['games' => $games, 'connectedPlayers' => $connected, 'packs' => $available, 'distinctSongs' => $type === ContentType::BlindTest ? app(BlindChoices::class)->count() : null, 'availability' => app(RoomContentCatalog::class)->availability($room, $type, $packs)]);
         });
     }
 
@@ -90,7 +90,7 @@ class GameController extends Controller
         return $this->rooms->locked($code, function (Room $room) use ($request): JsonResponse {
             $player = $this->rooms->requirePlayer($room, $request);
             $this->rooms->requireChief($room, $player);
-            $settings = $request->validate(['packs' => ['required', 'array', 'min:1', 'max:3'], 'packs.*' => ['integer', 'distinct', 'exists:packs,id'], 'allow_repeats' => ['required', 'boolean']]);
+            $settings = $request->validate(['packs' => ['present', 'array', 'max:3'], 'packs.*' => ['integer', 'distinct', 'exists:packs,id'], 'allow_repeats' => ['required', 'boolean']]);
             $this->games->recover($room, $settings);
 
             return response()->json($this->rooms->state($room, $player));

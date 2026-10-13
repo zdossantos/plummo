@@ -16,13 +16,16 @@ class ContentCatalog
     public function query(ContentType $type, array $packIds): Builder
     {
         $packIds = array_values(array_unique($packIds));
-        $packs = Pack::with('tags')->whereIn('id', $packIds)->get();
-        if (count($packIds) < 1 || count($packIds) > 3 || $packs->count() !== count($packIds)) {
+        $packs = Pack::with('tags')->when($packIds !== [], fn (Builder $query) => $query->whereIn('id', $packIds))->get();
+        if (count($packIds) > 3 || ($packIds !== [] && $packs->count() !== count($packIds))) {
             throw ValidationException::withMessages(['packs' => __('admin.invalid_packs')]);
         }
 
         return Content::where('type', $type->value)->where('published', true)
             ->where(function (Builder $query) use ($packs): void {
+                if ($packs->isEmpty()) {
+                    $query->whereRaw('1 = 0');
+                }
                 foreach ($packs as $pack) {
                     $ids = $pack->tags->modelKeys();
                     $query->orWhere(function (Builder $group) use ($ids): void {
