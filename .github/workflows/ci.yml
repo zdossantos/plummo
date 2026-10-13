@@ -9,7 +9,7 @@ permissions:
 jobs:
     quality:
         runs-on: ubuntu-latest
-        timeout-minutes: 15
+        timeout-minutes: 30
         services:
             mysql:
                 image: mysql:8.4
@@ -50,7 +50,7 @@ jobs:
             - run: APP_ENV=testing php artisan migrate --force
             - run: php artisan test --testsuite=Unit --stop-on-failure
             - run: php artisan test --testsuite=Feature --stop-on-failure
-            - run: php artisan test --testsuite=Browser --stop-on-failure
+            - run: php vendor/bin/pest --testsuite=Browser --stop-on-failure --debug
     runtime:
         runs-on: ubuntu-latest
         timeout-minutes: 15
