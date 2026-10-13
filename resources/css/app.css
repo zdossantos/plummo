@@ -1554,6 +1554,24 @@
         gap: 4px;
     }
 }
+@media (max-height: 600px) {
+    .setup-heading {
+        gap: 8px;
+    }
+    .setup-heading > h2 {
+        font-size: 18px;
+    }
+    .setup-main {
+        gap: 4px;
+    }
+    .setup-fields span {
+        font-size: 12px;
+        line-height: 16px;
+    }
+    .setup-details {
+        gap: 2px;
+    }
+}
 @media (max-height: 500px) and (min-width: 600px) {
     .setup-main {
         flex-direction: row;
