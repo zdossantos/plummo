@@ -22,7 +22,7 @@ function drawingAction(Room $room, array $values = []): array
 }
 function startDrawing(Room $room, string $token, int $tours = 1): Game
 {
-    test()->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', ['type' => 'drawing', 'packs' => [drawingPack()], 'rounds' => $tours, 'duration' => 90])->assertCreated();
+    test()->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, ['type' => 'drawing', 'packs' => [drawingPack()], 'rounds' => $tours, 'duration' => 90])->assertCreated();
 
     return Game::where('room_id', $room->id)->sole();
 }
@@ -43,12 +43,12 @@ it('requires two players and validates drawing settings, private words and histo
     [$artist, $one] = enterRoom($room);
     $pack = drawingPack();
     $settings = ['type' => 'drawing', 'packs' => [$pack], 'rounds' => 1, 'duration' => 90];
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', $settings)->assertUnprocessable();
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, $settings)->assertUnprocessable();
     [, $two] = enterRoom($room, 'Alex');
-    $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertForbidden();
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', [...$settings, 'rounds' => 6])->assertUnprocessable();
-    $this->postJson('/rooms/'.$room->code.'/games', [...$settings, 'duration' => 29])->assertUnprocessable();
-    $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertCreated()->assertJsonPath('game.phase', 'selecting')->assertJsonCount(3, 'game.me.words')->assertJsonPath('game.round.artistId', $artist);
+    $this->startReadyGame($room, $settings)->assertForbidden();
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, [...$settings, 'rounds' => 6])->assertUnprocessable();
+    $this->startReadyGame($room, [...$settings, 'duration' => 29])->assertUnprocessable();
+    $this->startReadyGame($room, $settings)->assertCreated()->assertJsonPath('game.phase', 'selecting')->assertJsonCount(3, 'game.me.words')->assertJsonPath('game.round.artistId', $artist);
     $this->assertDatabaseCount('room_content_history', 3);
     $this->getJson('/rooms/'.$room->code.'/state')->assertJsonMissingPath('game.me.words')->assertJsonPath('game.round.word', null);
     $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.me.words', [])->assertJsonPath('game.round.word', null);
@@ -139,8 +139,8 @@ it('finishes each player rotation and then returns cumulative results at the poi
     $this->postJson('/rooms/'.$room->code.'/game/lobby')->assertJsonPath('game', null);
     $this->assertDatabaseCount('room_content_history', 6);
     $room->update(['point_target' => 131]);
-    $this->postJson('/rooms/'.$room->code.'/games', ['type' => 'drawing', 'packs' => $game->settings['packs'], 'rounds' => 5, 'duration' => 90])->assertUnprocessable();
-    $this->postJson('/rooms/'.$room->code.'/games', ['type' => 'drawing', 'packs' => $game->settings['packs'], 'rounds' => 1, 'duration' => 90])->assertCreated();
+    $this->startReadyGame($room, ['type' => 'drawing', 'packs' => $game->settings['packs'], 'rounds' => 5, 'duration' => 90])->assertUnprocessable();
+    $this->startReadyGame($room, ['type' => 'drawing', 'packs' => $game->settings['packs'], 'rounds' => 1, 'duration' => 90])->assertCreated();
     $word = chooseDrawing($room, $one);
     $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/drawing/guess', drawingAction($room, ['guess' => $word]))->assertJsonPath('game.phase', 'reveal');
     $this->travel(3)->seconds();

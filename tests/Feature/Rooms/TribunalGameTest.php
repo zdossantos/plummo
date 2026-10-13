@@ -35,7 +35,7 @@ it('draws a new published subject from the selected pack without repetition', fu
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, tribunalSettings())->assertCreated();
     $game = Game::latest('id')->firstOrFail();
     $state = $game->state;
     $previous = $state['round']['content_id'];
@@ -52,10 +52,10 @@ it('requires three players and starts with packs with two advocates and a jury',
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     $this->withCookie('plummo_player_'.$room->code, $token);
-    $this->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertUnprocessable();
+    $this->startReadyGame($room, tribunalSettings())->assertUnprocessable();
     enterRoom($room, 'Trois');
     $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/game-options', ['type' => 'tribunal'])->assertOk()->assertJsonCount(2, 'packs');
-    $response = $this->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertCreated()->assertJsonPath('game.phase', 'preparing')->assertJsonCount(2, 'game.round.advocates');
+    $response = $this->startReadyGame($room, tribunalSettings())->assertCreated()->assertJsonPath('game.phase', 'preparing')->assertJsonCount(2, 'game.round.advocates');
     expect($response->json('game.round.question'))->not->toBeEmpty();
     $this->assertDatabaseCount('room_content_history', 1);
 });
@@ -67,7 +67,7 @@ it('permits only the current speaker to finish and keeps votes private until a s
         [$id, $token] = enterRoom($room, $name);
         $tokens[$id] = $token;
     }
-    $this->withCookie('plummo_player_'.$room->code, reset($tokens))->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, reset($tokens))->startReadyGame($room, tribunalSettings())->assertCreated();
     tribunalDeadline();
     $view = $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.phase', 'speaking_first')->json('game');
     $data = ['game_id' => $view['id'], 'round' => 1];
@@ -93,7 +93,7 @@ it('gives everyone each camp once per tour without repeating a topic', function 
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, tribunalSettings())->assertCreated();
     $camps = [[], []];
     $topics = [];
     foreach (range(1, 3) as $round) {
@@ -120,7 +120,7 @@ it('cancels a debate when its advocate leaves and never pays its partial votes',
         [$id, $token] = enterRoom($room, $name);
         $tokens[$id] = $token;
     }
-    $this->withCookie('plummo_player_'.$room->code, reset($tokens))->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, reset($tokens))->startReadyGame($room, tribunalSettings())->assertCreated();
     foreach (range(1, 3) as $phase) {
         tribunalDeadline();
         $this->getJson('/rooms/'.$room->code.'/state')->assertOk();
@@ -144,7 +144,7 @@ it('retains a departed juror vote and finishes when remaining connected jurors h
         [$id, $token] = enterRoom($room, $name);
         $tokens[$id] = $token;
     }
-    $this->withCookie('plummo_player_'.$room->code, reset($tokens))->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, reset($tokens))->startReadyGame($room, tribunalSettings())->assertCreated();
     foreach (range(1, 3) as $phase) {
         tribunalDeadline();
         $this->getJson('/rooms/'.$room->code.'/state');
@@ -165,7 +165,7 @@ it('keeps newcomers out of the current tour and includes them in the next one', 
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', tribunalSettings(['rounds' => 2]))->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, tribunalSettings(['rounds' => 2]))->assertCreated();
     [$late, $lateToken] = enterRoom($room, 'Nouveau');
     $this->withCookie('plummo_player_'.$room->code, $lateToken);
     foreach (range(1, 3) as $round) {
@@ -183,7 +183,7 @@ it('applies bonus clock debt to voting only even with a long speech duration', f
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', tribunalSettings(['duration' => 60, 'bonuses' => true]))->assertCreated()->assertJsonPath('game.bonuses.canUse', false);
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, tribunalSettings(['duration' => 60, 'bonuses' => true]))->assertCreated()->assertJsonPath('game.bonuses.canUse', false);
     $game = Game::latest('id')->firstOrFail();
     $state = $game->state;
     $state['bonuses']['debt'] = 6;
@@ -204,7 +204,7 @@ it('moves on to a new tour when no original jury remains but newcomers can play'
     [$id, $token] = enterRoom($room);
     [$two] = enterRoom($room, 'Deux');
     [$three] = enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', tribunalSettings(['rounds' => 2]))->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, tribunalSettings(['rounds' => 2]))->assertCreated();
     enterRoom($room, 'Nouveau');
     enterRoom($room, 'Autre');
     RoomPlayer::findOrFail($two)->update(['left_at' => now()]);
@@ -219,7 +219,7 @@ it('skips the rest of a tour with two original survivors instead of waiting fore
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', tribunalSettings(['rounds' => 2]))->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, tribunalSettings(['rounds' => 2]))->assertCreated();
     $game = Game::latest('id')->firstOrFail();
     $jury = array_values(array_diff($game->state['round']['participants'], $game->state['round']['advocates']))[0];
     $state = $game->state;
@@ -239,7 +239,7 @@ it('freezes a speech through pause and rejects stale or malformed actions', func
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, tribunalSettings())->assertCreated();
     tribunalDeadline();
     $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.phase', 'speaking_first');
     $game = Game::latest('id')->firstOrFail();
@@ -262,7 +262,7 @@ it('stops after the verdict when the session target is reached', function () {
         [$id, $token] = enterRoom($room, $name);
         $tokens[$id] = $token;
     }
-    $this->withCookie('plummo_player_'.$room->code, reset($tokens))->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, reset($tokens))->startReadyGame($room, tribunalSettings())->assertCreated();
     foreach (range(1, 3) as $phase) {
         tribunalDeadline();
         $this->getJson('/rooms/'.$room->code.'/state');
@@ -280,7 +280,7 @@ it('waits with two players and continues without replaying the canceled debate a
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, tribunalSettings())->assertCreated();
     $game = Game::latest('id')->firstOrFail();
     $left = $game->state['round']['advocates'][1];
     RoomPlayer::findOrFail($left)->update(['left_at' => now()]);
@@ -301,10 +301,10 @@ it('filters published subjects by pack and snapshots the current subject despite
     Content::where('type', 'tribunal')->where('id', '!=', $content->id)->update(['published' => false]);
     $this->withCookie('plummo_player_'.$room->code, $token);
     $this->postJson('/rooms/'.$room->code.'/game-options', ['type' => 'tribunal', 'packs' => [$pack]])->assertJsonPath('availability.total', 1)->assertJsonCount(1, 'packs');
-    $this->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertUnprocessable()->assertJsonValidationErrors('packs');
-    $this->postJson('/rooms/'.$room->code.'/games', [...tribunalSettings(), 'packs' => []])->assertUnprocessable();
+    $this->startReadyGame($room, tribunalSettings())->assertUnprocessable()->assertJsonValidationErrors('packs');
+    $this->startReadyGame($room, [...tribunalSettings(), 'packs' => []])->assertUnprocessable();
     $question = $content->payload['question'];
-    $this->postJson('/rooms/'.$room->code.'/games', tribunalSettings(['allow_repeats' => true]))->assertCreated()->assertJsonPath('game.round.question', $question);
+    $this->startReadyGame($room, tribunalSettings(['allow_repeats' => true]))->assertCreated()->assertJsonPath('game.round.question', $question);
     $content->delete();
     $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.round.question', $question);
 });
@@ -314,7 +314,7 @@ it('pauses on exhausted subjects and recovers without skipping a debate or losin
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', tribunalSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, tribunalSettings())->assertCreated();
     $game = Game::latest('id')->firstOrFail();
     $state = $game->state;
     $queue = $state['queue'];

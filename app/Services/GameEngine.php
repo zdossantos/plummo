@@ -24,6 +24,8 @@ class GameEngine
         if ($room->point_target !== null && (int) $room->players()->max('score') >= $room->point_target) {
             throw ValidationException::withMessages(['target' => __('rooms.target_reached')]);
         }
+        app(GameSetup::class)->requireReady($room, $settings);
+        app(GameSetup::class)->reset($room);
         if ($settings['type'] === 'drawing') {
             return app(DrawingGame::class)->start($room, $settings);
         }

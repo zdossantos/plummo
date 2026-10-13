@@ -208,7 +208,15 @@ games.bluffWriting = {
     ...base,
     type: 'bluff',
     phase: 'writing',
-    round: { ...base.round, question: ('Une définition mystérieuse demande une explication inventée et convaincante pour tromper les autres joueurs. ').repeat(5).slice(0, 500), index: 0, entries: [] },
+    round: {
+        ...base.round,
+        question:
+            'Une définition mystérieuse demande une explication inventée et convaincante pour tromper les autres joueurs. '
+                .repeat(5)
+                .slice(0, 500),
+        index: 0,
+        entries: [],
+    },
     me: {
         ...base.me,
         draft: '',
@@ -685,16 +693,26 @@ for (const [width, height] of formats.filter(
                 expected,
             );
             if (mode === 'bluffWriting' && width < 1000) {
-                await page.evaluate(() => { window.bluffSlow = true; });
+                await page.evaluate(() => {
+                    window.bluffSlow = true;
+                });
                 const field = page.locator('#bluff-draft');
                 await field.fill('Un bluff en cours');
                 await page.waitForTimeout(450);
-                assert.ok(await field.isEnabled(), 'Autosave disabled the editor');
-                assert.ok(await field.evaluate((el) => document.activeElement === el), 'Autosave lost keyboard focus');
+                assert.ok(
+                    await field.isEnabled(),
+                    'Autosave disabled the editor',
+                );
+                assert.ok(
+                    await field.evaluate((el) => document.activeElement === el),
+                    'Autosave lost keyboard focus',
+                );
                 await field.press('End');
                 await field.press('!');
                 await page.waitForTimeout(1400);
-                await page.evaluate(() => { window.bluffSlow = false; });
+                await page.evaluate(() => {
+                    window.bluffSlow = false;
+                });
             }
             if (mode === 'bluffVoting') {
                 const colors = await page
@@ -732,6 +750,158 @@ for (const [width, height] of formats.filter(
             });
         await page.evaluate(() => window.unmountLayout());
     }
+
+let preparationChecks = 0;
+for (const language of ['fr', 'en']) {
+    const locale = JSON.parse(
+        execFileSync(
+            process.env.PHP_BINARY || 'php',
+            [
+                '-r',
+                `echo json_encode(['rooms'=>require '${root}/lang/${language}/rooms.php','interface'=>require '${root}/lang/${language}/interface.php']);`,
+            ],
+            { encoding: 'utf8' },
+        ),
+    );
+    for (const [width, height] of formats.filter(
+        ([w, h]) =>
+            !process.env.PLUMMO_VIEWPORT_FORMAT ||
+            process.env.PLUMMO_VIEWPORT_FORMAT === `${w}x${h}`,
+    )) {
+        for (const type of [
+            'quiz',
+            'blind_test',
+            'drawing',
+            'phrase',
+            'tribunal',
+            'bluff',
+            'mini_games',
+        ]) {
+            for (const chief of [false, true]) {
+                await page.setViewportSize({ width, height });
+                await page.setContent(
+                    '<base href="https://offline.local"><div id="app"></div>',
+                );
+                await page.addStyleTag({ content: css });
+                await page.evaluate((t) => {
+                    window.translations = t;
+                    window.process = { env: { NODE_ENV: 'production' } };
+                    window.fetch = async () => ({
+                        ok: true,
+                        json: async () => ({
+                            packs: [{ id: 1, name: 'Pack Plummo' }],
+                            connectedPlayers: 8,
+                            distinctSongs: 20,
+                            availability: { total: 100, unseen: 100 },
+                        }),
+                    });
+                }, locale);
+                await page.addScriptTag({ content: js });
+                await page.evaluate(
+                    ({ type, chief }) => window.mountPreparation(type, chief),
+                    { type, chief },
+                );
+                await page.locator('[data-game-rules]').waitFor();
+                await page.evaluate(() => document.fonts.ready);
+                await page.waitForTimeout(100);
+                const inside = () =>
+                    page.evaluate(() => ({
+                        overflow:
+                            document.documentElement.scrollHeight >
+                                innerHeight + 1 ||
+                            document.documentElement.scrollWidth >
+                                innerWidth + 1,
+                        outside: [...document.querySelectorAll('button,input')]
+                            .filter((e) => {
+                                const r = e.getBoundingClientRect();
+                                return (
+                                    r.width &&
+                                    r.height &&
+                                    (r.top < 0 ||
+                                        r.bottom > innerHeight + 1 ||
+                                        r.left < 0 ||
+                                        r.right > innerWidth + 1)
+                                );
+                            })
+                            .map((e) => e.outerHTML.slice(0, 180)),
+                    }));
+                const before = await inside();
+                assert.equal(
+                    before.overflow,
+                    false,
+                    `Preparation ${language} ${type} ${chief} ${width}x${height} overflow`,
+                );
+                assert.deepEqual(
+                    before.outside,
+                    [],
+                    `Preparation ${language} ${type} ${chief} ${width}x${height} controls outside`,
+                );
+                await page.locator('[data-game-rules]').click();
+                await page.locator('.reader-text').waitFor();
+                await page.waitForTimeout(100);
+                assert.deepEqual(
+                    await inside(),
+                    { overflow: false, outside: [] },
+                    `Rules ${language} ${type} ${width}x${height}`,
+                );
+                if (
+                    process.env.VIEWPORT_SCREENSHOTS &&
+                    width === 320 &&
+                    type === 'mini_games'
+                )
+                    await page.screenshot({
+                        path: cache + `/rules-${language}-${chief}.png`,
+                    });
+                let read = '';
+                for (let index = 0; index < 100; index++) {
+                    const reader = await page
+                        .locator('.reader-text')
+                        .evaluate((e) => ({
+                            text: e.textContent,
+                            overflow:
+                                e.scrollHeight > e.clientHeight + 1 ||
+                                e.scrollWidth > e.clientWidth + 1,
+                        }));
+                    assert.equal(
+                        reader.overflow,
+                        false,
+                        `Rules reader ${language} ${type} ${width}x${height} page ${index + 1} overflow`,
+                    );
+                    read += reader.text;
+                    const next = page
+                        .locator('.game-drawer .page-controls button')
+                        .last();
+                    if (!(await next.count()) || (await next.isDisabled()))
+                        break;
+                    await next.click();
+                }
+                const expected = [
+                    locale.rooms['rules_' + type],
+                    ...(type === 'mini_games'
+                        ? ['memory', 'hide', 'count', 'cups', 'author'].map(
+                              (trial) => locale.rooms['rules_trial_' + trial],
+                          )
+                        : []),
+                    locale.rooms.rules_clock,
+                ].join('\n\n');
+                assert.equal(
+                    read,
+                    expected,
+                    `Rules ${language} ${type}: pagination lost text`,
+                );
+                await page
+                    .locator('.game-drawer [data-slot="drawer-close"]')
+                    .click();
+                await page.locator('[data-ready]').waitFor();
+                await page.evaluate(() => window.unmountLayout());
+                preparationChecks++;
+            }
+        }
+    }
+}
+console.log(
+    `${preparationChecks} preparation and rules checks passed in French and English.`,
+);
 await browser.close();
 fs.writeFileSync(cache + '/results.json', JSON.stringify(results, null, 2));
 assert.deepEqual(errors, [], 'Vue rendering or console errors');

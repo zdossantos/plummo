@@ -59,7 +59,25 @@ export type BonusState = {
         deflected?: boolean;
     })[];
 };
+export type GameType =
+    | 'quiz'
+    | 'blind_test'
+    | 'drawing'
+    | 'phrase'
+    | 'mini_games'
+    | 'tribunal'
+    | 'bluff';
+export type GameSetupState = {
+    type: GameType;
+    packs?: number[];
+    trials?: MiniTrial[];
+    rounds: number;
+    duration: number;
+    allow_repeats?: boolean;
+    bonuses?: boolean;
+};
 export type Player = {
+    ready?: boolean;
     id: number;
     name: string;
     color: string;
@@ -69,6 +87,8 @@ export type Player = {
     status: 'connected' | 'disconnected' | 'waiting' | 'left';
 };
 export type RoomState = {
+    gameSetup?: GameSetupState | null;
+    setupRevision?: number;
     audioReady?: boolean;
     code: string;
     capacity: number;

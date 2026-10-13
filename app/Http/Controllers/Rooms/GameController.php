@@ -10,6 +10,7 @@ use App\Services\BlindChoices;
 use App\Services\BluffGame;
 use App\Services\ContentCatalog;
 use App\Services\GameEngine;
+use App\Services\GameSetup;
 use App\Services\MiniGames;
 use App\Services\MiniGameScenes;
 use App\Services\RoomContentCatalog;
@@ -29,10 +30,37 @@ class GameController extends Controller
         return $this->rooms->locked($code, function (Room $room) use ($request): JsonResponse {
             $player = $this->rooms->requirePlayer($room, $request);
             $this->rooms->requireChief($room, $player);
-            $settings = $request->validate(['type' => ['required', 'in:quiz,blind_test,drawing,phrase,mini_games,tribunal,bluff'], 'packs' => ['exclude_if:type,mini_games', 'required', 'array', 'min:1', 'max:3'], 'packs.*' => ['integer', 'distinct', 'exists:packs,id'], 'rounds' => ['required', 'integer', in_array($request->input('type'), ['drawing', 'phrase', 'tribunal'], true) ? 'min:1' : 'min:5', in_array($request->input('type'), ['drawing', 'phrase', 'tribunal'], true) ? 'max:5' : 'max:30'], 'duration' => ['required', 'integer', in_array($request->input('type'), ['drawing', 'phrase', 'bluff'], true) ? 'min:30' : 'min:10', in_array($request->input('type'), ['mini_games', 'tribunal'], true) ? 'max:60' : 'max:150'], 'trials' => ['required_if:type,mini_games', 'array', 'min:1', 'max:5'], 'trials.*' => ['string', 'distinct', 'in:'.implode(',', MiniGameScenes::TRIALS)], 'allow_repeats' => ['sometimes', 'boolean'], 'bonuses' => ['sometimes', 'boolean']]);
+            $settings = GameSetup::normalize($request->validate(GameSetup::rules($request, true)));
             $this->games->start($room, $settings);
 
             return response()->json($this->rooms->state($room, $player), 201);
+        });
+    }
+
+    public function setup(Request $request, string $code): JsonResponse
+    {
+        return $this->rooms->locked($code, function (Room $room) use ($request): JsonResponse {
+            $player = $this->rooms->requirePlayer($room, $request);
+            $this->rooms->requireChief($room, $player);
+            abort_if($this->games->active($room) !== null, 409);
+            $settings = GameSetup::normalize($request->validate(GameSetup::rules($request, false)));
+            app(GameSetup::class)->configure($room, $settings);
+
+            return response()->json($this->rooms->state($room, $player));
+        });
+    }
+
+    public function ready(Request $request, string $code): JsonResponse
+    {
+        return $this->rooms->locked($code, function (Room $room) use ($request): JsonResponse {
+            $player = $this->rooms->requirePlayer($room, $request);
+            abort_unless($player->connected(), 403);
+            abort_if($this->games->active($room) !== null || $room->game_setup === null, 409);
+            $values = $request->validate(['ready' => ['required', 'boolean'], 'revision' => ['required', 'integer', 'min:0']]);
+            abort_unless($values['revision'] === $room->setup_revision, 409);
+            $player->update(['ready_revision' => $values['ready'] ? $room->setup_revision : null]);
+
+            return response()->json($this->rooms->state($room, $player));
         });
     }
 

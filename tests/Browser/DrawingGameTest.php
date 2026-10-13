@@ -20,6 +20,8 @@ it('draws from two separate phones and plays every artist before returning to th
         $second = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Alex')->click('Continue')->click('Enter the room')->assertSee('Alex');
         $first->click('[data-choose-game]')->click('[data-game-option="drawing"]')->assertSee('Prepare a drawing game');
         $first->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")')->assertSee('2 drawings');
+        confirmReadyPhone($first, $room);
+        confirmReadyPhone($second, $room);
         $first->page()->locator('button:has-text("Start drawing")')->click(['noWaitAfter' => true]);
         $first->assertSee('Choose a word');
         $second->assertSee('Camille is choosing a word');
@@ -150,6 +152,8 @@ it('darkens only the TV canvas and opponents phones when the artist launches lig
         $first->click('[data-choose-game]')->click('[data-game-option="drawing"]')->assertSee('Prepare a drawing game');
         $first->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")')->assertSee('2 drawings');
         $first->click('label:has-text("Prank bonuses")');
+        confirmReadyPhone($first, $room);
+        confirmReadyPhone($second, $room);
         $first->page()->locator('button:has-text("Start drawing")')->click(['noWaitAfter' => true]);
         $first->assertSee('Choose a word');
         $second->assertSee('Camille is choosing a word');

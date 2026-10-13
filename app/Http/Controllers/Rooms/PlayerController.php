@@ -60,7 +60,7 @@ class PlayerController extends Controller
     {
         return $this->rooms->locked($code, function (Room $room) use ($request): JsonResponse {
             $player = $this->rooms->requirePlayer($room, $request);
-            $player->update(['left_at' => now(), 'waiting' => false]);
+            $player->update(['left_at' => now(), 'waiting' => false, 'ready_revision' => null]);
             app(GameEngine::class)->withdraw($room, $player);
             $this->rooms->refreshPresence($room);
 

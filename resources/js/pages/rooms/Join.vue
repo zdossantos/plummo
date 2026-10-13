@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import BonusLaunch from '@/components/BonusLaunch.vue';
 import BonusPocket from '@/components/BonusPocket.vue';
@@ -10,6 +10,8 @@ import PlummoPicker from '@/components/PlummoPicker.vue';
 import ChatComposer from '@/components/ChatComposer.vue';
 import GamePlay from '@/components/GamePlay.vue';
 import GameSetup from '@/components/GameSetup.vue';
+import GameReadiness from '@/components/GameReadiness.vue';
+import GameRules from '@/components/GameRules.vue';
 import SessionSettings from '@/components/SessionSettings.vue';
 import RoomRanking from '@/components/RoomRanking.vue';
 import ViewportShell from '@/components/ViewportShell.vue';
@@ -18,7 +20,7 @@ import RoomNotice from '@/components/RoomNotice.vue';
 import PhonePointsFeedback from '@/components/PhonePointsFeedback.vue';
 import { useRoom } from '@/composables/useRoom';
 import { useTranslations } from '@/composables/useTranslations';
-import type { Catalog, Player } from '@/types/rooms';
+import type { Catalog, Player, GameSetupState } from '@/types/rooms';
 const props = defineProps<{
     code: string | null;
     me: Player | null;
@@ -52,6 +54,72 @@ const chief = computed(
     () =>
         me.value?.status === 'connected' && room.value?.chiefId === me.value.id,
 );
+const pendingSetup = ref<GameSetupState | null>(null);
+const setupFailed = ref(false);
+const savingSetup = ref(false);
+let setupTimer: ReturnType<typeof setTimeout> | undefined;
+const setupPending = computed(() => !!pendingSetup.value || savingSetup.value);
+const allReady = computed(() => {
+    const players =
+        room.value?.players.filter((player) => player.status === 'connected') ??
+        [];
+    return (
+        !!room.value?.gameSetup &&
+        !setupPending.value &&
+        players.length > 0 &&
+        players.every((player) => player.ready)
+    );
+});
+function changeSetup(settings: GameSetupState) {
+    pendingSetup.value = JSON.parse(JSON.stringify(settings)) as GameSetupState;
+    setupFailed.value = false;
+    clearTimeout(setupTimer);
+    setupTimer = setTimeout(() => void saveSetup(), 250);
+}
+async function saveSetup() {
+    if (
+        busy.value ||
+        savingSetup.value ||
+        !chief.value ||
+        game.value ||
+        !pendingSetup.value
+    )
+        return;
+    savingSetup.value = true;
+    while (pendingSetup.value && chief.value && !game.value) {
+        const settings: GameSetupState = pendingSetup.value;
+        const saved = await request(
+            'game-setup',
+            'POST',
+            settings,
+            false,
+            true,
+        );
+        if (!saved) {
+            setupFailed.value = true;
+            break;
+        }
+        if (pendingSetup.value === settings) pendingSetup.value = null;
+    }
+    savingSetup.value = false;
+}
+watch(busy, (value) => {
+    if (!value && !savingSetup.value && !setupFailed.value) void saveSetup();
+});
+watch([chief, () => game.value?.id], () => {
+    if (!chief.value || game.value) {
+        pendingSetup.value = null;
+        setupFailed.value = false;
+    }
+});
+onUnmounted(() => clearTimeout(setupTimer));
+function confirmReady(ready: boolean) {
+    if (!setupPending.value)
+        void request('ready', 'POST', {
+            ready,
+            revision: room.value?.setupRevision,
+        });
+}
 const profile = computed(() => ({
     name: name.value,
     color: color.value,
@@ -244,6 +312,15 @@ watch(chief, (value) => {
                     <span class="text-summary"
                         >{{ me.name }} · {{ me.score }} {{ t('score') }}</span
                     ><span class="text-primary">{{ code }}</span>
+                    <GameRules
+                        v-if="game"
+                        :type="game.type"
+                        :trials="
+                            game.type === 'mini_games'
+                                ? game.settings.trials
+                                : undefined
+                        "
+                    />
                     <GameControls
                         v-if="me.status !== 'left'"
                         v-model="view"
@@ -304,7 +381,9 @@ watch(chief, (value) => {
                             :key="game?.id ?? 0"
                             :code="code"
                             :audio-ready="room?.audioReady"
-                            :busy="busy"
+                            :busy="busy || setupPending"
+                            :can-start="allReady"
+                            :initial-setup="room?.gameSetup"
                             :recover="game?.exhausted"
                             :initial-packs="game?.settings.packs"
                             :initial-type="game?.type"
@@ -313,6 +392,7 @@ watch(chief, (value) => {
                                     (player) => player.status === 'connected',
                                 ).length
                             "
+                            @change="changeSetup"
                             @start="
                                 request(
                                     game?.exhausted ? 'game-recovery' : 'games',
@@ -320,7 +400,30 @@ watch(chief, (value) => {
                                     $event,
                                 )
                             "
-                        />
+                        >
+                            <template #readiness>
+                                <GameReadiness
+                                    v-if="room"
+                                    :players="room.players"
+                                    :me="me"
+                                    :revision="room.setupRevision"
+                                    :disabled="
+                                        busy || setupPending || !room.gameSetup
+                                    "
+                                    @ready="confirmReady"
+                                />
+                                <Button
+                                    v-if="setupFailed"
+                                    type="button"
+                                    variant="outline"
+                                    @click="
+                                        setupFailed = false;
+                                        saveSetup();
+                                    "
+                                    >{{ t('retry') }}</Button
+                                >
+                            </template>
+                        </GameSetup>
                         <GamePlay
                             v-if="game && room && !game.exhausted"
                             :game="game"
@@ -390,6 +493,27 @@ watch(chief, (value) => {
                                         : t('phone_hint')
                                 }}
                             </p>
+                            <template
+                                v-if="
+                                    !game &&
+                                    room &&
+                                    !chief &&
+                                    me.status === 'connected'
+                                "
+                            >
+                                <GameRules
+                                    v-if="room.gameSetup"
+                                    :type="room.gameSetup.type"
+                                    :trials="room.gameSetup.trials"
+                                />
+                                <GameReadiness
+                                    :players="room.players"
+                                    :me="me"
+                                    :revision="room.setupRevision"
+                                    :disabled="busy || !room.gameSetup"
+                                    @ready="confirmReady"
+                                />
+                            </template>
                             <GamePlummoAvatar
                                 :connected="connected"
                                 :game="game"

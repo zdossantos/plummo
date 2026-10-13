@@ -34,6 +34,8 @@ it('launches a collective bonus in one click while phone and screen stay inside 
         $first->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")');
         $first->assertSee('Prank bonuses')->click('label:has-text("Prank bonuses")');
         $first->fill('game-rounds', '5')->fill('game-duration', '60');
+        confirmReadyPhone($first, $room);
+        confirmReadyPhone($second, $room);
         $first->page()->locator('button:has-text("Start quiz")')->click(['noWaitAfter' => true]);
         $first->assertSee('Quiz · Question 1 / 5');
         expect(Game::where('room_id', $room->id)->sole()->settings['bonuses'])->toBeTrue();
@@ -130,7 +132,10 @@ it('changes a held drawing stroke at paint activation and expiry without losing 
         $second = visit('/join/'.$room->code)->on()->mobile()->withLocale('en-US')->fill('player-name', 'Alex')->click('Continue')->click('Enter the room')->assertSee('Alex');
         $first->click('[data-choose-game]')->click('[data-game-option="drawing"]');
         $first->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")');
-        $first->assertSee('Prank bonuses')->click('label:has-text("Prank bonuses")')->click('button:has-text("Start drawing")');
+        $first->assertSee('Prank bonuses')->click('label:has-text("Prank bonuses")');
+        confirmReadyPhone($first, $room);
+        confirmReadyPhone($second, $room);
+        $first->click('button:has-text("Start drawing")');
         $first->assertSee('Choose a word');
         $first->page()->locator('[data-testid="drawing-word"]')->first()->click(['noWaitAfter' => true]);
         $first->assertPresent('[data-testid="drawing-board"]');
@@ -181,6 +186,8 @@ it('keeps collective overlays usable and accepts only one of two simultaneous la
         $first->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")');
         $first->assertSee('Prank bonuses')->click('label:has-text("Prank bonuses")');
         $first->fill('game-rounds', '5')->fill('game-duration', '60');
+        confirmReadyPhone($first, $room);
+        confirmReadyPhone($second, $room);
         $first->page()->locator('button:has-text("Start quiz")')->click(['noWaitAfter' => true]);
         $first->assertSee('Quiz · Question 1 / 5');
         expect(Game::where('room_id', $room->id)->sole()->settings['bonuses'])->toBeTrue();
@@ -262,6 +269,8 @@ it('temporarily hides artists on opponents phones and restores all eight answers
         $first->click('[data-choose-game]')->click('[data-game-option="blind_test"]');
         $first->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")');
         $first->click('label:has-text("Prank bonuses")')->fill('game-rounds', '5')->fill('game-duration', '60');
+        confirmReadyPhone($first, $room);
+        confirmReadyPhone($second, $room);
         $first->page()->locator('button:has-text("Start blind test")')->click(['noWaitAfter' => true]);
         $first->assertSee('Blind test · Clip 1 / 5');
         $second->assertPresent('.game-choices .text-summary');

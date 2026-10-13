@@ -43,7 +43,7 @@ php artisan test
 docker build --target runtime -t plummo:ci .
 ```
 
-Les contrôles de composants `bun run test:viewport` utilisent Chromium sans serveur ni base de données : dix formats, du téléphone 320×568 au grand écran 1920×1080, avec vérification des débordements, du dessin, des lecteurs de réponse et des couleurs sous le malus dé. Installer Chromium avec `bunx playwright install chromium`. `PHP_BINARY` permet de choisir le binaire PHP ; `VIEWPORT_SCREENSHOTS=1` conserve les captures dans `node_modules/.cache/plummo-viewport`. Les parcours complets restent vérifiés par les tests navigateur avec MySQL.
+Les contrôles de composants `bun run test:viewport` utilisent Chromium sans serveur ni base de données : dix formats, du téléphone 320×568 au grand écran 1920×1080, avec vérification des débordements, du dessin, des lecteurs de réponse, des préparations et règles FR/EN des sept jeux et des couleurs sous le malus dé. Installer Chromium avec `bunx playwright install chromium`. `PHP_BINARY` permet de choisir le binaire PHP ; `VIEWPORT_SCREENSHOTS=1` conserve les captures dans `node_modules/.cache/plummo-viewport`. Les parcours complets restent vérifiés par les tests navigateur avec MySQL.
 
 Les tests métier et navigateur utilisent exclusivement MySQL `plummo_testing`. Démarrer MySQL puis migrer explicitement cette base avant les tests :
 

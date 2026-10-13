@@ -34,7 +34,11 @@ it('keeps the tribunal passive on TV and playable without scroll on compact phon
             $page = visit('/join/'.$room->code, ['viewport' => ['width' => $width, 'height' => $height]])->withLocale('en-US')->fill('player-name', $name)->click('Continue')->click('Enter the room')->assertSee($name);
             $pages[$room->players()->latest('id')->firstOrFail()->id] = $page;
         }
-        reset($pages)->refresh()->click('[data-choose-game]')->click('[data-game-option="tribunal"]')->assertSee('Prepare the tribunal')->assertSee('Content packs')->click('[data-choose-packs]')->check($pack->name)->click('Close')->assertDontSee('{count}')->click('Open the tribunal')->assertPresent('[data-testid="tribunal-play"]');
+        reset($pages)->refresh()->click('[data-choose-game]')->click('[data-game-option="tribunal"]')->assertSee('Prepare the tribunal')->assertSee('Content packs')->click('[data-choose-packs]')->check($pack->name)->click('Close')->assertDontSee('{count}');
+        foreach ($pages as $controller) {
+            confirmReadyPhone($controller, $room);
+        }
+        reset($pages)->click('Open the tribunal')->assertPresent('[data-testid="tribunal-play"]');
         $game = Game::where('room_id', $room->id)->latest('id')->firstOrFail();
         $jury = array_values(array_diff(array_keys($pages), $game->state['round']['advocates']))[0];
         $page = $phone ? $pages[$jury] : $screen;

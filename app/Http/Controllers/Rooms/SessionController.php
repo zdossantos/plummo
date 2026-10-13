@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Rooms;
 use App\Http\Controllers\Controller;
 use App\Models\Room;
 use App\Services\GameEngine;
+use App\Services\GameSetup;
 use App\Services\RoomService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,6 +37,10 @@ class SessionController extends Controller
                 }
             } else {
                 $target = $data['target'] === null ? null : (int) $data['target'];
+            }
+            if ($room->point_target !== $target || $data['action'] === 'restart') {
+                app(GameSetup::class)->reset($room);
+                $player->refresh();
             }
             if ($data['action'] === 'restart') {
                 $room->players()->update(['score' => 0]);

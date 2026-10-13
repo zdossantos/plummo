@@ -71,7 +71,7 @@ class RoomService
         foreach ($players as $player) {
             if ($player->left_at === null && $player->disconnected_at === null && $player->last_seen_at->addSeconds(15)->lte(now())) {
                 app(GameEngine::class)->withdraw($room, $player);
-                $player->update(['disconnected_at' => $player->last_seen_at->addSeconds(15)]);
+                $player->update(['disconnected_at' => $player->last_seen_at->addSeconds(15), 'ready_revision' => null]);
             }
         }
         if ($players->contains(fn (RoomPlayer $player): bool => $player->connected())) {
@@ -177,6 +177,7 @@ class RoomService
         } else {
             if (! $player->connected()) {
                 $player->connected_since = now();
+                $player->ready_revision = null;
             }
             $player->update(['left_at' => null, 'waiting' => false, 'last_seen_at' => now(), 'disconnected_at' => null]);
             $room->update(['empty_since' => null]);
@@ -214,6 +215,7 @@ class RoomService
             'game' => $game,
             'room' => [
                 'code' => $room->code, 'capacity' => 8, 'occupied' => $this->occupied($room), 'chiefId' => $this->chiefId($room),
+                'gameSetup' => $room->game_setup, 'setupRevision' => $room->setup_revision,
                 'audioReady' => $this->audioReady($room), 'pointTarget' => $room->point_target, 'ranking' => $this->ranking($room),
                 'players' => $room->players()->orderBy('id')->get()->filter(fn (RoomPlayer $player): bool => $player->occupiesPlace())->map(fn (RoomPlayer $player): array => $player->publicData())->values()->all(),
             ],

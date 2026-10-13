@@ -12,9 +12,11 @@ import {
 import { BookOpen } from '@lucide/vue';
 import PageControls from '@/components/PageControls.vue';
 import { useTranslations } from '@/composables/useTranslations';
+defineOptions({ inheritAttrs: false });
 const props = defineProps<{
     text: string;
     label?: string;
+    triggerLabel?: string;
     force?: boolean;
     upside?: boolean;
 }>();
@@ -60,35 +62,54 @@ const reader = ref<HTMLElement>();
 const { width, height } = useElementSize(reader);
 const parts = computed(() => {
     const element = reader.value;
-    const style = element ? getComputedStyle(element) : null;
-    const context = document.createElement('canvas').getContext('2d');
-    if (context) context.font = style?.font || '18px sans-serif';
-    const lineHeight = parseFloat(style?.lineHeight || '') || 28;
-    const lines = Math.max(
-        1,
-        Math.floor((height.value || 100) / lineHeight) - 1,
-    );
-    const available = Math.max(40, width.value || 200);
+    if (!element || !width.value || !height.value) return [props.text];
+    // Measure browser word wrapping with the reader's actual typography.
+    const probe = element.cloneNode(false) as HTMLElement;
+    Object.assign(probe.style, {
+        position: 'fixed',
+        visibility: 'hidden',
+        pointerEvents: 'none',
+        display: 'block',
+        width: `${width.value}px`,
+        height: 'auto',
+        minHeight: '0',
+        flex: 'none',
+        inset: '0 auto auto 0',
+    });
+    element.parentElement?.append(probe);
+    const characters = Array.from(props.text);
     const pages: string[] = [];
-    let part = '',
-        line = 0,
-        used = 0;
-    for (const char of Array.from(props.text)) {
-        const size = context?.measureText(char).width || 18;
-        const wraps = char === '\n' || used + size > available;
-        if (wraps && line + 1 >= lines && part) {
-            pages.push(part);
-            part = '';
-            line = 0;
-            used = 0;
-        } else if (wraps) {
-            line++;
-            used = 0;
+    let offset = 0;
+    try {
+        while (offset < characters.length) {
+            let low = 1;
+            let high = characters.length - offset;
+            let fits = 1;
+            while (low <= high) {
+                const length = Math.floor((low + high) / 2);
+                probe.textContent = characters
+                    .slice(offset, offset + length)
+                    .join('');
+                if (probe.getBoundingClientRect().height <= height.value) {
+                    fits = length;
+                    low = length + 1;
+                } else {
+                    high = length - 1;
+                }
+            }
+            if (offset + fits < characters.length) {
+                const boundary = characters
+                    .slice(offset, offset + fits)
+                    .findLastIndex((char) => /\s/.test(char));
+                if (boundary > 0) fits = boundary + 1;
+            }
+            pages.push(characters.slice(offset, offset + fits).join(''));
+            offset += fits;
         }
-        part += char;
-        if (char !== '\n') used += size;
+    } finally {
+        probe.remove();
     }
-    if (part || !pages.length) pages.push(part);
+    if (!pages.length) pages.push('');
     return pages;
 });
 watch(parts, () => {
@@ -105,12 +126,15 @@ watch(parts, () => {
         <DrawerTrigger as-child
             ><button
                 v-if="truncated || force"
+                v-bind="$attrs"
                 type="button"
                 class="text-reader-trigger"
-                :aria-label="t('read') + (label ? ' · ' + label : '')"
+                :aria-label="
+                    (triggerLabel || t('read')) + (label ? ' · ' + label : '')
+                "
             >
                 <BookOpen aria-hidden="true" /><span>{{
-                    t('read_short')
+                    triggerLabel || t('read_short')
                 }}</span>
             </button></DrawerTrigger
         >

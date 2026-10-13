@@ -41,10 +41,10 @@ it('requires three players and valid settings then exposes only the question', f
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     $settings = bluffSettings();
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', $settings)->assertUnprocessable();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, $settings)->assertUnprocessable();
     enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', [...$settings, 'rounds' => 1])->assertUnprocessable();
-    $view = $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertCreated()->assertJsonPath('game.phase', 'writing')->json('game');
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, [...$settings, 'rounds' => 1])->assertUnprocessable();
+    $view = $this->startReadyGame($room, $settings)->assertCreated()->assertJsonPath('game.phase', 'writing')->json('game');
     expect($view['round']['entries'])->toBe([])->and(json_encode($view))->not->toContain('Vérité');
 });
 
@@ -56,7 +56,7 @@ it('keeps drafts private and unsubmitted drafts out of voting and awards each vo
         $tokens[$id] = $token;
     }
     $ids = array_keys($tokens);
-    $this->withCookie('plummo_player_'.$room->code, reset($tokens))->postJson('/rooms/'.$room->code.'/games', bluffSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, reset($tokens))->startReadyGame($room, bluffSettings())->assertCreated();
     $data = ['game_id' => Game::latest('id')->value('id'), 'round' => 1];
     foreach ($ids as $i => $id) {
         $this->withCookie('plummo_player_'.$room->code, $tokens[$id])->postJson('/rooms/'.$room->code.'/bluff/write', [...$data, 'text' => $i === 0 ? 'Brouillon secret' : 'Bluff '.$i, 'submit' => $i > 0])->assertOk();
@@ -93,7 +93,7 @@ it('groups duplicates and reserves a truth finder reward without a vote', functi
         $tokens[$id] = $token;
     }
     $ids = array_keys($tokens);
-    $this->withCookie('plummo_player_'.$room->code, reset($tokens))->postJson('/rooms/'.$room->code.'/games', bluffSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, reset($tokens))->startReadyGame($room, bluffSettings())->assertCreated();
     $data = ['game_id' => Game::latest('id')->value('id'), 'round' => 1];
     foreach ($ids as $i => $id) {
         $view = $this->withCookie('plummo_player_'.$room->code, $tokens[$id])->postJson('/rooms/'.$room->code.'/bluff/write', [...$data, 'text' => $i === 0 ? 'vérité!' : 'Avion', 'submit' => true])->assertOk();
@@ -119,7 +119,7 @@ it('skips an empty vote and waits for enough players before a new round', functi
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     [$third] = enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', bluffSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, bluffSettings())->assertCreated();
     bluffExpire($room);
     expect(Game::latest('id')->firstOrFail()->state['phase'])->toBe('reveal');
     RoomPlayer::findOrFail($third)->update(['left_at' => now()]);
@@ -135,7 +135,7 @@ it('rejects empty submitted text and stale actions and freezes through pause', f
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', bluffSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, bluffSettings())->assertCreated();
     $data = ['game_id' => Game::latest('id')->value('id'), 'round' => 1, 'text' => '...', 'submit' => true];
     $this->postJson('/rooms/'.$room->code.'/bluff/write', $data)->assertUnprocessable();
     $this->postJson('/rooms/'.$room->code.'/bluff/write', [...$data, 'round' => 2, 'text' => 'Bluff'])->assertConflict();
@@ -152,7 +152,7 @@ it('keeps arrivals out of the current round and retains a departed player submis
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     [$third, $thirdToken] = enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', bluffSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, bluffSettings())->assertCreated();
     $data = ['game_id' => Game::latest('id')->value('id'), 'round' => 1];
     $this->withCookie('plummo_player_'.$room->code, $thirdToken)->postJson('/rooms/'.$room->code.'/bluff/write', [...$data, 'text' => 'Bluff conservé', 'submit' => true])->assertOk();
     [$late, $lateToken] = enterRoom($room, 'Nouveau');
@@ -172,7 +172,7 @@ it('uses voting duration for clock debt and limits effects to voting', function 
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', [...bluffSettings(), 'duration' => 150, 'bonuses' => true])->assertCreated()->assertJsonPath('game.bonuses.canUse', false);
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, [...bluffSettings(), 'duration' => 150, 'bonuses' => true])->assertCreated()->assertJsonPath('game.bonuses.canUse', false);
     $game = Game::latest('id')->firstOrFail();
     $state = $game->state;
     $state['bonuses']['debt'] = 6;
@@ -192,7 +192,7 @@ it('freezes catalogue text and pauses safely when remaining contents disappear',
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', bluffSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, bluffSettings())->assertCreated();
     $game = Game::latest('id')->firstOrFail();
     $question = $game->state['round']['question'];
     Content::where('type', 'bluff')->update(['published' => false, 'payload' => ['question' => 'Modifiée', 'answer' => 'Nouvelle vérité', 'format' => 'definition']]);
@@ -208,11 +208,30 @@ it('finishes at the session target and preserves definitive scores', function ()
     [$id, $token] = enterRoom($room);
     enterRoom($room, 'Deux');
     enterRoom($room, 'Trois');
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', bluffSettings())->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, bluffSettings())->assertCreated();
     $this->postJson('/rooms/'.$room->code.'/bluff/write', ['game_id' => Game::latest('id')->value('id'), 'round' => 1, 'text' => 'Vérité', 'submit' => true])->assertOk();
     bluffExpire($room);
     expect(RoomPlayer::findOrFail($id)->score)->toBe(65);
     bluffExpire($room);
     $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.phase', 'results')->assertJsonPath('game.targetReached', true);
     expect(Game::latest('id')->firstOrFail()->status)->toBe('finished')->and((int) $room->players()->sum('score'))->toBe(65);
+});
+
+it('requires fresh confirmations when switching to bluff and keeps its existing duration bounds', function () {
+    $room = openRoom();
+    [, $chief] = enterRoom($room);
+    [, $two] = enterRoom($room, 'Alex');
+    [, $three] = enterRoom($room, 'Robin');
+    $this->withCookie('plummo_player_'.$room->code, $chief);
+    $settings = bluffSettings();
+    $this->postJson('/rooms/'.$room->code.'/game-setup', [...$settings, 'duration' => 20])->assertUnprocessable();
+    $quiz = $this->postJson('/rooms/'.$room->code.'/game-setup', [...$settings, 'type' => 'quiz'])->assertOk();
+    $this->postJson('/rooms/'.$room->code.'/ready', ['ready' => true, 'revision' => $quiz->json('room.setupRevision')])->assertOk();
+    $bluff = $this->postJson('/rooms/'.$room->code.'/game-setup', $settings)->assertOk()->assertJsonPath('me.ready', false);
+    $revision = $bluff->json('room.setupRevision');
+    $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertUnprocessable()->assertJsonValidationErrors('ready');
+    foreach ([$chief, $two, $three] as $token) {
+        $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/ready', ['ready' => true, 'revision' => $revision])->assertOk();
+    }
+    $this->withCookie('plummo_player_'.$room->code, $chief)->postJson('/rooms/'.$room->code.'/games', $settings)->assertCreated()->assertJsonPath('game.phase', 'writing');
 });

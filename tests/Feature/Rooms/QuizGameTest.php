@@ -14,10 +14,10 @@ it('allows only the connected chief to launch a validated quiz and hides its ans
     enterRoom($room, 'Autre');
     $pack = quizPack();
     $settings = ['type' => 'quiz', 'packs' => [$pack], 'rounds' => 5, 'duration' => 30, 'allow_repeats' => false];
-    $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertForbidden();
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', [...$settings, 'rounds' => 4])->assertUnprocessable();
-    $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertCreated()->assertJsonPath('game.phase', 'answer')->assertJsonMissingPath('game.round.payload.correct')->assertJsonCount(4, 'game.round.choices');
-    $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertConflict();
+    $this->startReadyGame($room, $settings)->assertForbidden();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, [...$settings, 'rounds' => 4])->assertUnprocessable();
+    $this->startReadyGame($room, $settings)->assertCreated()->assertJsonPath('game.phase', 'answer')->assertJsonMissingPath('game.round.payload.correct')->assertJsonCount(4, 'game.round.choices');
+    $this->startReadyGame($room, $settings)->assertConflict();
     $this->patchJson('/rooms/'.$room->code.'/session', ['action' => 'configure', 'target' => null])->assertConflict();
 });
 
@@ -25,7 +25,7 @@ it('accepts one definitive answer per round and commits rapidity points once whe
     $room = openRoom();
     [$first, $one] = enterRoom($room);
     [$second, $two] = enterRoom($room, 'Autre');
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
     $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk()->assertJsonPath('game.me.answered', true)->assertJsonPath('game.round.answers', []);
     $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 1))->assertConflict();
     expect(RoomPlayer::findOrFail($first)->score)->toBe(0);
@@ -41,7 +41,7 @@ it('accepts one definitive answer per round and commits rapidity points once whe
 it('freezes actions and countdown during pause and resumes after five seconds', function () {
     $room = openRoom();
     [$chief, $token] = enterRoom($room);
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
     $this->postJson('/rooms/'.$room->code.'/game/pause')->assertOk()->assertJsonPath('game.phase', 'paused');
     $this->travel(10)->seconds();
     $this->postJson('/rooms/'.$room->code.'/screen-presence')->assertOk();
@@ -59,7 +59,7 @@ it('shares same-instant correct ranks and stops at the configured question count
     [$chief, $one] = enterRoom($room);
     [$other, $two] = enterRoom($room, 'Autre');
     $pack = quizPack();
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [$pack], 'rounds' => 5, 'duration' => 10])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, ['type' => 'quiz', 'packs' => [$pack], 'rounds' => 5, 'duration' => 10])->assertCreated();
     foreach (range(1, 5) as $number) {
         $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk();
         $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertJsonPath('game.phase', 'reveal');
@@ -75,7 +75,7 @@ it('shares same-instant correct ranks and stops at the configured question count
 it('expires a question without a reply and rejects late answers', function () {
     $room = openRoom();
     [$chief, $token] = enterRoom($room);
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 10])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 10])->assertCreated();
     $this->travel(10)->seconds();
     $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertConflict();
     $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.phase', 'reveal');
@@ -87,7 +87,7 @@ it('requires a pause before stopping and cancels only current round gains', func
     [$chief, $token] = enterRoom($room);
     [$other] = enterRoom($room, 'Autre');
     RoomPlayer::findOrFail($chief)->update(['score' => 200]);
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
     $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk();
     $this->postJson('/rooms/'.$room->code.'/game/stop')->assertConflict();
     $this->postJson('/rooms/'.$room->code.'/game/pause')->assertOk();
@@ -100,7 +100,7 @@ it('finishes the current round at the point target and preserves its results', f
     $room = openRoom();
     [$chief, $token] = enterRoom($room);
     $room->update(['point_target' => 50]);
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
     $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertJsonPath('game.phase', 'reveal');
     $this->travel(3)->seconds();
     $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.phase', 'results');
@@ -113,7 +113,7 @@ it('waits newcomers until the next round and excludes wrong answers from rapidit
     $room = openRoom();
     [$chief, $one] = enterRoom($room);
     [$other, $two] = enterRoom($room, 'Autre');
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
     [$late, $three] = enterRoom($room, 'Nouveau');
     $this->withCookie('plummo_player_'.$room->code, $three)->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertForbidden();
     $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 1))->assertOk();
@@ -126,7 +126,7 @@ it('waits newcomers until the next round and excludes wrong answers from rapidit
 it('pauses instead of completing a round when all players disconnect and resumes with a countdown', function () {
     $room = openRoom();
     [$chief, $token] = enterRoom($room);
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
     $this->travel(16)->seconds();
     $this->getJson('/rooms/'.$room->code.'/state')->assertJsonPath('game.phase', 'paused');
     $this->postJson('/rooms/'.$room->code.'/screen-presence')->assertOk();
@@ -139,7 +139,7 @@ it('pauses instead of completing a round when all players disconnect and resumes
 it('pauses when the screen is missing and never lets its return cancel a manual pause', function () {
     $room = openRoom();
     [$chief, $token] = enterRoom($room);
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
     $this->travel(10)->seconds();
     $this->postJson('/rooms/'.$room->code.'/presence')->assertOk();
     $this->travel(6)->seconds();
@@ -155,7 +155,7 @@ it('keeps a reconnected player waiting until the next question without changing 
     $room = openRoom();
     [$chief, $one] = enterRoom($room);
     [$other, $two] = enterRoom($room, 'Autre');
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
     $this->travel(10)->seconds();
     $this->postJson('/rooms/'.$room->code.'/screen-presence')->assertOk();
     $this->postJson('/rooms/'.$room->code.'/presence')->assertOk();
@@ -180,7 +180,7 @@ it('does not let an immediate departure and return rejoin the current question',
     $room = openRoom();
     [$chief, $one] = enterRoom($room);
     [$other, $two] = enterRoom($room, 'Autre');
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
     $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/leave')->assertOk();
     $this->postJson('/rooms/'.$room->code.'/return')->assertJsonPath('game.me.eligible', false);
     $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertForbidden();
@@ -190,7 +190,7 @@ it('pauses on exhausted content and lets the chief explicitly allow repeats with
     $room = openRoom();
     [$chief, $token] = enterRoom($room);
     $pack = quizPack();
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [$pack], 'rounds' => 5, 'duration' => 30])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, ['type' => 'quiz', 'packs' => [$pack], 'rounds' => 5, 'duration' => 30])->assertCreated();
     $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk();
     $revealed = Game::where('room_id', $room->id)->sole()->state['round']['content_id'];
     Content::where('id', '!=', $revealed)->update(['published' => false]);
@@ -206,7 +206,7 @@ it('pauses on exhausted content and lets the chief explicitly allow repeats with
 it('requires a pause before the chief closes a running mini-game', function () {
     $room = openRoom();
     [$chief, $token] = enterRoom($room);
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
     $this->deleteJson('/rooms/'.$room->code, ['confirm' => true])->assertConflict();
     $this->postJson('/rooms/'.$room->code.'/game/pause')->assertOk();
     $this->deleteJson('/rooms/'.$room->code, ['confirm' => true])->assertNoContent();
@@ -218,9 +218,9 @@ it('requires extending the reached target before another mini-game can start', f
     $room->update(['point_target' => 50]);
     RoomPlayer::findOrFail($chief)->update(['score' => 65]);
     $settings = ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30];
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', $settings)->assertUnprocessable()->assertJsonValidationErrors('target');
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, $settings)->assertUnprocessable()->assertJsonValidationErrors('target');
     $this->patchJson('/rooms/'.$room->code.'/session', ['action' => 'extend', 'extra' => 100])->assertOk();
-    $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertCreated();
+    $this->startReadyGame($room, $settings)->assertCreated();
 });
 
 it('distinguishes the global winner from the current mini-game winner at the target', function () {
@@ -229,7 +229,7 @@ it('distinguishes the global winner from the current mini-game winner at the tar
     [$other, $two] = enterRoom($room, 'Autre');
     $room->update(['point_target' => 100]);
     RoomPlayer::findOrFail($other)->update(['score' => 90]);
-    $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $one)->startReadyGame($room, ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 30])->assertCreated();
     $this->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk();
     $this->travel(1)->seconds();
     $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/answer', quizAnswer($room, 0))->assertOk();
@@ -241,7 +241,7 @@ it('rejects a delayed answer from an earlier round or game', function () {
     $this->freezeTime();
     $room = openRoom();
     [$chief, $token] = enterRoom($room);
-    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/games', ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 10])->assertCreated();
+    $this->withCookie('plummo_player_'.$room->code, $token)->startReadyGame($room, ['type' => 'quiz', 'packs' => [quizPack()], 'rounds' => 5, 'duration' => 10])->assertCreated();
     $oldAnswer = quizAnswer($room, 0);
     $this->travel(10)->seconds();
     $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.phase', 'reveal');

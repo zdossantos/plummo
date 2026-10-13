@@ -6,6 +6,7 @@ use App\Models\Game;
 use App\Models\Pack;
 use App\Models\Room;
 use App\Models\Tag;
+use App\Services\GameSetup;
 use Tests\TestCase;
 
 pest()->extend(TestCase::class)->in('Feature', 'Browser');
@@ -26,6 +27,14 @@ function enterRoom(Room $room, string $name = 'Camille', array $accessories = []
     $token = $response->getCookie('plummo_player_'.$room->code)->getValue();
 
     return [$response->json('me.id'), $token];
+}
+
+/** Confirm the preparation actually received by this phone, after the chief's save. */
+function confirmReadyPhone($page, Room $room)
+{
+    $page->assertEnabled('[data-ready]')->assertAttribute('.readiness-actions', 'data-setup-revision', (string) $room->fresh()->setup_revision)->click('[data-ready]')->assertSee('Withdraw readiness');
+
+    return $page;
 }
 
 function quizPack(): int
@@ -92,4 +101,12 @@ function phrasePack(int $count = 5): int
     }
 
     return $pack->id;
+}
+
+/** Fixture for tests of an already prepared game; readiness routes have dedicated coverage. */
+function prepareReadyGame(Room $room, array $settings): void
+{
+    $room->refresh();
+    app(GameSetup::class)->configure($room, GameSetup::normalize($settings));
+    $room->players()->get()->filter(fn ($player) => $player->connected())->each(fn ($player) => $player->update(['ready_revision' => $room->setup_revision]));
 }

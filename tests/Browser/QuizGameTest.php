@@ -23,6 +23,8 @@ it('plays a quiz with a shared screen and two separate phones then returns to th
         $first->click('button[aria-label="Controls"]')->click('Session')->assertSee('No point limit')->click('label:has-text("No point limit")')->fill('session-target', '50')->click('Save target')->assertSee('Target: 50 points');
         $first->click('button[aria-label="Play"]')->click('[data-choose-packs]')->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")');
         $first->assertSee('5 unseen questions')->fill('game-rounds', '5');
+        confirmReadyPhone($first, $room);
+        confirmReadyPhone($second, $room);
         $first->page()->locator('button:has-text("Start quiz")')->click(['noWaitAfter' => true]);
         $first->assertSee('Quiz · Question 1 / 5');
         $second->assertSee('Quiz · Question 1 / 5');
