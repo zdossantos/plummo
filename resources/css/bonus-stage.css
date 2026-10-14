@@ -224,9 +224,7 @@
     animation: vfx-return-line 2300ms both;
     filter: drop-shadow(0 4px 0 #35236b);
 }
-.bonus-stage-boomerang .vfx-hero-object,
-.bonus-stage-borrow .vfx-hero-object,
-.bonus-stage-mirror .vfx-hero-object {
+.bonus-stage-boomerang .vfx-hero-object {
     animation-name: vfx-return-object;
 }
 .vfx-theatre-curtain {
@@ -316,26 +314,24 @@
     text-shadow: 0 10px #35236b44;
     animation: vfx-letter 2600ms calc(var(--letter) * 35ms) both;
 }
-.vfx-visitor {
-    position: absolute;
-    left: 50%;
-    bottom: -5%;
-    width: min(45vw, 620px);
-    height: 80vh;
-    translate: -50% 0;
-    animation: vfx-visitor 2600ms both;
+.vfx-character {
+    width: min(52vw, 620px);
+    top: 50%;
+    animation-name: vfx-character;
 }
-.vfx-visitor .plummo-avatar {
+.vfx-incognito > img,
+.vfx-disguise {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
 }
-.bonus-stage-squatter .vfx-hero-object,
-.bonus-stage-strike .vfx-hero-object,
-.bonus-stage-singer .vfx-hero-object,
-.bonus-stage-photobomb .vfx-hero-object {
-    left: 72%;
-    top: 35%;
-    width: 180px;
+.bonus-stage-borrow .vfx-clock-hand {
+    animation-direction: reverse;
+}
+.bonus-stage-mirror .vfx-hero-object {
+    width: min(42vw, 520px);
+    animation-name: vfx-mirror;
 }
 .vfx-photo-frame {
     position: absolute;
@@ -346,21 +342,6 @@
         0 10px 0 #35236b44;
     rotate: -5deg;
     animation: vfx-splat 2600ms both;
-}
-.vfx-sound-waves {
-    position: absolute;
-    width: 100%;
-    height: 65%;
-    top: 18%;
-    fill: none;
-    stroke: #ab83ec;
-    stroke-width: 30px;
-    stroke-linecap: round;
-    opacity: 0.8;
-}
-.vfx-sound-waves path {
-    transform-origin: center;
-    animation: vfx-audio 350ms calc(var(--wave) * 40ms) alternate infinite;
 }
 .bonus-stage-giant .vfx-hero-object {
     width: min(70vw, 800px);
@@ -690,40 +671,46 @@
         transform: translateY(100vh) rotate(80deg);
     }
 }
-@keyframes vfx-visitor {
+@keyframes vfx-character {
     0% {
-        transform: translateY(100%);
+        transform: translateY(80px) scale(0.6);
+        opacity: 0;
     }
-    25%,
+    18% {
+        transform: translateY(-12px) scale(1.06);
+        opacity: 1;
+    }
+    30%,
     75% {
         transform: none;
+        opacity: 1;
     }
     100% {
-        transform: translateY(100%);
+        transform: translateY(35px) scale(0.9);
+        opacity: 0;
     }
 }
-@keyframes vfx-audio {
-    from {
-        transform: scaleY(0.5);
-    }
-    to {
-        transform: scaleY(1.2);
-    }
-}
-@keyframes vfx-wobble {
+@keyframes vfx-mirror {
     0% {
-        transform: scale(0);
+        transform: perspective(1000px) rotateY(-80deg) scale(0.6);
+        opacity: 0;
     }
-    20%,
-    60% {
-        transform: scale(1.3, 0.7) rotate(-15deg);
+    22% {
+        transform: perspective(1000px) rotateY(18deg) scale(1.06);
+        opacity: 1;
     }
-    40%,
-    75% {
-        transform: scale(0.8, 1.2) rotate(15deg);
+    42%,
+    68% {
+        transform: perspective(1000px) rotateY(0deg) scale(1);
+        opacity: 1;
+    }
+    85% {
+        transform: perspective(1000px) rotateY(180deg) scale(1);
+        opacity: 1;
     }
     100% {
-        transform: scale(0);
+        transform: perspective(1000px) rotateY(180deg) scale(0.8);
+        opacity: 0;
     }
 }
 @media (prefers-reduced-motion: reduce) {

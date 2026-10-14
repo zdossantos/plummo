@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import BonusIcon from '@/components/BonusIcon.vue';
-import PlummoAvatar from '@/components/PlummoAvatar.vue';
 import type { BonusLaunchEvent } from '@/lib/bonus-launch';
 import type { RoomState } from '@/types/rooms';
 const props = defineProps<{
@@ -9,11 +8,10 @@ const props = defineProps<{
     room: RoomState | null;
 }>();
 const kind = computed(() => props.event.kind);
-const actor = computed(() =>
-    props.room?.players.find((p) => p.id === props.event.actorId),
-);
-const visitor = computed(() =>
-    ['squatter', 'photobomb', 'singer', 'strike'].includes(kind.value),
+const character = computed(() =>
+    ['squatter', 'photobomb', 'singer', 'strike', 'missing_word'].includes(
+        kind.value,
+    ),
 );
 const bubbles = computed(() =>
     ['soap', 'bubbles', 'washer'].includes(kind.value),
@@ -27,6 +25,7 @@ const clock = computed(() =>
         'last_breath',
         'alarm',
         'leak',
+        'borrow',
     ].includes(kind.value),
 );
 const letters = computed(() =>
@@ -148,19 +147,39 @@ const palette = ['#efe681', '#f1b5c8', '#b7e1c3', '#aa83ec', '#f05a78'];
                 </svg>
                 <span class="vfx-shockwave" />
             </template>
-            <template
-                v-else-if="
-                    kind === 'boomerang' ||
-                    kind === 'borrow' ||
-                    kind === 'mirror'
-                "
-            >
+            <template v-else-if="kind === 'boomerang'">
                 <svg class="vfx-return-trail" viewBox="0 0 1000 600">
                     <path
                         d="M-50 420C120-130 1020 40 840 340S120 730 430 330"
                     />
                 </svg>
                 <div class="vfx-hero-object"><BonusIcon :kind="kind" /></div>
+            </template>
+            <template v-else-if="kind === 'artist'">
+                <div class="vfx-hero-object vfx-character vfx-incognito">
+                    <img :src="'/plummo/base.svg'" alt="" draggable="false" />
+                    <svg class="vfx-disguise" viewBox="0 0 512 512">
+                        <path
+                            d="M140 229Q255 199 361 238L355 306Q315 328 264 304Q207 322 145 298Z M161 263a34 39 0 1 0 68 0a34 39 0 1 0-68 0 M280 273a34 39 0 1 0 68 0a34 39 0 1 0-68 0"
+                            fill="#aa83ec"
+                            fill-rule="evenodd"
+                            stroke="#21182f"
+                            stroke-width="6"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M142 251Q116 263 110 290M358 258Q389 270 398 300"
+                            fill="none"
+                            stroke="#21182f"
+                            stroke-width="6"
+                            stroke-linecap="round"
+                        />
+                        <path
+                            d="M251 329Q269 311 290 331Q319 349 335 316Q348 353 320 361Q284 369 255 344Q215 369 189 360Q161 351 174 317Q190 349 220 330Q237 313 251 329Z"
+                            fill="#21182f"
+                        />
+                    </svg>
+                </div>
             </template>
             <template v-else-if="kind === 'curtain'">
                 <div class="vfx-theatre-curtain vfx-curtain-left" />
@@ -205,41 +224,23 @@ const palette = ['#efe681', '#f1b5c8', '#b7e1c3', '#aa83ec', '#f05a78'];
                         >{{ letter }}</span
                     ></template
                 >
-                <div v-if="visitor && actor" class="vfx-visitor">
-                    <PlummoAvatar
-                        :color="actor.color"
-                        :accessories="actor.accessories"
-                        motion="hello"
-                        :motion-key="event.id"
-                    />
-                </div>
                 <div v-if="kind === 'photobomb'" class="vfx-photo-frame">
                     <i v-for="n in 4" :key="n" />
                 </div>
-                <svg
-                    v-if="['speed', 'scratch', 'singer'].includes(kind)"
-                    class="vfx-sound-waves"
-                    viewBox="0 0 800 400"
+                <div
+                    class="vfx-hero-object"
+                    :class="{ 'vfx-character': character }"
                 >
-                    <path
-                        v-for="n in 9"
-                        :key="n"
-                        :d="
-                            'M' +
-                            n * 75 +
-                            ' 200v-' +
-                            (40 + (n % 3) * 50) +
-                            'm0 ' +
-                            (80 + (n % 3) * 100) +
-                            'v-' +
-                            (40 + (n % 3) * 50)
-                        "
-                        :style="{ '--wave': n }"
-                    />
-                </svg>
-                <div class="vfx-hero-object"><BonusIcon :kind="kind" /></div>
+                    <BonusIcon :kind="kind" />
+                </div>
                 <span
-                    v-if="!visitor && !bubbles && !letters && !clock"
+                    v-if="
+                        !character &&
+                        !bubbles &&
+                        !letters &&
+                        !clock &&
+                        kind !== 'mirror'
+                    "
                     class="vfx-shockwave"
                 />
             </template>
