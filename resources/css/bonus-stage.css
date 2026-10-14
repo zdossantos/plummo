@@ -1,0 +1,737 @@
+/* Short, illustrated TV scenes. The stage never captures input. */
+.bonus-stage {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    overflow: hidden;
+}
+.bonus-stage-scene {
+    position: absolute;
+    inset: 0;
+    animation: vfx-scene 2800ms both;
+}
+.bonus-stage-reduced {
+    display: none;
+}
+.vfx-hero-object {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    width: clamp(180px, 24vw, 350px);
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    filter: drop-shadow(0 16px 0 #35236b35);
+    animation: vfx-object 2800ms both;
+}
+.vfx-hero-object .bonus-icon,
+.vfx-pinata-swing .bonus-icon,
+.vfx-die .bonus-icon {
+    width: 100%;
+    height: 100%;
+}
+.vfx-shockwave {
+    position: absolute;
+    left: 50%;
+    top: 62%;
+    width: 180px;
+    height: 60px;
+    margin: -30px -90px;
+    border: 12px solid #efe681;
+    border-radius: 50%;
+    animation: vfx-wave 1100ms 240ms both;
+}
+.vfx-storm {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0, #35236bbb, #35236b11 80%);
+    animation: vfx-storm 1800ms both;
+}
+.vfx-lightning {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 24px #ffe981);
+    animation: vfx-bolt 1700ms both;
+}
+.vfx-lightning-edge {
+    fill: #35236b;
+}
+.vfx-lightning-core {
+    fill: #fff4a0;
+    stroke: #efc751;
+    stroke-width: 5px;
+}
+.vfx-lightning-fork {
+    fill: none;
+    stroke: #ffe981;
+    stroke-width: 9px;
+    stroke-linejoin: bevel;
+}
+/* The asset's rope starts at (82, 14) in its 200 × 200 viewBox.
+   Keep the extension and the swing pivot on that same attachment point. */
+.vfx-pinata-drop {
+    --pinata-size: clamp(220px, 27vw, 380px);
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: var(--pinata-size);
+    height: 52vh;
+    translate: -50% 0;
+    animation: vfx-drop 2800ms both;
+}
+.vfx-pinata-swing {
+    position: absolute;
+    inset: 0;
+    transform-origin: 41% 0;
+    animation: vfx-swing 2800ms both;
+}
+.vfx-rope {
+    position: absolute;
+    top: -100vh;
+    bottom: calc(var(--pinata-size) * 0.43 - 1px);
+    left: 41%;
+    width: calc(var(--pinata-size) * 0.015);
+    translate: -50% 0;
+    background: #fff7e6;
+    box-shadow: 0 0 0 1px #35236b55;
+}
+.vfx-pinata-swing .bonus-icon {
+    position: absolute;
+    top: calc(100% - var(--pinata-size) * 0.5);
+    height: var(--pinata-size);
+    transform-origin: 41% 7%;
+    animation: vfx-pinata-pop 2800ms both;
+}
+.vfx-confetti-field {
+    position: absolute;
+    left: 50%;
+    top: 52%;
+}
+.vfx-confetti {
+    position: absolute;
+    width: 18px;
+    height: 30px;
+    border: 2px solid #35236b;
+    border-radius: 4px;
+    animation: vfx-confetti 1400ms calc(1150ms + var(--delay)) both;
+}
+.bonus-stage-pinata .vfx-shockwave {
+    top: 52%;
+    animation-delay: 1150ms;
+    border-color: #f1b5c8;
+}
+.vfx-die {
+    position: absolute;
+    top: 43%;
+    left: calc(50% + (var(--die) - 2) * 21%);
+    width: clamp(150px, 18vw, 270px);
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    animation: vfx-dice 2400ms calc(var(--die) * 90ms) both;
+}
+.vfx-die > span {
+    position: absolute;
+    left: 0;
+    bottom: -25%;
+    width: 100%;
+    height: 22%;
+    background: #35236b33;
+    border-radius: 50%;
+    filter: blur(7px);
+}
+.vfx-splat {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    width: min(85vw, 950px);
+    height: 80vh;
+    translate: -50% -50%;
+    fill: #f05a78e6;
+    filter: drop-shadow(0 10px 0 #35236b);
+    animation: vfx-splat 2600ms both;
+}
+.bonus-stage-stamp .vfx-splat {
+    fill: #b7e1c3e6;
+}
+.bonus-stage-paint .vfx-hero-object {
+    left: 67%;
+    top: 35%;
+    rotate: -25deg;
+}
+.bonus-stage-stamp .vfx-hero-object {
+    top: 30%;
+    animation-name: vfx-stamp;
+}
+.vfx-stamp-mark {
+    position: absolute;
+    left: 50%;
+    top: 55%;
+    width: 250px;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    color: #35236b;
+    rotate: -14deg;
+    animation: vfx-crack 2200ms 500ms both;
+}
+.vfx-shield-dome {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    width: min(62vw, 750px);
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    border: 12px solid #b7e1c3;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle at 35% 30%,
+        #ffffff88,
+        #b7e1c388 45%,
+        #ab83ec66
+    );
+    box-shadow:
+        inset 0 0 0 5px #35236b,
+        0 0 55px #b7e1c399;
+    animation: vfx-dome 2500ms both;
+}
+.vfx-shield-crack {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    width: min(45vw, 560px);
+    height: 60vh;
+    translate: -50% -50%;
+    fill: none;
+    stroke: #35236b;
+    stroke-width: 8px;
+    animation: vfx-crack 2100ms 400ms both;
+}
+.bonus-stage-reaction .vfx-shield-dome {
+    animation-name: vfx-dome-hit;
+}
+.vfx-return-trail {
+    position: absolute;
+    inset: 10% 0;
+    width: 100%;
+    height: 80%;
+    fill: none;
+    stroke: #efe681;
+    stroke-width: 22px;
+    stroke-linecap: round;
+    stroke-dasharray: 1600;
+    animation: vfx-return-line 2300ms both;
+    filter: drop-shadow(0 4px 0 #35236b);
+}
+.bonus-stage-boomerang .vfx-hero-object {
+    animation-name: vfx-return-object;
+}
+.vfx-theatre-curtain {
+    position: absolute;
+    top: -2%;
+    width: 52%;
+    height: 104%;
+    background: repeating-linear-gradient(
+        90deg,
+        #ab83ec 0 40px,
+        #805cba 65px,
+        #35236b 75px,
+        #ab83ec 85px
+    );
+    border-bottom: 20px solid #efe681;
+    box-shadow: 0 15px 0 #35236b;
+    animation: vfx-curtain 2700ms both;
+}
+.vfx-curtain-left {
+    left: 0;
+    border-radius: 0 0 35% 0;
+}
+.vfx-curtain-right {
+    right: 0;
+    border-radius: 0 0 0 35%;
+    --curtain-direction: 1;
+}
+.vfx-curtain-tie {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: #35236b;
+    border-bottom: 12px solid #efe681;
+    animation: vfx-scene 2800ms both;
+}
+.vfx-bubble {
+    position: absolute;
+    left: calc(mod(var(--bubble) * 17, 100) * 1%);
+    top: 70%;
+    width: calc(85px + mod(var(--bubble), 4) * 45px);
+    aspect-ratio: 1;
+    border: 5px solid #b7e1c3;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 30% 25%, white 0 7%, transparent 12%),
+        linear-gradient(135deg, #ffffff55, #ab83ec55, #b7e1c366);
+    box-shadow:
+        inset -10px -10px 0 #ffffff33,
+        0 4px 0 #35236b55;
+    animation: vfx-bubble 2500ms calc(mod(var(--bubble), 4) * 80ms) both;
+}
+.vfx-clock-face {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    width: min(65vw, 700px);
+    height: 78vh;
+    translate: -50% -50%;
+    fill: #efe681cc;
+    stroke: #35236b;
+    stroke-width: 9px;
+    animation: vfx-dome 2500ms both;
+}
+.vfx-clock-hand {
+    transform-origin: 200px 200px;
+    animation: vfx-clock 2400ms both;
+}
+.bonus-stage-freeze .vfx-clock-face {
+    fill: #b7e1c3cc;
+}
+.bonus-stage-freeze .vfx-clock-hand {
+    animation: none;
+}
+.bonus-stage-alarm .vfx-clock-face {
+    fill: #f1b5c8dd;
+}
+.vfx-letter {
+    position: absolute;
+    top: 35%;
+    left: calc(7% + var(--letter) * 12%);
+    font:
+        900 clamp(90px, 12vw, 170px) / 1 'Fredoka',
+        sans-serif;
+    -webkit-text-stroke: 4px #35236b;
+    text-shadow: 0 10px #35236b44;
+    animation: vfx-letter 2600ms calc(var(--letter) * 35ms) both;
+}
+.vfx-character {
+    width: min(52vw, 620px);
+    top: 50%;
+    animation-name: vfx-character;
+}
+.vfx-incognito > img,
+.vfx-disguise {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+.bonus-stage-borrow .vfx-clock-hand {
+    animation-direction: reverse;
+}
+.bonus-stage-mirror .vfx-hero-object {
+    width: min(42vw, 520px);
+    animation-name: vfx-mirror;
+}
+.vfx-photo-frame {
+    position: absolute;
+    inset: 12%;
+    border: 20px solid white;
+    box-shadow:
+        0 0 0 5px #35236b,
+        0 10px 0 #35236b44;
+    rotate: -5deg;
+    animation: vfx-splat 2600ms both;
+}
+.bonus-stage-giant .vfx-hero-object {
+    width: min(70vw, 800px);
+}
+.bonus-stage-lock .vfx-hero-object {
+    animation-name: vfx-stamp;
+}
+.bonus-stage-jelly .vfx-hero-object,
+.bonus-stage-clumsy .vfx-hero-object {
+    animation-name: vfx-wobble;
+}
+.bonus-stage-mystery .vfx-hero-object {
+    filter: drop-shadow(0 0 70px #ab83ec);
+}
+@keyframes vfx-scene {
+    0%,
+    88% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes vfx-object {
+    0% {
+        transform: translateY(-80vh) rotate(-35deg) scale(0.3);
+    }
+    18% {
+        transform: translateY(30px) rotate(8deg) scale(1.1);
+    }
+    30%,
+    75% {
+        transform: none;
+    }
+    100% {
+        transform: translateY(90vh) rotate(20deg);
+    }
+}
+@keyframes vfx-wave {
+    0% {
+        transform: scale(0.1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(6);
+        opacity: 0;
+    }
+}
+@keyframes vfx-storm {
+    0% {
+        opacity: 0;
+    }
+    15%,
+    65% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes vfx-bolt {
+    0%,
+    9% {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+    15%,
+    50% {
+        opacity: 1;
+        transform: none;
+    }
+    65% {
+        opacity: 0.3;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes vfx-crack {
+    0% {
+        opacity: 0;
+        transform: scale(0.2);
+    }
+    10%,
+    70% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes vfx-drop {
+    0% {
+        transform: translateY(-100vh);
+    }
+    22% {
+        transform: translateY(30px);
+    }
+    32%,
+    75% {
+        transform: none;
+    }
+    100% {
+        transform: translateY(-100vh);
+    }
+}
+@keyframes vfx-swing {
+    0%,
+    22% {
+        rotate: -16deg;
+    }
+    35% {
+        rotate: 15deg;
+    }
+    48% {
+        rotate: -10deg;
+    }
+    61% {
+        rotate: 7deg;
+    }
+    76%,
+    100% {
+        rotate: 0deg;
+    }
+}
+@keyframes vfx-pinata-pop {
+    0%,
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    46% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    52%,
+    100% {
+        transform: scale(0.2);
+        opacity: 0;
+    }
+}
+@keyframes vfx-confetti {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    35% {
+        transform: translate(calc(var(--x) * 0.8), calc(var(--y) * -0.5))
+            rotate(var(--turn));
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--x), calc(var(--y) + 230px))
+            rotate(calc(var(--turn) + 200deg));
+        opacity: 0;
+    }
+}
+@keyframes vfx-dice {
+    0% {
+        transform: translateY(-90vh) rotate(-180deg);
+    }
+    28% {
+        transform: translateY(100px) rotate(25deg);
+    }
+    43% {
+        transform: translateY(-100px) rotate(-15deg);
+    }
+    60%,
+    80% {
+        transform: none;
+    }
+    100% {
+        transform: translateY(90vh) rotate(90deg);
+    }
+}
+@keyframes vfx-splat {
+    0% {
+        transform: scale(0) rotate(-30deg);
+        opacity: 0;
+    }
+    18% {
+        transform: scale(1.12) rotate(8deg);
+        opacity: 1;
+    }
+    28%,
+    80% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+}
+@keyframes vfx-stamp {
+    0% {
+        transform: translateY(-80vh) rotate(-20deg);
+    }
+    20% {
+        transform: translateY(100px) rotate(0);
+    }
+    30%,
+    75% {
+        transform: none;
+    }
+    100% {
+        transform: translateY(-80vh);
+    }
+}
+@keyframes vfx-dome {
+    0% {
+        transform: scale(0.05);
+    }
+    20% {
+        transform: scale(1.08);
+    }
+    35%,
+    80% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+}
+@keyframes vfx-dome-hit {
+    0% {
+        transform: scale(0.05);
+    }
+    20% {
+        transform: scale(1.08);
+    }
+    35% {
+        transform: translateX(-30px);
+    }
+    40% {
+        transform: translateX(25px);
+    }
+    45%,
+    80% {
+        transform: none;
+    }
+    100% {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+}
+@keyframes vfx-return-line {
+    0% {
+        stroke-dashoffset: 1600;
+    }
+    65% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes vfx-return-object {
+    0% {
+        transform: translate(-70vw, 30vh) rotate(-180deg);
+    }
+    30% {
+        transform: translate(30vw, -25vh) rotate(90deg);
+    }
+    60%,
+    75% {
+        transform: none;
+    }
+    100% {
+        transform: translate(-70vw, 30vh) rotate(-180deg);
+    }
+}
+@keyframes vfx-curtain {
+    0% {
+        transform: translateX(calc(var(--curtain-direction, -1) * 100%));
+    }
+    25%,
+    65% {
+        transform: none;
+    }
+    100% {
+        transform: translateX(calc(var(--curtain-direction, -1) * 100%));
+    }
+}
+@keyframes vfx-bubble {
+    0% {
+        transform: translateY(45vh) scale(0.1);
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 0.9;
+    }
+    100% {
+        transform: translateY(-90vh) scale(1.2);
+        opacity: 0;
+    }
+}
+@keyframes vfx-clock {
+    0% {
+        rotate: 0deg;
+    }
+    100% {
+        rotate: 720deg;
+    }
+}
+@keyframes vfx-letter {
+    0% {
+        transform: translateY(-70vh) rotate(-35deg);
+    }
+    25%,
+    70% {
+        transform: translateY(calc(mod(var(--letter), 3) * 80px))
+            rotate(calc(var(--letter) * 8deg - 20deg));
+    }
+    100% {
+        transform: translateY(100vh) rotate(80deg);
+    }
+}
+@keyframes vfx-character {
+    0% {
+        transform: translateY(80px) scale(0.6);
+        opacity: 0;
+    }
+    18% {
+        transform: translateY(-12px) scale(1.06);
+        opacity: 1;
+    }
+    30%,
+    75% {
+        transform: none;
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(35px) scale(0.9);
+        opacity: 0;
+    }
+}
+@keyframes vfx-mirror {
+    0% {
+        transform: perspective(1000px) rotateY(-80deg) scale(0.6);
+        opacity: 0;
+    }
+    22% {
+        transform: perspective(1000px) rotateY(18deg) scale(1.06);
+        opacity: 1;
+    }
+    42%,
+    68% {
+        transform: perspective(1000px) rotateY(0deg) scale(1);
+        opacity: 1;
+    }
+    85% {
+        transform: perspective(1000px) rotateY(180deg) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: perspective(1000px) rotateY(180deg) scale(0.8);
+        opacity: 0;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .bonus-stage-scene {
+        display: none;
+    }
+    .bonus-stage-reduced {
+        display: block;
+        position: absolute;
+        left: 50%;
+        top: 48%;
+        translate: -50% -50%;
+        width: 180px;
+        padding: 20px;
+        border-radius: 40px;
+        border: 4px solid #35236b;
+        background: #ffffffee;
+        box-shadow: 0 8px 0 #35236b33;
+    }
+    .bonus-stage-reduced .bonus-icon {
+        width: 100%;
+        height: auto;
+    }
+}

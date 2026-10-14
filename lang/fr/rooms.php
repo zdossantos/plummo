@@ -1,38 +1,44 @@
 <?php
 
 return [
+    'rules_flow' => 'Déroulement',
+    'rules_play' => 'Comment jouer',
+    'rules_bonuses' => 'Bonus / malus',
+    'rules_bonus_overview' => 'Principe : à plusieurs, le chef peut activer les bonus. Les objets aident, protègent ou gênent les autres ; certains modifient le chrono.
+
+Utilisation : tu reçois des objets dans ta poche (deux maximum). Touche-en un pour le lancer. Le bouton d’information explique son effet sans le consommer.',
     'rules' => 'Règles',
-    'ready_required' => 'Tous les joueurs connectés doivent confirmer les réglages sur leur téléphone avant le lancement.',
+    'ready_required' => 'Tous les autres joueurs connectés doivent confirmer les réglages sur leur téléphone avant le lancement.',
     'ready_confirm' => 'Je suis prêt',
     'ready_withdraw' => 'Retirer ma confirmation',
     'ready_count' => '{count} / {total} prêts',
     'ready_players' => 'Prêts à jouer ?',
-    'ready_hint' => 'Chaque joueur confirme sur son téléphone. Modifier les réglages annule les confirmations.',
+    'ready_hint' => 'Chaque joueur, sauf le chef, confirme sur son téléphone. Modifier les réglages annule les confirmations.',
     'ready_yes' => 'Prêt',
     'ready_waiting' => 'En attente',
     'rules_quiz' => 'But : trouver la bonne réponse.
 Déroulement : chaque question apparaît avec quatre choix, puis la correction.
-Sur ton téléphone : touche une réponse avant la fin du temps. Ton choix est définitif.
+Comment jouer : touche une réponse avant la fin du temps. Ton choix est définitif.
 Points : une bonne réponse rapporte 30 à 100 points selon ta rapidité ; une réponse fausse ou absente rapporte 0. Seul joueur : 65 points.',
     'rules_blind_test' => 'But : reconnaître le morceau diffusé sur le grand écran.
 Déroulement : écoute l’extrait, choisis parmi les propositions, puis découvre la correction.
-Sur ton téléphone : touche une réponse avant la fin du temps. Ton choix est définitif.
+Comment jouer : touche une réponse avant la fin du temps. Ton choix est définitif.
 Points : une bonne réponse rapporte 30 à 100 points selon ta rapidité ; une réponse fausse ou absente rapporte 0. Seul joueur : 65 points.',
     'rules_drawing' => 'But : faire deviner un mot ou le trouver.
 Déroulement : chacun dessine à son tour. Le dessinateur choisit un mot secret, puis le dessin apparaît sur le grand écran.
-Sur ton téléphone : dessine si c’est ton tour ; sinon, écris tes propositions. Tu peux réessayer jusqu’à trouver.
+Comment jouer : dessine si c’est ton tour ; sinon, écris tes propositions. Tu peux réessayer jusqu’à trouver.
 Points : trouver rapporte 30 à 100 points selon la rapidité (65 avec un seul chercheur). Le dessinateur gagne jusqu’à 65 points selon la proportion de joueurs qui trouvent.',
     'rules_phrase' => 'But : inventer la fin de phrase préférée des autres.
 Déroulement : écriture secrète, présentation anonyme des phrases, vote, puis révélation des auteurs.
-Sur ton téléphone : écris et envoie ta fin de phrase avant la fin du temps, puis vote pour une autre phrase que la tienne.
+Comment jouer : écris et envoie ta fin de phrase avant la fin du temps, puis vote pour une autre phrase que la tienne.
 Points : chaque vote reçu rapporte 65 points. Aucun vote reçu : 0 point.',
     'rules_tribunal' => 'But : convaincre le jury avec ton argument.
 Déroulement : deux joueurs défendent leur camp chacun à leur tour ; les autres votent, puis les résultats sont révélés.
-Sur ton téléphone : regarde ton rôle et le sujet. Plaide à voix haute quand c’est ton tour ; si tu es juré, vote pour le camp le plus convaincant avant la fin du temps. Les deux avocats ne votent pas.
+Comment jouer : regarde ton rôle et le sujet. Plaide à voix haute quand c’est ton tour ; si tu es juré, vote pour le camp le plus convaincant avant la fin du temps. Les deux avocats ne votent pas.
 Points : chaque vote reçu rapporte 65 points à son avocat. Le jury ne gagne pas de points.',
     'rules_mini_games' => 'But : réussir les épreuves choisies par le chef.
 Déroulement : les épreuves sont mélangées. Observe le grand écran quand on te le demande, réponds sur ton téléphone, puis découvre la correction.
-Sur ton téléphone : touche une réponse avant la fin du temps ; ton choix est définitif.
+Comment jouer : touche une réponse avant la fin du temps ; ton choix est définitif.
 Points : une bonne réponse rapporte 30 à 100 points selon ta rapidité ; une réponse fausse ou absente rapporte 0. Seul joueur : 65 points.',
     'rules_trial_memory' => 'Mémoire : retiens les couleurs et accessoires des quatre Plummos, puis réponds à la question.',
     'rules_trial_hide' => 'Cache-cache : retrouve le Plummo qui correspond à la couleur et à l’accessoire demandés.',
@@ -95,14 +101,14 @@ Points : une bonne réponse rapporte 30 à 100 points selon ta rapidité ; une r
     'bonus_sneeze' => 'Éternuement',
     'bonus_stamp' => 'Tampon',
     'bonus_paint' => 'Pot renversé',
-    'bonus_hint_bolt' => 'Baisse la lumière des autres téléphones pendant 3 secondes.',
-    'bonus_hint_dice' => 'Mélange les réponses des autres toutes les 2 secondes, trois fois.',
-    'bonus_hint_squatter' => 'Ton Plummo se promène devant les réponses des autres pendant 4 secondes.',
-    'bonus_hint_artist' => 'Cache les artistes sur les autres téléphones pendant 4 secondes.',
+    'bonus_hint_bolt' => 'Baisse la lumière des autres téléphones pendant 5 secondes.',
+    'bonus_hint_dice' => 'Mélange les réponses des autres toutes les 2 secondes, cinq fois.',
+    'bonus_hint_squatter' => 'Ton Plummo se promène devant les réponses des autres pendant 8 secondes.',
+    'bonus_hint_artist' => 'Cache les artistes sur les autres téléphones pendant 8 secondes.',
     'bonus_hint_accent' => 'Les R des autres phrases deviennent des W après validation.',
     'bonus_hint_sneeze' => 'Glisse un ATCHOUM ! dans les autres phrases après validation.',
-    'bonus_hint_stamp' => 'Un tampon farceur apparaît sur le dessin pendant 4 secondes.',
-    'bonus_hint_paint' => 'Impose un crayon rose pendant 4 secondes. Le choix précédent revient ensuite.',
+    'bonus_hint_stamp' => 'Un tampon farceur apparaît sur le dessin pendant 10 secondes.',
+    'bonus_hint_paint' => 'Impose un crayon rose pendant 10 secondes. Le choix précédent revient ensuite.',
 
     'chat_unavailable' => 'Termine ton action de jeu pour envoyer un message au groupe.',
     'chat_label' => 'Un mot au groupe',
@@ -361,7 +367,7 @@ Points : une bonne réponse rapporte 30 à 100 points selon ta rapidité ; une r
     'bonus_scratch' => 'Disque rayé',
     'bonus_hint_scratch' => 'Fait bégayer brièvement l’extrait sur le grand écran.',
     'bonus_speed' => 'Disque pressé',
-    'bonus_hint_speed' => 'Accélère un instant l’extrait collectif, puis retrouve sa vitesse.',
+    'bonus_hint_speed' => 'Accélère l’extrait à ×1,5 pendant 10 secondes.',
     'bonus_singer' => 'Plummo chanteur',
     'bonus_hint_singer' => 'Ton Plummo pousse une petite chansonnette sur le grand écran.',
     'bonus_missing_word' => 'Mot mangé',
@@ -375,7 +381,7 @@ Points : une bonne réponse rapporte 30 à 100 points selon ta rapidité ; une r
     'bonus_mirror' => 'Miroir farceur',
     'bonus_hint_mirror' => 'Retourne temporairement le dessin sur le grand écran seulement.',
     'bonus_clumsy' => 'Main maladroite',
-    'bonus_hint_clumsy' => 'Ajoute de petites ondulations aux nouveaux traits.',
+    'bonus_hint_clumsy' => 'Fait fortement onduler les nouveaux traits au crayon. La gomme et le remplissage restent précis.',
     'bonus_pop' => 'Éclater la bulle',
     'bonus_reveal' => 'Soulever le rideau',
     'bonus_mystery_name' => 'Surprise !',
@@ -436,7 +442,10 @@ Points : une bonne réponse rapporte 30 à 100 points selon ta rapidité ; une r
     'mini_empty' => 'Personne n’a écrit de réponse. On passe à la suite !',
     'mini_waiting' => 'On attend trois joueurs pour cette épreuve.',
     'mini_correct' => 'La bonne réponse : {answer}',
-    'rules_bluff' => 'Invente une réponse crédible pour tromper les autres tout en retrouvant la vérité. Au moins trois joueurs participent. Écris un bluff sur ton téléphone et valide-le avant la fin du temps ; un brouillon non validé ne participe pas. Les propositions sont présentées anonymement, puis tu votes pour celle que tu crois vraie. Tu ne peux pas voter pour ton propre bluff. Trouver la vérité dès l’écriture rapporte 65 points et dispense de voter ; voter pour la vérité rapporte aussi 65 points. Chaque vote attiré par un bluff rapporte 65 points à ses auteurs, partagés entre eux si plusieurs ont écrit la même réponse. Les réponses identiques sont regroupées. Les points sont révélés en fin de manche.',
+    'rules_bluff' => 'But : inventer une réponse crédible pour tromper les autres tout en retrouvant la vérité. Au moins trois joueurs participent.
+Déroulement : les propositions sont présentées anonymement, puis tu votes pour celle que tu crois vraie. Les réponses identiques sont regroupées. Les points sont révélés en fin de manche.
+Comment jouer : écris un bluff et valide-le avant la fin du temps ; un brouillon non validé ne participe pas. Tu ne peux pas voter pour ton propre bluff.
+Points : trouver la vérité dès l’écriture rapporte 65 points et dispense de voter ; voter pour la vérité rapporte aussi 65 points. Chaque vote attiré par un bluff rapporte 65 points à ses auteurs, partagés entre eux si plusieurs ont écrit la même réponse.',
     'bluff_name' => 'Le bluff des Plummos',
     'launch_bluff' => 'Préparer le bluff',
     'available_bluffs' => ':unseen sujets inédits sur :total disponibles',

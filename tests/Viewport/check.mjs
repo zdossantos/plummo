@@ -798,7 +798,8 @@ for (const language of ['fr', 'en']) {
                 }, locale);
                 await page.addScriptTag({ content: js });
                 await page.evaluate(
-                    ({ type, chief }) => window.mountPreparation(type, chief),
+                    ({ type, chief }) =>
+                        window.mountPreparation(type, chief, true),
                     { type, chief },
                 );
                 await page.locator('[data-game-rules]').waitFor();
@@ -837,18 +838,46 @@ for (const language of ['fr', 'en']) {
                     `Preparation ${language} ${type} ${chief} ${width}x${height} controls outside`,
                 );
                 if (chief) {
-                    const blocked = await page
-                        .locator('.setup-details label')
-                        .evaluateAll((labels) =>
-                            labels.filter((label) => {
-                                const r = label.getBoundingClientRect();
-                                const target = document.elementFromPoint(
-                                    r.x + r.width / 2,
-                                    r.y + r.height / 2,
-                                );
-                                return !label.contains(target);
-                            }).map((label) => label.textContent),
+                    const overlap = await page.evaluate(() => {
+                        const main = document
+                            .querySelector('.setup-main')
+                            .getBoundingClientRect();
+                        const actions = document
+                            .querySelector('.readiness-actions')
+                            .getBoundingClientRect();
+                        return (
+                            Math.min(
+                                document
+                                    .querySelector('.setup-details')
+                                    .getBoundingClientRect().bottom,
+                                main.bottom,
+                            ) >
+                            actions.top + 1
                         );
+                    });
+                    assert.equal(
+                        overlap,
+                        false,
+                        `Preparation ${language} ${type} ${width}x${height} details overlap actions`,
+                    );
+                    const blocked = [];
+                    for (const label of await page
+                        .locator('.setup-details label')
+                        .all()) {
+                        await label.scrollIntoViewIfNeeded();
+                        if (
+                            await label.evaluate((label) => {
+                                const r = label.getBoundingClientRect();
+                                return !label.contains(
+                                    document.elementFromPoint(
+                                        r.x + r.width / 2,
+                                        r.y + r.height / 2,
+                                    ),
+                                );
+                            })
+                        )
+                            blocked.push(await label.textContent());
+                    }
                     assert.deepEqual(
                         blocked,
                         [],
@@ -858,6 +887,28 @@ for (const language of ['fr', 'en']) {
                 await page.locator('[data-game-rules]').click();
                 await page.locator('.reader-text').waitFor();
                 await page.waitForTimeout(100);
+                assert.ok(
+                    await page.locator('.reader-text strong').count(),
+                    'Rules section labels must be bold',
+                );
+                assert.ok(
+                    await page
+                        .locator('.game-drawer')
+                        .evaluate(
+                            (e) =>
+                                e
+                                    .querySelector('[data-slot="drawer-title"]')
+                                    .getBoundingClientRect().top -
+                                    e.getBoundingClientRect().top <=
+                                30,
+                        ),
+                    'Rules title must stay close to the top of the modal',
+                );
+                assert.equal(
+                    await page.getByRole('tab').first().textContent(),
+                    locale.rooms.rules_flow,
+                );
+
                 assert.deepEqual(
                     await inside(),
                     { overflow: false, outside: [] },
@@ -865,53 +916,88 @@ for (const language of ['fr', 'en']) {
                 );
                 if (
                     process.env.VIEWPORT_SCREENSHOTS &&
-                    width === 320 &&
-                    type === 'mini_games'
+                    ((width === 320 && type === 'mini_games') ||
+                        (width === 390 && type === 'quiz'))
                 )
                     await page.screenshot({
-                        path: cache + `/rules-${language}-${chief}.png`,
+                        path:
+                            cache +
+                            `/rules-${type}-${width}-${language}-${chief}.png`,
                     });
-                let read = '';
-                for (let index = 0; index < 100; index++) {
-                    const reader = await page
-                        .locator('.reader-text')
-                        .evaluate((e) => ({
-                            text: e.textContent,
-                            overflow:
-                                e.scrollHeight > e.clientHeight + 1 ||
-                                e.scrollWidth > e.clientWidth + 1,
-                        }));
-                    assert.equal(
-                        reader.overflow,
-                        false,
-                        `Rules reader ${language} ${type} ${width}x${height} page ${index + 1} overflow`,
-                    );
-                    read += reader.text;
-                    const next = page
-                        .locator('.game-drawer .page-controls button')
-                        .last();
-                    if (!(await next.count()) || (await next.isDisabled()))
-                        break;
-                    await next.click();
-                }
-                const expected = [
-                    locale.rooms['rules_' + type],
-                    ...(type === 'mini_games'
+                const [goal, flow, play, points] =
+                    locale.rooms['rules_' + type].split('\n');
+                const trials =
+                    type === 'mini_games'
                         ? ['memory', 'hide', 'count', 'cups', 'author'].map(
                               (trial) => locale.rooms['rules_trial_' + trial],
                           )
-                        : []),
-                    locale.rooms.rules_clock,
-                ].join('\n\n');
+                        : [];
+                const expected = [
+                    [flow, goal].join('\n\n'),
+                    [play, ...trials, points, locale.rooms.rules_clock].join(
+                        '\n\n',
+                    ),
+                    locale.rooms.rules_bonus_overview,
+                ];
                 assert.equal(
-                    read,
-                    expected,
-                    `Rules ${language} ${type}: pagination lost text`,
+                    await page.getByRole('tab').count(),
+                    expected.length,
                 );
+                for (const [section, text] of expected.entries()) {
+                    await page.getByRole('tab').nth(section).click();
+                    await page.waitForTimeout(30);
+                    if (
+                        process.env.VIEWPORT_SCREENSHOTS &&
+                        width === 390 &&
+                        type === 'quiz' &&
+                        language === 'fr' &&
+                        chief &&
+                        section === 2
+                    )
+                        await page.screenshot({
+                            path: cache + '/rules-bonus-mobile.png',
+                        });
+                    assert.deepEqual(
+                        await inside(),
+                        { overflow: false, outside: [] },
+                        `Rules tab ${section} ${language} ${type} ${width}x${height}`,
+                    );
+                    let read = '';
+                    for (let index = 0; index < 100; index++) {
+                        const reader = await page
+                            .locator('.reader-text')
+                            .evaluate((e) => ({
+                                text: e.textContent,
+                                overflow:
+                                    e.scrollHeight > e.clientHeight + 1 ||
+                                    e.scrollWidth > e.clientWidth + 1,
+                            }));
+                        assert.equal(
+                            reader.overflow,
+                            false,
+                            `Rules reader ${language} ${type} ${width}x${height} tab ${section} page ${index + 1} overflow`,
+                        );
+                        read += reader.text;
+                        const next = page
+                            .locator('.game-drawer .page-controls button')
+                            .last();
+                        if (!(await next.count()) || (await next.isDisabled()))
+                            break;
+                        await next.click();
+                    }
+                    assert.equal(
+                        read,
+                        text,
+                        `Rules ${language} ${type} tab ${section}: pagination lost text`,
+                    );
+                }
                 await page
                     .locator('.game-drawer [data-slot="drawer-close"]')
                     .click();
-                await page.locator('[data-ready]').waitFor();
+                assert.equal(
+                    await page.locator('[data-ready]').count(),
+                    chief ? 0 : 1,
+                );
                 await page.evaluate(() => window.unmountLayout());
                 preparationChecks++;
             }

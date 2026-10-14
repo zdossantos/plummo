@@ -32,3 +32,12 @@ export class BonusLaunchTracker {
         return restored ? [] : fresh;
     }
 }
+
+export function selectImpactEvents(
+    events: BonusLaunchEvent[],
+): BonusLaunchEvent[] {
+    if (events.length <= 2) return events;
+    const attack = [...events].reverse().find((event) => !event.reaction);
+    const latest = events[events.length - 1];
+    return attack && attack !== latest ? [attack, latest] : events.slice(-2);
+}

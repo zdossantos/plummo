@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { onUnmounted, ref, watch } from 'vue';
 import BonusIcon from '@/components/BonusIcon.vue';
+import BonusImpact from '@/components/BonusImpact.vue';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
-import { BonusLaunchTracker, type BonusLaunchEvent } from '@/lib/bonus-launch';
+import {
+    BonusLaunchTracker,
+    selectImpactEvents,
+    type BonusLaunchEvent,
+} from '@/lib/bonus-launch';
 import { useTranslations } from '@/composables/useTranslations';
 import type { GameState, RoomState } from '@/types/rooms';
 
 const props = defineProps<{
+    screen?: boolean;
     game: GameState | null;
     room: RoomState | null;
     serverNow: number;
@@ -37,12 +43,15 @@ watch(
         if (props.closed) return;
         for (const event of fresh) {
             active.value.push(event);
-            const timer = setTimeout(() => {
-                active.value = active.value.filter(
-                    (item) => item.id !== event.id,
-                );
-                timers.delete(timer);
-            }, 1800);
+            const timer = setTimeout(
+                () => {
+                    active.value = active.value.filter(
+                        (item) => item.id !== event.id,
+                    );
+                    timers.delete(timer);
+                },
+                props.screen ? 2800 : 1800,
+            );
             timers.add(timer);
         }
     },
@@ -54,7 +63,19 @@ function actor(id: number) {
 }
 </script>
 <template>
-    <div class="bonus-launch-layer" aria-live="polite" aria-atomic="false">
+    <div
+        class="bonus-launch-layer"
+        :class="{ 'bonus-launch-layer-screen': screen }"
+        aria-live="polite"
+        aria-atomic="false"
+    >
+        <BonusImpact
+            v-for="event in screen ? selectImpactEvents(active) : []"
+            :key="'impact-' + event.id"
+            :event="event"
+            :room="room"
+        />
+
         <div
             v-for="event in active"
             :key="event.id"

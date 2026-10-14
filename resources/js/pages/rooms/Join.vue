@@ -82,7 +82,9 @@ const allReady = computed(() => {
         !!room.value?.gameSetup &&
         !setupPending.value &&
         players.length > 0 &&
-        players.every((player) => player.ready)
+        players.every(
+            (player) => player.id === room.value?.chiefId || player.ready,
+        )
     );
 });
 function changeSetup(settings: GameSetupState) {
@@ -419,6 +421,7 @@ watch(chief, (value) => {
                                 <GameReadiness
                                     v-if="room"
                                     :players="room.players"
+                                    :chief-id="room.chiefId"
                                     :me="me"
                                     :revision="room.setupRevision"
                                     :disabled="
@@ -522,6 +525,7 @@ watch(chief, (value) => {
                                 />
                                 <GameReadiness
                                     :players="room.players"
+                                    :chief-id="room.chiefId"
                                     :me="me"
                                     :revision="room.setupRevision"
                                     :disabled="busy || !room.gameSetup"

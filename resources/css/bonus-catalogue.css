@@ -50,7 +50,7 @@
     pointer-events: none;
 }
 .bonus-visitor-squatter {
-    animation: bonus-walk 4s ease-in-out both;
+    animation: bonus-walk 8s ease-in-out both;
 }
 .bonus-visitor-photobomb {
     animation: photo-peek 4s ease-in-out both;

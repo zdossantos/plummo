@@ -1,0 +1,24 @@
+# Ajouter ou modifier un bonus ou malus
+
+Un objet est terminé lorsque ses règles, ses effets en jeu, son animation sur le grand écran et son bruitage sont raccordés ensemble. Une toast seule ne remplace pas la scène VFX. Cette règle s’applique à chaque ajout et à chaque modification, ainsi qu’au raccordement à un nouveau mini-jeu.
+
+## Livraison obligatoire
+
+1. Définir les règles dans Laravel : catalogue, modes compatibles, cibles, durée, cumul, défenses, pause/reprise et expiration. Documenter les modes incompatibles et leur raison. Écrire les tests métier avant l’implémentation et constater leur échec pertinent, uniquement sur `plummo_testing`.
+2. Ajouter le type dans `resources/js/types/rooms.ts`, l’icône dans `public/bonuses`, et les noms/descriptions FR et EN dans `lang/fr/rooms.php` et `lang/en/rooms.php`. Les textes du jeu passent par Inertia.
+3. Choisir explicitement une scène dans `resources/js/lib/bonus-scenes.ts`. Implémenter son rendu dans `BonusImpact.vue` et sa chorégraphie dans `resources/css/bonus-stage.css`. Une famille existante peut être réutilisée si le geste correspond au sens de l’objet ; un boomerang ne représente pas un emprunt de temps ou un miroir. Quand l’icône représente déjà un Plummo particulier, utiliser ce personnage dans la scène. Soigner les raccords, attaches, masques, positions et disparition.
+4. Prévoir la version **statique** `prefers-reduced-motion: reduce`, avec la bonne icône, sans animations. Garder la scène traversable aux clics, contenue dans le viewport et réservée au grand écran. `BonusLaunch` conserve l’annonce en haut, les deux scènes simultanées maximum, leur nettoyage et la déduplication des événements. Ne pas rejouer les snapshots initiaux ou les reconnexions.
+5. Choisir un vrai bruitage de bibliothèque correspondant au geste, plutôt qu’un son d’interface ou un son synthétisé par défaut. Livrer le fichier local `public/audio/sfx/scenes/<kind>.mp3` et le raccordement dans `soundscape.ts`. Utiliser une source dont la licence permet la distribution, conserver auteur, page source, licence, lien de licence, empreinte SHA-256 et recette dans `sources.json`, puis mettre à jour les [crédits distribués](../public/audio/sfx/scenes/README.md). Les licences actuellement acceptées automatiquement sont CC0-1.0 et CC-BY-3.0 ; toute autre licence nécessite une vérification et une adaptation explicite du contrôle.
+6. Monter le son sur la chorégraphie, avec fondus et niveau cohérent : stéréo 48 kHz, MP3 160 kbit/s, scène de 2,8 s, normalisation cible −18 LUFS et crête cible −3 dB. Réutiliser `scripts/build-bonus-sfx.py`. Respecter mute, volume, atténuation pendant le blind test, préchargement, requêtes tardives et fermeture du salon via `Soundscape` et `ScreenSound`.
+7. Vérifier visuellement et écouter le résultat normal et les réactions éventuelles. Fournir une courte vidéo **avec le son** pour revue ; les exports distribués doivent embarquer les crédits et les licences à jour. Vérifier aussi l’image statique d’accessibilité. La grève utilise une foule qui proteste ; les effets musicaux n’ajoutent pas de barres de visualisation du son.
+
+## Contrôles automatiques obligatoires
+
+Exécuter `bun run test:unit`, `bun run test:bonuses`, puis les validations habituelles du [README](../README.md). Le job `quality` de `.github/workflows/ci.yml` exécute ces contrôles sur chaque PR, en plus du typage, du lint, du build, des viewports et des tests métier/navigateur existants.
+
+- `tests/Frontend/bonus-scenes.test.ts` compare les scènes explicites à l’union réelle des objets de `BonusCatalog` dans les sept modes. Le typage impose aussi une entrée pour chaque `BonusKind`.
+- `tests/BonusPresentation/check.mjs` monte le vrai composant Vue et charge les vrais assets locaux, sans serveur applicatif ni base de données. Il compare les types, les scènes, les fichiers audio et les recettes, puis vérifie les crédits, licences et empreintes déclarées. Les fichiers sources originaux ne sont pas téléchargés en CI ; leurs empreintes sont vérifiées lors de la reconstruction.
+- Chromium décode chaque MP3 : durée, stéréo, échantillons finis, présence sonore et absence de saturation. Un fichier absent, corrompu ou silencieux fait échouer le contrôle.
+- Chaque objet et les réactions bouclier/savon/boomerang sont rendus en 1280 × 720 et 1920 × 1080, avec et sans mouvement réduit : animations présentes en mode normal, bonne icône statique sans animation en mode réduit, images chargées, clics traversants, aucun débordement ni erreur JavaScript.
+
+Ces contrôles détectent les oublis et régressions techniques. Ils ne jugent pas la pertinence artistique d’un son, la finition d’une corde ou la perception du volume sur une télévision : la revue vidéo et l’écoute restent obligatoires. Si un nouveau format ou une nouvelle réaction est ajouté, étendre les cas du contrôle.

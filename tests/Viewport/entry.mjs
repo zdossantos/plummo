@@ -1,4 +1,5 @@
 import { createApp, ref, h } from 'vue';
+import { Button } from '../../resources/js/components/ui/button';
 import GameSetup from '../../resources/js/components/GameSetup.vue';
 import GameReadiness from '../../resources/js/components/GameReadiness.vue';
 import GameRules from '../../resources/js/components/GameRules.vue';
@@ -119,7 +120,7 @@ window.mountLayout = (game, phone = true) => {
     window.unmountLayout = () => app.unmount();
 };
 
-window.mountPreparation = (type, chief = true) => {
+window.mountPreparation = (type, chief = true, failed = false) => {
     const setup = {
         type,
         packs: [1],
@@ -162,12 +163,31 @@ window.mountPreparation = (type, chief = true) => {
                                               audioReady: true,
                                           },
                                           {
-                                              readiness: () =>
+                                              readiness: () => [
                                                   h(GameReadiness, {
                                                       players,
+                                                      chiefId: 1,
                                                       me: players[0],
                                                       disabled: false,
                                                   }),
+                                                  failed
+                                                      ? h(
+                                                            Button,
+                                                            {
+                                                                variant:
+                                                                    'outline',
+                                                                type: 'button',
+                                                                'data-setup-retry':
+                                                                    '',
+                                                            },
+                                                            () =>
+                                                                window
+                                                                    .translations
+                                                                    .interface
+                                                                    .retry,
+                                                        )
+                                                      : null,
+                                              ],
                                           },
                                       )
                                     : h(
@@ -188,6 +208,7 @@ window.mountPreparation = (type, chief = true) => {
                                               }),
                                               h(GameReadiness, {
                                                   players,
+                                                  chiefId: 1,
                                                   me: players[7],
                                                   disabled: false,
                                               }),

@@ -37,6 +37,7 @@ bun run lint:check
 bun run format:check
 bun run types:check
 bun run test:unit
+bun run test:bonuses
 bun run test:viewport
 bun run build
 php artisan test
@@ -146,3 +147,5 @@ Chaque lancement de bonus/malus affiche brièvement sur la TV le Plummo de son a
 ## Mini jeux
 
 Le chef choisit « Mini jeux » puis les épreuves dans le drawer qui remplace les packs. Toutes les épreuves compatibles sont cochées par défaut : mémoire, cache-cache, comptage et gobelets dès un joueur ; Qui a écrit ça ? dès trois joueurs. Aucun import n'est nécessaire. Les scènes sont générées sur le serveur et affichées sur la TV, avec des commandes de réponse sur téléphone. Le mode utilise les scores, les pauses, les résultats et les bonus compatibles existants. Voir les [règles métier](docs/metier-plummo.md).
+
+Les ajouts et modifications de bonus/malus suivent le [contrat de livraison VFX/SFX](docs/bonus-presentation.md). `bun run test:bonuses` contrôle les vrais composants et assets dans Chromium (sons, crédits et mouvement réduit) ; il est obligatoire en CI et fonctionne sans base de données.

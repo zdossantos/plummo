@@ -9,7 +9,9 @@ import {
     DrawerTrigger,
     DrawerClose,
 } from '@/components/ui/drawer';
+import { TabsRoot, TabsList, TabsTrigger, TabsContent } from 'reka-ui';
 import { BookOpen } from '@lucide/vue';
+import { rulesTextRuns } from '@/lib/rules-text';
 import PageControls from '@/components/PageControls.vue';
 import { useTranslations } from '@/composables/useTranslations';
 defineOptions({ inheritAttrs: false });
@@ -19,11 +21,24 @@ const props = defineProps<{
     triggerLabel?: string;
     force?: boolean;
     upside?: boolean;
+    sectionLabels?: boolean;
+    sections?: Array<{ label: string; text: string }>;
 }>();
 const { t } = useTranslations('interface');
 const desktop = useMediaQuery('(min-width: 768px)');
 const page = ref(0);
 const open = ref(false);
+const selected = ref('0');
+const sourceText = computed(
+    () => props.sections?.[Number(selected.value)]?.text ?? props.text,
+);
+watch(selected, () => {
+    page.value = 0;
+});
+function resetReader() {
+    page.value = 0;
+    selected.value = '0';
+}
 const anchor = ref<HTMLElement>();
 const truncated = ref(false);
 let observer: ResizeObserver | undefined;
@@ -62,7 +77,7 @@ const reader = ref<HTMLElement>();
 const { width, height } = useElementSize(reader);
 const parts = computed(() => {
     const element = reader.value;
-    if (!element || !width.value || !height.value) return [props.text];
+    if (!element || !width.value || !height.value) return [sourceText.value];
     // Measure browser word wrapping with the reader's actual typography.
     const probe = element.cloneNode(false) as HTMLElement;
     Object.assign(probe.style, {
@@ -77,7 +92,7 @@ const parts = computed(() => {
         inset: '0 auto auto 0',
     });
     element.parentElement?.append(probe);
-    const characters = Array.from(props.text);
+    const characters = Array.from(sourceText.value);
     const pages: string[] = [];
     let offset = 0;
     try {
@@ -87,9 +102,24 @@ const parts = computed(() => {
             let fits = 1;
             while (low <= high) {
                 const length = Math.floor((low + high) / 2);
-                probe.textContent = characters
-                    .slice(offset, offset + length)
-                    .join('');
+                probe.replaceChildren();
+                if (props.sectionLabels) {
+                    for (const run of rulesTextRuns(
+                        sourceText.value,
+                        offset,
+                        length,
+                    )) {
+                        const node = document.createElement(
+                            run.bold ? 'strong' : 'span',
+                        );
+                        node.textContent = run.text;
+                        probe.append(node);
+                    }
+                } else {
+                    probe.textContent = characters
+                        .slice(offset, offset + length)
+                        .join('');
+                }
                 if (probe.getBoundingClientRect().height <= height.value) {
                     fits = length;
                     low = length + 1;
@@ -112,6 +142,13 @@ const parts = computed(() => {
     if (!pages.length) pages.push('');
     return pages;
 });
+const formatted = computed(() =>
+    rulesTextRuns(
+        sourceText.value,
+        Array.from(parts.value.slice(0, page.value).join('')).length,
+        Array.from(parts.value[page.value] ?? '').length,
+    ),
+);
 watch(parts, () => {
     page.value = Math.min(page.value, parts.value.length - 1);
 });
@@ -121,7 +158,7 @@ watch(parts, () => {
     <Drawer
         v-model:open="open"
         :swipe-direction="desktop ? 'right' : 'down'"
-        @update:open="page = 0"
+        @update:open="resetReader"
     >
         <DrawerTrigger as-child
             ><button
@@ -143,14 +180,48 @@ watch(parts, () => {
             <DrawerDescription class="sr-only">{{
                 t('read')
             }}</DrawerDescription>
-            <p
-                ref="reader"
-                class="reader-text"
-                :class="{ 'answer-upside': upside }"
-            >
-                {{ parts[page] }}
-            </p>
-            <PageControls v-model="page" :total="parts.length" />
+            <TabsRoot v-model="selected" class="reader-content">
+                <TabsList
+                    v-if="sections"
+                    class="rules-tabs"
+                    :aria-label="label"
+                >
+                    <TabsTrigger
+                        v-for="(section, index) in sections"
+                        :key="index"
+                        :value="String(index)"
+                        class="rules-tab"
+                        >{{ section.label }}</TabsTrigger
+                    >
+                </TabsList>
+                <component
+                    :is="sections ? TabsContent : 'div'"
+                    :value="sections ? selected : undefined"
+                    class="reader-page"
+                >
+                    <p
+                        ref="reader"
+                        class="reader-text"
+                        :class="{
+                            'answer-upside': upside,
+                            'rules-reader': sectionLabels,
+                        }"
+                    >
+                        <template v-if="sectionLabels">
+                            <template
+                                v-for="(run, index) in formatted"
+                                :key="index"
+                                ><strong v-if="run.bold">{{ run.text }}</strong
+                                ><template v-else>{{
+                                    run.text
+                                }}</template></template
+                            >
+                        </template>
+                        <template v-else>{{ parts[page] }}</template>
+                    </p>
+                    <PageControls v-model="page" :total="parts.length" />
+                </component>
+            </TabsRoot>
             <DrawerClose as-child
                 ><button type="button" class="game-action">
                     {{ t('close') }}

@@ -3,9 +3,9 @@ import { computed, inject, onUnmounted, ref, watch } from 'vue';
 import { Volume2, VolumeX } from '@lucide/vue';
 import { playAudio } from '@/lib/audio';
 import { Soundscape, soundSettings } from '@/lib/soundscape';
-import { BonusReceiptTracker } from '@/lib/bonuses';
+import { BonusLaunchTracker } from '@/lib/bonus-launch';
 import { useTranslations } from '@/composables/useTranslations';
-import type { BonusItem, GameState, RoomState } from '@/types/rooms';
+import type { GameState, RoomState } from '@/types/rooms';
 const props = defineProps<{
     game: GameState | null;
     room: RoomState | null;
@@ -25,7 +25,7 @@ const settings = inject(soundSettings);
 const media = settings?.media ?? ref<HTMLAudioElement>();
 const blocked = settings?.blocked ?? ref(false);
 let sound: Soundscape | undefined;
-const launches = new BonusReceiptTracker<BonusItem & { at: number }>();
+const launches = new BonusLaunchTracker();
 let idle: ReturnType<typeof setTimeout> | undefined;
 const blind = computed(
     () =>
@@ -110,12 +110,10 @@ watch(
     },
 );
 watch(
-    () => [props.game?.bonuses?.launches, props.connected] as const,
-    ([events]) => {
-        if (!props.game) return;
+    () => [props.game, props.connected] as const,
+    () => {
         const fresh = launches.observe(
-            props.game.id,
-            events ?? [],
+            props.game,
             props.serverNow,
             props.connected,
         );

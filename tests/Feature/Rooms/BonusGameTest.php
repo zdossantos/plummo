@@ -100,7 +100,7 @@ it('expires timed effects and freezes their remaining duration during a manual p
     $this->postJson('/rooms/'.$room->code.'/game/resume')->assertOk();
     $this->travel(5)->seconds();
     $this->withCookie('plummo_player_'.$room->code, $members[1][1])->postJson('/rooms/'.$room->code.'/presence')->assertJsonCount(1, 'game.bonuses.effects');
-    $this->travel(2)->seconds();
+    $this->travel(4)->seconds();
     $this->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.bonuses.effects', []);
 })->group('bonuses');
 
@@ -148,7 +148,7 @@ it('imposes paint on new strokes without corrupting existing strokes or chunk re
     giveTestBonus($game, $other, 'paint');
     $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/bonuses', [...$values, 'item_id' => 'test-object'])->assertOk();
     $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/drawing/stroke', [...$stroke, 'id' => 2])->assertOk()->assertJsonPath('game.round.canvas.0.color', '#35236b')->assertJsonPath('game.round.canvas.1.color', '#f05a78');
-    $this->travel(4)->seconds();
+    $this->travel(10)->seconds();
     $this->postJson('/rooms/'.$room->code.'/drawing/stroke', [...$stroke, 'id' => 2, 'offset' => 2, 'points' => [[0.3, 0.3]]])->assertOk();
     $this->postJson('/rooms/'.$room->code.'/drawing/stroke', [...$stroke, 'id' => 3])->assertOk()->assertJsonPath('game.round.canvas.2.color', '#35236b');
 })->group('bonuses');
@@ -188,7 +188,7 @@ it('does not extend the same effect when another opponent launches it', function
     $this->postJson('/rooms/'.$room->code.'/bonuses', [...$values, 'item_id' => 'one'])->assertOk();
     $this->travel(1)->seconds();
     $this->withCookie('plummo_player_'.$room->code, $members[1][1])->postJson('/rooms/'.$room->code.'/bonuses', [...$values, 'item_id' => 'two'])->assertOk();
-    $this->travel(2)->seconds();
+    $this->travel(4)->seconds();
     $this->withCookie('plummo_player_'.$room->code, $members[2][1])->postJson('/rooms/'.$room->code.'/presence')->assertJsonPath('game.bonuses.effects', []);
     $this->withCookie('plummo_player_'.$room->code, $members[0][1])->postJson('/rooms/'.$room->code.'/presence')->assertJsonCount(1, 'game.bonuses.effects');
 })->group('bonuses');
@@ -285,9 +285,9 @@ it('launches every compatible object with the expected targets and lifetime', fu
     expect($view->json('game.bonuses.inventory'))->toBe([]);
     expect($view->json('game.bonuses.effects'))->toHaveCount($type === 'drawing' || in_array($kind, ['dice', 'squatter', 'artist'], true) ? 1 : 0);
 })->with([
-    ['quiz', 'bolt', 3], ['quiz', 'dice', 6], ['quiz', 'squatter', 4],
-    ['blind_test', 'bolt', 3], ['blind_test', 'dice', 6], ['blind_test', 'squatter', 4], ['blind_test', 'artist', 4],
-    ['phrase', 'accent', null], ['phrase', 'sneeze', null], ['drawing', 'stamp', 4], ['drawing', 'paint', 4],
+    ['quiz', 'bolt', 5], ['quiz', 'dice', 10], ['quiz', 'squatter', 8],
+    ['blind_test', 'bolt', 5], ['blind_test', 'dice', 10], ['blind_test', 'squatter', 8], ['blind_test', 'artist', 8],
+    ['phrase', 'accent', null], ['phrase', 'sneeze', null], ['drawing', 'stamp', 10], ['drawing', 'paint', 10],
 ])->group('bonuses');
 
 it('rejects an incompatible or stolen object without changing the pocket or effects', function (string $item) {
@@ -418,6 +418,6 @@ it('projects drawing lightning onto the TV canvas only when an opponent is hit',
     expect($bonuses->view($game->fresh(), null, true)['effects'])->toHaveCount($protected ? 0 : 1);
     $response = $this->withCookie('plummo_player_'.$room->code, $targetToken)->postJson('/rooms/'.$room->code.'/presence')->assertOk();
     $response->assertJsonCount($protected ? 0 : 1, 'game.bonuses.effects');
-    $this->travel(3)->seconds();
+    $this->travel(5)->seconds();
     expect($bonuses->view($game->fresh(), null, true)['effects'])->toBe([]);
 })->with([[true, false], [false, false], [true, true], [false, true]]);

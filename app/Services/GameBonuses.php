@@ -301,7 +301,7 @@ class GameBonuses
      */
     public function strokePoints(array $points, bool $clumsy): array
     {
-        return $clumsy ? array_map(fn ($p) => [min(1, max(0, $p[0] + 0.008 * sin($p[1] * 90))), min(1, max(0, $p[1] + 0.012 * sin($p[0] * 70)))], $points) : $points;
+        return $clumsy ? array_map(fn ($p) => [min(1, max(0, $p[0] + 0.024 * sin($p[1] * 90))), min(1, max(0, $p[1] + 0.036 * sin($p[0] * 70)))], $points) : $points;
     }
 
     public function paint(Game $game, string $color): string
