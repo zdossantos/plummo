@@ -28,10 +28,10 @@ test('receipts animate only once and never replay after reconnect or late arriva
     expect(tracker.observe(2, [{ ...receipt, id: 'old', at: 90 }], 110, true)).toEqual([]);
 });
 
-test('each bonus resolves to a shipped Kenney sample', async () => {
+test('each bonus resolves to a documented scene-specific library sample', async () => {
     const { bonusSoundFile } =
         await import('../../resources/js/lib/soundscape');
-    const { existsSync } = await import('node:fs');
+    const { existsSync, readFileSync } = await import('node:fs');
     const kinds = [
         'bolt',
         'dice',
@@ -74,9 +74,13 @@ test('each bonus resolves to a shipped Kenney sample', async () => {
     ] as const;
     const files = kinds.map((kind) => bonusSoundFile(kind));
     expect(new Set(files).size).toBe(38);
+    const sources = JSON.parse(
+        readFileSync('public/audio/sfx/scenes/sources.json', 'utf8'),
+    );
     for (const file of files) {
-        expect(file).toMatch(/^\/audio\/sfx\/[a-z]+_\d{3}\.mp3$/);
+        expect(file).toMatch(/^\/audio\/sfx\/scenes\/[a-z_]+\.mp3$/);
         expect(existsSync('public' + file)).toBe(true);
+        expect(sources[file.split('/').pop()!]?.sources.length).toBeGreaterThan(0);
     }
 });
 

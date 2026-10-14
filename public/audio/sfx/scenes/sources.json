@@ -1,0 +1,1950 @@
+{
+  "bolt.mp3": {
+    "sources": [
+      {
+        "path": "100-cc0-sfx-2/sfx100v2_thunder_01.ogg",
+        "title": "100 CC0 SFX #2",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx-2",
+        "sha256": "8a4f1dee999546b363f989eff92174375eeae7c241dc9beaa0892fb131ef12a9",
+        "delay": 0.2,
+        "length": 2.5,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "dice.mp3": {
+    "sources": [
+      {
+        "path": "multiple-dice-rolling.ogg",
+        "title": "Multiple Dice Rolling",
+        "author": "Justin Nichol",
+        "license": "CC-BY-3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "url": "https://opengameart.org/content/multiple-dice-rolling",
+        "sha256": "8344ce1a294bdb77a3fd27904a94f288bbe09e6409bc9df446c34cab8c5d259d",
+        "delay": 0.18,
+        "length": 2.3,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "squatter.mp3": {
+    "sources": [
+      {
+        "path": "swishes-sound-pack/swishes/swish-2.wav",
+        "title": "Swishes Sound Pack",
+        "author": "artisticdude",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/swishes-sound-pack",
+        "sha256": "1ce7752cce3d43f16fc222ad7f7ffb69d9a5fc01e64b93d205765fc37b8e9b0d",
+        "delay": 0,
+        "length": 0.35,
+        "gain": 0.35,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "80-cc0-creature-sfx/cute_03.ogg",
+        "title": "80 CC0 creature SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/80-cc0-creature-sfx",
+        "sha256": "de5b8609ffcdb6f22865c8dc696dc01bdbc54e78ca54af45cb22116a0641b6c2",
+        "delay": 0.4,
+        "length": 1.3,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/spring_02.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "024b00be17500bc7d272089f95e4ce615c1bde6c6680926f61ea44a1e425fe58",
+        "delay": 0.5,
+        "length": 0.5,
+        "gain": 0.3,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "artist.mp3": {
+    "sources": [
+      {
+        "path": "swishes-sound-pack/swishes/swish-1.wav",
+        "title": "Swishes Sound Pack",
+        "author": "artisticdude",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/swishes-sound-pack",
+        "sha256": "9a15c881345c1ce1c39cc31f52f081c8c4dc81fa41111e0079400f39d3ba0e45",
+        "delay": 0.05,
+        "length": 0.5,
+        "gain": 0.6,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "202-more-sound-effects/Cloth/Cloth_03.wav",
+        "title": "202 More Sound Effects",
+        "author": "OwlishMedia",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/202-more-sound-effects",
+        "sha256": "0852458e2e59541e3d759436c7a6cf8931f50ce6218d7cdecf2527422fc4d7bc",
+        "delay": 0.6,
+        "length": 1.1,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "80-cc0-creature-sfx/cute_09.ogg",
+        "title": "80 CC0 creature SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/80-cc0-creature-sfx",
+        "sha256": "2432bc342b5688c390df41fbeb87be6af7fb686d67400d3310dfd1e2922bdbda",
+        "delay": 1.2,
+        "length": 0.6,
+        "gain": 0.55,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "accent.mp3": {
+    "sources": [
+      {
+        "path": "80-cc0-creature-sfx/cute_05.ogg",
+        "title": "80 CC0 creature SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/80-cc0-creature-sfx",
+        "sha256": "41d1b63ad4f006c09dbc65a686c022633825b01aa20e400b6dce0c6a22970c7c",
+        "delay": 0.35,
+        "length": 1.9,
+        "gain": 1,
+        "pitch": 1.1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "sneeze.mp3": {
+    "sources": [
+      {
+        "path": "genuine-sneeze-sound.flac",
+        "title": "Genuine Sneeze Sound",
+        "author": "qubodup",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/genuine-sneeze-sound",
+        "sha256": "2ba4e6f9aa760a11027e68920983c8121a9cf5e1b64ea8a3ece97bba4d53302a",
+        "delay": 0.35,
+        "length": 2.2,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "stamp.mp3": {
+    "sources": [
+      {
+        "path": "swishes-sound-pack/swishes/swish-7.wav",
+        "title": "Swishes Sound Pack",
+        "author": "artisticdude",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/swishes-sound-pack",
+        "sha256": "e6de737a34de16afed094d6170d7679149022f149e0a8356d2f029b0e8f4a4d7",
+        "delay": 0,
+        "length": 0.45,
+        "gain": 0.4,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/wooden_01.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "e7f7b1243ecd6ff3487eee1540de56f38fac606fe6218bdd49a91efc29ae1b9a",
+        "delay": 0.5,
+        "length": 0.55,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/paper_02.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "4d0c68b367bd3fbdf9817e764908e5524b2cad6536eb0911fc74f6ab4f60c50a",
+        "delay": 0.58,
+        "length": 0.6,
+        "gain": 0.4,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "paint.mp3": {
+    "sources": [
+      {
+        "path": "40-cc0-water-splash-slime-sfx/splash_05.ogg",
+        "title": "40 CC0 water, splash & slime SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/40-cc0-water-splash-slime-sfx",
+        "sha256": "7aeaf4ac236629cf71042f56592ffc50e36f552df12c8442600839ce10156ca3",
+        "delay": 0.5,
+        "length": 1.3,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "40-cc0-water-splash-slime-sfx/slime_02.ogg",
+        "title": "40 CC0 water, splash & slime SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/40-cc0-water-splash-slime-sfx",
+        "sha256": "a4ba1530c081706cb7ce8a08702c3552437561c33b851fe46e97d3232574320c",
+        "delay": 0.8,
+        "length": 1.4,
+        "gain": 0.6,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "shield.mp3": {
+    "sources": [
+      {
+        "path": "shimmer-glitter-magic.flac",
+        "title": "Shimmer Glitter Magic",
+        "author": "The Berklee College of Music; submitted by qubodup",
+        "license": "CC-BY-3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "url": "https://opengameart.org/content/shimmer-glitter-magic",
+        "sha256": "b6802e6ef22189058a4406ae5c7bda9a54c47e908fad3fd6212650c1aa0170af",
+        "delay": 0.12,
+        "length": 2.2,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/glass_03.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "b35c3ac4cc7d665bed2a37f54fce4528c7a048daf46c1e4db0a371092bf333e8",
+        "delay": 0.45,
+        "length": 0.7,
+        "gain": 0.25,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "soap.mp3": {
+    "sources": [
+      {
+        "path": "40-cc0-water-splash-slime-sfx/bubble_01.ogg",
+        "title": "40 CC0 water, splash & slime SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/40-cc0-water-splash-slime-sfx",
+        "sha256": "1d03d72347019be889280efc6de5ca5ea439d0b24b235e6db87e5bf7583ecb2b",
+        "delay": 0.3,
+        "length": 0.5,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "40-cc0-water-splash-slime-sfx/splash_02.ogg",
+        "title": "40 CC0 water, splash & slime SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/40-cc0-water-splash-slime-sfx",
+        "sha256": "eab0bb4bc01386528ba1e6244c6fd8940ee8d3c91ddb9e9cfea186e8560e04de",
+        "delay": 0.65,
+        "length": 1.2,
+        "gain": 0.75,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "40-cc0-water-splash-slime-sfx/bubble_03.ogg",
+        "title": "40 CC0 water, splash & slime SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/40-cc0-water-splash-slime-sfx",
+        "sha256": "6189106305ab917f1a260b66a74380ed7d6e5be0fb4f5eba3ac93aeb89d9b7ca",
+        "delay": 1.45,
+        "length": 0.6,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "boomerang.mp3": {
+    "sources": [
+      {
+        "path": "swishes-sound-pack/swishes/swish-5.wav",
+        "title": "Swishes Sound Pack",
+        "author": "artisticdude",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/swishes-sound-pack",
+        "sha256": "4db41f2d2f97caf94627be05ff2870217fecc86534cf30f2aab413b847a0d50a",
+        "delay": 0.05,
+        "length": 0.7,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "swishes-sound-pack/swishes/swish-8.wav",
+        "title": "Swishes Sound Pack",
+        "author": "artisticdude",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/swishes-sound-pack",
+        "sha256": "113a3709ad889ad2fcf38eaceaf4eb9d67ffe1e96713fed93a6f0aed08769980",
+        "delay": 0.85,
+        "length": 0.65,
+        "gain": 1,
+        "pitch": 1.12,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "swishes-sound-pack/swishes/swish-3.wav",
+        "title": "Swishes Sound Pack",
+        "author": "artisticdude",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/swishes-sound-pack",
+        "sha256": "55b100e2c67fa43dad8510e31e85bbd51a68d5ce84a6e0259e21e19030083e24",
+        "delay": 1.8,
+        "length": 0.55,
+        "gain": 1,
+        "pitch": 0.9,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "pinata.mp3": {
+    "sources": [
+      {
+        "path": "100-cc0-sfx/door_01.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "a1a7fd61ccd03dd58151f5429d6447ad80c2f31c3e357c4756609a0c6c945391",
+        "delay": 0.48,
+        "length": 0.4,
+        "gain": 0.35,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/paper_04.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "afae7236bce275fad555922cc8578882eb0c0b5d822be0a9180c9efdadf4a770",
+        "delay": 1.3,
+        "length": 0.8,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/wooden_02.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "a6f6edf91a63c5af9059f70df0ac4e3fcee2c57342dc41dd3a166810365392fd",
+        "delay": 1.3,
+        "length": 0.5,
+        "gain": 0.6,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "shimmer-glitter-magic.flac",
+        "title": "Shimmer Glitter Magic",
+        "author": "The Berklee College of Music; submitted by qubodup",
+        "license": "CC-BY-3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "url": "https://opengameart.org/content/shimmer-glitter-magic",
+        "sha256": "b6802e6ef22189058a4406ae5c7bda9a54c47e908fad3fd6212650c1aa0170af",
+        "delay": 1.4,
+        "length": 1.3,
+        "gain": 0.45,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "washer.mp3": {
+    "sources": [
+      {
+        "path": "100-cc0-sfx-2/sfx100v2_loop_machine_02.ogg",
+        "title": "100 CC0 SFX #2",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx-2",
+        "sha256": "098f3c6ea71eef9ccd1667f36e9bd8cfd51857603ff56f649ab742dd75d8fe98",
+        "delay": 0.1,
+        "length": 2.3,
+        "gain": 0.7,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "40-cc0-water-splash-slime-sfx/loop_water_01.ogg",
+        "title": "40 CC0 water, splash & slime SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/40-cc0-water-splash-slime-sfx",
+        "sha256": "11ebdc63e0178f4de48167570e51a60a9ce968451ce60ff49a3c1faceabf1e0b",
+        "delay": 0.3,
+        "length": 2.1,
+        "gain": 0.75,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "lock.mp3": {
+    "sources": [
+      {
+        "path": "100-cc0-sfx-2/sfx100v2_lock_open_01.ogg",
+        "title": "100 CC0 SFX #2",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx-2",
+        "sha256": "5147f96254216792e0bf5f32a3589efbc4e4632fbba4737740f336b7bfbf3f55",
+        "delay": 0.4,
+        "length": 1.5,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/metal_03.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "35ec56e5136e7091f36470c3e502e714819c9ff843baff0910b095571459f274",
+        "delay": 1.2,
+        "length": 0.7,
+        "gain": 0.45,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "mystery.mp3": {
+    "sources": [
+      {
+        "path": "100-cc0-sfx/wooded_box_open.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "f564d93620fa150f6a85f86f26c3dc61ca42b62c887bc833b3af3a564897796f",
+        "delay": 0.12,
+        "length": 0.8,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/paper_01.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "b2b2b55e44761c7a45283bce0196f41f72207180fb08c970d7dcf93b705d280c",
+        "delay": 0.4,
+        "length": 0.8,
+        "gain": 0.6,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "shimmer-glitter-magic.flac",
+        "title": "Shimmer Glitter Magic",
+        "author": "The Berklee College of Music; submitted by qubodup",
+        "license": "CC-BY-3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "url": "https://opengameart.org/content/shimmer-glitter-magic",
+        "sha256": "b6802e6ef22189058a4406ae5c7bda9a54c47e908fad3fd6212650c1aa0170af",
+        "delay": 0.8,
+        "length": 1.6,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "bubbles.mp3": {
+    "sources": [
+      {
+        "path": "40-cc0-water-splash-slime-sfx/bubble_01.ogg",
+        "title": "40 CC0 water, splash & slime SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/40-cc0-water-splash-slime-sfx",
+        "sha256": "1d03d72347019be889280efc6de5ca5ea439d0b24b235e6db87e5bf7583ecb2b",
+        "delay": 0.28,
+        "length": 0.4,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "40-cc0-water-splash-slime-sfx/bubble_02.ogg",
+        "title": "40 CC0 water, splash & slime SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/40-cc0-water-splash-slime-sfx",
+        "sha256": "7992a1a4637ea727b177b3edbc086ec280167d67a8fad010bb8fb58893b2e2f2",
+        "delay": 0.75,
+        "length": 0.4,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "40-cc0-water-splash-slime-sfx/bubble_03.ogg",
+        "title": "40 CC0 water, splash & slime SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/40-cc0-water-splash-slime-sfx",
+        "sha256": "6189106305ab917f1a260b66a74380ed7d6e5be0fb4f5eba3ac93aeb89d9b7ca",
+        "delay": 1.2,
+        "length": 0.4,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "40-cc0-water-splash-slime-sfx/bubble_01.ogg",
+        "title": "40 CC0 water, splash & slime SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/40-cc0-water-splash-slime-sfx",
+        "sha256": "1d03d72347019be889280efc6de5ca5ea439d0b24b235e6db87e5bf7583ecb2b",
+        "delay": 1.7,
+        "length": 0.4,
+        "gain": 1,
+        "pitch": 1.2,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "photobomb.mp3": {
+    "sources": [
+      {
+        "path": "80-cc0-creature-sfx/cute_01.ogg",
+        "title": "80 CC0 creature SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/80-cc0-creature-sfx",
+        "sha256": "de478d6aaa052a06ff88351c684a5cd5fbef013248985fbb5ff0cdcddd9904ad",
+        "delay": 0.4,
+        "length": 0.75,
+        "gain": 0.7,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "202-more-sound-effects/Camera/Camera_01.wav",
+        "title": "202 More Sound Effects",
+        "author": "OwlishMedia",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/202-more-sound-effects",
+        "sha256": "eaef1eb4e6bb310ef9cacec1afcc60214c1f6622c1f3a18633c260ad2db8ca0b",
+        "delay": 0.72,
+        "length": 1.1,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "jelly.mp3": {
+    "sources": [
+      {
+        "path": "40-cc0-water-splash-slime-sfx/slime_03.ogg",
+        "title": "40 CC0 water, splash & slime SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/40-cc0-water-splash-slime-sfx",
+        "sha256": "e78e0702ac671ae098537266cb6f9106d2402ed99b6554b1429327ec603c3dae",
+        "delay": 0.15,
+        "length": 0.65,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "40-cc0-water-splash-slime-sfx/slime_07.ogg",
+        "title": "40 CC0 water, splash & slime SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/40-cc0-water-splash-slime-sfx",
+        "sha256": "c9b1cfeaed0b9d65a04a67cac302861bd6ee750a054b55f0a6b9ac4ddb0ada36",
+        "delay": 0.9,
+        "length": 0.75,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/spring_04.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "48f679060be3538232d2d18d45c0b38285fffd07b8e21ebc6896d42aa9b53327",
+        "delay": 1.65,
+        "length": 0.8,
+        "gain": 0.45,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "strike.mp3": {
+    "sources": [
+      {
+        "path": "80-cc0-creature-sfx/grunt_02.ogg",
+        "title": "80 CC0 creature SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/80-cc0-creature-sfx",
+        "sha256": "76d78154f2f22b3f373bd3ec4ff0edabb459322f72adabfa285b738f37987cbb",
+        "delay": 0.4,
+        "length": 0.8,
+        "gain": 1,
+        "pitch": 1.2,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "80-cc0-creature-sfx/grunt_04.ogg",
+        "title": "80 CC0 creature SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/80-cc0-creature-sfx",
+        "sha256": "4fbc2b361ce055a3b94d43489108582313dd999e5761d4e69d59c9c7abcec295",
+        "delay": 1.3,
+        "length": 0.9,
+        "gain": 1,
+        "pitch": 1.15,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx-2/sfx100v2_footstep_01.ogg",
+        "title": "100 CC0 SFX #2",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx-2",
+        "sha256": "007a96c62d6c335df0d292bdc5cf44fef768b7e2f14378759d03673be6be7ec6",
+        "delay": 0.45,
+        "length": 0.3,
+        "gain": 0.3,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "leak.mp3": {
+    "sources": [
+      {
+        "path": "100-cc0-sfx-2/sfx100v2_stones_01.ogg",
+        "title": "100 CC0 SFX #2",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx-2",
+        "sha256": "20d293a892e1fa6330da2569065aa260a822198bddce2b183f8c11642e7deb4d",
+        "delay": 0.2,
+        "length": 2.3,
+        "gain": 0.8,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "clock-tick-0.ogg",
+        "title": "Clock Tick",
+        "author": "IgnasD",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/clock-tick-0",
+        "sha256": "fcceab5059d16196618e00ddc320bab85880efb11045e98ef33c01f90740e3db",
+        "delay": 0.3,
+        "length": 0.22,
+        "gain": 0.4,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "clock-tick-0.ogg",
+        "title": "Clock Tick",
+        "author": "IgnasD",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/clock-tick-0",
+        "sha256": "fcceab5059d16196618e00ddc320bab85880efb11045e98ef33c01f90740e3db",
+        "delay": 1.1,
+        "length": 0.22,
+        "gain": 0.3,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "clock-tick-0.ogg",
+        "title": "Clock Tick",
+        "author": "IgnasD",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/clock-tick-0",
+        "sha256": "fcceab5059d16196618e00ddc320bab85880efb11045e98ef33c01f90740e3db",
+        "delay": 1.9,
+        "length": 0.22,
+        "gain": 0.2,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "freeze.mp3": {
+    "sources": [
+      {
+        "path": "100-cc0-sfx/glass_04.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "4bd640a2bd50919f78076b4f204a63dabf76915e74e9e6e8457444a40fee737f",
+        "delay": 0.2,
+        "length": 0.65,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "shimmer-glitter-magic.flac",
+        "title": "Shimmer Glitter Magic",
+        "author": "The Berklee College of Music; submitted by qubodup",
+        "license": "CC-BY-3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "url": "https://opengameart.org/content/shimmer-glitter-magic",
+        "sha256": "b6802e6ef22189058a4406ae5c7bda9a54c47e908fad3fd6212650c1aa0170af",
+        "delay": 0.6,
+        "length": 1.7,
+        "gain": 0.7,
+        "pitch": 0.85,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "extension.mp3": {
+    "sources": [
+      {
+        "path": "100-cc0-sfx-2/sfx100v2_switch_01.ogg",
+        "title": "100 CC0 SFX #2",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx-2",
+        "sha256": "fa2c8ebd6361394762e9964698a0be2e31ae62dc91510f81c716c0ef8cf5741d",
+        "delay": 0.35,
+        "length": 0.35,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/spring_07.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "a53ae8b8aea0d6a08a04633b5c4cdb4d5dbde4933e42cc81e3408aa6db271ef3",
+        "delay": 0.6,
+        "length": 0.65,
+        "gain": 0.65,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "shimmer-glitter-magic.flac",
+        "title": "Shimmer Glitter Magic",
+        "author": "The Berklee College of Music; submitted by qubodup",
+        "license": "CC-BY-3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "url": "https://opengameart.org/content/shimmer-glitter-magic",
+        "sha256": "b6802e6ef22189058a4406ae5c7bda9a54c47e908fad3fd6212650c1aa0170af",
+        "delay": 0.9,
+        "length": 1.5,
+        "gain": 0.6,
+        "pitch": 1.15,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "watch.mp3": {
+    "sources": [
+      {
+        "path": "clock-tick-0.ogg",
+        "title": "Clock Tick",
+        "author": "IgnasD",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/clock-tick-0",
+        "sha256": "fcceab5059d16196618e00ddc320bab85880efb11045e98ef33c01f90740e3db",
+        "delay": 0.2,
+        "length": 0.22,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "clock-tick-0.ogg",
+        "title": "Clock Tick",
+        "author": "IgnasD",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/clock-tick-0",
+        "sha256": "fcceab5059d16196618e00ddc320bab85880efb11045e98ef33c01f90740e3db",
+        "delay": 0.7,
+        "length": 0.22,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "clock-tick-0.ogg",
+        "title": "Clock Tick",
+        "author": "IgnasD",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/clock-tick-0",
+        "sha256": "fcceab5059d16196618e00ddc320bab85880efb11045e98ef33c01f90740e3db",
+        "delay": 1.2,
+        "length": 0.22,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/metal_02.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "545c2d698e72e1a3f0f22407fc0567a1f1041d9dbeff528bef0947284b45fdf2",
+        "delay": 1.7,
+        "length": 0.45,
+        "gain": 0.45,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "overtime.mp3": {
+    "sources": [
+      {
+        "path": "clock-tick-0.ogg",
+        "title": "Clock Tick",
+        "author": "IgnasD",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/clock-tick-0",
+        "sha256": "fcceab5059d16196618e00ddc320bab85880efb11045e98ef33c01f90740e3db",
+        "delay": 0.15,
+        "length": 0.22,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "clock-tick-0.ogg",
+        "title": "Clock Tick",
+        "author": "IgnasD",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/clock-tick-0",
+        "sha256": "fcceab5059d16196618e00ddc320bab85880efb11045e98ef33c01f90740e3db",
+        "delay": 0.6,
+        "length": 0.22,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "clock-tick-0.ogg",
+        "title": "Clock Tick",
+        "author": "IgnasD",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/clock-tick-0",
+        "sha256": "fcceab5059d16196618e00ddc320bab85880efb11045e98ef33c01f90740e3db",
+        "delay": 1.05,
+        "length": 0.22,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "clock-tick-0.ogg",
+        "title": "Clock Tick",
+        "author": "IgnasD",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/clock-tick-0",
+        "sha256": "fcceab5059d16196618e00ddc320bab85880efb11045e98ef33c01f90740e3db",
+        "delay": 1.5,
+        "length": 0.22,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/bell_01.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "b29cf8f3885eb2a266a16455227288dd3e004ea0414d2823b1a8677915f862d1",
+        "delay": 1.9,
+        "length": 0.8,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "last_breath.mp3": {
+    "sources": [
+      {
+        "path": "80-cc0-creature-sfx/breath.ogg",
+        "title": "80 CC0 creature SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/80-cc0-creature-sfx",
+        "sha256": "d6ecfd092c261059701fe81581957ce6e67c1737978449bbd98ec6d4f30abb7f",
+        "delay": 0.2,
+        "length": 1.5,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "shimmer-glitter-magic.flac",
+        "title": "Shimmer Glitter Magic",
+        "author": "The Berklee College of Music; submitted by qubodup",
+        "license": "CC-BY-3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "url": "https://opengameart.org/content/shimmer-glitter-magic",
+        "sha256": "b6802e6ef22189058a4406ae5c7bda9a54c47e908fad3fd6212650c1aa0170af",
+        "delay": 1.2,
+        "length": 1.4,
+        "gain": 0.35,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "alarm.mp3": {
+    "sources": [
+      {
+        "path": "100-cc0-sfx/bell_02.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "ea47ae29d3fe87c82414881084cf5dfa4a0a43c6def7437fcafbc21ffbf3ec72",
+        "delay": 0.25,
+        "length": 0.55,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/bell_02.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "ea47ae29d3fe87c82414881084cf5dfa4a0a43c6def7437fcafbc21ffbf3ec72",
+        "delay": 0.85,
+        "length": 0.55,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/bell_02.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "ea47ae29d3fe87c82414881084cf5dfa4a0a43c6def7437fcafbc21ffbf3ec72",
+        "delay": 1.45,
+        "length": 0.55,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/bell_02.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "ea47ae29d3fe87c82414881084cf5dfa4a0a43c6def7437fcafbc21ffbf3ec72",
+        "delay": 2.05,
+        "length": 0.55,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "borrow.mp3": {
+    "sources": [
+      {
+        "path": "shimmer-glitter-magic.flac",
+        "title": "Shimmer Glitter Magic",
+        "author": "The Berklee College of Music; submitted by qubodup",
+        "license": "CC-BY-3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "url": "https://opengameart.org/content/shimmer-glitter-magic",
+        "sha256": "b6802e6ef22189058a4406ae5c7bda9a54c47e908fad3fd6212650c1aa0170af",
+        "delay": 0.1,
+        "length": 1.3,
+        "gain": 0.65,
+        "pitch": 1,
+        "start": 0,
+        "reverse": true
+      },
+      {
+        "path": "clock-tick-0.ogg",
+        "title": "Clock Tick",
+        "author": "IgnasD",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/clock-tick-0",
+        "sha256": "fcceab5059d16196618e00ddc320bab85880efb11045e98ef33c01f90740e3db",
+        "delay": 0.35,
+        "length": 0.22,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": true
+      },
+      {
+        "path": "clock-tick-0.ogg",
+        "title": "Clock Tick",
+        "author": "IgnasD",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/clock-tick-0",
+        "sha256": "fcceab5059d16196618e00ddc320bab85880efb11045e98ef33c01f90740e3db",
+        "delay": 0.85,
+        "length": 0.22,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": true
+      },
+      {
+        "path": "clock-tick-0.ogg",
+        "title": "Clock Tick",
+        "author": "IgnasD",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/clock-tick-0",
+        "sha256": "fcceab5059d16196618e00ddc320bab85880efb11045e98ef33c01f90740e3db",
+        "delay": 1.35,
+        "length": 0.22,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": true
+      },
+      {
+        "path": "clock-tick-0.ogg",
+        "title": "Clock Tick",
+        "author": "IgnasD",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/clock-tick-0",
+        "sha256": "fcceab5059d16196618e00ddc320bab85880efb11045e98ef33c01f90740e3db",
+        "delay": 1.85,
+        "length": 0.22,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": true
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "translator.mp3": {
+    "sources": [
+      {
+        "path": "80-cc0-creature-sfx/burble_01.ogg",
+        "title": "80 CC0 creature SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/80-cc0-creature-sfx",
+        "sha256": "f4c27a1839ef9e82d29e1bb175c0ebf73c65b6839b2914108d0c219fc1f42445",
+        "delay": 0.35,
+        "length": 0.85,
+        "gain": 1,
+        "pitch": 1.25,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "80-cc0-creature-sfx/cute_06.ogg",
+        "title": "80 CC0 creature SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/80-cc0-creature-sfx",
+        "sha256": "51810bea0b961af26d3fd81b4bcc9248636e2a8e8ea9e2bc6a3d83b39eacdf71",
+        "delay": 1.2,
+        "length": 1.1,
+        "gain": 1,
+        "pitch": 1.1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "advert.mp3": {
+    "sources": [
+      {
+        "path": "100-cc0-sfx/gong_01.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "4780a38e91688b59899b3679cf3534b4b75654b45a177af9d9fb681c447f7f9a",
+        "delay": 0.3,
+        "length": 0.7,
+        "gain": 0.6,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "80-cc0-creature-sfx/ooh.ogg",
+        "title": "80 CC0 creature SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/80-cc0-creature-sfx",
+        "sha256": "6e2323960b6eaa931a75e4f75e3f13926cf3b67d4c21767cae88f2b2f7c83613",
+        "delay": 0.7,
+        "length": 1.1,
+        "gain": 1,
+        "pitch": 1.15,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "shimmer-glitter-magic.flac",
+        "title": "Shimmer Glitter Magic",
+        "author": "The Berklee College of Music; submitted by qubodup",
+        "license": "CC-BY-3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "url": "https://opengameart.org/content/shimmer-glitter-magic",
+        "sha256": "b6802e6ef22189058a4406ae5c7bda9a54c47e908fad3fd6212650c1aa0170af",
+        "delay": 1.15,
+        "length": 1.4,
+        "gain": 0.45,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "scratch.mp3": {
+    "sources": [
+      {
+        "path": "scratch-speed.wav",
+        "title": "Scratch Speed",
+        "author": "Raccoonanimator",
+        "license": "CC-BY-3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "url": "https://opengameart.org/content/scratch-speed",
+        "sha256": "37cececf082f70009e37c1b84ccfffd27c38875f1df754441ad66252df006a2e",
+        "delay": 0.3,
+        "length": 0.65,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "scratch-speed.wav",
+        "title": "Scratch Speed",
+        "author": "Raccoonanimator",
+        "license": "CC-BY-3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "url": "https://opengameart.org/content/scratch-speed",
+        "sha256": "37cececf082f70009e37c1b84ccfffd27c38875f1df754441ad66252df006a2e",
+        "delay": 1.12,
+        "length": 0.6,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": true
+      },
+      {
+        "path": "scratch-speed.wav",
+        "title": "Scratch Speed",
+        "author": "Raccoonanimator",
+        "license": "CC-BY-3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "url": "https://opengameart.org/content/scratch-speed",
+        "sha256": "37cececf082f70009e37c1b84ccfffd27c38875f1df754441ad66252df006a2e",
+        "delay": 1.9,
+        "length": 0.55,
+        "gain": 1,
+        "pitch": 0.9,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "speed.mp3": {
+    "sources": [
+      {
+        "path": "scratch-speed.wav",
+        "title": "Scratch Speed",
+        "author": "Raccoonanimator",
+        "license": "CC-BY-3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "url": "https://opengameart.org/content/scratch-speed",
+        "sha256": "37cececf082f70009e37c1b84ccfffd27c38875f1df754441ad66252df006a2e",
+        "delay": 0.25,
+        "length": 0.65,
+        "gain": 0.7,
+        "pitch": 1.4,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "swishes-sound-pack/swishes/swish-9.wav",
+        "title": "Swishes Sound Pack",
+        "author": "artisticdude",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/swishes-sound-pack",
+        "sha256": "123883f006ce55feecbff11eea5f87c4493df4399989983037144570a23723c1",
+        "delay": 0.8,
+        "length": 0.6,
+        "gain": 1,
+        "pitch": 1.3,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "swishes-sound-pack/swishes/swish-10.wav",
+        "title": "Swishes Sound Pack",
+        "author": "artisticdude",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/swishes-sound-pack",
+        "sha256": "4f7381a76f280d3f36f962ac3f44f16f77eec44797f30715d063c81ea3859024",
+        "delay": 1.4,
+        "length": 0.6,
+        "gain": 1,
+        "pitch": 1.5,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "singer.mp3": {
+    "sources": [
+      {
+        "path": "singer.mp3",
+        "title": "feminine voice singing improv melody",
+        "author": "buggly",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://freesound.org/people/buggly/sounds/700247/",
+        "sha256": "afe7ad98f8394afaf00b7e2ffd086e082e34c5ca2eda977becf4b3751d1bbf81",
+        "delay": 0.25,
+        "length": 2.4,
+        "gain": 1,
+        "pitch": 1.1,
+        "start": 1.5,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "missing_word.mp3": {
+    "sources": [
+      {
+        "path": "80-cc0-creature-sfx/eat_01.ogg",
+        "title": "80 CC0 creature SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/80-cc0-creature-sfx",
+        "sha256": "f17305072d3d0ca5556f72db8701866329d33561ca5df086e501f2a52e2022df",
+        "delay": 0.45,
+        "length": 0.8,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "80-cc0-creature-sfx/eat_03.ogg",
+        "title": "80 CC0 creature SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/80-cc0-creature-sfx",
+        "sha256": "3e7425cdf2cba7fe9c42e8306dc303a2c4f9a4f02358ee19329b734bf06591dd",
+        "delay": 1.3,
+        "length": 0.9,
+        "gain": 1,
+        "pitch": 1.1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "alphabet.mp3": {
+    "sources": [
+      {
+        "path": "100-cc0-sfx/paper_01.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "b2b2b55e44761c7a45283bce0196f41f72207180fb08c970d7dcf93b705d280c",
+        "delay": 0.2,
+        "length": 0.65,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/paper_03.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "90147dde68b9e2082404f439165bbcb6f7c2364e88e9373d1cd1f7446a37f7b2",
+        "delay": 0.9,
+        "length": 0.65,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": true
+      },
+      {
+        "path": "100-cc0-sfx/paper_02.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "4d0c68b367bd3fbdf9817e764908e5524b2cad6536eb0911fc74f6ab4f60c50a",
+        "delay": 1.6,
+        "length": 0.65,
+        "gain": 1,
+        "pitch": 1.1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "curtain.mp3": {
+    "sources": [
+      {
+        "path": "202-more-sound-effects/Cloth/Cloth_05.wav",
+        "title": "202 More Sound Effects",
+        "author": "OwlishMedia",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/202-more-sound-effects",
+        "sha256": "01521e1895f50ec054db264a967b71f0b68f26b08a2952d8d57e69f2f3ebc1be",
+        "delay": 0.05,
+        "length": 1.2,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "202-more-sound-effects/Cloth/Cloth_06.wav",
+        "title": "202 More Sound Effects",
+        "author": "OwlishMedia",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/202-more-sound-effects",
+        "sha256": "143fb58d76d94f8e29a8521c5a46cb51c23f3c6c2ffe8317de1e87a917b4ed00",
+        "delay": 1.5,
+        "length": 1.1,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "giant.mp3": {
+    "sources": [
+      {
+        "path": "swishes-sound-pack/swishes/swish-4.wav",
+        "title": "Swishes Sound Pack",
+        "author": "artisticdude",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/swishes-sound-pack",
+        "sha256": "0060f4a7040edce4cc50d1daa10a9cb76764128a942e4688339e69cd1d5d784c",
+        "delay": 0.05,
+        "length": 0.4,
+        "gain": 0.35,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "pencil-sounds/flac/pencil_write.flac",
+        "title": "Pencil Sounds",
+        "author": "NachtmahrTV (writing), damsur (erasing); packaged by AntumDeluge",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/pencil-sounds",
+        "sha256": "aa835e94c7bafed9e096684a709f20de806083da5511e284d802bd16e244c025",
+        "delay": 0.5,
+        "length": 2.0,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "mirror.mp3": {
+    "sources": [
+      {
+        "path": "100-cc0-sfx/glass_02.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "f93e91479793e618fabd6a1607e3ce6a382a0ccdba09d82cd5e209980feed4d5",
+        "delay": 0.4,
+        "length": 0.7,
+        "gain": 0.65,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "shimmer-glitter-magic.flac",
+        "title": "Shimmer Glitter Magic",
+        "author": "The Berklee College of Music; submitted by qubodup",
+        "license": "CC-BY-3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/",
+        "url": "https://opengameart.org/content/shimmer-glitter-magic",
+        "sha256": "b6802e6ef22189058a4406ae5c7bda9a54c47e908fad3fd6212650c1aa0170af",
+        "delay": 0.45,
+        "length": 1.2,
+        "gain": 0.6,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "swishes-sound-pack/swishes/swish-1.wav",
+        "title": "Swishes Sound Pack",
+        "author": "artisticdude",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/swishes-sound-pack",
+        "sha256": "9a15c881345c1ce1c39cc31f52f081c8c4dc81fa41111e0079400f39d3ba0e45",
+        "delay": 2.0,
+        "length": 0.5,
+        "gain": 0.7,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  },
+  "clumsy.mp3": {
+    "sources": [
+      {
+        "path": "pencil-sounds/flac/pencil_erase.flac",
+        "title": "Pencil Sounds",
+        "author": "NachtmahrTV (writing), damsur (erasing); packaged by AntumDeluge",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/pencil-sounds",
+        "sha256": "3dcfb87bcfa4dd8aaca5de2c650a2c5fd7c9fd98b4f8ffa52d88796a76a47c0f",
+        "delay": 0.25,
+        "length": 0.7,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "100-cc0-sfx/spring_03.ogg",
+        "title": "100 CC0 SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/100-cc0-sfx",
+        "sha256": "f05277b7af3301cc9eb4d76ab3751235cd60b42205f0763f06036cd90bdbaadf",
+        "delay": 1.05,
+        "length": 0.7,
+        "gain": 1,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      },
+      {
+        "path": "80-cc0-creature-sfx/cute_08.ogg",
+        "title": "80 CC0 creature SFX",
+        "author": "rubberduck",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "url": "https://opengameart.org/content/80-cc0-creature-sfx",
+        "sha256": "1776b641f37d0de4d51cf067c4a4b2c170ae582fc75a83c7abd42f13acdb1ce3",
+        "delay": 1.7,
+        "length": 0.6,
+        "gain": 0.6,
+        "pitch": 1,
+        "start": 0,
+        "reverse": false
+      }
+    ],
+    "mix": {
+      "duration": 2.8,
+      "loudness_lufs": -18,
+      "true_peak_db": -3,
+      "sample_rate": 48000,
+      "bitrate": "160k"
+    }
+  }
+}
