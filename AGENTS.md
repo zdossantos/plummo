@@ -13,3 +13,5 @@ Lire PRODUCT.md et docs/metier-plummo.md avant de développer le métier. Le soc
 - Branches chore/feature/fix/docs, Conventional Commits, PR et Squash & Merge ; pas de push direct sur main.
 - Commandes de validation dans README.md. Ne pas annoncer une vérification sans sortie récente.
 - À chaque nouveau mini-jeu, intégrer les bonus/malus existants qui ont un effet cohérent dans ce mode, avec leurs règles serveur, effets Vue, sons et tests. Documenter les incompatibilités ; ne pas laisser ce raccordement implicite.
+
+- À chaque ajout ou modification de bonus/malus, livrer les règles et tests, une scène VFX cohérente sur le grand écran, sa version statique en mouvement réduit, un SFX de bibliothèque servi localement avec crédits/licences/recette, et une vidéo avec son pour revue. Suivre docs/bonus-presentation.md ; `bun run test:unit` et `bun run test:bonuses` doivent passer en CI. Une toast seule ne suffit pas.

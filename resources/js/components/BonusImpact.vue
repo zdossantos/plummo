@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import BonusIcon from '@/components/BonusIcon.vue';
+import { bonusScenes } from '@/lib/bonus-scenes';
 import type { BonusLaunchEvent } from '@/lib/bonus-launch';
 import type { RoomState } from '@/types/rooms';
 const props = defineProps<{
@@ -13,31 +14,10 @@ const character = computed(() =>
         kind.value,
     ),
 );
-const bubbles = computed(() =>
-    ['soap', 'bubbles', 'washer'].includes(kind.value),
-);
-const clock = computed(() =>
-    [
-        'freeze',
-        'extension',
-        'watch',
-        'overtime',
-        'last_breath',
-        'alarm',
-        'leak',
-        'borrow',
-    ].includes(kind.value),
-);
-const letters = computed(() =>
-    [
-        'alphabet',
-        'missing_word',
-        'translator',
-        'accent',
-        'advert',
-        'sneeze',
-    ].includes(kind.value),
-);
+const scene = computed(() => bonusScenes[kind.value]);
+const bubbles = computed(() => scene.value === 'bubbles');
+const clock = computed(() => scene.value === 'clock');
+const letters = computed(() => scene.value === 'letters');
 const palette = ['#efe681', '#f1b5c8', '#b7e1c3', '#aa83ec', '#f05a78'];
 </script>
 <template>
@@ -49,6 +29,7 @@ const palette = ['#efe681', '#f1b5c8', '#b7e1c3', '#aa83ec', '#f05a78'];
         ]"
         data-testid="bonus-impact"
         :data-kind="kind"
+        :data-scene="scene"
         aria-hidden="true"
     >
         <div class="bonus-stage-scene">
