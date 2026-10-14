@@ -5,10 +5,18 @@ test('reloads a failed media request before retry and restores its position afte
     let loaded = false;
     let metadata: (() => void) | undefined;
     const element = {
-        error: { code: 4 }, currentTime: 12,
-        load() { loaded = true; this.currentTime = 0; },
-        addEventListener(event: string, callback: () => void) { if (event === 'loadedmetadata') metadata = callback; },
-        async play() { if (!loaded) throw new Error('Failed media remains unusable'); },
+        error: { code: 4 },
+        currentTime: 12,
+        load() {
+            loaded = true;
+            this.currentTime = 0;
+        },
+        addEventListener(event: string, callback: () => void) {
+            if (event === 'loadedmetadata') metadata = callback;
+        },
+        async play() {
+            if (!loaded) throw new Error('Failed media remains unusable');
+        },
     };
     await playAudio(element as unknown as HTMLAudioElement);
     expect(loaded).toBe(true);
@@ -18,14 +26,22 @@ test('reloads a failed media request before retry and restores its position afte
 
 test('keeps buffered audio and its position for normal resume or autoplay refusal', async () => {
     let loads = 0;
-    const element = { error: null, currentTime: 5, load() { loads++; }, async play() {} };
+    const element = {
+        error: null,
+        currentTime: 5,
+        load() {
+            loads++;
+        },
+        async play() {},
+    };
     await playAudio(element as unknown as HTMLAudioElement);
     expect(loads).toBe(0);
     expect(element.currentTime).toBe(5);
 });
 
 test('keeps ambiance audible during blind excerpts and restores it afterwards', async () => {
-    const { ambianceVolume } = await import('../../resources/js/lib/soundscape');
+    const { ambianceVolume } =
+        await import('../../resources/js/lib/soundscape');
     expect(ambianceVolume(0.6, true)).toBeCloseTo(0.036);
     expect(ambianceVolume(0.6, false)).toBeCloseTo(0.18);
     expect(ambianceVolume(0, true)).toBe(0);
@@ -37,12 +53,19 @@ test('fades smoothly and cancels an obsolete transition before it can overwrite 
     const oldCancel = globalThis.cancelAnimationFrame;
     let callback: FrameRequestCallback | undefined;
     let finished = false;
-    globalThis.requestAnimationFrame = (fn) => { callback = fn; return 1; };
-    globalThis.cancelAnimationFrame = () => { callback = undefined; };
+    globalThis.requestAnimationFrame = (fn) => {
+        callback = fn;
+        return 1;
+    };
+    globalThis.cancelAnimationFrame = () => {
+        callback = undefined;
+    };
     try {
         const element = { volume: 0 };
         const start = performance.now();
-        const cancel = fadeAudio(element, 0.6, 1000, () => { finished = true; });
+        const cancel = fadeAudio(element, 0.6, 1000, () => {
+            finished = true;
+        });
         callback?.(start + 500);
         expect(element.volume).toBeGreaterThan(0.29);
         expect(element.volume).toBeLessThan(0.31);
@@ -50,7 +73,9 @@ test('fades smoothly and cancels an obsolete transition before it can overwrite 
         cancel();
         expect(callback).toBeUndefined();
         const next = performance.now();
-        fadeAudio(element, 0, 200, () => { finished = true; });
+        fadeAudio(element, 0, 200, () => {
+            finished = true;
+        });
         callback?.(next + 201);
         expect(element.volume).toBe(0);
         expect(finished).toBe(true);
@@ -65,14 +90,20 @@ test('keeps audio volume valid when the first animation timestamp precedes the f
     const oldRequest = globalThis.requestAnimationFrame;
     const oldCancel = globalThis.cancelAnimationFrame;
     let callback: FrameRequestCallback | undefined;
-    globalThis.requestAnimationFrame = (fn) => { callback = fn; return 1; };
+    globalThis.requestAnimationFrame = (fn) => {
+        callback = fn;
+        return 1;
+    };
     globalThis.cancelAnimationFrame = () => {};
     try {
         let volume = 0;
         const element = {
-            get volume() { return volume; },
+            get volume() {
+                return volume;
+            },
             set volume(value: number) {
-                if (value < 0 || value > 1) throw new RangeError('Invalid media volume');
+                if (value < 0 || value > 1)
+                    throw new RangeError('Invalid media volume');
                 volume = value;
             },
         };
@@ -94,24 +125,47 @@ test('starts one continuous decoded loop and stops it when disposed', async () =
     let starts = 0;
     let stops = 0;
     let loads = 0;
-    const source = { buffer: null, loop: false, connect() {}, start() { starts++; }, stop() { stops++; }, disconnect() {} };
+    const source = {
+        buffer: null,
+        loop: false,
+        connect() {},
+        start() {
+            starts++;
+        },
+        stop() {
+            stops++;
+        },
+        disconnect() {},
+    };
     class FakeContext {
         currentTime = 0;
         state = 'running';
         destination = {};
-        createGain() { return { gain: { value: 0, setTargetAtTime() {} }, connect() {} }; }
-        createBufferSource() { return source; }
-        async decodeAudioData() { return { duration: 147.692 }; }
+        createGain() {
+            return { gain: { value: 0, setTargetAtTime() {} }, connect() {} };
+        }
+        createBufferSource() {
+            return source;
+        }
+        async decodeAudioData() {
+            return { duration: 147.692 };
+        }
         async resume() {}
-        async close() { this.state = 'closed'; }
+        async close() {
+            this.state = 'closed';
+        }
     }
     globalThis.AudioContext = FakeContext as unknown as typeof AudioContext;
-    globalThis.fetch = (async () => { loads++; return new Response(new ArrayBuffer(8)); }) as typeof fetch;
+    globalThis.fetch = (async () => {
+        loads++;
+        return new Response(new ArrayBuffer(8));
+    }) as typeof fetch;
     try {
-        const { Soundscape } = await import('../../resources/js/lib/soundscape');
+        const { Soundscape } =
+            await import('../../resources/js/lib/soundscape');
         const sound = new Soundscape();
         await Promise.all([sound.start(), sound.start()]);
-        expect(loads).toBe(1);
+        expect(loads).toBe(41);
         expect(starts).toBe(1);
         expect(source.loop).toBe(true);
         sound.setVolume(0, false);
@@ -129,9 +183,37 @@ test('audio pranks reuse their loop and restore normal playback on pause, expiry
     const { AudioPranks } = await import('../../resources/js/lib/audio-pranks');
     let repeat: (() => void) | undefined;
     let starts = 0;
-    const pranks = new AudioPranks({ every(fn) { repeat = fn; starts++; return () => { repeat = undefined; }; } });
-    const audio = { playbackRate: 1, currentTime: 12, paused: false, duration: 30 };
-    const effects = [{id:'scratch',kind:'scratch' as const,actorId:1,startedAt:0,expiresAt:4}, {id:'speed',kind:'speed' as const,actorId:1,startedAt:0,expiresAt:8}];
+    const pranks = new AudioPranks({
+        every(fn) {
+            repeat = fn;
+            starts++;
+            return () => {
+                repeat = undefined;
+            };
+        },
+    });
+    const audio = {
+        playbackRate: 1,
+        currentTime: 12,
+        paused: false,
+        duration: 30,
+    };
+    const effects = [
+        {
+            id: 'scratch',
+            kind: 'scratch' as const,
+            actorId: 1,
+            startedAt: 0,
+            expiresAt: 4,
+        },
+        {
+            id: 'speed',
+            kind: 'speed' as const,
+            actorId: 1,
+            startedAt: 0,
+            expiresAt: 8,
+        },
+    ];
     pranks.update(audio, effects, 1, true);
     pranks.update(audio, effects, 2, true);
     expect(starts).toBe(1);
@@ -149,4 +231,103 @@ test('audio pranks reuse their loop and restore normal playback on pause, expiry
     pranks.dispose();
     expect(audio.playbackRate).toBe(1);
     expect(repeat).toBeUndefined();
+});
+
+test('plays decoded local samples once, reuses the cache and respects mute, late loads and disposal', async () => {
+    const originalContext = globalThis.AudioContext;
+    const originalFetch = globalThis.fetch;
+    let starts = 0;
+    let loads = 0;
+    let resolveLoad: (() => void) | undefined;
+    let defer = false;
+    const outputs: unknown[] = [];
+    const gains: number[] = [];
+    let context: FakeContext;
+    class FakeContext {
+        currentTime = 0;
+        state = 'running';
+        destination = {};
+        constructor() {
+            context = this;
+        }
+        createGain() {
+            const output = {
+                gain: {
+                    value: 0,
+                    setTargetAtTime(value: number) {
+                        gains.push(value);
+                    },
+                },
+                connect() {},
+            };
+            outputs.push(output);
+            return output;
+        }
+        createBufferSource() {
+            return {
+                buffer: null,
+                connect(output: unknown) {
+                    expect(output).toBe(outputs[1]);
+                },
+                start() {
+                    starts++;
+                },
+                disconnect() {},
+                onended: undefined,
+            };
+        }
+        async decodeAudioData() {
+            return { duration: 0.3 };
+        }
+        async close() {
+            this.state = 'closed';
+        }
+    }
+    globalThis.AudioContext = FakeContext as unknown as typeof AudioContext;
+    globalThis.fetch = (async (url: string) => {
+        expect(url.startsWith('/audio/sfx/')).toBe(true);
+        loads++;
+        if (defer)
+            await new Promise<void>((resolve) => {
+                resolveLoad = resolve;
+            });
+        return new Response(new ArrayBuffer(8));
+    }) as typeof fetch;
+    try {
+        const { Soundscape } =
+            await import('../../resources/js/lib/soundscape');
+        const sound = new Soundscape();
+        sound.setVolume(0.6, false);
+        await sound.prank('bolt');
+        await sound.prank('bolt');
+        expect(loads).toBe(1);
+        expect(starts).toBe(2);
+        sound.setVolume(0, false);
+        await sound.prank('paint');
+        expect(loads).toBe(1);
+        expect(starts).toBe(2);
+        sound.setVolume(0.6, true);
+        expect(gains.at(-1)).toBeCloseTo(0.006);
+        defer = true;
+        const mutedDuringLoad = sound.prank('paint');
+        sound.setVolume(0, false);
+        sound.setVolume(0.6, false);
+        resolveLoad?.();
+        await mutedDuringLoad;
+        expect(starts).toBe(2);
+        sound.setVolume(0.6, false);
+        const late = sound.prank('dice');
+        context!.currentTime = 2;
+        resolveLoad?.();
+        await late;
+        expect(starts).toBe(2);
+        const closing = sound.prank('shield');
+        sound.close();
+        resolveLoad?.();
+        await closing;
+        expect(starts).toBe(2);
+    } finally {
+        globalThis.AudioContext = originalContext;
+        globalThis.fetch = originalFetch;
+    }
 });

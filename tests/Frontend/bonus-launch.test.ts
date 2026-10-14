@@ -1,5 +1,8 @@
 import { expect, test } from 'bun:test';
-import { BonusLaunchTracker } from '../../resources/js/lib/bonus-launch';
+import {
+    BonusLaunchTracker,
+    selectImpactEvents,
+} from '../../resources/js/lib/bonus-launch';
 import type { GameState } from '../../resources/js/types/rooms';
 function snapshot(ids: string[], id = 12): GameState {
     return {
@@ -45,4 +48,21 @@ test('waits for the first new snapshot after reconnect before accepting launches
     expect(tracker.observe(null, 100, true)).toEqual([]);
     expect(tracker.observe(snapshot(['live']), 100, true)).toEqual([]);
     expect(tracker.observe(snapshot(['live', 'late']), 104, true)).toEqual([]);
+});
+
+test('keeps the attack visible when several defensive reactions follow it', () => {
+    const attack = { id: 'attack', kind: 'bolt', actorId: 1, at: 100 };
+    const reactions = [2, 3, 4].map((actorId) => ({
+        id: `shield-${actorId}`,
+        kind: 'shield',
+        actorId,
+        at: 100,
+        reaction: true,
+    }));
+    expect(selectImpactEvents([attack, ...reactions])).toEqual([
+        attack,
+        reactions[2],
+    ]);
+    expect(selectImpactEvents([attack])).toEqual([attack]);
+    expect(selectImpactEvents(reactions)).toEqual(reactions.slice(-2));
 });

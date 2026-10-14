@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { onUnmounted, ref, watch } from 'vue';
 import BonusIcon from '@/components/BonusIcon.vue';
+import BonusImpact from '@/components/BonusImpact.vue';
 import PlummoAvatar from '@/components/PlummoAvatar.vue';
-import { BonusLaunchTracker, type BonusLaunchEvent } from '@/lib/bonus-launch';
+import {
+    BonusLaunchTracker,
+    selectImpactEvents,
+    type BonusLaunchEvent,
+} from '@/lib/bonus-launch';
 import { useTranslations } from '@/composables/useTranslations';
 import type { GameState, RoomState } from '@/types/rooms';
 
@@ -38,12 +43,15 @@ watch(
         if (props.closed) return;
         for (const event of fresh) {
             active.value.push(event);
-            const timer = setTimeout(() => {
-                active.value = active.value.filter(
-                    (item) => item.id !== event.id,
-                );
-                timers.delete(timer);
-            }, 1800);
+            const timer = setTimeout(
+                () => {
+                    active.value = active.value.filter(
+                        (item) => item.id !== event.id,
+                    );
+                    timers.delete(timer);
+                },
+                props.screen ? 2800 : 1800,
+            );
             timers.add(timer);
         }
     },
@@ -56,34 +64,12 @@ function actor(id: number) {
 </script>
 <template>
     <div class="bonus-launch-layer" aria-live="polite" aria-atomic="false">
-        <div
-            v-for="event in screen ? active : []"
+        <BonusImpact
+            v-for="event in screen ? selectImpactEvents(active) : []"
             :key="'impact-' + event.id"
-            class="bonus-impact"
-            :class="'bonus-impact-' + event.kind"
-            data-testid="bonus-impact"
-            aria-hidden="true"
-        >
-            <span class="bonus-impact-ring" />
-            <span
-                v-for="(offset, index) in [
-                    [-180, -95],
-                    [-95, -180],
-                    [100, -165],
-                    [190, -65],
-                    [125, 95],
-                    [-130, 85],
-                ]"
-                :key="index"
-                class="bonus-impact-particle"
-                :style="{
-                    '--impact-x': offset[0] + 'px',
-                    '--impact-y': offset[1] + 'px',
-                    '--impact-turn': (index % 2 ? 140 : -140) + 'deg',
-                }"
-                ><BonusIcon :kind="event.kind"
-            /></span>
-        </div>
+            :event="event"
+            :room="room"
+        />
 
         <div
             v-for="event in active"

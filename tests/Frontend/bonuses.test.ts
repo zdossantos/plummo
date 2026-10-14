@@ -28,17 +28,55 @@ test('receipts animate only once and never replay after reconnect or late arriva
     expect(tracker.observe(2, [{ ...receipt, id: 'old', at: 90 }], 110, true)).toEqual([]);
 });
 
-test('each prank has its own short, restrained sound signature', async () => {
-    const { bonusSoundNotes } = await import('../../resources/js/lib/soundscape');
-    const kinds = ['bolt', 'dice', 'squatter', 'artist', 'accent', 'sneeze', 'stamp', 'paint', 'shield', 'soap', 'boomerang', 'pinata', 'washer', 'lock', 'mystery', 'bubbles', 'photobomb', 'jelly', 'strike', 'leak', 'freeze', 'extension', 'watch', 'overtime', 'last_breath', 'alarm', 'borrow', 'translator', 'advert', 'scratch', 'speed', 'singer', 'missing_word', 'alphabet', 'curtain', 'giant', 'mirror', 'clumsy'] as const;
-    const signatures = kinds.map(kind => bonusSoundNotes(kind));
-    expect(new Set(signatures.map(notes => JSON.stringify(notes))).size).toBe(38);
-    for (const notes of signatures) {
-        expect(notes.length).toBeGreaterThan(0);
-        for (const note of notes) {
-            expect(note.at + note.duration).toBeLessThanOrEqual(0.8);
-            expect(note.gain).toBeLessThanOrEqual(0.3);
-        }
+test('each bonus resolves to a shipped Kenney sample', async () => {
+    const { bonusSoundFile } =
+        await import('../../resources/js/lib/soundscape');
+    const { existsSync } = await import('node:fs');
+    const kinds = [
+        'bolt',
+        'dice',
+        'squatter',
+        'artist',
+        'accent',
+        'sneeze',
+        'stamp',
+        'paint',
+        'shield',
+        'soap',
+        'boomerang',
+        'pinata',
+        'washer',
+        'lock',
+        'mystery',
+        'bubbles',
+        'photobomb',
+        'jelly',
+        'strike',
+        'leak',
+        'freeze',
+        'extension',
+        'watch',
+        'overtime',
+        'last_breath',
+        'alarm',
+        'borrow',
+        'translator',
+        'advert',
+        'scratch',
+        'speed',
+        'singer',
+        'missing_word',
+        'alphabet',
+        'curtain',
+        'giant',
+        'mirror',
+        'clumsy',
+    ] as const;
+    const files = kinds.map((kind) => bonusSoundFile(kind));
+    expect(new Set(files).size).toBe(38);
+    for (const file of files) {
+        expect(file).toMatch(/^\/audio\/sfx\/[a-z]+_\d{3}\.mp3$/);
+        expect(existsSync('public' + file)).toBe(true);
     }
 });
 
@@ -131,15 +169,4 @@ test('clumsy hand visibly offsets new strokes while preserving fill and erase', 
     expect(Math.abs(distorted[1] - 0.5)).toBeGreaterThan(0.015);
     expect(bonusStrokePoints(points,true,'fill')).toEqual(points);
     expect(bonusStrokePoints(points,true,'erase')).toEqual(points);
-});
-
-test('reinforced sound effects have distinct timbres and pitch movement with bounded volume', async () => {
-    const { bonusSoundNotes } = await import('../../resources/js/lib/soundscape');
-    const bolt = bonusSoundNotes('bolt');
-    const paint = bonusSoundNotes('paint');
-    expect(bolt[0]!.type).toBe('sawtooth');
-    expect(paint[0]!.type).toBe('sine');
-    expect(bolt[0]!.endFrequency).toBeLessThan(bolt[0]!.frequency);
-    expect(paint[0]!.endFrequency).toBeGreaterThan(paint[0]!.frequency);
-    for (const note of [...bolt,...paint]) expect(note.gain).toBeLessThanOrEqual(0.3);
 });

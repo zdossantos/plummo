@@ -59,7 +59,7 @@ it('launches a collective bonus in one click while phone and screen stay inside 
         expect($first->page()->evaluate('() => { const r = document.querySelector(".bonus-object").getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight; }'))->toBeTrue();
         $first->page()->setViewportSize(390, 664);
         $screen->assertSee('Quiz · Question 1 / 5');
-        $screen->page()->evaluate('() => { window.bonusNotes = 0; const original = AudioContext.prototype.createOscillator; AudioContext.prototype.createOscillator = function(...args) { window.bonusNotes++; return original.apply(this, args); }; }');
+        $screen->page()->evaluate('() => { window.bonusNotes = 0; const original = AudioBufferSourceNode.prototype.start; AudioBufferSourceNode.prototype.start = function(...args) { if (!this.loop) window.bonusNotes++; return original.apply(this, args); }; }');
         $screen->click('.sound-controls button')->assertAttribute('.sound-controls button', 'aria-pressed', 'true');
         $screen->page()->evaluate('() => { window.launchIds = new Set(); new MutationObserver(() => document.querySelectorAll("[data-testid=bonus-launch]").forEach(item => window.launchIds.add(item.dataset.launchId))).observe(document.body, {subtree:true,childList:true}); }');
         $first->click('.bonus-object')->assertMissing('.bonus-object');
@@ -67,16 +67,21 @@ it('launches a collective bonus in one click while phone and screen stay inside 
         $screen->assertPresent('[data-testid="bonus-impact"]');
         expect($screen->page()->evaluate('() => getComputedStyle(document.querySelector(".bonus-impact")).pointerEvents'))->toBe('none');
         $first->assertMissing('[data-testid="bonus-impact"]');
-        expect($screen->page()->evaluate('() => { const r = document.querySelector(".bonus-impact").getBoundingClientRect(); return Math.abs(r.x - innerWidth * .5) < 2 && Math.abs(r.y - innerHeight * .58) < 2; }'))->toBeTrue();
+        expect($screen->page()->evaluate('() => { const r = document.querySelector(".bonus-impact").getBoundingClientRect(); return Math.abs(r.x) < 2 && Math.abs(r.y) < 2 && Math.abs(r.width - innerWidth) < 2 && Math.abs(r.height - innerHeight) < 2; }'))->toBeTrue();
         expect($screen->page()->evaluate('() => getComputedStyle(document.querySelector(".bonus-launch-layer")).pointerEvents'))->toBe('none');
         if ($reduced) {
-            expect($screen->page()->evaluate('() => [".bonus-launch", ".bonus-launch-projectile", ".bonus-impact-particle", ".bonus-impact-ring"].every(selector => getComputedStyle(document.querySelector(selector)).animationName === "none")'))->toBeTrue();
+            expect($screen->page()->evaluate('() => [".bonus-launch", ".bonus-launch-projectile"].every(selector => getComputedStyle(document.querySelector(selector)).animationName === "none")'))->toBeTrue();
+            expect($screen->page()->evaluate('() => getComputedStyle(document.querySelector(".bonus-stage-scene")).display'))->toBe('none');
+            $screen->assertVisible('.bonus-stage-reduced');
+        } else {
+            $screen->assertVisible('.vfx-lightning');
+            expect($screen->page()->evaluate('() => document.querySelector(".vfx-lightning").getBoundingClientRect().height'))->toBeGreaterThan(600);
         }
         $screen->screenshot(filename: 'bonus-launch-'.($reduced ? 'reduced' : 'animated'));
 
         $screen->page()->evaluate('() => new Promise(resolve => { const until = Date.now() + 4000; const check = () => window.bonusNotes > 0 || Date.now() >= until ? resolve() : setTimeout(check, 50); check(); })');
         $notes = $screen->page()->evaluate('() => window.bonusNotes');
-        expect($notes)->toBeGreaterThanOrEqual(2)->toBeLessThanOrEqual(4);
+        expect($notes)->toBe(1);
         $screen->page()->evaluate('() => new Promise(resolve => setTimeout(resolve, 1200))');
         expect($screen->page()->evaluate('() => window.bonusNotes'))->toBe($notes);
         expect($screen->page()->evaluate('() => window.launchIds.size'))->toBe(1);

@@ -1,3 +1,4 @@
+@import './bonus-stage.css';
 @import './plummo-motion.css';
 @import './bonus-catalogue.css';
 @import 'tailwindcss';
@@ -3753,86 +3754,4 @@
 [data-game-rules].text-reader-trigger svg {
     width: 18px;
     height: 18px;
-}
-
-/* TV launch impacts share the launch lifetime and never intercept the game. */
-.bonus-impact {
-    position: fixed;
-    left: 50%;
-    top: 58%;
-    width: 0;
-    height: 0;
-    pointer-events: none;
-    color: var(--primary);
-}
-.bonus-impact-ring {
-    position: absolute;
-    width: 80px;
-    height: 80px;
-    margin: -40px;
-    border: 5px solid currentColor;
-    border-radius: 50%;
-    animation: bonus-impact-wave 900ms ease-out both;
-}
-.bonus-impact-particle {
-    position: absolute;
-    width: 44px;
-    height: 44px;
-    margin: -22px;
-    filter: drop-shadow(0 3px 0 #35236b33);
-    animation: bonus-impact-burst 1100ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-.bonus-impact-paint,
-.bonus-impact-stamp {
-    color: #f05a78;
-}
-.bonus-impact-bolt {
-    color: #f7c843;
-}
-.bonus-impact-shield,
-.bonus-impact-soap,
-.bonus-impact-boomerang {
-    color: #36bda8;
-}
-@keyframes bonus-impact-wave {
-    from {
-        transform: scale(0.4);
-        opacity: 0.8;
-    }
-    to {
-        transform: scale(4);
-        opacity: 0;
-    }
-}
-@keyframes bonus-impact-burst {
-    0% {
-        transform: scale(0.3);
-        opacity: 0;
-    }
-    15% {
-        opacity: 1;
-    }
-    70% {
-        opacity: 0.9;
-    }
-    100% {
-        transform: translate(var(--impact-x), var(--impact-y))
-            rotate(var(--impact-turn)) scale(0.6);
-        opacity: 0;
-    }
-}
-@media (prefers-reduced-motion: reduce) {
-    .bonus-impact-particle,
-    .bonus-impact-ring {
-        animation: none;
-    }
-    .bonus-impact-particle {
-        display: none;
-    }
-    .bonus-impact-ring {
-        width: 100px;
-        height: 100px;
-        margin: -50px;
-        opacity: 0.25;
-    }
 }
