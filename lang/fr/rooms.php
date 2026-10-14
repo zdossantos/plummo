@@ -113,6 +113,7 @@ Points : une bonne réponse rapporte 30 à 100 points selon ta rapidité ; une r
     'chat_unavailable' => 'Termine ton action de jeu pour envoyer un message au groupe.',
     'chat_label' => 'Un mot au groupe',
     'chat_hint' => 'Votre message apparaît cinq secondes sur le grand écran.',
+    'chat_drawer_hint' => 'Le brouillon reste disponible pendant le jeu. Les commandes de jeu restent accessibles au-dessus.',
     'chat_send' => 'Envoyer le message',
     'chat_wait' => 'Patientez {count} s',
     'chat_from' => 'Message de {name}',

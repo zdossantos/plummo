@@ -24,7 +24,7 @@ it('shows escaped chat bubbles, returns to game controls and celebrates tied win
         expect($screen->page()->locator('[data-testid="chat-bubble"] b')->count())->toBe(0);
         expect($screen->page()->evaluate('() => getComputedStyle(document.querySelector("[data-testid=chat-bubble]")).animationName'))->toBe('none');
         $first->assertSee('Wait');
-        $first->click('button[aria-label="Play"]')->click('[data-choose-packs]');
+        $first->click('.chat-drawer button[aria-label="Close"]')->click('[data-choose-packs]');
         $first->click('input[type="checkbox"][value="'.$pack->id.'"]')->click('[data-slot="drawer-content"] button:has-text("Close")')->fill('game-rounds', '5');
         confirmReadyPhone($first, $room);
         confirmReadyPhone($second, $room);

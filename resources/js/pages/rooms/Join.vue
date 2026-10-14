@@ -8,6 +8,14 @@ import BonusReception from '@/components/BonusReception.vue';
 import GamePlummoAvatar from '@/components/GamePlummoAvatar.vue';
 import PlummoPicker from '@/components/PlummoPicker.vue';
 import ChatComposer from '@/components/ChatComposer.vue';
+import {
+    Drawer,
+    DrawerContent,
+    DrawerTitle,
+    DrawerDescription,
+    DrawerClose,
+} from '@/components/ui/drawer';
+import { X } from '@lucide/vue';
 import GamePlay from '@/components/GamePlay.vue';
 import GameSetup from '@/components/GameSetup.vue';
 import GameReadiness from '@/components/GameReadiness.vue';
@@ -48,6 +56,13 @@ const editing = ref(false);
 const returning = ref(!!props.me);
 const target = ref('');
 const view = ref('play');
+const chatOpen = ref(false);
+const chatDraft = ref('');
+async function sendChat(values: Record<string, unknown>) {
+    const sent = await request('chat', 'POST', values);
+    if (sent && chatDraft.value === values.message) chatDraft.value = '';
+    return sent;
+}
 const profileStage = ref(0);
 const ui = useTranslations('interface');
 const chief = computed(
@@ -171,9 +186,6 @@ watch([() => game.value?.id, () => game.value?.phase], () => {
     if (game.value && !['paused', 'results'].includes(game.value.phase))
         view.value = 'play';
 });
-watch(canChat, (available) => {
-    if (!available && view.value === 'chat') view.value = 'play';
-});
 watch(chief, (value) => {
     if (!value && view.value === 'settings') view.value = 'play';
 });
@@ -183,6 +195,7 @@ watch(chief, (value) => {
     <ViewportShell
         :class="{
             'controller-active': !!me && !!game && !editing && view === 'play',
+            'chat-open': chatOpen && !!me && !closed && !editing,
         }"
     >
         <RoomNotice :message="error" />
@@ -328,6 +341,7 @@ watch(chief, (value) => {
                         v-model="view"
                         :session="chief && !game"
                         :chat="canChat"
+                        @chat="chatOpen = true"
                     />
                 </div>
                 <div
@@ -542,26 +556,6 @@ watch(chief, (value) => {
                         v-if="view === 'ranking' && room"
                         :room="room"
                     />
-                    <ChatComposer
-                        v-if="view === 'chat' && canChat"
-                        :me="me"
-                        :game="game"
-                        :server-now="serverNow"
-                        :busy="busy"
-                        :connected="connected"
-                        :send="(values) => request('chat', 'POST', values)"
-                    />
-                    <div
-                        v-if="view === 'chat' && !canChat"
-                        class="game-panel justify-center text-center"
-                        role="status"
-                    >
-                        <h2>{{ t('chat_label') }}</h2>
-                        <p>{{ t('chat_unavailable') }}</p>
-                        <Button @click="view = 'play'">{{
-                            ui.t('play')
-                        }}</Button>
-                    </div>
                     <div v-if="view === 'more'" class="game-panel">
                         <div class="room-command-board">
                             <div class="room-primary-actions">
@@ -624,6 +618,43 @@ watch(chief, (value) => {
                 </template>
             </template>
         </div>
+        <Drawer
+            v-if="me && !closed && !editing && me.status !== 'left'"
+            v-model:open="chatOpen"
+            :modal="false"
+        >
+            <DrawerContent
+                v-if="chatOpen"
+                inline
+                class="game-drawer chat-drawer"
+                :initial-focus="false"
+                @interact-outside.prevent
+            >
+                <div class="chat-drawer-heading">
+                    <DrawerTitle>{{ t('chat_label') }}</DrawerTitle>
+                    <DrawerClose as-child
+                        ><Button
+                            size="icon-sm"
+                            variant="outline"
+                            :aria-label="ui.t('close')"
+                            ><X /></Button
+                    ></DrawerClose>
+                </div>
+                <DrawerDescription class="sr-only">{{
+                    t('chat_drawer_hint')
+                }}</DrawerDescription>
+                <ChatComposer
+                    v-model="chatDraft"
+                    :me="me"
+                    :game="game"
+                    :server-now="serverNow"
+                    :busy="busy"
+                    :connected="connected"
+                    :can-chat="canChat"
+                    :send="sendChat"
+                />
+            </DrawerContent>
+        </Drawer>
         <template
             v-if="
                 me &&

@@ -16,18 +16,18 @@ defineOptions({
 });
 
 const props = defineProps<
-    DrawerContentProps & { class?: HTMLAttributes['class'] }
+    DrawerContentProps & { class?: HTMLAttributes['class']; inline?: boolean }
 >();
 const emits = defineEmits<DrawerContentEmits>();
 
-const delegatedProps = reactiveOmit(props, 'class');
+const delegatedProps = reactiveOmit(props, 'class', 'inline');
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits);
 </script>
 
 <template>
-    <DrawerPortal>
-        <DrawerOverlay />
+    <DrawerPortal :disabled="inline">
+        <DrawerOverlay v-if="!inline" />
         <DrawerContent
             data-slot="drawer-content"
             v-bind="{ ...$attrs, ...forwarded }"

@@ -19,13 +19,15 @@ import {
 import { Button } from '@/components/ui/button';
 import { useTranslations } from '@/composables/useTranslations';
 const view = defineModel<string>({ required: true });
+const emit = defineEmits<{ chat: [] }>();
 defineProps<{ session: boolean; chat: boolean }>();
 const { t } = useTranslations('interface');
 const rooms = useTranslations('rooms');
 const open = ref(false);
 const desktop = useMediaQuery('(min-width: 768px)');
 function choose(next: string) {
-    view.value = next;
+    if (next === 'chat') emit('chat');
+    else view.value = next;
     open.value = false;
 }
 </script>
