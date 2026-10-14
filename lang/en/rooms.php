@@ -107,6 +107,7 @@ Points: a correct answer earns 30 to 100 points depending on speed; a wrong or m
     'chat_unavailable' => 'Finish your game action to send a message to the group.',
     'chat_label' => 'Say something to the group',
     'chat_hint' => 'Your message appears on the big screen for five seconds.',
+    'chat_drawer_hint' => 'Your draft stays available during the game. Game controls remain accessible above.',
     'chat_send' => 'Send message',
     'chat_wait' => 'Wait {count} s',
     'chat_from' => 'Message from {name}',

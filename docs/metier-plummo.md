@@ -250,7 +250,8 @@ Pour le quiz et le blind test, les choix restent privés pendant la réponse. À
 - Il apparaît temporairement dans une bulle au-dessus du Plummo du joueur sur le grand écran.
 - Une seule bulle est visible par joueur à la fois.
 - Une bulle reste affichée cinq secondes. Chaque joueur doit attendre au moins trois secondes entre deux envois ; un nouveau message remplace sa bulle précédente et démarre une nouvelle durée d'affichage.
-- Dès qu'une nouvelle action est attendue, le téléphone revient aux commandes du jeu.
+- La rédaction utilise un drawer non bloquant : les commandes du jeu restent accessibles au-dessus. Une nouvelle action ne ferme pas le drawer et ne supprime pas le brouillon ; l'envoi reste interdit tant que cette action est attendue.
+- Le brouillon reste conservé après fermeture manuelle, changement d'étape, refus d'envoi ou coupure réseau dans la page ouverte. Seul un envoi réussi l'efface. Le rechargement de la page et les nouvelles sessions ne restaurent pas le brouillon.
 
 ## 8. Connexions, pauses et départs
 

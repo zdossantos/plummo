@@ -9,10 +9,11 @@ const props = defineProps<{
     serverNow: number;
     busy: boolean;
     connected: boolean;
+    canChat: boolean;
     send: (values: Record<string, unknown>) => Promise<boolean>;
 }>();
 const { t } = useTranslations('rooms');
-const message = ref('');
+const message = defineModel<string>({ required: true });
 const sending = ref(false);
 const remaining = computed(() =>
     Math.max(
@@ -32,32 +33,30 @@ async function submit() {
         sending.value ||
         props.busy ||
         !props.connected ||
+        !props.canChat ||
         remaining.value ||
         !message.value.trim()
     )
         return;
     sending.value = true;
     try {
-        if (
-            await props.send({
-                message: message.value,
-                game_id: props.game?.id ?? null,
-                round: props.game?.round.number ?? null,
-            })
-        )
-            message.value = '';
+        await props.send({
+            message: message.value,
+            game_id: props.game?.id ?? null,
+            round: props.game?.round.number ?? null,
+        });
     } finally {
         sending.value = false;
     }
 }
 </script>
 <template>
-    <form class="game-panel justify-center" @submit.prevent="submit">
+    <form class="chat-composer" @submit.prevent="submit">
         <label for="chat-message" class="block font-bold">{{
             t('chat_label')
         }}</label>
         <p id="chat-hint" class="mt-1 text-sm text-muted-foreground">
-            {{ t('chat_hint') }}
+            {{ canChat ? t('chat_hint') : t('chat_unavailable') }}
         </p>
         <input
             id="chat-message"
@@ -65,7 +64,7 @@ async function submit() {
             type="text"
             autocomplete="off"
             aria-describedby="chat-hint chat-count"
-            :disabled="sending || !connected"
+            :disabled="sending"
             class="mt-3 w-full rounded-xl border border-primary/20 bg-background px-4 py-3"
             @input="input"
         />
@@ -81,6 +80,7 @@ async function submit() {
                     busy ||
                     sending ||
                     !connected ||
+                    !canChat ||
                     remaining > 0 ||
                     !message.trim()
                 "

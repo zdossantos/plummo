@@ -3754,3 +3754,58 @@
     width: 18px;
     height: 18px;
 }
+
+/* An inline, non-modal drawer reserves space instead of covering game actions. */
+.chat-open .viewport-stage > .phone-scene {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+.chat-open .viewport-stage > .phone-scene > .phone-scene {
+    min-height: 280px;
+    flex-shrink: 0;
+}
+.game-drawer.chat-drawer[data-swipe-direction='down'] {
+    position: relative;
+    inset: auto;
+    flex: none;
+    width: min(100%, 800px);
+    height: auto;
+    margin: 8px auto 0;
+    padding: 10px 12px;
+    gap: 4px;
+    border-radius: 20px;
+}
+.chat-drawer-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+.chat-drawer-heading [data-slot='drawer-title'] {
+    font-size: 20px;
+}
+.chat-composer label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+}
+.chat-composer #chat-hint {
+    margin: 0;
+    font-size: 12px;
+}
+.chat-composer input {
+    margin-top: 6px;
+    padding: 8px 12px;
+}
+.chat-composer > div {
+    margin-top: 6px;
+}
+.chat-composer button {
+    min-height: 36px;
+    padding-block: 6px;
+}
+[data-compact] .chat-drawer #chat-hint {
+    display: none;
+}
