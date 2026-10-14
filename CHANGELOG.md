@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.10.0](https://github.com/zdossantos/plummo/compare/plummo-v0.9.2...plummo-v0.10.0) (2026-10-14)
+
+
+### Features
+
+* add approved Plummo favicon ([#88](https://github.com/zdossantos/plummo/issues/88)) ([c2e4229](https://github.com/zdossantos/plummo/commit/c2e4229b4757a1a5af61f8f076b8304ec88dd6df))
+* add Le bluff des Plummos game ([#83](https://github.com/zdossantos/plummo/issues/83)) ([a902222](https://github.com/zdossantos/plummo/commit/a90222200a620dee6c44d2f3ebba54acfbe898e0))
+* renforcer les bonus et ajouter des scènes VFX et SFX de bibliothèque ([#96](https://github.com/zdossantos/plummo/issues/96)) ([4626e84](https://github.com/zdossantos/plummo/commit/4626e849530c71fcdf8a1fcb66d60e84747fc5b9))
+* **rooms:** confirmation des joueurs et règles paginées ([#85](https://github.com/zdossantos/plummo/issues/85), [#86](https://github.com/zdossantos/plummo/issues/86)) ([#94](https://github.com/zdossantos/plummo/issues/94)) ([cbf6c5e](https://github.com/zdossantos/plummo/commit/cbf6c5e5b36935f998c08d0921ae41ea759761fe))
+* use all packs when selection is empty ([#95](https://github.com/zdossantos/plummo/issues/95)) ([d2a50d1](https://github.com/zdossantos/plummo/commit/d2a50d1de863b9d218f0892443a3014592ba93fd))
+
 ## [0.9.2](https://github.com/zdossantos/plummo/compare/plummo-v0.9.1...plummo-v0.9.2) (2026-10-12)
 
 
