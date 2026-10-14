@@ -132,8 +132,16 @@ Après fusion volontaire de la PR Release Please :
 3. Il conserve image, commit et plateforme dans `container-image.json` attaché
    à la release.
 4. Si l’UUID est configuré, il actualise uniquement `APP_IMAGE`, épingle le commit
-   du Compose puis demande le déploiement Coolify. Sinon il indique explicitement
+   du Compose et configure la commande après déploiement dans `web` :
+   `php artisan migrate --force --no-interaction`. Il demande ensuite le
+   déploiement Coolify. Sinon il indique explicitement
    que l’image est prête et que la configuration Coolify reste à terminer.
+
+5. La CI attend la fin du déploiement du commit attendu et la confirmation de
+   réussite des migrations dans ses logs. Le token Coolify doit autoriser la
+   lecture de ces logs (`read:sensitive`). Une migration échouée, une confirmation
+   absente ou un délai dépassé fait échouer le job. Coolify peut afficher
+   « terminé » avant sa commande après déploiement : ce statut seul ne suffit pas.
 
 Une réponse API confirme l’acceptation de la demande, **pas la santé du site**.
 Vérifier le résultat dans Coolify et les parcours ci-dessous. Les mutations API
@@ -151,7 +159,9 @@ php artisan admin:create
 
 La création administrateur est interactive avec mot de passe masqué. Aucun
 seed automatique ni migration dans un entrypoint. Pour une nouvelle release,
-examiner les migrations et sauvegarder avant leur application explicite.
+examiner les migrations et sauvegarder avant de publier la release : la CI les
+applique explicitement après le déploiement, sans seed ni migration dans un
+entrypoint. Une erreur de migration ne provoque aucun rollback automatique.
 
 Vérifier dans chacun des quatre conteneurs une connexion Laravel à la base
 `plummo` et un `PING` Redis authentifié. Les healthchecks prouvent le démarrage

@@ -17,6 +17,7 @@ const props = defineProps<{
     me: Player;
     disabled: boolean;
     revision?: number;
+    chiefId: number | null;
 }>();
 const emit = defineEmits<{ ready: [value: boolean] }>();
 const { t } = useTranslations('rooms');
@@ -24,7 +25,10 @@ const ui = useTranslations('interface');
 const open = ref(false);
 const desktop = useMediaQuery('(min-width: 768px)');
 const expected = computed(() =>
-    props.players.filter((player) => player.status === 'connected'),
+    props.players.filter(
+        (player) =>
+            player.status === 'connected' && player.id !== props.chiefId,
+    ),
 );
 const count = computed(
     () => expected.value.filter((player) => player.ready).length,
@@ -33,6 +37,7 @@ const count = computed(
 <template>
     <div class="readiness-actions" :data-setup-revision="revision">
         <Button
+            v-if="me.id !== chiefId"
             type="button"
             data-ready
             :variant="me.ready ? 'outline' : 'secondary'"

@@ -62,7 +62,8 @@ class GameSetup
     public function requireReady(Room $room, array $settings): void
     {
         $players = $room->players()->get()->filter(fn (RoomPlayer $player) => $player->connected());
-        if ($room->game_setup != self::normalize($settings) || $players->isEmpty() || $players->contains(fn (RoomPlayer $player) => $player->ready_revision !== $room->setup_revision)) {
+        $chiefId = app(RoomService::class)->chiefId($room);
+        if ($room->game_setup != self::normalize($settings) || $players->isEmpty() || $players->contains(fn (RoomPlayer $player) => $player->id !== $chiefId && $player->ready_revision !== $room->setup_revision)) {
             throw ValidationException::withMessages(['ready' => __('rooms.ready_required')]);
         }
     }

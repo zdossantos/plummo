@@ -1,38 +1,44 @@
 <?php
 
 return [
+    'rules_flow' => 'How it works',
+    'rules_play' => 'How to play',
+    'rules_bonuses' => 'Bonuses / pranks',
+    'rules_bonus_overview' => 'How it works: with several players, the chief can enable bonuses. Items help, protect or hinder others; some change the timer.
+
+Using items: you receive items in your pocket (two maximum). Tap one to launch it. The information button explains its effect without using it.',
     'rules' => 'Rules',
-    'ready_required' => 'Every connected player must confirm the settings on their phone before starting.',
+    'ready_required' => 'Every other connected player must confirm the settings on their phone before starting.',
     'ready_confirm' => 'I’m ready',
     'ready_withdraw' => 'Withdraw readiness',
     'ready_count' => '{count} / {total} ready',
     'ready_players' => 'Ready to play?',
-    'ready_hint' => 'Everyone confirms on their phone. Changing settings clears all confirmations.',
+    'ready_hint' => 'Everyone except the chief confirms on their phone. Changing settings clears all confirmations.',
     'ready_yes' => 'Ready',
     'ready_waiting' => 'Waiting',
     'rules_quiz' => 'Goal: find the correct answer.
 How it works: each question shows four choices, followed by the correct answer.
-On your phone: tap one answer before time runs out. Your choice is final.
+How to play: tap one answer before time runs out. Your choice is final.
 Points: a correct answer earns 30 to 100 points depending on speed; a wrong or missing answer earns 0. Playing alone: 65 points.',
     'rules_blind_test' => 'Goal: recognise the song playing on the big screen.
 How it works: listen to the clip, choose an answer, then see the correct answer.
-On your phone: tap one answer before time runs out. Your choice is final.
+How to play: tap one answer before time runs out. Your choice is final.
 Points: a correct answer earns 30 to 100 points depending on speed; a wrong or missing answer earns 0. Playing alone: 65 points.',
     'rules_drawing' => 'Goal: draw a word for others to guess, or guess it yourself.
 How it works: everyone takes turns drawing. The artist chooses a secret word and draws on the big screen.
-On your phone: draw on your turn; otherwise type your guesses. Keep trying until you find the word.
+How to play: draw on your turn; otherwise type your guesses. Keep trying until you find the word.
 Points: guessing earns 30 to 100 points depending on speed (65 with one guesser). The artist earns up to 65 points depending on how many players guess correctly.',
     'rules_phrase' => 'Goal: write the sentence ending others like best.
 How it works: secret writing, anonymous presentation, voting, then author reveal.
-On your phone: write and submit your ending before time runs out, then vote for a sentence other than your own.
+How to play: write and submit your ending before time runs out, then vote for a sentence other than your own.
 Points: each vote received earns 65 points. No votes received: 0 points.',
     'rules_tribunal' => 'Goal: convince the jury with your argument.
 How it works: two players take turns defending their side; the others vote, then results are revealed.
-On your phone: check your role and topic. Speak aloud on your turn; as a juror, vote for the most convincing side before time runs out. The two advocates cannot vote.
+How to play: check your role and topic. Speak aloud on your turn; as a juror, vote for the most convincing side before time runs out. The two advocates cannot vote.
 Points: each vote earns its advocate 65 points. Jurors earn no points.',
     'rules_mini_games' => 'Goal: solve the challenges selected by the leader.
 How it works: challenges are shuffled. Watch the big screen when asked, answer on your phone, then see the correct answer.
-On your phone: tap one answer before time runs out; your choice is final.
+How to play: tap one answer before time runs out; your choice is final.
 Points: a correct answer earns 30 to 100 points depending on speed; a wrong or missing answer earns 0. Playing alone: 65 points.',
     'rules_trial_memory' => 'Memory: remember the four Plummos’ colours and accessories, then answer the question.',
     'rules_trial_hide' => 'Hide and seek: find the Plummo matching the requested colour and accessory.',
@@ -435,7 +441,10 @@ Points: a correct answer earns 30 to 100 points depending on speed; a wrong or m
     'mini_empty' => 'Nobody wrote an answer. On to the next challenge!',
     'mini_waiting' => 'Waiting for three players for this challenge.',
     'mini_correct' => 'The correct answer: {answer}',
-    'rules_bluff' => 'Invent a believable answer to fool the others while finding the truth. At least three players take part. Write a bluff on your phone and submit it before time runs out; unsubmitted drafts do not take part. Answers are presented anonymously, then you vote for the one you believe is true. You cannot vote for your own bluff. Writing the truth earns 65 points and exempts you from voting; voting for the truth also earns 65 points. Each vote attracted by a bluff earns its authors 65 points, shared between them if several wrote the same answer. Identical answers are grouped. Points are revealed at the end of the round.',
+    'rules_bluff' => 'Goal: invent a believable answer to fool the others while finding the truth. At least three players take part.
+Flow: answers are presented anonymously, then you vote for the one you believe is true. Identical answers are grouped. Points are revealed at the end of the round.
+How to play: write a bluff and submit it before time runs out; unsubmitted drafts do not take part. You cannot vote for your own bluff.
+Points: writing the truth earns 65 points and exempts you from voting; voting for the truth also earns 65 points. Each vote attracted by a bluff earns its authors 65 points, shared between them if several wrote the same answer.',
     'bluff_name' => 'Plummo Bluff',
     'launch_bluff' => 'Prepare the bluff',
     'available_bluffs' => ':unseen fresh topics out of :total available',

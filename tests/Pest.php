@@ -7,6 +7,7 @@ use App\Models\Pack;
 use App\Models\Room;
 use App\Models\Tag;
 use App\Services\GameSetup;
+use Pest\Browser\Execution;
 use Tests\TestCase;
 
 pest()->extend(TestCase::class)->in('Feature', 'Browser');
@@ -32,7 +33,18 @@ function enterRoom(Room $room, string $name = 'Camille', array $accessories = []
 /** Confirm the preparation actually received by this phone, after the chief's save. */
 function confirmReadyPhone($page, Room $room)
 {
-    $page->assertEnabled('[data-ready]')->assertAttribute('.readiness-actions', 'data-setup-revision', (string) $room->fresh()->setup_revision)->click('[data-ready]')->assertSee('Withdraw readiness');
+    Execution::instance()->waitForExpectation(function () use ($page, $room) {
+        $revision = $page->page()->evaluate('() => Number(document.querySelector(".readiness-actions").dataset.setupRevision)');
+        expect($revision)->toBe($room->fresh()->setup_revision);
+    });
+
+    if (! $page->page()->evaluate('() => Boolean(document.querySelector("[data-ready]"))')) {
+        $page->assertAttribute('.setup-board', 'aria-busy', 'false');
+
+        return $page->assertPresent('.setup-launch');
+    }
+
+    $page->assertEnabled('[data-ready]')->click('[data-ready]')->assertSee('Withdraw readiness');
 
     return $page;
 }

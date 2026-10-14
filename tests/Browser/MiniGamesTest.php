@@ -25,7 +25,7 @@ it('selects all available challenges instead of packs and plays the cups from a 
         foreach (['memory', 'hide', 'count'] as $trial) {
             $phone->click('[data-mini-trial="'.$trial.'"]');
         }
-        $phone->click('[data-slot="drawer-content"] button:has-text("Close")')->assertSee('1 challenges selected')->fill('game-rounds', '5')->assertEnabled('[data-ready]')->click('[data-ready]')->assertSee('Withdraw readiness')->click('Start mini games')->assertSee('Watch the big screen!');
+        $phone->click('[data-slot="drawer-content"] button:has-text("Close")')->assertSee('1 challenges selected')->fill('game-rounds', '5')->assertMissing('[data-ready]')->click('Start mini games')->assertSee('Watch the big screen!');
         $screen->assertPresent('[data-mini-scene="cups"]')->assertMissing('.page-controls');
         $phone->assertMissing('[data-mini-scene]')->assertSee('Which cup is hiding the Plummo?')->assertEnabled('[data-mini-choice="0"]')->click('[data-mini-choice="0"]');
         $phone->assertSee('The correct answer:')->assertNoJavaScriptErrors();
