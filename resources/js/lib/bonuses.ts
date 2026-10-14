@@ -32,7 +32,7 @@ export function bonusChoices(
     if (!dice || items.length < 2) return items;
     // A deterministic rotation changes every two seconds, without moving answer IDs.
     const step = Math.min(
-        2,
+        4,
         Math.max(0, Math.floor((now - dice.startedAt) / 2)),
     );
     const offset =
@@ -92,8 +92,8 @@ export function bonusStrokePoints(
 ): [number, number][] {
     if (!active || tool !== 'brush') return points;
     return points.map(([x, y]) => [
-        Math.min(1, Math.max(0, x + 0.008 * Math.sin(y * 90))),
-        Math.min(1, Math.max(0, y + 0.012 * Math.sin(x * 70))),
+        Math.min(1, Math.max(0, x + 0.024 * Math.sin(y * 90))),
+        Math.min(1, Math.max(0, y + 0.036 * Math.sin(x * 70))),
     ]);
 }
 
@@ -102,7 +102,7 @@ export function bonusPlaybackRate(effects: BonusEffect[], now: number): number {
         (e) =>
             e.kind === 'speed' && (e.expiresAt === null || e.expiresAt > now),
     )
-        ? 1.25
+        ? 1.5
         : 1;
 }
 

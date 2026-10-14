@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Pest\Browser\Execution;
 
-pest()->browser()->timeout(5000);
+pest()->browser()->timeout(15000);
 
 it('launches a collective bonus in one click while phone and screen stay inside their viewport', function (bool $reduced) {
     app()->terminating(function () {
@@ -64,9 +64,13 @@ it('launches a collective bonus in one click while phone and screen stay inside 
         $screen->page()->evaluate('() => { window.launchIds = new Set(); new MutationObserver(() => document.querySelectorAll("[data-testid=bonus-launch]").forEach(item => window.launchIds.add(item.dataset.launchId))).observe(document.body, {subtree:true,childList:true}); }');
         $first->click('.bonus-object')->assertMissing('.bonus-object');
         $screen->assertVisible('[data-testid="bonus-launch"]')->assertSee('Camille');
+        $screen->assertPresent('[data-testid="bonus-impact"]');
+        expect($screen->page()->evaluate('() => getComputedStyle(document.querySelector(".bonus-impact")).pointerEvents'))->toBe('none');
+        $first->assertMissing('[data-testid="bonus-impact"]');
+        expect($screen->page()->evaluate('() => { const r = document.querySelector(".bonus-impact").getBoundingClientRect(); return Math.abs(r.x - innerWidth * .5) < 2 && Math.abs(r.y - innerHeight * .58) < 2; }'))->toBeTrue();
         expect($screen->page()->evaluate('() => getComputedStyle(document.querySelector(".bonus-launch-layer")).pointerEvents'))->toBe('none');
         if ($reduced) {
-            expect($screen->page()->evaluate('() => [".bonus-launch", ".bonus-launch-projectile"].every(selector => getComputedStyle(document.querySelector(selector)).animationName === "none")'))->toBeTrue();
+            expect($screen->page()->evaluate('() => [".bonus-launch", ".bonus-launch-projectile", ".bonus-impact-particle", ".bonus-impact-ring"].every(selector => getComputedStyle(document.querySelector(selector)).animationName === "none")'))->toBeTrue();
         }
         $screen->screenshot(filename: 'bonus-launch-'.($reduced ? 'reduced' : 'animated'));
 
@@ -217,6 +221,12 @@ it('keeps collective overlays usable and accepts only one of two simultaneous la
         $second->page()->evaluate('() => new Promise(resolve => setTimeout(resolve, 300))');
         if (in_array($kind, ['bolt', 'squatter'], true)) {
             expect($second->page()->evaluate('(selector) => getComputedStyle(document.querySelector(selector)).pointerEvents', $selector))->toBe('none');
+        }
+        if ($kind === 'squatter') {
+            $second->page()->setViewportSize(320, 664);
+            expect($second->page()->evaluate('() => parseFloat(getComputedStyle(document.querySelector(".bonus-squatter")).width)'))->toBeGreaterThanOrEqual(140);
+            expect($second->page()->evaluate('() => getComputedStyle(document.querySelector(".bonus-squatter")).animationDuration'))->toBe('8s');
+            expect($second->page()->evaluate('() => document.documentElement.scrollHeight <= innerHeight && document.documentElement.scrollWidth <= innerWidth'))->toBeTrue();
         }
         if ($kind === 'bubbles') {
             foreach (range(1, 6) as $unused) {

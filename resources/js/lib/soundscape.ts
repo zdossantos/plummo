@@ -44,6 +44,15 @@ export function bonusSoundNotes(kind: BonusKind) {
     };
     return pitches[kind].map((frequency, index) => ({
         frequency,
+        type: (kind === 'bolt'
+            ? 'sawtooth'
+            : kind === 'paint' || kind === 'soap' || kind === 'bubbles'
+              ? 'sine'
+              : kind === 'dice'
+                ? 'square'
+                : 'triangle') as OscillatorType,
+        endFrequency:
+            frequency * (kind === 'bolt' ? 0.45 : kind === 'paint' ? 1.6 : 1),
         at: index * 0.09,
         duration: 0.16,
         gain: 0.25,
@@ -120,11 +129,16 @@ export class Soundscape {
         gain: number,
         output: GainNode,
         type: OscillatorType = 'sine',
+        endFrequency = frequency,
     ) {
         const oscillator = this.context.createOscillator();
         const envelope = this.context.createGain();
         oscillator.type = type;
-        oscillator.frequency.value = frequency;
+        oscillator.frequency.setValueAtTime(frequency, start);
+        oscillator.frequency.exponentialRampToValueAtTime(
+            endFrequency,
+            start + duration,
+        );
         envelope.gain.setValueAtTime(0, start);
         envelope.gain.linearRampToValueAtTime(
             gain,
@@ -157,7 +171,8 @@ export class Soundscape {
                 note.duration,
                 note.gain,
                 this.voices,
-                'triangle',
+                note.type,
+                note.endFrequency,
             );
     }
     close() {

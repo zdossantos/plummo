@@ -51,6 +51,7 @@ const { t } = useTranslations('rooms');
     >
         <RoomNotice :message="error" />
         <BonusLaunch
+            screen
             :game="game"
             :room="room"
             :server-now="serverNow"

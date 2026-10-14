@@ -49,11 +49,11 @@ class BonusCatalog
     {
         return match ($kind) {
             'shield', 'boomerang', 'accent', 'sneeze', 'translator', 'advert', 'last_breath' => null,
-            'bolt' => 3,
-            'dice' => 6,
-            'stamp', 'paint' => 4,
-            'photobomb', 'scratch', 'singer', 'squatter', 'artist' => 4,
-            'speed' => 8,
+            'bolt' => 5,
+            'dice' => 10,
+            'stamp', 'paint', 'speed' => 10,
+            'photobomb', 'scratch', 'singer' => 4,
+            'squatter', 'artist' => 8,
             'alarm' => 12,
             default => min(20, max(8, (int) round($duration * 0.2))),
         };

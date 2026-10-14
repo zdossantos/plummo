@@ -151,7 +151,7 @@ it('extends temporary opponent effects under an alarm and lets soap clear them',
     launchCatalogueBonus($this, $room, $members[0], $game, 'bolt');
     launchCatalogueBonus($this, $room, $members[2], $game, 'alarm');
     $effects = collect($game->fresh()->state['bonuses']['effects']);
-    expect($effects->where('target', $members[1][0])->where('kind', 'bolt')->first()['expiresAt'])->toBe((float) now()->format('U.u') + 6);
+    expect($effects->where('target', $members[1][0])->where('kind', 'bolt')->first()['expiresAt'])->toBe((float) now()->format('U.u') + 10);
     launchCatalogueBonus($this, $room, $members[1], $game, 'soap');
     expect(collect($game->fresh()->state['bonuses']['effects'])->where('target', $members[1][0]))->toHaveCount(0);
 })->group('bonuses');

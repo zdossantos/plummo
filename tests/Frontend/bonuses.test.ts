@@ -3,7 +3,7 @@ import { bonusChoices, activeBonusEffects, BonusReceiptTracker } from '../../res
 import type { BonusEffect, BonusReceipt } from '../../resources/js/types/rooms';
 
 const dice: BonusEffect = { id: 'dice-1', kind: 'dice', actorId: 1, startedAt: 100, expiresAt: 106 };
-test('shuffles three times while keeping answer identity and restores order at expiry', () => {
+test('restores the original order when a shortened dice effect expires', () => {
     const choices = ['one', 'two', 'three', 'four'];
     const first = bonusChoices(choices, [dice], 100);
     const second = bonusChoices(choices, [dice], 102);
@@ -89,7 +89,7 @@ test('clumsy strokes are deterministic, bounded and leave erasers untouched', ()
     expect(one.every(p => p.every(n => n >= 0 && n <= 1))).toBe(true);
 });
 test('shared audio speed restores on expiry', () => {
-    expect(bonusPlaybackRate([{id: 'fast',kind: 'speed',actorId: 1,startedAt: 0,expiresAt: 8}], 2)).toBe(1.25);
+    expect(bonusPlaybackRate([{id: 'fast',kind: 'speed',actorId: 1,startedAt: 0,expiresAt: 8}], 2)).toBe(1.5);
     expect(bonusPlaybackRate([{id: 'fast',kind: 'speed',actorId: 1,startedAt: 0,expiresAt: 8}], 8)).toBe(1);
 });
 
@@ -115,4 +115,31 @@ test('voting retains common visual maluses until they expire', () => {
     const effects: BonusEffect[] = ['bubbles', 'photobomb', 'jelly', 'watch'].map(kind => ({ ...dice, kind: kind as BonusEffect['kind'] }));
     expect(activeBonusEffects(effects, 101, 'voting')).toEqual(effects);
     expect(activeBonusEffects(effects, 106, 'voting')).toEqual([]);
+});
+
+ test('dice continues changing through the fifth displacement and restores at ten seconds', () => {
+    const effect = { ...dice, expiresAt: 110 };
+    const choices = ['A', 'B', 'C', 'D'];
+    const orders = [100,102,104,106,108].map(now => bonusChoices(choices,[effect],now).map(item => item.index));
+    expect(orders).toEqual([[1,2,3,0],[2,3,0,1],[3,0,1,2],[1,2,3,0],[2,3,0,1]]);
+    expect(bonusChoices(choices,[effect],110).map(item => item.index)).toEqual([0,1,2,3]);
+});
+test('clumsy hand visibly offsets new strokes while preserving fill and erase', () => {
+    const points: [number, number][] = [[0.5,0.5]];
+    const distorted = bonusStrokePoints(points,true,'brush')[0]!;
+    expect(Math.abs(distorted[0] - 0.5)).toBeGreaterThan(0.02);
+    expect(Math.abs(distorted[1] - 0.5)).toBeGreaterThan(0.015);
+    expect(bonusStrokePoints(points,true,'fill')).toEqual(points);
+    expect(bonusStrokePoints(points,true,'erase')).toEqual(points);
+});
+
+test('reinforced sound effects have distinct timbres and pitch movement with bounded volume', async () => {
+    const { bonusSoundNotes } = await import('../../resources/js/lib/soundscape');
+    const bolt = bonusSoundNotes('bolt');
+    const paint = bonusSoundNotes('paint');
+    expect(bolt[0]!.type).toBe('sawtooth');
+    expect(paint[0]!.type).toBe('sine');
+    expect(bolt[0]!.endFrequency).toBeLessThan(bolt[0]!.frequency);
+    expect(paint[0]!.endFrequency).toBeGreaterThan(paint[0]!.frequency);
+    for (const note of [...bolt,...paint]) expect(note.gain).toBeLessThanOrEqual(0.3);
 });
