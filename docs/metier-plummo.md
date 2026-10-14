@@ -33,7 +33,7 @@ Le premier joueur connecté devient chef de partie. Il participe aux jeux comme 
 
 Depuis son téléphone, il choisit le mini-jeu, les packs et les réglages, lance la partie, met en pause et reprend. Il peut transmettre volontairement son rôle à un autre joueur.
 
-Avant chaque mini-jeu, tous les joueurs connectés, chef compris, confirment qu’ils sont prêts sur leur téléphone. Chacun peut retirer sa confirmation. Le chef voit les joueurs prêts et ceux attendus ; le serveur refuse tout lancement tant qu’une confirmation manque. Un changement de mini-jeu, de réglages ou d’objectif de session efface les confirmations. Un nouvel arrivant ou un joueur qui se reconnecte doit confirmer ; les départs et déconnexions cessent de bloquer le lancement.
+Avant chaque mini-jeu, tous les joueurs connectés, sauf le chef, confirment qu’ils sont prêts sur leur téléphone. Chacun peut retirer sa confirmation. Le chef confirme sa propre disponibilité en lançant le mini-jeu, sans bouton « prêt » séparé. Il peut lancer seul. Le chef voit les joueurs prêts et ceux attendus ; le serveur refuse tout lancement tant qu’une confirmation manque. Un changement de mini-jeu, de réglages ou d’objectif de session efface les confirmations. Un nouvel arrivant ou un joueur qui se reconnecte doit confirmer ; les départs et déconnexions cessent de bloquer le lancement.
 
 Les règles du jeu choisi sont consultables sur chaque téléphone pendant la préparation et pendant le jeu : objectif, déroulement, actions et points. Pour les mini-épreuves, seules les épreuves sélectionnées sont détaillées. Leur lecture paginée ne met pas la partie en pause ; fermer le lecteur conserve l’écran de jeu et les saisies en cours.
 

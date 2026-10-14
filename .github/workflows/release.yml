@@ -134,7 +134,7 @@ jobs:
       - name: Deployment configuration pending
         if: ${{ vars.COOLIFY_APPLICATION_UUID == '' }}
         run: echo 'Image verified and recorded. Configure the dedicated Plummo Coolify resource to enable deployment.' >> "$GITHUB_STEP_SUMMARY"
-      - name: Deploy release to Coolify
+      - name: Deploy release and verify post-deployment migrations
         if: ${{ vars.COOLIFY_APPLICATION_UUID != '' }}
         env:
           COOLIFY_API_URL: ${{ vars.COOLIFY_API_URL }}

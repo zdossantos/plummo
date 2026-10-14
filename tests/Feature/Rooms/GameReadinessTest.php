@@ -14,6 +14,7 @@ function readySettings(): array
 it('accepts all packs while preparing but requires confirmations and selected mini trials before launch', function () {
     $room = openRoom();
     [, $token] = enterRoom($room);
+    enterRoom($room, 'Alex');
     $this->withCookie('plummo_player_'.$room->code, $token);
     foreach ([['type' => 'quiz', 'packs' => []], ['type' => 'mini_games', 'trials' => []]] as $selection) {
         $settings = [...$selection, 'rounds' => 5, 'duration' => 30];
@@ -31,14 +32,13 @@ it('refuses a direct launch without confirmations and creates no game or history
     $this->assertDatabaseCount('room_content_history', 0);
 });
 
-it('requires every connected player including the chief and allows withdrawing confirmation', function () {
+it('requires every connected player except the chief and allows withdrawing confirmation', function () {
     $room = openRoom();
     [$chief, $one] = enterRoom($room);
     [$other, $two] = enterRoom($room, 'Alex');
     $settings = readySettings();
     $setup = $this->withCookie('plummo_player_'.$room->code, $one)->postJson('/rooms/'.$room->code.'/game-setup', $settings)->assertOk();
     $revision = $setup->json('room.setupRevision');
-    $this->postJson('/rooms/'.$room->code.'/ready', ['ready' => true, 'revision' => $revision])->assertOk()->assertJsonPath('me.ready', true);
     $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertUnprocessable()->assertJsonValidationErrors('ready');
     $this->withCookie('plummo_player_'.$room->code, $two)->postJson('/rooms/'.$room->code.'/ready', ['ready' => true, 'revision' => $revision])->assertOk();
     $this->postJson('/rooms/'.$room->code.'/ready', ['ready' => false, 'revision' => $revision])->assertOk()->assertJsonPath('me.ready', false);
@@ -113,4 +113,12 @@ it('clears confirmations when the session target changes or scores restart', fun
     $this->postJson('/rooms/'.$room->code.'/ready', ['ready' => true, 'revision' => $changed->json('room.setupRevision')])->assertOk();
     $this->patchJson('/rooms/'.$room->code.'/session', ['action' => 'configure', 'target' => 1000])->assertOk()->assertJsonPath('me.ready', true);
     $this->patchJson('/rooms/'.$room->code.'/session', ['action' => 'restart', 'target' => 1000, 'confirm' => true])->assertOk()->assertJsonPath('me.ready', false);
+});
+
+it('lets the chief start alone without a separate readiness confirmation', function () {
+    $room = openRoom();
+    [, $token] = enterRoom($room);
+    $settings = readySettings();
+    $this->withCookie('plummo_player_'.$room->code, $token)->postJson('/rooms/'.$room->code.'/game-setup', $settings)->assertOk();
+    $this->postJson('/rooms/'.$room->code.'/games', $settings)->assertCreated();
 });

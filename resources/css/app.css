@@ -294,6 +294,41 @@
     line-height: 1.4;
     font-size: clamp(18px, 3vw, 28px);
 }
+.reader-content,
+.reader-page {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    gap: 16px;
+}
+.rules-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.rules-tab {
+    min-height: 44px;
+    padding: 6px 12px;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    background: var(--paper);
+    color: var(--ink);
+}
+.rules-tab[data-state='active'] {
+    background: var(--purple);
+    color: var(--ink);
+}
+.rules-tab:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 2px;
+}
+.reader-text.rules-reader {
+    display: block;
+}
 .text-reader-trigger {
     font-size: 12px;
     display: inline-flex;
@@ -1419,6 +1454,8 @@
     line-height: 1.2;
 }
 .setup-main {
+    overflow-y: auto;
+    padding: 0 4px 8px;
     flex: 1;
     min-height: 0;
     display: flex;
@@ -1430,6 +1467,7 @@
     align-self: center;
 }
 .setup-fields {
+    flex-shrink: 0;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px 12px;
@@ -1489,9 +1527,14 @@
     height: 16px;
 }
 .setup-details {
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     gap: 8px;
+}
+.setup-board > [data-slot='button'],
+.setup-board > [role='alert'] {
+    flex-shrink: 0;
 }
 .setup-launch {
     flex-shrink: 0;
@@ -3765,6 +3808,7 @@
 }
 
 .readiness-actions {
+    flex-shrink: 0;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;

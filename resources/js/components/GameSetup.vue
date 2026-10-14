@@ -325,6 +325,7 @@ onUnmounted(() => controller?.abort());
 <template>
     <form
         class="game-panel setup-board"
+        :aria-busy="busy"
         @submit.prevent="
             emit('start', {
                 type: gameType,
