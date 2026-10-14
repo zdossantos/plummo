@@ -5,6 +5,8 @@ Les fichiers sources sont sous CC0 1.0 ou CC-BY 3.0. Les extraits CC-BY restent 
 
 ## Crédits
 
+- [Crowd Shouting/Speaking Ambience](https://opengameart.org/content/crowd-shoutingspeaking-ambience) — [StarNinjas](https://opengameart.org/users/starninjas) — [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/). Foule qui proteste pour la grève des Plummos.
+
 - [100 CC0 SFX #2](https://opengameart.org/content/100-cc0-sfx-2) — rubberduck — [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/).
 - [Multiple Dice Rolling](https://opengameart.org/content/multiple-dice-rolling) — Justin Nichol — [CC-BY-3.0](https://creativecommons.org/licenses/by/3.0/).
 - [Swishes Sound Pack](https://opengameart.org/content/swishes-sound-pack) — artisticdude — [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/).
@@ -25,7 +27,7 @@ Modifications par Plummo : sélection d’extraits, coupe des silences initiaux,
 
 ## Reconstruction
 
-Télécharger les sources depuis les pages indiquées dans `sources.json`. Extraire les archives dans un dossier portant le slug OpenGameArt (`100-cc0-sfx`, `pencil-sounds`, etc.). Les fichiers seuls portent le slug et leur extension (`genuine-sneeze-sound.flac`, `clock-tick-0.ogg`, `multiple-dice-rolling.ogg`, `shimmer-glitter-magic.flac`, `scratch-speed.wav`). Le chant utilise le MP3 de préécoute haute qualité `https://cdn.freesound.org/previews/700/700247_9088242-hq.mp3`, enregistré en `singer.mp3`.
+Télécharger les sources depuis les pages indiquées dans `sources.json`. Extraire les archives dans un dossier portant le slug OpenGameArt (`100-cc0-sfx`, `pencil-sounds`, etc.). Les fichiers seuls portent le slug et leur extension (`genuine-sneeze-sound.flac`, `clock-tick-0.ogg`, `multiple-dice-rolling.ogg`, `shimmer-glitter-magic.flac`, `scratch-speed.wav`, `crowd-shoutingspeaking-ambience.ogg`). Le chant utilise le MP3 de préécoute haute qualité `https://cdn.freesound.org/previews/700/700247_9088242-hq.mp3`, enregistré en `singer.mp3`.
 
 Puis :
 
