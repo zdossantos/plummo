@@ -29,6 +29,8 @@ Pour développer avec rechargement : garder MySQL/Redis en Docker, puis lancer `
 
 ## Vérifications
 
+La CI répartit les tests métier `Feature` sur deux shards Pest et les tests `Browser` sur quatre, chacun avec son propre MySQL et la base `plummo_testing`. Les dix formats des contrôles de composants sont exécutés dans des jobs distincts, en parallèle des contrôles statiques, des tests unitaires et des scènes de bonus. Le check obligatoire `quality` exige la réussite de tous ces jobs, y compris chaque shard.
+
 ```sh
 composer lint:check
 composer analyse
