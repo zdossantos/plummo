@@ -3,7 +3,7 @@ import { bonusChoices, activeBonusEffects, BonusReceiptTracker } from '../../res
 import type { BonusEffect, BonusReceipt } from '../../resources/js/types/rooms';
 
 const dice: BonusEffect = { id: 'dice-1', kind: 'dice', actorId: 1, startedAt: 100, expiresAt: 106 };
-test('shuffles three times while keeping answer identity and restores order at expiry', () => {
+test('restores the original order when a shortened dice effect expires', () => {
     const choices = ['one', 'two', 'three', 'four'];
     const first = bonusChoices(choices, [dice], 100);
     const second = bonusChoices(choices, [dice], 102);
@@ -28,17 +28,59 @@ test('receipts animate only once and never replay after reconnect or late arriva
     expect(tracker.observe(2, [{ ...receipt, id: 'old', at: 90 }], 110, true)).toEqual([]);
 });
 
-test('each prank has its own short, restrained sound signature', async () => {
-    const { bonusSoundNotes } = await import('../../resources/js/lib/soundscape');
-    const kinds = ['bolt', 'dice', 'squatter', 'artist', 'accent', 'sneeze', 'stamp', 'paint', 'shield', 'soap', 'boomerang', 'pinata', 'washer', 'lock', 'mystery', 'bubbles', 'photobomb', 'jelly', 'strike', 'leak', 'freeze', 'extension', 'watch', 'overtime', 'last_breath', 'alarm', 'borrow', 'translator', 'advert', 'scratch', 'speed', 'singer', 'missing_word', 'alphabet', 'curtain', 'giant', 'mirror', 'clumsy'] as const;
-    const signatures = kinds.map(kind => bonusSoundNotes(kind));
-    expect(new Set(signatures.map(notes => JSON.stringify(notes))).size).toBe(38);
-    for (const notes of signatures) {
-        expect(notes.length).toBeGreaterThan(0);
-        for (const note of notes) {
-            expect(note.at + note.duration).toBeLessThanOrEqual(0.8);
-            expect(note.gain).toBeLessThanOrEqual(0.3);
-        }
+test('each bonus resolves to a documented scene-specific library sample', async () => {
+    const { bonusSoundFile } =
+        await import('../../resources/js/lib/soundscape');
+    const { existsSync, readFileSync } = await import('node:fs');
+    const kinds = [
+        'bolt',
+        'dice',
+        'squatter',
+        'artist',
+        'accent',
+        'sneeze',
+        'stamp',
+        'paint',
+        'shield',
+        'soap',
+        'boomerang',
+        'pinata',
+        'washer',
+        'lock',
+        'mystery',
+        'bubbles',
+        'photobomb',
+        'jelly',
+        'strike',
+        'leak',
+        'freeze',
+        'extension',
+        'watch',
+        'overtime',
+        'last_breath',
+        'alarm',
+        'borrow',
+        'translator',
+        'advert',
+        'scratch',
+        'speed',
+        'singer',
+        'missing_word',
+        'alphabet',
+        'curtain',
+        'giant',
+        'mirror',
+        'clumsy',
+    ] as const;
+    const files = kinds.map((kind) => bonusSoundFile(kind));
+    expect(new Set(files).size).toBe(38);
+    const sources = JSON.parse(
+        readFileSync('public/audio/sfx/scenes/sources.json', 'utf8'),
+    );
+    for (const file of files) {
+        expect(file).toMatch(/^\/audio\/sfx\/scenes\/[a-z_]+\.mp3$/);
+        expect(existsSync('public' + file)).toBe(true);
+        expect(sources[file.split('/').pop()!]?.sources.length).toBeGreaterThan(0);
     }
 });
 
@@ -89,7 +131,7 @@ test('clumsy strokes are deterministic, bounded and leave erasers untouched', ()
     expect(one.every(p => p.every(n => n >= 0 && n <= 1))).toBe(true);
 });
 test('shared audio speed restores on expiry', () => {
-    expect(bonusPlaybackRate([{id: 'fast',kind: 'speed',actorId: 1,startedAt: 0,expiresAt: 8}], 2)).toBe(1.25);
+    expect(bonusPlaybackRate([{id: 'fast',kind: 'speed',actorId: 1,startedAt: 0,expiresAt: 8}], 2)).toBe(1.5);
     expect(bonusPlaybackRate([{id: 'fast',kind: 'speed',actorId: 1,startedAt: 0,expiresAt: 8}], 8)).toBe(1);
 });
 
@@ -115,4 +157,20 @@ test('voting retains common visual maluses until they expire', () => {
     const effects: BonusEffect[] = ['bubbles', 'photobomb', 'jelly', 'watch'].map(kind => ({ ...dice, kind: kind as BonusEffect['kind'] }));
     expect(activeBonusEffects(effects, 101, 'voting')).toEqual(effects);
     expect(activeBonusEffects(effects, 106, 'voting')).toEqual([]);
+});
+
+ test('dice continues changing through the fifth displacement and restores at ten seconds', () => {
+    const effect = { ...dice, expiresAt: 110 };
+    const choices = ['A', 'B', 'C', 'D'];
+    const orders = [100,102,104,106,108].map(now => bonusChoices(choices,[effect],now).map(item => item.index));
+    expect(orders).toEqual([[1,2,3,0],[2,3,0,1],[3,0,1,2],[1,2,3,0],[2,3,0,1]]);
+    expect(bonusChoices(choices,[effect],110).map(item => item.index)).toEqual([0,1,2,3]);
+});
+test('clumsy hand visibly offsets new strokes while preserving fill and erase', () => {
+    const points: [number, number][] = [[0.5,0.5]];
+    const distorted = bonusStrokePoints(points,true,'brush')[0]!;
+    expect(Math.abs(distorted[0] - 0.5)).toBeGreaterThan(0.02);
+    expect(Math.abs(distorted[1] - 0.5)).toBeGreaterThan(0.015);
+    expect(bonusStrokePoints(points,true,'fill')).toEqual(points);
+    expect(bonusStrokePoints(points,true,'erase')).toEqual(points);
 });
