@@ -73,12 +73,6 @@ const palette = ['#efe681', '#f1b5c8', '#b7e1c3', '#aa83ec', '#f05a78'];
                         d="m451 174-112 9 46 86-125-14M605 227l110 68-57 31 145 70"
                     />
                 </svg>
-                <svg class="vfx-ground-crack" viewBox="0 0 600 180">
-                    <path
-                        d="m300 30-90 55-40-15-95 65m225-105 85 50 30-15 115 65M300 30l-5 55-50 40 10 35m45-130 45 68 55 12 45 45"
-                    />
-                </svg>
-                <span class="vfx-shockwave" />
             </template>
             <template v-else-if="kind === 'pinata'">
                 <div class="vfx-pinata-drop">

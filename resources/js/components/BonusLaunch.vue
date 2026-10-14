@@ -63,7 +63,12 @@ function actor(id: number) {
 }
 </script>
 <template>
-    <div class="bonus-launch-layer" aria-live="polite" aria-atomic="false">
+    <div
+        class="bonus-launch-layer"
+        :class="{ 'bonus-launch-layer-screen': screen }"
+        aria-live="polite"
+        aria-atomic="false"
+    >
         <BonusImpact
             v-for="event in screen ? selectImpactEvents(active) : []"
             :key="'impact-' + event.id"

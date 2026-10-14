@@ -70,52 +70,39 @@
     stroke-width: 9px;
     stroke-linejoin: bevel;
 }
-.vfx-ground-crack {
-    position: absolute;
-    left: 50%;
-    top: 64%;
-    translate: -50% -50%;
-    width: min(65vw, 800px);
-    height: 200px;
-    fill: none;
-    stroke: #35236b;
-    stroke-width: 7px;
-    stroke-linecap: round;
-    animation: vfx-crack 2200ms 250ms both;
-}
+/* The asset's rope starts at (82, 14) in its 200 × 200 viewBox.
+   Keep the extension and the swing pivot on that same attachment point. */
 .vfx-pinata-drop {
+    --pinata-size: clamp(220px, 27vw, 380px);
     position: absolute;
     top: 0;
     left: 50%;
-    width: clamp(220px, 27vw, 380px);
-    height: 65vh;
+    width: var(--pinata-size);
+    height: 52vh;
     translate: -50% 0;
     animation: vfx-drop 2800ms both;
 }
 .vfx-pinata-swing {
     position: absolute;
     inset: 0;
-    transform-origin: 50% 0;
+    transform-origin: 41% 0;
     animation: vfx-swing 2800ms both;
 }
 .vfx-rope {
     position: absolute;
-    top: -20vh;
-    bottom: 40%;
-    left: calc(50% - 4px);
-    width: 8px;
-    background: repeating-linear-gradient(
-        45deg,
-        #35236b 0 5px,
-        #ab83ec 5px 10px
-    );
-    border: 2px solid #35236b;
+    top: -100vh;
+    bottom: calc(var(--pinata-size) * 0.43 - 1px);
+    left: 41%;
+    width: calc(var(--pinata-size) * 0.015);
+    translate: -50% 0;
+    background: #fff7e6;
+    box-shadow: 0 0 0 1px #35236b55;
 }
 .vfx-pinata-swing .bonus-icon {
     position: absolute;
-    bottom: -10%;
-    height: auto;
-    aspect-ratio: 1;
+    top: calc(100% - var(--pinata-size) * 0.5);
+    height: var(--pinata-size);
+    transform-origin: 41% 7%;
     animation: vfx-pinata-pop 2800ms both;
 }
 .vfx-confetti-field {
