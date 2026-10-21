@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.10.1](https://github.com/zdossantos/plummo/compare/plummo-v0.10.0...plummo-v0.10.1) (2026-10-21)
+
+
+### Bug Fixes
+
+* preserve chat drafts in a persistent drawer ([#97](https://github.com/zdossantos/plummo/issues/97)) ([27c9f38](https://github.com/zdossantos/plummo/commit/27c9f381e345c0760a3efe3f577a812a83e9d31f))
+* repair game preparation and migrate after deployment ([#98](https://github.com/zdossantos/plummo/issues/98)) ([f01c891](https://github.com/zdossantos/plummo/commit/f01c891627b131e1a74c07f335f5e30109252bd6))
+* shard CI tests across isolated runners ([#100](https://github.com/zdossantos/plummo/issues/100)) ([0a4d9e9](https://github.com/zdossantos/plummo/commit/0a4d9e942cecf8dfa6142d0eb85b943bab29a58d))
+* upgrade PHP to 8.4.27 for critical security fixes ([#106](https://github.com/zdossantos/plummo/issues/106)) ([f71699b](https://github.com/zdossantos/plummo/commit/f71699bb1a27cdaa0fd7b4354724e82a25e85b43))
+
 ## [0.10.0](https://github.com/zdossantos/plummo/compare/plummo-v0.9.2...plummo-v0.10.0) (2026-10-14)
 
 
