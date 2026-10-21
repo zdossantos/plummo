@@ -1,4 +1,4 @@
-FROM php:8.4-apache AS php-base
+FROM php:8.4.27-apache@sha256:e6bad969f0b673ce9121c88dabb53488ab1ca139d8ebfac1d1b1ab63f245f725 AS php-base
 RUN apt-get update && apt-get install -y --no-install-recommends git unzip libzip-dev libxml2-dev curl \
     && docker-php-ext-install pdo_mysql zip opcache xmlreader pcntl \
     && pecl install redis-6.3.0 && docker-php-ext-enable redis \

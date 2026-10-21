@@ -14,6 +14,8 @@ container="$(docker run --detach --pull missing \
     "$image")"
 trap 'docker rm --force "$container" >/dev/null' EXIT
 
+docker exec "$container" php -r 'echo "Runtime PHP ", PHP_VERSION, PHP_EOL; exit(PHP_VERSION_ID >= 80427 ? 0 : 1);'
+
 for attempt in $(seq 1 30); do
     if docker exec "$container" curl --fail --silent http://127.0.0.1/up >/dev/null; then
         docker exec "$container" test -s public/build/manifest.json
