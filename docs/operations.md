@@ -12,6 +12,12 @@ immuable. Plummo garde Apache/PHP 8.4, Bun 1.3.14 et son stockage audio local pr
 Les réglages publics Reverb sont partagés à l’exécution par Inertia : aucune
 variable `VITE_*` ni secret de production n’est requis pour construire l’image.
 
+Depuis le 21 octobre 2026, l’image PHP est épinglée à **8.4.27** par digest pour
+corriger CVE-2026-109618 et CVE-2026-109619. Le smoke test de l’image publiée
+refuse PHP antérieur à 8.4.27. Chaque livraison doit remplacer les quatre
+conteneurs (`web`, `worker`, `scheduler`, `reverb`) ; vérifier `php -v` dans chacun
+après déploiement. Référence : [avis de sécurité PHP](https://www.php.net/archive/2026.php#2026-10-21-5).
+
 **Plummo possède ses propres ressources MySQL et Redis**, comptes, secrets et
 volumes. Ne reprendre aucun UUID, mot de passe, volume ni base DLP Friends.
 Le Compose local reste destiné au développement.
